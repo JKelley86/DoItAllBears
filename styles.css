@@ -1,0 +1,191 @@
+/* Global styles */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    color: white;
+    overflow: hidden;
+}
+<style>
+        @font-face {
+            font-family: 'Fairwater Script';
+            src: url('FairwaterScript.woff2') format('woff2'), /* Update this to the correct file format and path */
+                 url('FairwaterScript.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+body {
+    text-align: center;
+    margin: 0; /* Reset default body margin */
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure container fills the viewport height */
+    box-sizing: border-box;
+    position: relative; /* Ensure relative positioning for child elements */
+    overflow-x: hidden; /* Hide horizontal overflow */
+    overflow-y: auto; /* Enable vertical scrolling when content exceeds viewport */
+    flex: 1; /* Allow container to grow and shrink */
+    height: 100vh;
+}
+
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: black;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px; /* Adjusted padding */
+    z-index: 1000;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin-right: 10px; /* Reduced margin */
+}
+
+nav ul li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 12px 20px; /* Adjusted padding */
+    text-decoration: none;
+    background-color: transparent;
+    font-size: 16px; /* Adjusted font size */
+    border: 2px solid transparent; /* Add transparent border initially */
+    border-radius: 4px; /* Add border radius for rounded corners */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+}
+
+nav ul li a:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent white background on hover */
+    border-color: white; /* White border color on hover */
+}
+
+.navbar-right {
+    margin-right: 25px; /* Adjusted margin */
+    font-size: 16px; /* Adjusted font size */
+}
+
+main {
+    flex: 1;
+    padding: 90px 20px; /* Adjusted padding */
+    font-size: 20px; /* Adjusted font size */
+    box-sizing: border-box;
+    margin-bottom: 30px; /* Increased margin between sections */
+}
+
+h1, h2 {
+    color: white; /* Override text color for headers */
+     text-align: center;
+font-family: 'Fairwater Script', 'Comic Sans MS', Cursive;
+}
+.main-list {
+    list-style-type: none; /* Remove default list styles for main list */
+    padding: 0;
+    margin-left: 0; /* Align main list to the left */
+}
+
+.sub-list {
+    list-style-type: lower-alpha; /* Different list style for sublist */
+    margin-left: 40px; /* Indent the sublist */
+    padding-left: 20px; /* Additional padding for the sublist */
+}
+
+section {
+    padding: 20px;
+}
+li {
+     margin: 5px 0;
+ }
+
+iframe {
+    width: 100%; /* Ensure the iframe fills its container */
+    height: 100%; /* Ensure the iframe fills its container */
+    border: none; /* Remove default border */
+}
+
+footer {
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 10px; /* Adjusted padding */
+    font-size: 16px; /* Adjusted font size */
+    width: 100%;
+    margin-top: auto; /* Push footer to the bottom of the container */
+    position: relative; /* Ensure footer is relative to the container */
+}
+/* RSVP specific styles */
+.rsvp-body {
+    background-image: url('picture3.jpeg');
+    background-size: cover;
+    background-repeat: no-repeat;
+ background-position: center 10px; /* Adjust the vertical position of the background image */
+}
+/* Media Queries */
+@media (max-width: 768px) {
+    nav {
+        padding: 8px 12px;
+    }
+
+    nav ul li {
+        margin-right: 4px;
+    }
+
+    nav ul li a {
+        padding: 10px 16px; /* Adjusted padding */
+        font-size: 14px;
+    }
+
+    .navbar-right {
+        margin-right: 15px;
+        font-size: 14px;
+    }
+
+    main {
+        padding: 60px 12px; /* Adjusted padding */
+        font-size: 16px; /* Adjusted font size */
+        margin-bottom: 20px; /* Adjusted margin */
+    }
+    footer {
+        padding: 8px; /* Adjusted padding */
+        font-size: 14px; /* Adjusted font size */
+    }
+    .back-button-container {
+    text-align: center;
+    margin-top: 5px;
+}
+
+.back-button {
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    padding: 10px 20px; /* Padding */
+    text-align: center; /* Centered text */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Make the link block-level */
+    font-size: 16px; /* Increase font size */
+    border: none; /* Remove border */
+    cursor: pointer; /* Pointer/hand icon on hover */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.back-button:hover {
+    background-color: #45a049; /* Darker green background on hover */
+}
+}
