@@ -90,7 +90,11 @@ h1, h2 {
     text-align: center;
     font-family: Arial, sans-serif;
 }
-
+h3 {
+    color: black; /* Override text color for headers */
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
 .main-list {
     list-style-type: none; /* Remove default list styles for main list */
     padding: 0;
