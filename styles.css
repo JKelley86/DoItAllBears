@@ -11,14 +11,7 @@ html, body {
     color: white;
     overflow: hidden;
 }
-<style>
-        @font-face {
-            font-family: 'Fairwater Script';
-            src: url('FairwaterScript.woff2') format('woff2'), /* Update this to the correct file format and path */
-                 url('FairwaterScript.woff') format('woff');
-            font-weight: normal;
-            font-style: normal;
-        }
+
 body {
     text-align: center;
     margin: 0; /* Reset default body margin */
@@ -43,10 +36,11 @@ nav {
     width: 100%;
     background-color: black;
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: 10px 20px; /* Adjusted padding */
     z-index: 1000;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevent items from wrapping to the next line */
 }
 
 nav ul {
@@ -93,9 +87,10 @@ main {
 
 h1, h2 {
     color: white; /* Override text color for headers */
-     text-align: center;
-font-family: 'Fairwater Script', 'Comic Sans MS', Cursive;
+    text-align: center;
+    font-family: 'Fairwater Script', 'Comic Sans MS', Cursive;
 }
+
 .main-list {
     list-style-type: none; /* Remove default list styles for main list */
     padding: 0;
@@ -111,9 +106,10 @@ font-family: 'Fairwater Script', 'Comic Sans MS', Cursive;
 section {
     padding: 20px;
 }
+
 li {
-     margin: 5px 0;
- }
+    margin: 5px 0;
+}
 
 iframe {
     width: 100%; /* Ensure the iframe fills its container */
@@ -131,13 +127,15 @@ footer {
     margin-top: auto; /* Push footer to the bottom of the container */
     position: relative; /* Ensure footer is relative to the container */
 }
+
 /* RSVP specific styles */
 .rsvp-body {
     background-image: url('picture3.jpeg');
     background-size: cover;
     background-repeat: no-repeat;
- background-position: center 10px; /* Adjust the vertical position of the background image */
+    background-position: center 10px; /* Adjust the vertical position of the background image */
 }
+
 /* Media Queries */
 @media (max-width: 768px) {
     nav {
@@ -163,29 +161,31 @@ footer {
         font-size: 16px; /* Adjusted font size */
         margin-bottom: 20px; /* Adjusted margin */
     }
+
     footer {
         padding: 8px; /* Adjusted padding */
         font-size: 14px; /* Adjusted font size */
     }
+
     .back-button-container {
-    text-align: center;
-    margin-top: 5px;
-}
+        text-align: center;
+        margin-top: 5px;
+    }
 
-.back-button {
-    background-color: #4CAF50; /* Green background */
-    color: white; /* White text */
-    padding: 10px 20px; /* Padding */
-    text-align: center; /* Centered text */
-    text-decoration: none; /* Remove underline */
-    display: inline-block; /* Make the link block-level */
-    font-size: 16px; /* Increase font size */
-    border: none; /* Remove border */
-    cursor: pointer; /* Pointer/hand icon on hover */
-    border-radius: 5px; /* Rounded corners */
-}
+    .back-button {
+        background-color: #4CAF50; /* Green background */
+        color: white; /* White text */
+        padding: 10px 20px; /* Padding */
+        text-align: center; /* Centered text */
+        text-decoration: none; /* Remove underline */
+        display: inline-block; /* Make the link block-level */
+        font-size: 16px; /* Increase font size */
+        border: none; /* Remove border */
+        cursor: pointer; /* Pointer/hand icon on hover */
+        border-radius: 5px; /* Rounded corners */
+    }
 
-.back-button:hover {
-    background-color: #45a049; /* Darker green background on hover */
-}
+    .back-button:hover {
+        background-color: #45a049; /* Darker green background on hover */
+    }
 }
