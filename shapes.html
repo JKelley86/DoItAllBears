@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shape Calculators</title>
-    <link rel="stylesheet" href="styles.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -24,7 +23,7 @@
             display: flex;
             justify-content: space-between;
         }
-        .calculator div {
+        .calc-column {
             width: 48%;
         }
         .calculator label {
@@ -57,9 +56,28 @@
             font-weight: bold;
             color: #333;
         }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            background-color: #007BFF;
+            border-radius: 4px;
+        }
+        nav ul li a:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+<div class="container">
     <nav>
         <ul class="navbar-left">
             <li><a href="index.html">Home</a></li>
@@ -75,187 +93,234 @@
 
     <h1>Shape Calculators</h1>
 
-    <div class="calculator" id="circleCalculator">
-        <div>
-            <h2>Circle</h2>
-            <label for="circleRadius1">Radius 1:</label>
-            <input type="number" id="circleRadius1" step="0.01">
-            <button onclick="calculateCircle(1)">Calculate</button>
+    <div class="calculator">
+        <div class="calc-column">
+            <h2>Circle (Using Radius)</h2>
+            <label for="circleRadius">Radius:</label>
+            <input type="number" id="circleRadius" step="0.01">
+            <button onclick="calculateCircleFromRadius()">Calculate</button>
             <div class="result" id="circleResult1"></div>
         </div>
-        <div>
-            <h2>Circle</h2>
-            <label for="circleRadius2">Radius 2:</label>
-            <input type="number" id="circleRadius2" step="0.01">
-            <button onclick="calculateCircle(2)">Calculate</button>
+        <div class="calc-column">
+            <h2>Circle (Using Circumference)</h2>
+            <label for="circleCircumference">Circumference:</label>
+            <input type="number" id="circleCircumference" step="0.01">
+            <button onclick="calculateCircleFromCircumference()">Calculate</button>
             <div class="result" id="circleResult2"></div>
         </div>
     </div>
 
-    <div class="calculator" id="squareCalculator">
-        <div>
-            <h2>Square</h2>
-            <label for="squareSide1">Side Length 1:</label>
-            <input type="number" id="squareSide1" step="0.01">
-            <button onclick="calculateSquare(1)">Calculate</button>
+    <div class="calculator">
+        <div class="calc-column">
+            <h2>Square (Using Side Length)</h2>
+            <label for="squareSide">Side Length:</label>
+            <input type="number" id="squareSide" step="0.01">
+            <button onclick="calculateSquareFromSide()">Calculate</button>
             <div class="result" id="squareResult1"></div>
         </div>
-        <div>
-            <h2>Square</h2>
-            <label for="squareSide2">Side Length 2:</label>
-            <input type="number" id="squareSide2" step="0.01">
-            <button onclick="calculateSquare(2)">Calculate</button>
+        <div class="calc-column">
+            <h2>Square (Using Area)</h2>
+            <label for="squareArea">Area:</label>
+            <input type="number" id="squareArea" step="0.01">
+            <button onclick="calculateSquareFromArea()">Calculate</button>
             <div class="result" id="squareResult2"></div>
         </div>
     </div>
 
-    <div class="calculator" id="triangleCalculator">
-        <div>
-            <h2>Triangle</h2>
-            <label for="triangleBase1">Base 1:</label>
-            <input type="number" id="triangleBase1" step="0.01">
-            <label for="triangleHeight1">Height 1:</label>
-            <input type="number" id="triangleHeight1" step="0.01">
-            <button onclick="calculateTriangle(1)">Calculate</button>
+    <div class="calculator">
+        <div class="calc-column">
+            <h2>Triangle (Using Base and Height)</h2>
+            <label for="triangleBase">Base:</label>
+            <input type="number" id="triangleBase" step="0.01">
+            <label for="triangleHeight">Height:</label>
+            <input type="number" id="triangleHeight" step="0.01">
+            <button onclick="calculateTriangleFromBaseHeight()">Calculate</button>
             <div class="result" id="triangleResult1"></div>
         </div>
-        <div>
-            <h2>Triangle</h2>
-            <label for="triangleBase2">Base 2:</label>
+        <div class="calc-column">
+            <h2>Triangle (Using Area and Base)</h2>
+            <label for="triangleArea">Area:</label>
+            <input type="number" id="triangleArea" step="0.01">
+            <label for="triangleBase2">Base:</label>
             <input type="number" id="triangleBase2" step="0.01">
-            <label for="triangleHeight2">Height 2:</label>
-            <input type="number" id="triangleHeight2" step="0.01">
-            <button onclick="calculateTriangle(2)">Calculate</button>
+            <button onclick="calculateTriangleFromAreaBase()">Calculate</button>
             <div class="result" id="triangleResult2"></div>
         </div>
     </div>
 
-    <div class="calculator" id="pythagoreanCalculator">
-        <div>
-            <h2>Pythagorean Theorem</h2>
-            <label for="sideA1">Side A 1:</label>
-            <input type="number" id="sideA1" step="0.01">
-            <label for="sideB1">Side B 1:</label>
-            <input type="number" id="sideB1" step="0.01">
-            <button onclick="calculatePythagorean(1)">Calculate</button>
+    <div class="calculator">
+        <div class="calc-column">
+            <h2>Pythagorean Theorem (Using Sides A and B)</h2>
+            <label for="sideA">Side A:</label>
+            <input type="number" id="sideA" step="0.01">
+            <label for="sideB">Side B:</label>
+            <input type="number" id="sideB" step="0.01">
+            <button onclick="calculatePythagoreanFromSides()">Calculate</button>
             <div class="result" id="pythagoreanResult1"></div>
         </div>
-        <div>
-            <h2>Pythagorean Theorem</h2>
-            <label for="sideA2">Side A 2:</label>
-            <input type="number" id="sideA2" step="0.01">
-            <label for="sideB2">Side B 2:</label>
-            <input type="number" id="sideB2" step="0.01">
-            <button onclick="calculatePythagorean(2)">Calculate</button>
+        <div class="calc-column">
+            <h2>Pythagorean Theorem (Using Hypotenuse and One Side)</h2>
+            <label for="hypotenuse">Hypotenuse:</label>
+            <input type="number" id="hypotenuse" step="0.01">
+            <label for="oneSide">One Side:</label>
+            <input type="number" id="oneSide" step="0.01">
+            <button onclick="calculatePythagoreanFromHypotenuse()">Calculate</button>
             <div class="result" id="pythagoreanResult2"></div>
         </div>
     </div>
 
-    <div class="calculator" id="sphereCalculator">
-        <div>
-            <h2>Sphere</h2>
-            <label for="sphereRadius1">Radius 1:</label>
-            <input type="number" id="sphereRadius1" step="0.01">
-            <button onclick="calculateSphere(1)">Calculate</button>
+    <div class="calculator">
+        <div class="calc-column">
+            <h2>Sphere (Using Radius)</h2>
+            <label for="sphereRadius">Radius:</label>
+            <input type="number" id="sphereRadius" step="0.01">
+            <button onclick="calculateSphereFromRadius()">Calculate</button>
             <div class="result" id="sphereResult1"></div>
         </div>
-        <div>
-            <h2>Sphere</h2>
-            <label for="sphereRadius2">Radius 2:</label>
-            <input type="number" id="sphereRadius2" step="0.01">
-            <button onclick="calculateSphere(2)">Calculate</button>
+        <div class="calc-column">
+            <h2>Sphere (Using Volume)</h2>
+            <label for="sphereVolume">Volume:</label>
+            <input type="number" id="sphereVolume" step="0.01">
+            <button onclick="calculateSphereFromVolume()">Calculate</button>
             <div class="result" id="sphereResult2"></div>
         </div>
     </div>
 
-    <div class="calculator" id="cubeCalculator">
-        <div>
-            <h2>Cube</h2>
-            <label for="cubeSide1">Side Length 1:</label>
-            <input type="number" id="cubeSide1" step="0.01">
-            <button onclick="calculateCube(1)">Calculate</button>
+    <div class="calculator">
+        <div class="calc-column">
+            <h2>Cube (Using Side Length)</h2>
+            <label for="cubeSide">Side Length:</label>
+            <input type="number" id="cubeSide" step="0.01">
+            <button onclick="calculateCubeFromSide()">Calculate</button>
             <div class="result" id="cubeResult1"></div>
         </div>
-        <div>
-            <h2>Cube</h2>
-            <label for="cubeSide2">Side Length 2:</label>
-            <input type="number" id="cubeSide2" step="0.01">
-            <button onclick="calculateCube(2)">Calculate</button>
+        <div class="calc-column">
+            <h2>Cube (Using Volume)</h2>
+            <label for="cubeVolume">Volume:</label>
+            <input type="number" id="cubeVolume" step="0.01">
+            <button onclick="calculateCubeFromVolume()">Calculate</button>
             <div class="result" id="cubeResult2"></div>
         </div>
     </div>
 
-    <div class="calculator" id="densityCalculator">
-        <div>
-            <h2>Density</h2>
-            <label for="mass1">Mass 1:</label>
-            <input type="number" id="mass1" step="0.01">
-            <label for="volume1">Volume 1:</label>
-            <input type="number" id="volume1" step="0.01">
-            <button onclick="calculateDensity(1)">Calculate</button>
+    <div class="calculator">
+        <div class="calc-column">
+            <h2>Density (Using Mass and Volume)</h2>
+            <label for="mass">Mass:</label>
+            <input type="number" id="mass" step="0.01">
+            <label for="volume">Volume:</label>
+            <input type="number" id="volume" step="0.01">
+            <button onclick="calculateDensityFromMassVolume()">Calculate</button>
             <div class="result" id="densityResult1"></div>
         </div>
-        <div>
-            <h2>Density</h2>
-            <label for="mass2">Mass 2:</label>
-            <input type="number" id="mass2" step="0.01">
-            <label for="volume2">Volume 2:</label>
-            <input type="number" id="volume2" step="0.01">
-            <button onclick="calculateDensity(2)">Calculate</button>
+        <div class="calc-column">
+            <h2>Density (Using Density and Volume)</h2>
+            <label for="density">Density:</label>
+            <input type="number" id="density" step="0.01">
+            <label for="densityVolume">Volume:</label>
+            <input type="number" id="densityVolume" step="0.01">
+            <button onclick="calculateDensityFromDensityVolume()">Calculate</button>
             <div class="result" id="densityResult2"></div>
         </div>
     </div>
-
-    <footer>
+    
+    <footer> 
         <span>&copy; 2024 Justin's Calculations. All rights reserved.</span>
-    </footer>
+    </footer> 
 
     <script>
-        function calculateCircle(num) {
-            const radius = parseFloat(document.getElementById(`circleRadius${num}`).value);
+        function calculateCircleFromRadius() {
+            const radius = parseFloat(document.getElementById('circleRadius').value);
             const area = Math.PI * Math.pow(radius, 2);
             const circumference = 2 * Math.PI * radius;
             const diameter = 2 * radius;
-            document.getElementById(`circleResult${num}`).innerHTML = `Area: ${area.toFixed(2)}<br>Circumference: ${circumference.toFixed(2)}<br>Diameter: ${diameter.toFixed(2)}`;
+            document.getElementById('circleResult1').innerHTML = `Area: ${area.toFixed(2)}<br>Circumference: ${circumference.toFixed(2)}<br>Diameter: ${diameter.toFixed(2)}`;
         }
 
-        function calculateSquare(num) {
-            const side = parseFloat(document.getElementById(`squareSide${num}`).value);
+        function calculateCircleFromCircumference() {
+            const circumference = parseFloat(document.getElementById('circleCircumference').value);
+            const radius = circumference / (2 * Math.PI);
+            const area = Math.PI * Math.pow(radius, 2);
+            const diameter = 2 * radius;
+            document.getElementById('circleResult2').innerHTML = `Radius: ${radius.toFixed(2)}<br>Area: ${area.toFixed(2)}<br>Diameter: ${diameter.toFixed(2)}`;
+        }
+
+        function calculateSquareFromSide() {
+            const side = parseFloat(document.getElementById('squareSide').value);
             const area = Math.pow(side, 2);
-            document.getElementById(`squareResult${num}`).innerHTML = `Area: ${area.toFixed(2)}`;
+            document.getElementById('squareResult1').innerHTML = `Area: ${area.toFixed(2)}`;
         }
 
-        function calculateTriangle(num) {
-            const base = parseFloat(document.getElementById(`triangleBase${num}`).value);
-            const height = parseFloat(document.getElementById(`triangleHeight${num}`).value);
+        function calculateSquareFromArea() {
+            const area = parseFloat(document.getElementById('squareArea').value);
+            const side = Math.sqrt(area);
+            document.getElementById('squareResult2').innerHTML = `Side Length: ${side.toFixed(2)}`;
+        }
+
+        function calculateTriangleFromBaseHeight() {
+            const base = parseFloat(document.getElementById('triangleBase').value);
+            const height = parseFloat(document.getElementById('triangleHeight').value);
             const area = 0.5 * base * height;
-            document.getElementById(`triangleResult${num}`).innerHTML = `Area: ${area.toFixed(2)}`;
+            document.getElementById('triangleResult1').innerHTML = `Area: ${area.toFixed(2)}`;
         }
 
-        function calculatePythagorean(num) {
-            const a = parseFloat(document.getElementById(`sideA${num}`).value);
-            const b = parseFloat(document.getElementById(`sideB${num}`).value);
+        function calculateTriangleFromAreaBase() {
+            const area = parseFloat(document.getElementById('triangleArea').value);
+            const base = parseFloat(document.getElementById('triangleBase2').value);
+            const height = (2 * area) / base;
+            document.getElementById('triangleResult2').innerHTML = `Height: ${height.toFixed(2)}`;
+        }
+
+        function calculatePythagoreanFromSides() {
+            const a = parseFloat(document.getElementById('sideA').value);
+            const b = parseFloat(document.getElementById('sideB').value);
             const c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
-            document.getElementById(`pythagoreanResult${num}`).innerHTML = `Hypotenuse (C): ${c.toFixed(2)}`;
+            document.getElementById('pythagoreanResult1').innerHTML = `Hypotenuse (C): ${c.toFixed(2)}`;
         }
 
-        function calculateSphere(num) {
-            const radius = parseFloat(document.getElementById(`sphereRadius${num}`).value);
+        function calculatePythagoreanFromHypotenuse() {
+            const c = parseFloat(document.getElementById('hypotenuse').value);
+            const a = parseFloat(document.getElementById('oneSide').value);
+            const b = Math.sqrt(Math.pow(c, 2) - Math.pow(a, 2));
+            document.getElementById('pythagoreanResult2').innerHTML = `Other Side (B): ${b.toFixed(2)}`;
+        }
+
+        function calculateSphereFromRadius() {
+            const radius = parseFloat(document.getElementById('sphereRadius').value);
             const volume = (4/3) * Math.PI * Math.pow(radius, 3);
-            document.getElementById(`sphereResult${num}`).innerHTML = `Volume: ${volume.toFixed(2)}`;
+            document.getElementById('sphereResult1').innerHTML = `Volume: ${volume.toFixed(2)}`;
         }
 
-        function calculateCube(num) {
-            const side = parseFloat(document.getElementById(`cubeSide${num}`).value);
+        function calculateSphereFromVolume() {
+            const volume = parseFloat(document.getElementById('sphereVolume').value);
+            const radius = Math.cbrt((3 * volume) / (4 * Math.PI));
+            document.getElementById('sphereResult2').innerHTML = `Radius: ${radius.toFixed(2)}`;
+        }
+
+        function calculateCubeFromSide() {
+            const side = parseFloat(document.getElementById('cubeSide').value);
             const volume = Math.pow(side, 3);
-            document.getElementById(`cubeResult${num}`).innerHTML = `Volume: ${volume.toFixed(2)}`;
+            document.getElementById('cubeResult1').innerHTML = `Volume: ${volume.toFixed(2)}`;
         }
 
-        function calculateDensity(num) {
-            const mass = parseFloat(document.getElementById(`mass${num}`).value);
-            const volume = parseFloat(document.getElementById(`volume${num}`).value);
+        function calculateCubeFromVolume() {
+            const volume = parseFloat(document.getElementById('cubeVolume').value);
+            const side = Math.cbrt(volume);
+            document.getElementById('cubeResult2').innerHTML = `Side Length: ${side.toFixed(2)}`;
+        }
+
+        function calculateDensityFromMassVolume() {
+            const mass = parseFloat(document.getElementById('mass').value);
+            const volume = parseFloat(document.getElementById('volume').value);
             const density = mass / volume;
-            document.getElementById(`densityResult${num}`).innerHTML = `Density: ${density.toFixed(2)}`;
+            document.getElementById('densityResult1').innerHTML = `Density: ${density.toFixed(2)}`;
+        }
+
+        function calculateDensityFromDensityVolume() {
+            const density = parseFloat(document.getElementById('density').value);
+            const volume = parseFloat(document.getElementById('densityVolume').value);
+            const mass = density * volume;
+            document.getElementById('densityResult2').innerHTML = `Mass: ${mass.toFixed(2)}`;
         }
     </script>
 </body>
