@@ -88,7 +88,7 @@ main {
 h1, h2 {
     color: white; /* Override text color for headers */
     text-align: center;
-    font-family: 'Fairwater Script', 'Comic Sans MS', Cursive;
+    font-family: Arial, sans-serif;
 }
 
 .main-list {
