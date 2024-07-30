@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Binary Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .calculator {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin: 20px auto;
+        }
+        .calc-column {
+            width: 45%;
+            margin-bottom: 20px;
+        }
+        .calculator label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .calculator input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            color: #333;
+            touch-action: manipulation;
+        }
+        .calculator button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .calculator button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+<div class="container">
+    <nav>
+        <ul class="navbar-left">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="shapes.html">Shapes</a></li>
+            <li><a href="speed.html">Speed</a></li>
+            <li><a href="conversions.html">Conversions</a></li>
+            <li><a href="electrical.html">Electrical</a></li>
+            <li><a href="algebra.html">Algebra</a></li>
+            <li><a href="conveyor.html">Conveyor</a></li>
+            <li><a href="binary.html">Binary</a></li>
+            <li><a href="cooking.html">Cooking</a></li>
+            <li><a href="weight.html">Weight</a></li>
+        </ul>
+    </nav>
+
+    <h1>Binary Calculator</h1>
+
+    <!-- Binary to Decimal -->
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Binary to Decimal</h3>
+            <label for="binaryInput">Binary Number:</label>
+            <input type="text" id="binaryInput" placeholder="Enter binary number">
+            <button onclick="binaryToDecimal()">Convert</button>
+            <div class="result" id="binaryToDecimalResult"></div>
+        </div>
+    </div>
+
+    <!-- Decimal to Binary -->
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Decimal to Binary</h3>
+            <label for="decimalInput">Decimal Number:</label>
+            <input type="number" id="decimalInput" step="1" min="0">
+            <button onclick="decimalToBinary()">Convert</button>
+            <div class="result" id="decimalToBinaryResult"></div>
+        </div>
+    </div>
+
+    <footer>
+        <span>&copy; 2024 Justin's Calculations. All rights reserved.</span>
+    </footer>
+
+    <script>
+        function binaryToDecimal() {
+            const binaryStr = document.getElementById('binaryInput').value;
+            const decimal = parseInt(binaryStr, 2);
+            
+            if (isNaN(decimal)) {
+                document.getElementById('binaryToDecimalResult').innerHTML = "Invalid binary number";
+            } else {
+                document.getElementById('binaryToDecimalResult').innerHTML = `Decimal: ${decimal}`;
+            }
+        }
+
+        function decimalToBinary() {
+            const decimal = parseInt(document.getElementById('decimalInput').value);
+            
+            if (isNaN(decimal) || decimal < 0) {
+                document.getElementById('decimalToBinaryResult').innerHTML = "Invalid decimal number";
+            } else {
+                const binaryStr = decimal.toString(2);
+                document.getElementById('decimalToBinaryResult').innerHTML = `Binary: ${binaryStr}`;
+            }
+        }
+    </script>
+</div>
+</body>
+</html>
