@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Speed Calculators</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .calculator {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin: 20px auto;
+        }
+        .calc-column {
+            width: 40%;
+        }
+        .calculator label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .calculator input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            color: #333;
+            touch-action: manipulation;
+        }
+        .calculator button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .calculator button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+<div class="container">
+    <nav>
+        <ul class="navbar-left">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="shapes.html">Shapes</a></li>
+            <li><a href="speed.html">Speed</a></li>
+            <li><a href="conversions.html">Conversions</a></li>
+            <li><a href="electrical.html">Electrical</a></li>
+            <li><a href="algebra.html">Algebra</a></li>
+            <li><a href="conveyor.html">Conveyor</a></li>
+            <li><a href="binary.html">Binary</a></li>
+        </ul>
+    </nav>
+
+    <h1>Speed Calculators</h1>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Speed (Using Distance and Time)</h3>
+            <label for="distance">Distance (km):</label>
+            <input type="number" id="distance" step="0.01">
+            <label for="time">Time (hours):</label>
+            <input type="number" id="time" step="0.01">
+            <button onclick="calculateSpeed()">Calculate</button>
+            <div class="result" id="speedResult"></div>
+        </div>
+        <div class="calc-column">
+            <h3>Speed Conversion</h3>
+            <label for="speed">Speed (km/h):</label>
+            <input type="number" id="speed" step="0.01">
+            <button onclick="convertSpeed()">Convert</button>
+            <div class="result" id="conversionResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Acceleration (Using Initial and Final Speed and Time)</h3>
+            <label for="initialSpeed">Initial Speed (m/s):</label>
+            <input type="number" id="initialSpeed" step="0.01">
+            <label for="finalSpeed">Final Speed (m/s):</label>
+            <input type="number" id="finalSpeed" step="0.01">
+            <label for="accelTime">Time (s):</label>
+            <input type="number" id="accelTime" step="0.01">
+            <button onclick="calculateAcceleration()">Calculate</button>
+            <div class="result" id="accelerationResult"></div>
+        </div>
+        <div class="calc-column">
+            <h3>Speed Conversion (Miles per Hour to Kilometers per Hour)</h3>
+            <label for="mph">Speed (mph):</label>
+            <input type="number" id="mph" step="0.01">
+            <button onclick="convertMPHtoKPH()">Convert</button>
+            <div class="result" id="mphToKphResult"></div>
+        </div>
+    </div>
+
+    <footer>
+        <span>&copy; 2024 Justin's Calculations. All rights reserved.</span>
+    </footer>
+
+    <script>
+        function calculateSpeed() {
+            const distance = parseFloat(document.getElementById('distance').value);
+            const time = parseFloat(document.getElementById('time').value);
+            const speed = distance / time;
+            document.getElementById('speedResult').innerHTML = `Speed: ${speed.toFixed(2)} km/h`;
+        }
+
+        function convertSpeed() {
+            const speed = parseFloat(document.getElementById('speed').value);
+            const speedInMph = speed * 0.621371;
+            document.getElementById('conversionResult').innerHTML = `Speed: ${speedInMph.toFixed(2)} mph`;
+        }
+
+        function calculateAcceleration() {
+            const initialSpeed = parseFloat(document.getElementById('initialSpeed').value);
+            const finalSpeed = parseFloat(document.getElementById('finalSpeed').value);
+            const time = parseFloat(document.getElementById('accelTime').value);
+            const acceleration = (finalSpeed - initialSpeed) / time;
+            document.getElementById('accelerationResult').innerHTML = `Acceleration: ${acceleration.toFixed(2)} m/s²`;
+        }
+
+        function convertMPHtoKPH() {
+            const mph = parseFloat(document.getElementById('mph').value);
+            const kph = mph * 1.60934;
+            document.getElementById('mphToKphResult').innerHTML = `Speed: ${kph.toFixed(2)} km/h`;
+        }
+    </script>
+</div>
+</body>
+</html>
