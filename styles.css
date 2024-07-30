@@ -41,6 +41,7 @@ nav {
     z-index: 1000;
     overflow-x: auto; /* Enable horizontal scrolling */
     white-space: nowrap; /* Prevent items from wrapping to the next line */
+    padding-bottom: 70px;
 }
 
 nav ul {
