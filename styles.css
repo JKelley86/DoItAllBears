@@ -16,7 +16,12 @@ body {
     text-align: center;
     margin: 0; /* Reset default body margin */
 }
-
+.calculator.single-column {
+    display: flex;
+    justify-content: center;
+    width: 50%;
+    margin: 20px auto;
+}
 .container {
     display: flex;
     flex-direction: column;
