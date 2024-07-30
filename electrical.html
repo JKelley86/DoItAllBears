@@ -2,183 +2,328 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resistor Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Electrical Calculators</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Global styles */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        .container {
-            padding: 20px;
-            max-width: 1200px;
-            margin: auto;
-        }
-        .resistor-calculator {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-        }
-        .resistor {
-            width: 48%;
+        .calculator {
             background-color: #fff;
             padding: 20px;
             margin-bottom: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin: 20px auto;
         }
-        .resistor h2 {
-            margin-top: 0;
+        .calc-column {
+            width: 45%;
         }
-        .resistor .resistor-band {
-            height: 20px;
+        .calculator label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .calculator input, .calculator select {
             width: 100%;
+            padding: 8px;
             margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        .resistor select {
-            width: 100%;
-            padding: 10px;
             border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-bottom: 10px;
+            border-radius: 4px;
+            color: #333;
+            touch-action: manipulation;
         }
-        .footer {
-            background-color: #333;
+        .calculator button {
+            padding: 10px 20px;
+            background-color: #007BFF;
             color: #fff;
-            text-align: center;
-            padding: 10px;
-            position: relative;
-            bottom: 0;
-            width: 100%;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .calculator button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+        .resistor {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .resistor div {
+            width: 20px;
+            height: 100px;
+            margin: 0 2px;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="resistor-calculator">
-            <!-- 4-Band Resistor -->
-            <div class="resistor">
-                <h2>4-Band Resistor</h2>
-                <div class="resistor-band" id="bandColor1"></div>
-                <div class="resistor-band" id="bandColor2"></div>
-                <div class="resistor-band" id="bandColor3"></div>
-                <div class="resistor-band" id="bandColor4"></div>
-                <select id="band1">
-                    <option value="black">Black</option>
-                    <option value="brown">Brown</option>
-                    <option value="red">Red</option>
-                    <!-- Add more colors as needed -->
-                </select>
-                <select id="band2">
-                    <option value="black">Black</option>
-                    <option value="brown">Brown</option>
-                    <option value="red">Red</option>
-                    <!-- Add more colors as needed -->
-                </select>
-                <select id="multiplier">
-                    <option value="black">Black</option>
-                    <option value="brown">Brown</option>
-                    <option value="red">Red</option>
-                    <!-- Add more colors as needed -->
-                </select>
-                <select id="tolerance">
-                    <option value="brown">Brown (±1%)</option>
-                    <option value="red">Red (±2%)</option>
-                    <option value="green">Green (±0.5%)</option>
-                    <!-- Add more colors as needed -->
-                </select>
-            </div>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+<div class="container">
+    <nav>
+        <ul class="navbar-left">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="shapes.html">Shapes</a></li>
+            <li><a href="speed.html">Speed</a></li>
+            <li><a href="conversions.html">Conversions</a></li>
+            <li><a href="electrical.html">Electrical</a></li>
+            <li><a href="algebra.html">Algebra</a></li>
+            <li><a href="conveyor.html">Conveyor</a></li>
+            <li><a href="binary.html">Binary</a></li>
+        </ul>
+    </nav>
 
-            <!-- 5-Band Resistor -->
-            <div class="resistor">
-                <h2>5-Band Resistor</h2>
-                <div class="resistor-band" id="bandColor5_1"></div>
-                <div class="resistor-band" id="bandColor5_2"></div>
-                <div class="resistor-band" id="bandColor5_3"></div>
-                <div class="resistor-band" id="bandColor5_4"></div>
-                <div class="resistor-band" id="bandColor5_5"></div>
-                <select id="band5_1">
-                    <option value="black">Black</option>
-                    <option value="brown">Brown</option>
-                    <option value="red">Red</option>
-                    <!-- Add more colors as needed -->
-                </select>
-                <select id="band5_2">
-                    <option value="black">Black</option>
-                    <option value="brown">Brown</option>
-                    <option value="red">Red</option>
-                    <!-- Add more colors as needed -->
-                </select>
-                <select id="band5_3">
-                    <option value="black">Black</option>
-                    <option value="brown">Brown</option>
-                    <option value="red">Red</option>
-                    <!-- Add more colors as needed -->
-                </select>
-                <select id="band5_4">
-                    <option value="black">Black</option>
-                    <option value="brown">Brown</option>
-                    <option value="red">Red</option>
-                    <!-- Add more colors as needed -->
-                </select>
-                <select id="band5_5">
-                    <option value="brown">Brown (±1%)</option>
-                    <option value="red">Red (±2%)</option>
-                    <option value="green">Green (±0.5%)</option>
-                    <!-- Add more colors as needed -->
-                </select>
-            </div>
+    <h1>Electrical Calculators</h1>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>4-Band Resistor Calculator</h3>
+            <label for="band1">Band 1:</label>
+            <select id="band1" onchange="calculateResistor4Band()">
+                <option value="0">Black</option>
+                <option value="1">Brown</option>
+                <option value="2">Red</option>
+                <option value="3">Orange</option>
+                <option value="4">Yellow</option>
+                <option value="5">Green</option>
+                <option value="6">Blue</option>
+                <option value="7">Violet</option>
+                <option value="8">Gray</option>
+                <option value="9">White</option>
+            </select>
+            <label for="band2">Band 2:</label>
+            <select id="band2" onchange="calculateResistor4Band()">
+                <option value="0">Black</option>
+                <option value="1">Brown</option>
+                <option value="2">Red</option>
+                <option value="3">Orange</option>
+                <option value="4">Yellow</option>
+                <option value="5">Green</option>
+                <option value="6">Blue</option>
+                <option value="7">Violet</option>
+                <option value="8">Gray</option>
+                <option value="9">White</option>
+            </select>
+            <label for="multiplier">Multiplier:</label>
+            <select id="multiplier" onchange="calculateResistor4Band()">
+                <option value="1">Black</option>
+                <option value="10">Brown</option>
+                <option value="100">Red</option>
+                <option value="1000">Orange</option>
+                <option value="10000">Yellow</option>
+                <option value="100000">Green</option>
+                <option value="1000000">Blue</option>
+                <option value="10000000">Violet</option>
+                <option value="0.1">Gold</option>
+                <option value="0.01">Silver</option>
+            </select>
+            <label for="tolerance">Tolerance:</label>
+            <select id="tolerance" onchange="calculateResistor4Band()">
+                <option value="1">Brown ±1%</option>
+                <option value="2">Red ±2%</option>
+                <option value="5">Gold ±5%</option>
+                <option value="10">Silver ±10%</option>
+            </select>
+            <button onclick="calculateResistor4Band()">Calculate</button>
+            <div class="result" id="resistor4BandResult"></div>
         </div>
-
-        <footer class="footer">
-            <span>&copy; 2024 Justin's Calculations. All rights reserved.</span>
-        </footer>
+        <div class="calc-column">
+            <h3>5-Band Resistor Calculator</h3>
+            <label for="band1-5">Band 1:</label>
+            <select id="band1-5" onchange="calculateResistor5Band()">
+                <option value="0">Black</option>
+                <option value="1">Brown</option>
+                <option value="2">Red</option>
+                <option value="3">Orange</option>
+                <option value="4">Yellow</option>
+                <option value="5">Green</option>
+                <option value="6">Blue</option>
+                <option value="7">Violet</option>
+                <option value="8">Gray</option>
+                <option value="9">White</option>
+            </select>
+            <label for="band2-5">Band 2:</label>
+            <select id="band2-5" onchange="calculateResistor5Band()">
+                <option value="0">Black</option>
+                <option value="1">Brown</option>
+                <option value="2">Red</option>
+                <option value="3">Orange</option>
+                <option value="4">Yellow</option>
+                <option value="5">Green</option>
+                <option value="6">Blue</option>
+                <option value="7">Violet</option>
+                <option value="8">Gray</option>
+                <option value="9">White</option>
+            </select>
+            <label for="band3-5">Band 3:</label>
+            <select id="band3-5" onchange="calculateResistor5Band()">
+                <option value="0">Black</option>
+                <option value="1">Brown</option>
+                <option value="2">Red</option>
+                <option value="3">Orange</option>
+                <option value="4">Yellow</option>
+                <option value="5">Green</option>
+                <option value="6">Blue</option>
+                <option value="7">Violet</option>
+                <option value="8">Gray</option>
+                <option value="9">White</option>
+            </select>
+            <label for="multiplier-5">Multiplier:</label>
+            <select id="multiplier-5" onchange="calculateResistor5Band()">
+                <option value="1">Black</option>
+                <option value="10">Brown</option>
+                <option value="100">Red</option>
+                <option value="1000">Orange</option>
+                <option value="10000">Yellow</option>
+                <option value="100000">Green</option>
+                <option value="1000000">Blue</option>
+                <option value="10000000">Violet</option>
+                <option value="0.1">Gold</option>
+                <option value="0.01">Silver</option>
+            </select>
+            <label for="tolerance-5">Tolerance:</label>
+            <select id="tolerance-5" onchange="calculateResistor5Band()">
+                <option value="1">Brown ±1%</option>
+                <option value="2">Red ±2%</option>
+                <option value="5">Gold ±5%</option>
+                <option value="10">Silver ±10%</option>
+            </select>
+            <button onclick="calculateResistor5Band()">Calculate</button>
+            <div class="result" id="resistor5BandResult"></div>
+        </div>
     </div>
 
-    <script>
-        const colorMap = {
-            black: '#000000',
-            brown: '#8B4513',
-            red: '#FF0000',
-            orange: '#FFA500',
-            yellow: '#FFFF00',
-            green: '#008000',
-            blue: '#0000FF',
-            violet: '#8A2BE2',
-            gray: '#808080',
-            white: '#FFFFFF'
-        };
+    <div class="calculator">
+        <h3>Electrical Calculations</h3>
+        <label for="voltage">Voltage (V):</label>
+        <input type="number" id="voltage">
+        <label for="current">Current (I):</label>
+        <input type="number" id="current">
+        <label for="resistance">Resistance (R):</label>
+        <input type="number" id="resistance">
+        <button onclick="calculateElectrical()">Calculate</button>
+        <div class="result" id="electricalResult"></div>
+    </div>
+</div>
 
-        function setBandColor(elementId, color) {
-            document.getElementById(elementId).style.backgroundColor = colorMap[color] || '#FFFFFF';
+<script>
+    function calculateResistor4Band() {
+        const band1 = parseInt(document.getElementById('band1').value);
+        const band2 = parseInt(document.getElementById('band2').value);
+        const multiplier = parseFloat(document.getElementById('multiplier').value);
+        const tolerance = parseFloat(document.getElementById('tolerance').value);
+
+        const resistance = (band1 * 10 + band2) * multiplier;
+        const toleranceValue = (resistance * tolerance) / 100;
+        const minResistance = resistance - toleranceValue;
+        const maxResistance = resistance + toleranceValue;
+
+        document.getElementById('resistor4BandResult').innerHTML = `
+            Resistance: ${resistance} Ω<br>
+            Tolerance: ±${tolerance}%<br>
+            Range: ${minResistance.toFixed(2)} Ω - ${maxResistance.toFixed(2)} Ω
+        `;
+        displayResistor4BandColors(band1, band2, multiplier, tolerance);
+    }
+
+    function displayResistor4BandColors(band1, band2, multiplier, tolerance) {
+        const colorCodes = ["black", "brown", "red", "orange", "yellow", "green", "blue", "violet", "gray", "white"];
+        const multiplierCodes = ["black", "brown", "red", "orange", "yellow", "green", "blue", "violet", "gold", "silver"];
+        const toleranceCodes = ["brown", "red", "gold", "silver"];
+
+        const band1Color = colorCodes[band1];
+        const band2Color = colorCodes[band2];
+        const multiplierColor = multiplierCodes[Object.keys(multiplierCodes).find(key => multiplierCodes[key] == multiplier)];
+        const toleranceColor = toleranceCodes[Object.keys(toleranceCodes).find(key => toleranceCodes[key] == tolerance)];
+
+        document.getElementById('resistor4BandResult').innerHTML += `
+            <div class="resistor">
+                <div style="background-color: ${band1Color};"></div>
+                <div style="background-color: ${band2Color};"></div>
+                <div style="background-color: ${multiplierColor};"></div>
+                <div style="background-color: ${toleranceColor};"></div>
+            </div>
+        `;
+    }
+
+    function calculateResistor5Band() {
+        const band1 = parseInt(document.getElementById('band1-5').value);
+        const band2 = parseInt(document.getElementById('band2-5').value);
+        const band3 = parseInt(document.getElementById('band3-5').value);
+        const multiplier = parseFloat(document.getElementById('multiplier-5').value);
+        const tolerance = parseFloat(document.getElementById('tolerance-5').value);
+
+        const resistance = (band1 * 100 + band2 * 10 + band3) * multiplier;
+        const toleranceValue = (resistance * tolerance) / 100;
+        const minResistance = resistance - toleranceValue;
+        const maxResistance = resistance + toleranceValue;
+
+        document.getElementById('resistor5BandResult').innerHTML = `
+            Resistance: ${resistance} Ω<br>
+            Tolerance: ±${tolerance}%<br>
+            Range: ${minResistance.toFixed(2)} Ω - ${maxResistance.toFixed(2)} Ω
+        `;
+        displayResistor5BandColors(band1, band2, band3, multiplier, tolerance);
+    }
+
+    function displayResistor5BandColors(band1, band2, band3, multiplier, tolerance) {
+        const colorCodes = ["black", "brown", "red", "orange", "yellow", "green", "blue", "violet", "gray", "white"];
+        const multiplierCodes = ["black", "brown", "red", "orange", "yellow", "green", "blue", "violet", "gold", "silver"];
+        const toleranceCodes = ["brown", "red", "gold", "silver"];
+
+        const band1Color = colorCodes[band1];
+        const band2Color = colorCodes[band2];
+        const band3Color = colorCodes[band3];
+        const multiplierColor = multiplierCodes[Object.keys(multiplierCodes).find(key => multiplierCodes[key] == multiplier)];
+        const toleranceColor = toleranceCodes[Object.keys(toleranceCodes).find(key => toleranceCodes[key] == tolerance)];
+
+        document.getElementById('resistor5BandResult').innerHTML += `
+            <div class="resistor">
+                <div style="background-color: ${band1Color};"></div>
+                <div style="background-color: ${band2Color};"></div>
+                <div style="background-color: ${band3Color};"></div>
+                <div style="background-color: ${multiplierColor};"></div>
+                <div style="background-color: ${toleranceColor};"></div>
+            </div>
+        `;
+    }
+
+    function calculateElectrical() {
+        const voltage = parseFloat(document.getElementById('voltage').value);
+        const current = parseFloat(document.getElementById('current').value);
+        const resistance = parseFloat(document.getElementById('resistance').value);
+        let power, calcVoltage, calcCurrent, calcResistance;
+
+        if (voltage && current) {
+            power = voltage * current;
+            calcResistance = voltage / current;
+            document.getElementById('electricalResult').innerHTML = `
+                Power: ${power.toFixed(2)} W<br>
+                Resistance: ${calcResistance.toFixed(2)} Ω
+            `;
+        } else if (voltage && resistance) {
+            power = (voltage ** 2) / resistance;
+            calcCurrent = voltage / resistance;
+            document.getElementById('electricalResult').innerHTML = `
+                Power: ${power.toFixed(2)} W<br>
+                Current: ${calcCurrent.toFixed(2)} A
+            `;
+        } else if (current && resistance) {
+            power = (current ** 2) * resistance;
+            calcVoltage = current * resistance;
+            document.getElementById('electricalResult').innerHTML = `
+                Power: ${power.toFixed(2)} W<br>
+                Voltage: ${calcVoltage.toFixed(2)} V
+            `;
+        } else {
+            document.getElementById('electricalResult').innerHTML = 'Please enter two values to calculate the third.';
         }
-
-        function updateResistorColors() {
-            // 4-Band Resistor
-            setBandColor('bandColor1', document.getElementById('band1').value);
-            setBandColor('bandColor2', document.getElementById('band2').value);
-            setBandColor('bandColor3', document.getElementById('multiplier').value);
-            setBandColor('bandColor4', document.getElementById('tolerance').value);
-
-            // 5-Band Resistor
-            setBandColor('bandColor5_1', document.getElementById('band5_1').value);
-            setBandColor('bandColor5_2', document.getElementById('band5_2').value);
-            setBandColor('bandColor5_3', document.getElementById('band5_3').value);
-            setBandColor('bandColor5_4', document.getElementById('band5_4').value);
-            setBandColor('bandColor5_5', document.getElementById('band5_5').value);
-        }
-
-        document.querySelectorAll('select').forEach(select => {
-            select.addEventListener('change', updateResistorColors);
-        });
-
-        window.onload = updateResistorColors; // Set initial colors on page load
-    </script>
+    }
+</script>
 </body>
 </html>
