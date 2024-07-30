@@ -10,7 +10,6 @@ html, body {
     background-position: center;
     color: white;
     overflow: hidden;
-    padding-top: 70px; /* Adjust this value based on your navbar height */
 }
 
 body {
@@ -84,6 +83,9 @@ main {
     font-size: 20px; /* Adjusted font size */
     box-sizing: border-box;
     margin-bottom: 30px; /* Increased margin between sections */
+}
+.main-content {
+    padding-top: 70px; /* Adjust this value based on your navbar height */
 }
 
 h1, h2 {
