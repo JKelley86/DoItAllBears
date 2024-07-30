@@ -15,7 +15,7 @@ html, body {
 body {
     text-align: center;
     margin: 0; /* Reset default body margin */
-    padding-bottom: 100px; /* Adjust the value as needed */
+    padding-bottom: 200px; /* Adjust the value as needed */
 }
 .calculator.single-column {
     display: flex;
