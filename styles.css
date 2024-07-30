@@ -14,7 +14,6 @@ html, body {
 body {
     text-align: center;
     margin: 0;
-    padding-bottom: 200px; /* Adjust the value as needed */
 }
 
 .calculator.single-column {
