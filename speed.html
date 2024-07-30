@@ -72,41 +72,64 @@
 
     <div class="calculator">
         <div class="calc-column">
-            <h3>Speed (Using Distance and Time)</h3>
-            <label for="distance">Distance (km):</label>
-            <input type="number" id="distance" step="0.01">
-            <label for="time">Time (hours):</label>
-            <input type="number" id="time" step="0.01">
-            <button onclick="calculateSpeed()">Calculate</button>
-            <div class="result" id="speedResult"></div>
+            <h3>Speed (Using Distance and Time in Miles)</h3>
+            <label for="distanceMiles">Distance (miles):</label>
+            <input type="number" id="distanceMiles" step="0.01">
+            <label for="timeHours">Time (hours):</label>
+            <input type="number" id="timeHours" step="0.01">
+            <button onclick="calculateSpeedMiles()">Calculate</button>
+            <div class="result" id="speedResultMiles"></div>
         </div>
         <div class="calc-column">
-            <h3>Speed Conversion</h3>
-            <label for="speed">Speed (km/h):</label>
-            <input type="number" id="speed" step="0.01">
-            <button onclick="convertSpeed()">Convert</button>
-            <div class="result" id="conversionResult"></div>
+            <h3>Speed (Using Distance and Time in Kilometers)</h3>
+            <label for="distanceKm">Distance (km):</label>
+            <input type="number" id="distanceKm" step="0.01">
+            <label for="timeKmHours">Time (hours):</label>
+            <input type="number" id="timeKmHours" step="0.01">
+            <button onclick="calculateSpeedKm()">Calculate</button>
+            <div class="result" id="speedResultKm"></div>
         </div>
     </div>
 
     <div class="calculator">
         <div class="calc-column">
-            <h3>Acceleration (Using Initial and Final Speed and Time)</h3>
-            <label for="initialSpeed">Initial Speed (m/s):</label>
-            <input type="number" id="initialSpeed" step="0.01">
-            <label for="finalSpeed">Final Speed (m/s):</label>
-            <input type="number" id="finalSpeed" step="0.01">
-            <label for="accelTime">Time (s):</label>
-            <input type="number" id="accelTime" step="0.01">
-            <button onclick="calculateAcceleration()">Calculate</button>
-            <div class="result" id="accelerationResult"></div>
-        </div>
-        <div class="calc-column">
-            <h3>Speed Conversion (Miles per Hour to Kilometers per Hour)</h3>
-            <label for="mph">Speed (mph):</label>
-            <input type="number" id="mph" step="0.01">
+            <h3>Speed Conversion (MPH to KPH)</h3>
+            <label for="speedMph">Speed (mph):</label>
+            <input type="number" id="speedMph" step="0.01">
             <button onclick="convertMPHtoKPH()">Convert</button>
             <div class="result" id="mphToKphResult"></div>
+        </div>
+        <div class="calc-column">
+            <h3>Speed Conversion (KPH to MPH)</h3>
+            <label for="speedKph">Speed (kph):</label>
+            <input type="number" id="speedKph" step="0.01">
+            <button onclick="convertKPHtoMPH()">Convert</button>
+            <div class="result" id="kphToMphResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Acceleration (Using Initial and Final Speed and Time in ft/s)</h3>
+            <label for="initialSpeedFt">Initial Speed (ft/s):</label>
+            <input type="number" id="initialSpeedFt" step="0.01">
+            <label for="finalSpeedFt">Final Speed (ft/s):</label>
+            <input type="number" id="finalSpeedFt" step="0.01">
+            <label for="accelTimeFt">Time (s):</label>
+            <input type="number" id="accelTimeFt" step="0.01">
+            <button onclick="calculateAccelerationFt()">Calculate</button>
+            <div class="result" id="accelerationResultFt"></div>
+        </div>
+        <div class="calc-column">
+            <h3>Acceleration (Using Initial and Final Speed and Time in m/s)</h3>
+            <label for="initialSpeedM">Initial Speed (m/s):</label>
+            <input type="number" id="initialSpeedM" step="0.01">
+            <label for="finalSpeedM">Final Speed (m/s):</label>
+            <input type="number" id="finalSpeedM" step="0.01">
+            <label for="accelTimeM">Time (s):</label>
+            <input type="number" id="accelTimeM" step="0.01">
+            <button onclick="calculateAccelerationM()">Calculate</button>
+            <div class="result" id="accelerationResultM"></div>
         </div>
     </div>
 
@@ -115,31 +138,46 @@
     </footer>
 
     <script>
-        function calculateSpeed() {
-            const distance = parseFloat(document.getElementById('distance').value);
-            const time = parseFloat(document.getElementById('time').value);
+        function calculateSpeedMiles() {
+            const distance = parseFloat(document.getElementById('distanceMiles').value);
+            const time = parseFloat(document.getElementById('timeHours').value);
             const speed = distance / time;
-            document.getElementById('speedResult').innerHTML = `Speed: ${speed.toFixed(2)} km/h`;
+            document.getElementById('speedResultMiles').innerHTML = `Speed: ${speed.toFixed(2)} mph`;
         }
 
-        function convertSpeed() {
-            const speed = parseFloat(document.getElementById('speed').value);
-            const speedInMph = speed * 0.621371;
-            document.getElementById('conversionResult').innerHTML = `Speed: ${speedInMph.toFixed(2)} mph`;
-        }
-
-        function calculateAcceleration() {
-            const initialSpeed = parseFloat(document.getElementById('initialSpeed').value);
-            const finalSpeed = parseFloat(document.getElementById('finalSpeed').value);
-            const time = parseFloat(document.getElementById('accelTime').value);
-            const acceleration = (finalSpeed - initialSpeed) / time;
-            document.getElementById('accelerationResult').innerHTML = `Acceleration: ${acceleration.toFixed(2)} m/s²`;
+        function calculateSpeedKm() {
+            const distance = parseFloat(document.getElementById('distanceKm').value);
+            const time = parseFloat(document.getElementById('timeKmHours').value);
+            const speed = distance / time;
+            document.getElementById('speedResultKm').innerHTML = `Speed: ${speed.toFixed(2)} km/h`;
         }
 
         function convertMPHtoKPH() {
-            const mph = parseFloat(document.getElementById('mph').value);
+            const mph = parseFloat(document.getElementById('speedMph').value);
             const kph = mph * 1.60934;
             document.getElementById('mphToKphResult').innerHTML = `Speed: ${kph.toFixed(2)} km/h`;
+        }
+
+        function convertKPHtoMPH() {
+            const kph = parseFloat(document.getElementById('speedKph').value);
+            const mph = kph / 1.60934;
+            document.getElementById('kphToMphResult').innerHTML = `Speed: ${mph.toFixed(2)} mph`;
+        }
+
+        function calculateAccelerationFt() {
+            const initialSpeed = parseFloat(document.getElementById('initialSpeedFt').value);
+            const finalSpeed = parseFloat(document.getElementById('finalSpeedFt').value);
+            const time = parseFloat(document.getElementById('accelTimeFt').value);
+            const acceleration = (finalSpeed - initialSpeed) / time;
+            document.getElementById('accelerationResultFt').innerHTML = `Acceleration: ${acceleration.toFixed(2)} ft/s²`;
+        }
+
+        function calculateAccelerationM() {
+            const initialSpeed = parseFloat(document.getElementById('initialSpeedM').value);
+            const finalSpeed = parseFloat(document.getElementById('finalSpeedM').value);
+            const time = parseFloat(document.getElementById('accelTimeM').value);
+            const acceleration = (finalSpeed - initialSpeed) / time;
+            document.getElementById('accelerationResultM').innerHTML = `Acceleration: ${acceleration.toFixed(2)} m/s²`;
         }
     </script>
 </div>
