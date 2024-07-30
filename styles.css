@@ -33,11 +33,9 @@ body {
     flex-direction: column;
     min-height: 100vh; /* Ensure container fills the viewport height */
     box-sizing: border-box;
-    position: relative; /* Ensure relative positioning for child elements */
     overflow-x: hidden; /* Hide horizontal overflow */
     overflow-y: auto; /* Enable vertical scrolling when content exceeds viewport */
     flex: 1; /* Allow container to grow and shrink */
-    height: 100vh;
     padding-bottom: 100px; /* Ensure there's space at the bottom */
 }
 
@@ -148,7 +146,6 @@ footer {
     font-size: 16px; /* Adjusted font size */
     width: 100%;
     margin-top: auto; /* Push footer to the bottom of the container */
-    position: relative; /* Ensure footer is relative to the container */
 }
 
 /* RSVP specific styles */
