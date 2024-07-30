@@ -10,6 +10,7 @@ html, body {
     background-position: center;
     color: white;
     overflow: hidden;
+    padding-top: 70px; /* Adjust this value based on your navbar height */
 }
 
 body {
