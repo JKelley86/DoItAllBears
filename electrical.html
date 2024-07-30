@@ -197,20 +197,33 @@
             <div class="result" id="resistor5BandResult"></div>
         </div>
     </div>
-
     <div class="calculator">
         <h3>Electrical Calculations</h3>
-        <label for="voltage">Voltage (V):</label>
-        <input type="number" id="voltage">
-        <label for="current">Current (I):</label>
-        <input type="number" id="current">
-        <label for="resistance">Resistance (R):</label>
-        <input type="number" id="resistance">
-        <button onclick="calculateElectrical()">Calculate</button>
-        <div class="result" id="electricalResult"></div>
+        <div class="calc-column">
+            <label for="voltage">Voltage (V):</label>
+            <input type="number" id="voltage" step="0.01">
+            <label for="current">Current (I):</label>
+            <input type="number" id="current" step="0.01">
+            <button onclick="calculatePower()">Calculate Power</button>
+            <div class="result" id="powerResult"></div>
+        </div>
+        <div class="calc-column">
+            <label for="resistance">Resistance (R):</label>
+            <input type="number" id="resistance" step="0.01">
+            <label for="voltage2">Voltage (V):</label>
+            <input type="number" id="voltage2" step="0.01">
+            <button onclick="calculateCurrent()">Calculate Current</button>
+            <div class="result" id="currentResult"></div>
+        </div>
+        <div class="calc-column">
+            <label for="power">Power (P):</label>
+            <input type="number" id="power" step="0.01">
+            <label for="resistance2">Resistance (R):</label>
+            <input type="number" id="resistance2" step="0.01">
+            <button onclick="calculateVoltage()">Calculate Voltage</button>
+            <div class="result" id="voltageResult"></div>
+        </div>
     </div>
-</div>
-
 <script>
     function calculateResistor4Band() {
         const band1 = parseInt(document.getElementById('band1').value);
@@ -293,37 +306,26 @@
         `;
     }
 
-    function calculateElectrical() {
-        const voltage = parseFloat(document.getElementById('voltage').value);
-        const current = parseFloat(document.getElementById('current').value);
-        const resistance = parseFloat(document.getElementById('resistance').value);
-        let power, calcVoltage, calcCurrent, calcResistance;
-
-        if (voltage && current) {
-            power = voltage * current;
-            calcResistance = voltage / current;
-            document.getElementById('electricalResult').innerHTML = `
-                Power: ${power.toFixed(2)} W<br>
-                Resistance: ${calcResistance.toFixed(2)} Ω
-            `;
-        } else if (voltage && resistance) {
-            power = (voltage ** 2) / resistance;
-            calcCurrent = voltage / resistance;
-            document.getElementById('electricalResult').innerHTML = `
-                Power: ${power.toFixed(2)} W<br>
-                Current: ${calcCurrent.toFixed(2)} A
-            `;
-        } else if (current && resistance) {
-            power = (current ** 2) * resistance;
-            calcVoltage = current * resistance;
-            document.getElementById('electricalResult').innerHTML = `
-                Power: ${power.toFixed(2)} W<br>
-                Voltage: ${calcVoltage.toFixed(2)} V
-            `;
-        } else {
-            document.getElementById('electricalResult').innerHTML = 'Please enter two values to calculate the third.';
+       function calculatePower() {
+            const voltage = parseFloat(document.getElementById('voltage').value);
+            const current = parseFloat(document.getElementById('current').value);
+            const power = voltage * current;
+            document.getElementById('powerResult').innerHTML = `Power: ${power.toFixed(2)} W`;
         }
-    }
+
+        function calculateCurrent() {
+            const voltage = parseFloat(document.getElementById('voltage2').value);
+            const resistance = parseFloat(document.getElementById('resistance').value);
+            const current = voltage / resistance;
+            document.getElementById('currentResult').innerHTML = `Current: ${current.toFixed(2)} A`;
+        }
+
+        function calculateVoltage() {
+            const power = parseFloat(document.getElementById('power').value);
+            const resistance = parseFloat(document.getElementById('resistance2').value);
+            const voltage = Math.sqrt(power * resistance);
+            document.getElementById('voltageResult').innerHTML = `Voltage: ${voltage.toFixed(2)} V`;
+        }
 </script>
 </body>
 </html>
