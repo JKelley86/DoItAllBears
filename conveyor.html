@@ -76,27 +76,33 @@
             <h1>Conveyor Belt Calculators</h1>
             <div class="calculator">
                 <div class="calc-column">
-                    <h3>Frequency (Hz)</h3>
-                    <label for="frequency">Frequency:</label>
-                    <input type="number" id="frequency" name="frequency" placeholder="Enter frequency in Hz">
-                    <button onclick="calculateHz()">Calculate</button>
-                    <div class="result" id="hzResult"></div>
+                    <h3>Belt Length Calculator</h3>
+                    <label for="pulley1Diameter">Pulley 1 Diameter (mm):</label>
+                    <input type="number" id="pulley1Diameter" name="pulley1Diameter" placeholder="Enter Pulley 1 Diameter">
+                    <label for="pulley2Diameter">Pulley 2 Diameter (mm):</label>
+                    <input type="number" id="pulley2Diameter" name="pulley2Diameter" placeholder="Enter Pulley 2 Diameter">
+                    <label for="centerDistance">Center Distance (mm):</label>
+                    <input type="number" id="centerDistance" name="centerDistance" placeholder="Enter Center Distance">
+                    <button onclick="calculateBeltLength()">Calculate</button>
+                    <div class="result" id="beltLengthResult"></div>
                 </div>
                 <div class="calc-column">
-                    <h3>Gear Ratio</h3>
-                    <label for="gear1">Gear 1 Teeth:</label>
-                    <input type="number" id="gear1" name="gear1" placeholder="Enter number of teeth on gear 1">
-                    <label for="gear2">Gear 2 Teeth:</label>
-                    <input type="number" id="gear2" name="gear2" placeholder="Enter number of teeth on gear 2">
-                    <button onclick="calculateGearRatio()">Calculate</button>
-                    <div class="result" id="gearRatioResult"></div>
-                </div>
-                <div class="calc-column">
-                    <h3>RPM</h3>
+                    <h3>Belt Speed Calculator</h3>
+                    <label for="pulleyDiameter">Pulley Diameter (mm):</label>
+                    <input type="number" id="pulleyDiameter" name="pulleyDiameter" placeholder="Enter Pulley Diameter">
                     <label for="rpm">RPM:</label>
                     <input type="number" id="rpm" name="rpm" placeholder="Enter RPM">
-                    <button onclick="calculateRPM()">Calculate</button>
-                    <div class="result" id="rpmResult"></div>
+                    <button onclick="calculateBeltSpeed()">Calculate</button>
+                    <div class="result" id="beltSpeedResult"></div>
+                </div>
+                <div class="calc-column">
+                    <h3>Load Capacity Calculator</h3>
+                    <label for="beltWidth">Belt Width (mm):</label>
+                    <input type="number" id="beltWidth" name="beltWidth" placeholder="Enter Belt Width">
+                    <label for="beltType">Belt Type:</label>
+                    <input type="text" id="beltType" name="beltType" placeholder="Enter Belt Type">
+                    <button onclick="calculateLoadCapacity()">Calculate</button>
+                    <div class="result" id="loadCapacityResult"></div>
                 </div>
             </div>
         </main>
@@ -105,24 +111,39 @@
         </footer>
     </div>
     <script>
-        function calculateHz() {
-            // Add calculation logic here
-            const frequency = document.getElementById('frequency').value;
-            document.getElementById('hzResult').innerText = `Result: ${frequency} Hz`;
+        function calculateBeltLength() {
+            const pulley1Diameter = parseFloat(document.getElementById('pulley1Diameter').value);
+            const pulley2Diameter = parseFloat(document.getElementById('pulley2Diameter').value);
+            const centerDistance = parseFloat(document.getElementById('centerDistance').value);
+            if (isNaN(pulley1Diameter) || isNaN(pulley2Diameter) || isNaN(centerDistance)) {
+                document.getElementById('beltLengthResult').innerText = 'Please enter valid numbers';
+                return;
+            }
+            const beltLength = (2 * centerDistance) + (Math.PI * (pulley1Diameter + pulley2Diameter) / 2) + (Math.pow(pulley1Diameter - pulley2Diameter, 2) / (4 * centerDistance));
+            document.getElementById('beltLengthResult').innerText = `Belt Length: ${beltLength.toFixed(2)} mm`;
         }
 
-        function calculateGearRatio() {
-            // Add calculation logic here
-            const gear1 = document.getElementById('gear1').value;
-            const gear2 = document.getElementById('gear2').value;
-            const ratio = gear1 / gear2;
-            document.getElementById('gearRatioResult').innerText = `Gear Ratio: ${ratio}`;
+        function calculateBeltSpeed() {
+            const pulleyDiameter = parseFloat(document.getElementById('pulleyDiameter').value);
+            const rpm = parseFloat(document.getElementById('rpm').value);
+            if (isNaN(pulleyDiameter) || isNaN(rpm)) {
+                document.getElementById('beltSpeedResult').innerText = 'Please enter valid numbers';
+                return;
+            }
+            const beltSpeed = (pulleyDiameter * Math.PI * rpm) / 60;
+            document.getElementById('beltSpeedResult').innerText = `Belt Speed: ${beltSpeed.toFixed(2)} mm/s`;
         }
 
-        function calculateRPM() {
-            // Add calculation logic here
-            const rpm = document.getElementById('rpm').value;
-            document.getElementById('rpmResult').innerText = `RPM: ${rpm}`;
+        function calculateLoadCapacity() {
+            const beltWidth = parseFloat(document.getElementById('beltWidth').value);
+            const beltType = document.getElementById('beltType').value;
+            if (isNaN(beltWidth) || !beltType) {
+                document.getElementById('loadCapacityResult').innerText = 'Please enter valid numbers and belt type';
+                return;
+            }
+            // Load capacity calculation logic depends on the belt type and width, assuming a simplified calculation
+            const loadCapacity = beltWidth * 10; // Simplified example calculation
+            document.getElementById('loadCapacityResult').innerText = `Load Capacity: ${loadCapacity} kg`;
         }
     </script>
 </body>
