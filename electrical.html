@@ -213,43 +213,45 @@
         </div>
     </div>
 </div>
-    <script>
-        const colors = ['#000000', '#8B4513', '#FF0000', '#FFA500', '#FFFF00', '#008000', '#0000FF', '#EE82EE', '#808080', '#FFFFFF', '#FFD700', '#C0C0C0'];
+<script>
+    const colors = ["#000000", "#8B4513", "#FF0000", "#FFA500", "#FFFF00", "#008000", "#0000FF", "#EE82EE", "#808080", "#FFFFFF", "#FFD700", "#C0C0C0"];
 
-        function calculateResistor4Band() {
-            const band1 = parseInt(document.getElementById('band1').value);
-            const band2 = parseInt(document.getElementById('band2').value);
-            const multiplier = parseFloat(document.getElementById('multiplier').value);
-            const tolerance = parseFloat(document.getElementById('tolerance').value);
+    function calculateResistor4Band() {
+        const band1 = parseInt(document.getElementById('band1').value);
+        const band2 = parseInt(document.getElementById('band2').value);
+        const multiplier = parseFloat(document.getElementById('multiplier').value);
+        const tolerance = parseFloat(document.getElementById('tolerance').value);
 
-            const resistance = ((band1 * 10) + band2) * multiplier;
-            const resultText = resistance + " Ω ±" + tolerance + "%";
-            document.getElementById('resistor4BandResult').innerText = resultText;
+        const resistance = (band1 * 10 + band2) * multiplier;
+        const resultText = `${resistance} Ω ±${tolerance}%`;
 
-            document.getElementById('resistor-band1').style.backgroundColor = colors[band1];
-            document.getElementById('resistor-band2').style.backgroundColor = colors[band2];
-            document.getElementById('resistor-multiplier').style.backgroundColor = colors[Math.log10(multiplier)];
-            document.getElementById('resistor-tolerance').style.backgroundColor = colors[tolerance];
-        }
+        document.getElementById('resistor4BandResult').innerText = resultText;
 
-        function calculateResistor5Band() {
-            const band1 = parseInt(document.getElementById('band1-5').value);
-            const band2 = parseInt(document.getElementById('band2-5').value);
-            const band3 = parseInt(document.getElementById('band3-5').value);
-            const multiplier = parseFloat(document.getElementById('multiplier-5').value);
-            const tolerance = parseFloat(document.getElementById('tolerance-5').value);
+        document.getElementById('resistor-band1').style.backgroundColor = colors[band1];
+        document.getElementById('resistor-band2').style.backgroundColor = colors[band2];
+        document.getElementById('resistor-multiplier').style.backgroundColor = colors[colors.length - 2 + parseInt(document.getElementById('multiplier').selectedIndex)];
+        document.getElementById('resistor-tolerance').style.backgroundColor = colors[colors.length - 2 + parseInt(document.getElementById('tolerance').selectedIndex)];
+    }
 
-            const resistance = ((band1 * 100) + (band2 * 10) + band3) * multiplier;
-            const resultText = resistance + " Ω ±" + tolerance + "%";
-            document.getElementById('resistor5BandResult').innerText = resultText;
+    function calculateResistor5Band() {
+        const band1 = parseInt(document.getElementById('band1-5').value);
+        const band2 = parseInt(document.getElementById('band2-5').value);
+        const band3 = parseInt(document.getElementById('band3-5').value);
+        const multiplier = parseFloat(document.getElementById('multiplier-5').value);
+        const tolerance = parseFloat(document.getElementById('tolerance-5').value);
 
-            document.getElementById('resistor-band1-5').style.backgroundColor = colors[band1];
-            document.getElementById('resistor-band2-5').style.backgroundColor = colors[band2];
-            document.getElementById('resistor-band3-5').style.backgroundColor = colors[band3];
-            document.getElementById('resistor-multiplier-5').style.backgroundColor = colors[Math.log10(multiplier)];
-            document.getElementById('resistor-tolerance-5').style.backgroundColor = colors[tolerance];
-        }
-    </script>
+        const resistance = (band1 * 100 + band2 * 10 + band3) * multiplier;
+        const resultText = `${resistance} Ω ±${tolerance}%`;
+
+        document.getElementById('resistor5BandResult').innerText = resultText;
+
+        document.getElementById('resistor5-band1').style.backgroundColor = colors[band1];
+        document.getElementById('resistor5-band2').style.backgroundColor = colors[band2];
+        document.getElementById('resistor5-band3').style.backgroundColor = colors[band3];
+        document.getElementById('resistor5-multiplier').style.backgroundColor = colors[colors.length - 2 + parseInt(document.getElementById('multiplier-5').selectedIndex)];
+        document.getElementById('resistor5-tolerance').style.backgroundColor = colors[colors.length - 2 + parseInt(document.getElementById('tolerance-5').selectedIndex)];
+    }
+</script>
 
     <div class="calculator single-column">
         <div class="calc-column">
