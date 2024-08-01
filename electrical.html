@@ -80,7 +80,8 @@
 <main>
     <h1>Electrical Calculators</h1>
 
-    <div class="calculator">
+    <div class="calculator single-column">
+        <div class="calc-column">
         <h3>4-Band Resistor Calculator</h3>
         <label for="band1">Band 1:</label>
         <select id="band1" onchange="calculateResistor4Band()">
@@ -138,7 +139,8 @@
         </div>
     </div>
 
-    <div class="calculator">
+    <div class="calculator single-column">
+        <div class="calc-column">
         <h3>5-Band Resistor Calculator</h3>
         <label for="band1-5">Band 1:</label>
         <select id="band1-5" onchange="calculateResistor5Band()">
@@ -248,7 +250,8 @@
         }
     </script>
 
-    <div class="calculator">
+    <div class="calculator single-column">
+        <div class="calc-column">
         <h3>Ohm's Law Calculator</h3>
         <label for="voltage">Voltage (V):</label>
         <input type="number" id="voltage" oninput="calculateOhmsLaw()">
@@ -259,7 +262,8 @@
         <div class="result" id="ohmsLawResult"></div>
     </div>
 
-    <div class="calculator">
+    <div class="calculator single-column">
+        <div class="calc-column">
         <h3>Power Calculator</h3>
         <label for="power-voltage">Voltage (V):</label>
         <input type="number" id="power-voltage" oninput="calculatePower()">
