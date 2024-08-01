@@ -109,6 +109,27 @@
 
     <div class="calculator">
         <div class="calc-column">
+            <h3>Rectangle (Using Length and Width)</h3>
+            <label for="rectLength">Length:</label>
+            <input type="number" id="rectLength" step="0.01">
+            <label for="rectWidth">Width:</label>
+            <input type="number" id="rectWidth" step="0.01">
+            <button onclick="calculateRectangleFromLengthWidth()">Calculate</button>
+            <div class="result" id="rectResult1"></div>
+        </div>
+        <div class="calc-column">
+            <h3>Rectangle (Using Area and One Side)</h3>
+            <label for="rectArea">Area:</label>
+            <input type="number" id="rectArea" step="0.01">
+            <label for="rectSide">One Side:</label>
+            <input type="number" id="rectSide" step="0.01">
+            <button onclick="calculateRectangleFromAreaSide()">Calculate</button>
+            <div class="result" id="rectResult2"></div>
+        </div>
+    </div>
+
+    <div class="calculator">
+        <div class="calc-column">
             <h3>Triangle (Using Base and Height)</h3>
             <label for="triangleBase">Base:</label>
             <input type="number" id="triangleBase" step="0.01">
@@ -163,6 +184,48 @@
             <input type="number" id="sphereVolume" step="0.01">
             <button onclick="calculateSphereFromVolume()">Calculate</button>
             <div class="result" id="sphereResult2"></div>
+        </div>
+    </div>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Cylinder (Using Radius and Height)</h3>
+            <label for="cylinderRadius">Radius:</label>
+            <input type="number" id="cylinderRadius" step="0.01">
+            <label for="cylinderHeight">Height:</label>
+            <input type="number" id="cylinderHeight" step="0.01">
+            <button onclick="calculateCylinderFromRadiusHeight()">Calculate</button>
+            <div class="result" id="cylinderResult1"></div>
+        </div>
+        <div class="calc-column">
+            <h3>Cylinder (Using Volume and Height)</h3>
+            <label for="cylinderVolume">Volume:</label>
+            <input type="number" id="cylinderVolume" step="0.01">
+            <label for="cylinderHeight2">Height:</label>
+            <input type="number" id="cylinderHeight2" step="0.01">
+            <button onclick="calculateCylinderFromVolumeHeight()">Calculate</button>
+            <div class="result" id="cylinderResult2"></div>
+        </div>
+    </div>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Cone (Using Radius and Height)</h3>
+            <label for="coneRadius">Radius:</label>
+            <input type="number" id="coneRadius" step="0.01">
+            <label for="coneHeight">Height:</label>
+            <input type="number" id="coneHeight" step="0.01">
+            <button onclick="calculateConeFromRadiusHeight()">Calculate</button>
+            <div class="result" id="coneResult1"></div>
+        </div>
+        <div class="calc-column">
+            <h3>Cone (Using Volume and Height)</h3>
+            <label for="coneVolume">Volume:</label>
+            <input type="number" id="coneVolume" step="0.01">
+            <label for="coneHeight2">Height:</label>
+            <input type="number" id="coneHeight2" step="0.01">
+            <button onclick="calculateConeFromVolumeHeight()">Calculate</button>
+            <div class="result" id="coneResult2"></div>
         </div>
     </div>
 
@@ -237,6 +300,22 @@
             document.getElementById('squareResult2').innerHTML = `Side Length: ${side.toFixed(2)}`;
         }
 
+        function calculateRectangleFromLengthWidth() {
+            const length = parseFloat(document.getElementById('rectLength').value);
+            const width = parseFloat(document.getElementById('rectWidth').value);
+            const area = length * width;
+            const perimeter = 2 * (length + width);
+            document.getElementById('rectResult1').innerHTML = `Area: ${area.toFixed(2)}<br>Perimeter: ${perimeter.toFixed(2)}`;
+        }
+
+        function calculateRectangleFromAreaSide() {
+            const area = parseFloat(document.getElementById('rectArea').value);
+            const side = parseFloat(document.getElementById('rectSide').value);
+            const width = area / side;
+            const perimeter = 2 * (side + width);
+            document.getElementById('rectResult2').innerHTML = `Width: ${width.toFixed(2)}<br>Perimeter: ${perimeter.toFixed(2)}`;
+        }
+
         function calculateTriangleFromBaseHeight() {
             const base = parseFloat(document.getElementById('triangleBase').value);
             const height = parseFloat(document.getElementById('triangleHeight').value);
@@ -268,25 +347,63 @@
         function calculateSphereFromRadius() {
             const radius = parseFloat(document.getElementById('sphereRadius').value);
             const volume = (4/3) * Math.PI * Math.pow(radius, 3);
-            document.getElementById('sphereResult1').innerHTML = `Volume: ${volume.toFixed(2)}`;
+            const surfaceArea = 4 * Math.PI * Math.pow(radius, 2);
+            document.getElementById('sphereResult1').innerHTML = `Volume: ${volume.toFixed(2)}<br>Surface Area: ${surfaceArea.toFixed(2)}`;
         }
 
         function calculateSphereFromVolume() {
             const volume = parseFloat(document.getElementById('sphereVolume').value);
             const radius = Math.cbrt((3 * volume) / (4 * Math.PI));
-            document.getElementById('sphereResult2').innerHTML = `Radius: ${radius.toFixed(2)}`;
+            const surfaceArea = 4 * Math.PI * Math.pow(radius, 2);
+            document.getElementById('sphereResult2').innerHTML = `Radius: ${radius.toFixed(2)}<br>Surface Area: ${surfaceArea.toFixed(2)}`;
+        }
+
+        function calculateCylinderFromRadiusHeight() {
+            const radius = parseFloat(document.getElementById('cylinderRadius').value);
+            const height = parseFloat(document.getElementById('cylinderHeight').value);
+            const volume = Math.PI * Math.pow(radius, 2) * height;
+            const surfaceArea = 2 * Math.PI * radius * (height + radius);
+            document.getElementById('cylinderResult1').innerHTML = `Volume: ${volume.toFixed(2)}<br>Surface Area: ${surfaceArea.toFixed(2)}`;
+        }
+
+        function calculateCylinderFromVolumeHeight() {
+            const volume = parseFloat(document.getElementById('cylinderVolume').value);
+            const height = parseFloat(document.getElementById('cylinderHeight2').value);
+            const radius = Math.sqrt(volume / (Math.PI * height));
+            const surfaceArea = 2 * Math.PI * radius * (height + radius);
+            document.getElementById('cylinderResult2').innerHTML = `Radius: ${radius.toFixed(2)}<br>Surface Area: ${surfaceArea.toFixed(2)}`;
+        }
+
+        function calculateConeFromRadiusHeight() {
+            const radius = parseFloat(document.getElementById('coneRadius').value);
+            const height = parseFloat(document.getElementById('coneHeight').value);
+            const volume = (1/3) * Math.PI * Math.pow(radius, 2) * height;
+            const slantHeight = Math.sqrt(Math.pow(radius, 2) + Math.pow(height, 2));
+            const surfaceArea = Math.PI * radius * (radius + slantHeight);
+            document.getElementById('coneResult1').innerHTML = `Volume: ${volume.toFixed(2)}<br>Surface Area: ${surfaceArea.toFixed(2)}`;
+        }
+
+        function calculateConeFromVolumeHeight() {
+            const volume = parseFloat(document.getElementById('coneVolume').value);
+            const height = parseFloat(document.getElementById('coneHeight2').value);
+            const radius = Math.sqrt((3 * volume) / (Math.PI * height));
+            const slantHeight = Math.sqrt(Math.pow(radius, 2) + Math.pow(height, 2));
+            const surfaceArea = Math.PI * radius * (radius + slantHeight);
+            document.getElementById('coneResult2').innerHTML = `Radius: ${radius.toFixed(2)}<br>Surface Area: ${surfaceArea.toFixed(2)}`;
         }
 
         function calculateCubeFromSide() {
             const side = parseFloat(document.getElementById('cubeSide').value);
             const volume = Math.pow(side, 3);
-            document.getElementById('cubeResult1').innerHTML = `Volume: ${volume.toFixed(2)}`;
+            const surfaceArea = 6 * Math.pow(side, 2);
+            document.getElementById('cubeResult1').innerHTML = `Volume: ${volume.toFixed(2)}<br>Surface Area: ${surfaceArea.toFixed(2)}`;
         }
 
         function calculateCubeFromVolume() {
             const volume = parseFloat(document.getElementById('cubeVolume').value);
             const side = Math.cbrt(volume);
-            document.getElementById('cubeResult2').innerHTML = `Side Length: ${side.toFixed(2)}`;
+            const surfaceArea = 6 * Math.pow(side, 2);
+            document.getElementById('cubeResult2').innerHTML = `Side Length: ${side.toFixed(2)}<br>Surface Area: ${surfaceArea.toFixed(2)}`;
         }
 
         function calculateDensityFromMassVolume() {
