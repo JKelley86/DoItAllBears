@@ -229,8 +229,8 @@
 
         document.getElementById('resistor-band1').style.backgroundColor = colors[band1];
         document.getElementById('resistor-band2').style.backgroundColor = colors[band2];
-        document.getElementById('resistor-multiplier').style.backgroundColor = colors[colors.length - 2 + parseInt(document.getElementById('multiplier').selectedIndex)];
-        document.getElementById('resistor-tolerance').style.backgroundColor = colors[colors.length - 2 + parseInt(document.getElementById('tolerance').selectedIndex)];
+        document.getElementById('resistor-multiplier').style.backgroundColor = (multiplier === 0.1) ? colors[10] : (multiplier === 0.01) ? colors[11] : colors[Math.log10(multiplier)];
+        document.getElementById('resistor-tolerance').style.backgroundColor = (tolerance === 5) ? colors[10] : (tolerance === 10) ? colors[11] : colors[tolerance - 1];
     }
 
     function calculateResistor5Band() {
@@ -248,8 +248,8 @@
         document.getElementById('resistor5-band1').style.backgroundColor = colors[band1];
         document.getElementById('resistor5-band2').style.backgroundColor = colors[band2];
         document.getElementById('resistor5-band3').style.backgroundColor = colors[band3];
-        document.getElementById('resistor5-multiplier').style.backgroundColor = colors[colors.length - 2 + parseInt(document.getElementById('multiplier-5').selectedIndex)];
-        document.getElementById('resistor5-tolerance').style.backgroundColor = colors[colors.length - 2 + parseInt(document.getElementById('tolerance-5').selectedIndex)];
+        document.getElementById('resistor5-multiplier').style.backgroundColor = (multiplier === 0.1) ? colors[10] : (multiplier === 0.01) ? colors[11] : colors[Math.log10(multiplier)];
+        document.getElementById('resistor5-tolerance').style.backgroundColor = (tolerance === 5) ? colors[10] : (tolerance === 10) ? colors[11] : colors[tolerance - 1];
     }
 </script>
 
