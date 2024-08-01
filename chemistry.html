@@ -212,19 +212,30 @@
         }
 
         // Combining Elements
-        function combineElements() {
-            const element1 = document.getElementById('element1').value.trim().toUpperCase();
-            const element2 = document.getElementById('element2').value.trim().toUpperCase();
-            // Simple combinatorial logic, actual chemistry would be more complex
-            const compounds = {
-                'H': { 'O': 'H2O', 'Cl': 'HCl' },
-                'Na': { 'Cl': 'NaCl', 'O': 'Na2O' }
-                // Add more combinations as needed
-            };
-            let result = compounds[element1] ? compounds[element1][element2] : 'No compound found';
-            document.getElementById('combinationResult').innerText = `Resulting Compound: ${result}`;
-        }
+    function combineElements() {
+        const element1 = document.getElementById('element1').value.trim();
+        const element2 = document.getElementById('element2').value.trim();
+        
+        const combinations = {
+            'H': {
+                'O': 'H2O (Water)',
+                'Cl': 'HCl (Hydrochloric Acid)'
+            },
+            'Na': {
+                'Cl': 'NaCl (Sodium Chloride - Table Salt)'
+            },
+            'C': {
+                'O': 'CO2 (Carbon Dioxide)',
+                'H': 'CH4 (Methane)'
+            }
+            // Add more combinations as needed
+        };
 
+        if (combinations[element1] && combinations[element1][element2]) {
+            document.getElementById('combinationResult').innerHTML = `Combination: ${combinations[element1][element2]}`;
+        } else {
+            document.getElementById('combinationResult').innerHTML = `Combination not found for ${element1} and ${element2}`;
+        }
         // Concentration Calculator
         function calculateConcentration() {
             const mass = parseFloat(document.getElementById('concentrationMass').value);
