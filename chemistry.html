@@ -142,6 +142,7 @@
                     <div class="result" id="phResult"></div>
                 </div>
             </div>
+            
             <div class="periodic-table">
                 <h3>Periodic Table</h3>
                 <img src="https://www.ptable.com/images/ptable.png" alt="Periodic Table">
@@ -212,30 +213,32 @@
         }
 
         // Combining Elements
-    function combineElements() {
-        const element1 = document.getElementById('element1').value.trim();
-        const element2 = document.getElementById('element2').value.trim();
-        
-        const combinations = {
-            'H': {
-                'O': 'H2O (Water)',
-                'Cl': 'HCl (Hydrochloric Acid)'
-            },
-            'Na': {
-                'Cl': 'NaCl (Sodium Chloride - Table Salt)'
-            },
-            'C': {
-                'O': 'CO2 (Carbon Dioxide)',
-                'H': 'CH4 (Methane)'
-            }
-            // Add more combinations as needed
-        };
+        function combineElements() {
+            const element1 = document.getElementById('element1').value.trim();
+            const element2 = document.getElementById('element2').value.trim();
+            
+            const combinations = {
+                'H': {
+                    'O': 'H2O (Water)',
+                    'Cl': 'HCl (Hydrochloric Acid)'
+                },
+                'Na': {
+                    'Cl': 'NaCl (Sodium Chloride - Table Salt)'
+                },
+                'C': {
+                    'O': 'CO2 (Carbon Dioxide)',
+                    'H': 'CH4 (Methane)'
+                }
+                // Add more combinations as needed
+            };
 
-        if (combinations[element1] && combinations[element1][element2]) {
-            document.getElementById('combinationResult').innerHTML = `Combination: ${combinations[element1][element2]}`;
-        } else {
-            document.getElementById('combinationResult').innerHTML = `Combination not found for ${element1} and ${element2}`;
+            if (combinations[element1] && combinations[element1][element2]) {
+                document.getElementById('combinationResult').innerHTML = `Combination: ${combinations[element1][element2]}`;
+            } else {
+                document.getElementById('combinationResult').innerHTML = `Combination not found for ${element1} and ${element2}`;
+            }
         }
+
         // Concentration Calculator
         function calculateConcentration() {
             const mass = parseFloat(document.getElementById('concentrationMass').value);
