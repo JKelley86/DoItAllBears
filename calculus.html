@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Calculus Calculators</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.5.0/math.min.js"></script>
     <style>
         .calculator {
             background-color: #fff;
@@ -82,6 +83,9 @@
             <button onclick="calculateDerivative()">Calculate Derivative</button>
             <div class="result" id="derivativeResult"></div>
         </div>
+    </div>
+
+    <div class="calculator">
         <div class="calc-column">
             <h3>Integral of a Function</h3>
             <label for="functionIntegral">Function (f(x)):</label>
@@ -91,7 +95,7 @@
         </div>
     </div>
 
-    <div class="calculator single-column">
+    <div class="calculator">
         <div class="calc-column">
             <h3>Definite Integral</h3>
             <label for="defIntegralFunction">Function (f(x)):</label>
@@ -105,7 +109,7 @@
         </div>
     </div>
 
-    <div class="calculator single-column">
+    <div class="calculator">
         <div class="calc-column">
             <h3>Limit of a Function</h3>
             <label for="functionLimit">Function (f(x)):</label>
@@ -117,7 +121,7 @@
         </div>
     </div>
 
-    <div class="calculator single-column">
+    <div class="calculator">
         <div class="calc-column">
             <h3>Partial Derivative</h3>
             <label for="functionPartial">Function (f(x, y)):</label>
@@ -129,7 +133,7 @@
         </div>
     </div>
 
-    <div class="calculator single-column">
+    <div class="calculator">
         <div class="calc-column">
             <h3>Critical Points</h3>
             <label for="functionCritical">Function (f(x)):</label>
@@ -139,7 +143,7 @@
         </div>
     </div>
 
-    <div class="calculator single-column">
+    <div class="calculator">
         <div class="calc-column">
             <h3>Concavity</h3>
             <label for="functionConcavity">Function (f(x)):</label>
@@ -154,40 +158,80 @@
     </footer>
 
     <script>
-        // Placeholder functions for calculations
         function calculateDerivative() {
-            // Implement derivative calculation
-            document.getElementById('derivativeResult').innerHTML = `Derivative calculation result will be displayed here.`;
+            const expr = document.getElementById('functionDerivative').value;
+            try {
+                const derivative = math.derivative(expr, 'x').toString();
+                document.getElementById('derivativeResult').innerHTML = `Derivative: ${derivative}`;
+            } catch (error) {
+                document.getElementById('derivativeResult').innerHTML = 'Error: Invalid function.';
+            }
         }
 
         function calculateIntegral() {
-            // Implement integral calculation
-            document.getElementById('integralResult').innerHTML = `Integral calculation result will be displayed here.`;
+            const expr = document.getElementById('functionIntegral').value;
+            try {
+                const integral = math.integral(expr, 'x').toString();
+                document.getElementById('integralResult').innerHTML = `Integral: ${integral}`;
+            } catch (error) {
+                document.getElementById('integralResult').innerHTML = 'Error: Invalid function.';
+            }
         }
 
         function calculateDefiniteIntegral() {
-            // Implement definite integral calculation
-            document.getElementById('defIntegralResult').innerHTML = `Definite integral calculation result will be displayed here.`;
+            const expr = document.getElementById('defIntegralFunction').value;
+            const lower = parseFloat(document.getElementById('defIntegralLower').value);
+            const upper = parseFloat(document.getElementById('defIntegralUpper').value);
+            try {
+                const integral = math.integral(expr, 'x');
+                const result = math.evaluate(integral.toString(), {x: upper}) - math.evaluate(integral.toString(), {x: lower});
+                document.getElementById('defIntegralResult').innerHTML = `Definite Integral: ${result.toFixed(2)}`;
+            } catch (error) {
+                document.getElementById('defIntegralResult').innerHTML = 'Error: Invalid function or limits.';
+            }
         }
 
         function calculateLimit() {
-            // Implement limit calculation
-            document.getElementById('limitResult').innerHTML = `Limit calculation result will be displayed here.`;
+            const expr = document.getElementById('functionLimit').value;
+            const point = parseFloat(document.getElementById('limitPoint').value);
+            try {
+                const limit = math.limit(expr, 'x', point).toString();
+                document.getElementById('limitResult').innerHTML = `Limit: ${limit}`;
+            } catch (error) {
+                document.getElementById('limitResult').innerHTML = 'Error: Invalid function or limit point.';
+            }
         }
 
         function calculatePartialDerivative() {
-            // Implement partial derivative calculation
-            document.getElementById('partialDerivativeResult').innerHTML = `Partial derivative calculation result will be displayed here.`;
+            const expr = document.getElementById('functionPartial').value;
+            const variable = document.getElementById('partialVariable').value;
+            try {
+                const partialDerivative = math.derivative(expr, variable).toString();
+                document.getElementById('partialDerivativeResult').innerHTML = `Partial Derivative: ${partialDerivative}`;
+            } catch (error) {
+                document.getElementById('partialDerivativeResult').innerHTML = 'Error: Invalid function or variable.';
+            }
         }
 
         function calculateCriticalPoints() {
-            // Implement critical points calculation
-            document.getElementById('criticalPointsResult').innerHTML = `Critical points calculation result will be displayed here.`;
+            const expr = document.getElementById('functionCritical').value;
+            try {
+                const derivative = math.derivative(expr, 'x').toString();
+                const criticalPoints = math.solve(derivative, 'x');
+                document.getElementById('criticalPointsResult').innerHTML = `Critical Points: ${criticalPoints}`;
+            } catch (error) {
+                document.getElementById('criticalPointsResult').innerHTML = 'Error: Invalid function.';
+            }
         }
 
         function calculateConcavity() {
-            // Implement concavity calculation
-            document.getElementById('concavityResult').innerHTML = `Concavity calculation result will be displayed here.`;
+            const expr = document.getElementById('functionConcavity').value;
+            try {
+                const secondDerivative = math.derivative(math.derivative(expr, 'x').toString(), 'x').toString();
+                document.getElementById('concavityResult').innerHTML = `Concavity (Second Derivative): ${secondDerivative}`;
+            } catch (error) {
+                document.getElementById('concavityResult').innerHTML = 'Error: Invalid function.';
+            }
         }
     </script>
 </body>
