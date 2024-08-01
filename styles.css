@@ -160,21 +160,24 @@ footer {
 }
 .nav-button {
     display: inline-block;
-    width: 70px;
-    height: 50px;
+    width: 80px;
+    height: 80px;
     margin: 10px;
     border-radius: 50%;
-    overflow: hidden;
+    background-color: #007BFF;
+    color: #fff;
     text-align: center;
+    line-height: 80px;
+    font-size: 14px;
+    font-weight: bold;
     cursor: pointer;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.nav-button img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.nav-button:hover {
+    background-color: #0056b3;
 }
+
 
 
 /* Media Queries */
