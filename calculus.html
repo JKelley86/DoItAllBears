@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Calculus Calculators</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .calculator {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin: 20px auto; /* Center table horizontally */
+        }
+        .calc-column {
+            width: 40%;
+        }
+        .calculator label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .calculator input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            color: #333;
+            touch-action: manipulation;
+        }
+        .calculator button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .calculator button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+<div class="container">
+    <nav>
+        <ul class="navbar-left">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="shapes.html">Shapes</a></li>
+            <li><a href="speed.html">Speed</a></li>
+            <li><a href="conversions.html">Conversions</a></li>
+            <li><a href="electrical.html">Electrical</a></li>
+            <li><a href="algebra.html">Algebra</a></li>
+            <li><a href="conveyor.html">Conveyor</a></li>
+            <li><a href="binary.html">Binary</a></li>
+            <li><a href="cooking.html">Cooking</a></li>
+            <li><a href="weight.html">Weight</a></li>
+            <li><a href="physics.html">Physics</a></li>
+            <li><a href="calculus.html">Calculus</a></li>
+        </ul>
+    </nav>
+<main>
+    <h1>Calculus Calculators</h1>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Derivative of a Function</h3>
+            <label for="functionDerivative">Function (f(x)):</label>
+            <input type="text" id="functionDerivative" placeholder="e.g., x^2 + 3*x + 2">
+            <button onclick="calculateDerivative()">Calculate Derivative</button>
+            <div class="result" id="derivativeResult"></div>
+        </div>
+        <div class="calc-column">
+            <h3>Integral of a Function</h3>
+            <label for="functionIntegral">Function (f(x)):</label>
+            <input type="text" id="functionIntegral" placeholder="e.g., x^2 + 3*x + 2">
+            <button onclick="calculateIntegral()">Calculate Integral</button>
+            <div class="result" id="integralResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Definite Integral</h3>
+            <label for="defIntegralFunction">Function (f(x)):</label>
+            <input type="text" id="defIntegralFunction" placeholder="e.g., x^2 + 3*x + 2">
+            <label for="defIntegralLower">Lower Limit:</label>
+            <input type="number" id="defIntegralLower" step="0.01">
+            <label for="defIntegralUpper">Upper Limit:</label>
+            <input type="number" id="defIntegralUpper" step="0.01">
+            <button onclick="calculateDefiniteIntegral()">Calculate Definite Integral</button>
+            <div class="result" id="defIntegralResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Limit of a Function</h3>
+            <label for="functionLimit">Function (f(x)):</label>
+            <input type="text" id="functionLimit" placeholder="e.g., (x^2 - 4)/(x - 2)">
+            <label for="limitPoint">Limit Point (x → ?):</label>
+            <input type="number" id="limitPoint" step="0.01">
+            <button onclick="calculateLimit()">Calculate Limit</button>
+            <div class="result" id="limitResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Partial Derivative</h3>
+            <label for="functionPartial">Function (f(x, y)):</label>
+            <input type="text" id="functionPartial" placeholder="e.g., x^2*y + y^3">
+            <label for="partialVariable">Variable (x or y):</label>
+            <input type="text" id="partialVariable" placeholder="e.g., x">
+            <button onclick="calculatePartialDerivative()">Calculate Partial Derivative</button>
+            <div class="result" id="partialDerivativeResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Critical Points</h3>
+            <label for="functionCritical">Function (f(x)):</label>
+            <input type="text" id="functionCritical" placeholder="e.g., x^3 - 3*x^2 + 2">
+            <button onclick="calculateCriticalPoints()">Calculate Critical Points</button>
+            <div class="result" id="criticalPointsResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Concavity</h3>
+            <label for="functionConcavity">Function (f(x)):</label>
+            <input type="text" id="functionConcavity" placeholder="e.g., x^3 - 3*x^2 + 2">
+            <button onclick="calculateConcavity()">Calculate Concavity</button>
+            <div class="result" id="concavityResult"></div>
+        </div>
+    </div>
+</main>
+    <footer> 
+        <span>&copy; 2024 Justin's Calculations. All rights reserved.</span>
+    </footer>
+
+    <script>
+        // Placeholder functions for calculations
+        function calculateDerivative() {
+            // Implement derivative calculation
+            document.getElementById('derivativeResult').innerHTML = `Derivative calculation result will be displayed here.`;
+        }
+
+        function calculateIntegral() {
+            // Implement integral calculation
+            document.getElementById('integralResult').innerHTML = `Integral calculation result will be displayed here.`;
+        }
+
+        function calculateDefiniteIntegral() {
+            // Implement definite integral calculation
+            document.getElementById('defIntegralResult').innerHTML = `Definite integral calculation result will be displayed here.`;
+        }
+
+        function calculateLimit() {
+            // Implement limit calculation
+            document.getElementById('limitResult').innerHTML = `Limit calculation result will be displayed here.`;
+        }
+
+        function calculatePartialDerivative() {
+            // Implement partial derivative calculation
+            document.getElementById('partialDerivativeResult').innerHTML = `Partial derivative calculation result will be displayed here.`;
+        }
+
+        function calculateCriticalPoints() {
+            // Implement critical points calculation
+            document.getElementById('criticalPointsResult').innerHTML = `Critical points calculation result will be displayed here.`;
+        }
+
+        function calculateConcavity() {
+            // Implement concavity calculation
+            document.getElementById('concavityResult').innerHTML = `Concavity calculation result will be displayed here.`;
+        }
+    </script>
+</body>
+</html>
