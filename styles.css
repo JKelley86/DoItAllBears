@@ -158,6 +158,24 @@ footer {
     background-repeat: no-repeat;
     background-position: center 10px; /* Adjust the vertical position of the background image */
 }
+.nav-button {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    margin: 10px;
+    border-radius: 50%;
+    overflow: hidden;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.nav-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 
 /* Media Queries */
 @media (max-width: 768px) {
