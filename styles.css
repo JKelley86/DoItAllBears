@@ -159,7 +159,9 @@ footer {
     background-position: center 10px; /* Adjust the vertical position of the background image */
 }
 .nav-button {
-    display: inline-block;
+    display: inline-flex; /* Changed from inline-block to inline-flex */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
     width: 75px;
     height: 75px;
     margin: 10px;
@@ -167,7 +169,6 @@ footer {
     background-color: #000;
     color: #fff;
     text-align: center;
-    line-height: 80px;
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
