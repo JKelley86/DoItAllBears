@@ -2,109 +2,78 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Number Sequence Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Shape Calculators</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
+        .calculator {
+            background-color: #fff;
             padding: 20px;
-            text-align: center;
-            background-color: #f9f9f9;
+            margin-bottom: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin: 20px auto; /* Center table horizontally */
         }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
+        .calc-column {
+            width: 40%;
         }
-        label {
+        .calculator label {
             display: block;
-            margin: 10px 0 5px;
+            margin-bottom: 5px;
             font-weight: bold;
+            color: #333;
         }
-        input {
+        .calculator input {
             width: 100%;
             padding: 8px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            color: #333;
+            touch-action: manipulation;
         }
-        button {
+        .calculator button {
             padding: 10px 20px;
             background-color: #007BFF;
             color: #fff;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
         }
-        button:hover {
+        .calculator button:hover {
             background-color: #0056b3;
         }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            background-color: #e9e9e9;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 4px;
-        }
-        /* Existing styles */
-        body {
-            font-family: Arial, sans-serif;
-            background-image: url('background.jpg');
-            background-size: cover;
-            background-attachment: fixed;
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
             color: #333;
-        }
-        .nav-bar {
-            background-color: #333;
-            overflow: hidden;
-        }
-        .nav-bar a {
-            float: left;
-            display: block;
-            color: #f2f2f2;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-        }
-        .nav-bar a:hover {
-            background-color: #ddd;
-            color: black;
-        }
-        footer {
-            background-color: #333;
-            color: #f2f2f2;
-            text-align: center;
-            padding: 10px 0;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
         }
     </style>
 </head>
-<body>
-    <div class="nav-bar">
-        <a href="index.html">Home</a>
-        <a href="shapes.html">Shapes</a>
-        <a href="speed.html">Speed</a>
-        <a href="conversions.html">Conversions</a>
-        <a href="electrical.html">Electrical</a>
-        <a href="algebra.html">Algebra</a>
-        <a href="conveyor.html">Conveyor</a>
-        <a href="binary.html">Binary</a>
-        <a href="cooking.html">Cooking</a>
-        <a href="weight.html">Weight</a>
-        <a href="physics.html">Physics</a>
-        <a href="calculus.html">Calculus</a>
-        <a href="chemistry.html">Chemistry</a>
-    </div>
-
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+<div class="container">
+    <nav>
+        <ul class="navbar-left">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="shapes.html">Shapes</a></li>
+            <li><a href="speed.html">Speed</a></li>
+            <li><a href="conversions.html">Conversions</a></li>
+            <li><a href="electrical.html">Electrical</a></li>
+            <li><a href="algebra.html">Algebra</a></li>
+            <li><a href="conveyor.html">Conveyor</a></li>
+            <li><a href="binary.html">Binary</a></li>
+            <li><a href="cooking.html">Cooking</a></li>
+            <li><a href="weight.html">Weight</a></li>
+            <li><a href="physics.html">Physics</a></li>
+            <li><a href="calculus.html">Calculus</a></li>
+            <li><a href="chemistry.html">Chemistry</a></li>
+            <li><a href="trigonometry.html">Trigonometry</a></li>
+        </ul>
+    </nav>
+<main>
     <div class="container">
         <h1>Number Sequence Generator</h1>
         <label for="startNumber">Starting Number:</label>
@@ -117,7 +86,7 @@
         
         <ul id="numberList"></ul>
     </div>
-
+</main>
     <footer>
         &copy; 2024 Your Website. All rights reserved.
     </footer>
