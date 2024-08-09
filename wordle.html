@@ -36,7 +36,7 @@
             grid-gap: 5px;
             justify-content: center;
             margin: 20px auto;
-            max-width: 500px;
+            max-width: 450px;
         }
 
         /* Keyboard keys */
@@ -199,9 +199,6 @@
                 }
                 currentGuess = "";
                 rowIndex++;
-                if (rowIndex >= maxGuesses) {
-                    document.getElementById('reset-button').style.display = 'block';
-                }
             }
         }
 
@@ -214,8 +211,9 @@
 
         function updateGrid() {
             const start = rowIndex * 5;
+            const cells = document.querySelectorAll('.grid-cell');
             for (let i = 0; i < 5; i++) {
-                const cell = document.querySelector(`.grid-cell[data-index='${start + i}']`);
+                const cell = cells[start + i];
                 cell.textContent = currentGuess[i] || '';
             }
         }
@@ -227,24 +225,24 @@
 
             guess.forEach((letter, index) => {
                 const cell = document.querySelector(`.grid-cell[data-index='${start + index}']`);
-
                 if (correctWord[index] === letter) {
                     cell.classList.add('correct');
-                    updateKeyboardKeyColor(letter, 'correct');
                 } else if (correctWord.includes(letter)) {
                     cell.classList.add('present');
-                    updateKeyboardKeyColor(letter, 'present');
                 } else {
                     cell.classList.add('absent');
-                    updateKeyboardKeyColor(letter, 'absent');
                 }
             });
+
+            guess.forEach(letter => updateKeyboardKeyColor(letter));
         }
 
-        function updateKeyboardKeyColor(letter, status) {
+        function updateKeyboardKeyColor(letter) {
             const key = [...document.querySelectorAll('.key')].find(k => k.textContent === letter);
             if (key) {
-                key.className = `key ${status}`;
+                if (key.classList.contains('correct')) return;
+                if (key.classList.contains('present')) return;
+                key.classList.add('absent');
             }
         }
     </script>
