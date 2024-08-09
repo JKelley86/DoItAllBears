@@ -75,16 +75,22 @@
         }
 
         /* Center the start and reset buttons */
-        .button-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
+        #start-button, #reset-button {
+            display: block;
+            margin: 20px auto;
         }
 
         /* Hide reset button initially */
         #reset-button {
             display: none;
+        }
+
+        /* Reset button positioning */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -126,10 +132,10 @@
             currentGuess = "";
             rowIndex = 0;
             document.getElementById('message').textContent = "";
-            document.getElementById('reset-button').style.display = 'block'; // Show reset button
             generateGrid();
             generateKeyboard();
             document.getElementById('start-button').style.display = 'none';
+            document.getElementById('reset-button').style.display = 'block';
         }
 
         function resetGame() {
@@ -149,33 +155,30 @@
 
         function generateKeyboard() {
             const keyboardLayout = [
-                'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
-                'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
-                'z', 'x', 'c', 'v', 'b', 'n', 'm'
+                ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+                ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+                ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
+                ['Enter', 'Del']
             ];
 
             const keyboard = document.getElementById('keyboard');
             keyboard.innerHTML = "";
 
-            keyboardLayout.forEach(key => {
-                const button = document.createElement('button');
-                button.className = 'key';
-                button.textContent = key;
-                button.addEventListener('click', () => handleKeyPress(key));
-                keyboard.appendChild(button);
+            keyboardLayout.forEach(row => {
+                row.forEach(key => {
+                    const button = document.createElement('button');
+                    button.className = 'key';
+                    if (key === 'Enter' || key === 'Del') {
+                        button.classList.add('large');
+                        button.textContent = key;
+                        button.addEventListener('click', key === 'Enter' ? handleEnter : handleDelete);
+                    } else {
+                        button.textContent = key;
+                        button.addEventListener('click', () => handleKeyPress(key));
+                    }
+                    keyboard.appendChild(button);
+                });
             });
-
-            const enterKey = document.createElement('button');
-            enterKey.className = 'key large';
-            enterKey.textContent = 'Enter';
-            enterKey.addEventListener('click', handleEnter);
-            keyboard.appendChild(enterKey);
-
-            const deleteKey = document.createElement('button');
-            deleteKey.className = 'key large';
-            deleteKey.textContent = 'Del';
-            deleteKey.addEventListener('click', handleDelete);
-            keyboard.appendChild(deleteKey);
         }
 
         function handleKeyPress(key) {
@@ -192,10 +195,13 @@
                     document.getElementById('message').textContent = currentGuess === currentWord ? 
                         "Congratulations! You've guessed the word!" : 
                         `Game Over! The word was ${currentWord}.`;
-                    document.getElementById('reset-button').style.display = 'block'; // Show reset button
+                    document.getElementById('reset-button').style.display = 'block';
                 }
                 currentGuess = "";
                 rowIndex++;
+                if (rowIndex >= maxGuesses) {
+                    document.getElementById('reset-button').style.display = 'block';
+                }
             }
         }
 
