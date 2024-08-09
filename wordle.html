@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Wordle Game</title>
-    <link rel="stylesheet" href="styles.css">
     <style>
         /* Grid container */
         .grid {
@@ -74,18 +73,7 @@
             color: #fff;
         }
 
-        /* Center the start and reset buttons */
-        #start-button, #reset-button {
-            display: block;
-            margin: 20px auto;
-        }
-
-        /* Hide reset button initially */
-        #reset-button {
-            display: none;
-        }
-
-        /* Reset button positioning */
+        /* Button container */
         .button-container {
             display: flex;
             flex-direction: column;
@@ -94,7 +82,7 @@
         }
     </style>
 </head>
-<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+<body>
     <div class="container">
         <main>
             <h1>Wordle Game</h1>
@@ -107,14 +95,11 @@
 
             <div class="button-container">
                 <button id="start-button" class="key large">Start Game</button>
-                <button id="reset-button" class="key large">Reset Game</button>
+                <button id="reset-button" class="key large" style="display:none;">Reset Game</button>
             </div>
 
             <p id="message"></p>
         </main>
-        <footer>
-            <span>&copy; 2024 Justin's Calculations. All rights reserved.</span>
-        </footer>
     </div>
 
     <script>
@@ -233,17 +218,6 @@
                     cell.classList.add('absent');
                 }
             });
-
-            guess.forEach(letter => updateKeyboardKeyColor(letter));
-        }
-
-        function updateKeyboardKeyColor(letter) {
-            const key = [...document.querySelectorAll('.key')].find(k => k.textContent === letter);
-            if (key) {
-                if (key.classList.contains('correct')) return;
-                if (key.classList.contains('present')) return;
-                key.classList.add('absent');
-            }
         }
     </script>
 </body>
