@@ -120,7 +120,7 @@
     <script>
         const wordList = ["apple", "bread", "crane", "drive", "eagle", "flame", "grape"];
         let currentWord = "";
-        let currentGuess = "";
+        let currentGuess = [];
         let rowIndex = 0;
         const maxGuesses = 6;
 
@@ -129,7 +129,7 @@
 
         function startGame() {
             currentWord = wordList[Math.floor(Math.random() * wordList.length)];
-            currentGuess = "";
+            currentGuess = [];
             rowIndex = 0;
             document.getElementById('message').textContent = "";
             generateGrid();
@@ -186,7 +186,7 @@
 
         function handleKeyPress(key) {
             if (currentGuess.length < 5) {
-                currentGuess += key;
+                currentGuess.push(key);
                 updateGrid();
             }
         }
@@ -194,20 +194,20 @@
         function handleEnter() {
             if (currentGuess.length === 5) {
                 checkGuess();
-                if (currentGuess === currentWord || rowIndex === maxGuesses - 1) {
-                    document.getElementById('message').textContent = currentGuess === currentWord ? 
+                if (currentGuess.join('') === currentWord || rowIndex === maxGuesses - 1) {
+                    document.getElementById('message').textContent = currentGuess.join('') === currentWord ? 
                         "Congratulations! You've guessed the word!" : 
                         `Game Over! The word was ${currentWord}.`;
                     document.getElementById('reset-button').style.display = 'block';
                 }
-                currentGuess = "";
+                currentGuess = [];
                 rowIndex++;
             }
         }
 
         function handleDelete() {
             if (currentGuess.length > 0) {
-                currentGuess = currentGuess.slice(0, -1);
+                currentGuess.pop();
                 updateGrid();
             }
         }
@@ -222,7 +222,7 @@
 
         function checkGuess() {
             const start = rowIndex * 5;
-            const guess = currentGuess.split('');
+            const guess = currentGuess;
             const correctWord = currentWord.split('');
 
             guess.forEach((letter, index) => {
