@@ -31,33 +31,39 @@
         }
 
         /* Keyboard container */
-        .keyboard {
-            display: grid;
-            grid-template-columns: repeat(10, 40px);
-            grid-gap: 5px;
-            justify-content: center;
-            margin: 20px auto;
-            max-width: 450px;
-        }
+.keyboard {
+    display: grid;
+    grid-template-columns: repeat(10, 40px); /* Adjust as needed */
+    grid-gap: 5px;
+    justify-content: center;
+    margin: 20px auto;
+    max-width: 450px;
+}
 
-        /* Keyboard keys */
-        .key {
-            height: 40px;
-            background-color: #ccc;
-            border: none;
-            border-radius: 4px;
-            font-size: 18px;
-            font-weight: bold;
-            text-transform: uppercase;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+/* Adjust the layout based on key size */
+.key {
+    height: 40px;
+    background-color: #ccc;
+    border: none;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-        .key.large {
-            width: 80px;
-        }
+.key.large {
+    width: 80px;
+}
+
+/* Adjust the grid layout to accommodate various keyboard rows if needed */
+.keyboard-row {
+    display: flex;
+    justify-content: center;
+}
 
         /* Colors for feedback */
         .correct {
