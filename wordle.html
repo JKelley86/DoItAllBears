@@ -216,19 +216,25 @@
 
             guess.forEach((letter, index) => {
                 const cell = document.querySelector(`.grid-cell[data-index='${start + index}']`);
-                const key = document.querySelector(`.key:contains('${letter}')`);
 
                 if (correctWord[index] === letter) {
                     cell.classList.add('correct');
-                    if (key) key.classList.add('correct');
+                    updateKeyboardKeyColor(letter, 'correct');
                 } else if (correctWord.includes(letter)) {
                     cell.classList.add('present');
-                    if (key) key.classList.add('present');
+                    updateKeyboardKeyColor(letter, 'present');
                 } else {
                     cell.classList.add('absent');
-                    if (key) key.classList.add('absent');
+                    updateKeyboardKeyColor(letter, 'absent');
                 }
             });
+        }
+
+        function updateKeyboardKeyColor(letter, status) {
+            const key = [...document.querySelectorAll('.key')].find(k => k.textContent === letter);
+            if (key) {
+                key.className = `key ${status}`;
+            }
         }
     </script>
 </body>
