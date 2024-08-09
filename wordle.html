@@ -1,224 +1,134 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Wordle Game</title>
-    <style>
-        /* Grid container */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(5, 60px);
-            grid-gap: 5px;
-            justify-content: center;
-            margin-top: 20px;
-        }
+const wordList = ["apple", "bread", "crane", "drive", "eagle", "flame", "grape"];
+let currentWord = "";
+let currentGuess = "";
+let rowIndex = 0;
+const maxGuesses = 6;
 
-        /* Grid cells */
-        .grid-cell {
-            width: 60px;
-            height: 60px;
-            border: 2px solid #ccc;
-            font-size: 24px;
-            text-align: center;
-            line-height: 60px;
-            font-weight: bold;
-            text-transform: uppercase;
-            background-color: #fff;
-            user-select: none;
-        }
+document.getElementById('start-button').addEventListener('click', startGame);
+document.getElementById('reset-button').addEventListener('click', resetGame);
 
-        /* Keyboard container */
-        .keyboard {
-            display: grid;
-            grid-template-columns: repeat(10, 40px);
-            grid-gap: 5px;
-            justify-content: center;
-            margin: 20px auto;
-            max-width: 450px;
-        }
+function startGame() {
+    currentWord = wordList[Math.floor(Math.random() * wordList.length)];
+    currentGuess = "";
+    rowIndex = 0;
+    document.getElementById('message').textContent = "";
+    generateGrid();
+    generateKeyboard();
+    document.getElementById('start-button').style.display = 'none';
+    document.getElementById('reset-button').style.display = 'none';
+}
 
-        /* Keyboard keys */
-        .key {
-            height: 40px;
-            background-color: #ccc;
-            border: none;
-            border-radius: 4px;
-            font-size: 18px;
-            font-weight: bold;
-            text-transform: uppercase;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+function resetGame() {
+    startGame();
+}
 
-        .key.large {
-            width: 80px;
-        }
+function generateGrid() {
+    const grid = document.getElementById('grid');
+    grid.innerHTML = "";
+    for (let i = 0; i < maxGuesses * 5; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'grid-cell';
+        cell.setAttribute('data-index', i);
+        grid.appendChild(cell);
+    }
+}
 
-        /* Colors for feedback */
-        .correct {
-            background-color: #6aaa64; /* green */
-            color: #fff;
-        }
+function generateKeyboard() {
+    const keyboardLayout = [
+        'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
+        'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+        'z', 'x', 'c', 'v', 'b', 'n', 'm'
+    ];
 
-        .present {
-            background-color: #c9b458; /* yellow */
-            color: #fff;
-        }
+    const keyboard = document.getElementById('keyboard');
+    keyboard.innerHTML = "";
 
-        .absent {
-            background-color: #787c7e; /* gray */
-            color: #fff;
-        }
+    keyboardLayout.forEach(key => {
+        const button = document.createElement('button');
+        button.className = 'key';
+        button.textContent = key;
+        button.addEventListener('click', () => handleKeyPress(key));
+        keyboard.appendChild(button);
+    });
 
-        /* Button container */
-        .button-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <main>
-            <h1>Wordle Game</h1>
+    const enterKey = document.createElement('button');
+    enterKey.className = 'key large';
+    enterKey.textContent = 'Enter';
+    enterKey.addEventListener('click', handleEnter);
+    keyboard.appendChild(enterKey);
 
-            <!-- Grid -->
-            <div id="grid" class="grid"></div>
+    const deleteKey = document.createElement('button');
+    deleteKey.className = 'key large';
+    deleteKey.textContent = 'Del';
+    deleteKey.addEventListener('click', handleDelete);
+    keyboard.appendChild(deleteKey);
+}
 
-            <!-- Keyboard -->
-            <div id="keyboard" class="keyboard"></div>
+function handleKeyPress(key) {
+    if (currentGuess.length < 5) {
+        currentGuess += key;
+        updateGrid();
+    }
+}
 
-            <div class="button-container">
-                <button id="start-button" class="key large">Start Game</button>
-                <button id="reset-button" class="key large" style="display:none;">Reset Game</button>
-            </div>
-
-            <p id="message"></p>
-        </main>
-    </div>
-
-    <script>
-        const wordList = ["apple", "bread", "crane", "drive", "eagle", "flame", "grape"];
-        let currentWord = "";
-        let currentGuess = "";
-        let rowIndex = 0;
-        const maxGuesses = 6;
-
-        document.getElementById('start-button').addEventListener('click', startGame);
-        document.getElementById('reset-button').addEventListener('click', resetGame);
-
-        function startGame() {
-            currentWord = wordList[Math.floor(Math.random() * wordList.length)];
-            currentGuess = "";
-            rowIndex = 0;
-            document.getElementById('message').textContent = "";
-            generateGrid();
-            generateKeyboard();
-            document.getElementById('start-button').style.display = 'none';
+function handleEnter() {
+    if (currentGuess.length === 5) {
+        checkGuess();
+        if (currentGuess === currentWord || rowIndex === maxGuesses - 1) {
+            document.getElementById('message').textContent = currentGuess === currentWord ? 
+                "Congratulations! You've guessed the word!" : 
+                `Game Over! The word was ${currentWord}.`;
             document.getElementById('reset-button').style.display = 'block';
         }
+        currentGuess = "";
+        rowIndex++;
+    }
+}
 
-        function resetGame() {
-            startGame();
+function handleDelete() {
+    if (currentGuess.length > 0) {
+        currentGuess = currentGuess.slice(0, -1);
+        updateGrid();
+    }
+}
+
+function updateGrid() {
+    const start = rowIndex * 5;
+    for (let i = 0; i < 5; i++) {
+        const cell = document.querySelector(`.grid-cell[data-index='${start + i}']`);
+        cell.textContent = currentGuess[i] || '';
+    }
+}
+
+function checkGuess() {
+    const start = rowIndex * 5;
+    const guess = currentGuess.split('');
+    const correctWord = currentWord.split('');
+
+    guess.forEach((letter, index) => {
+        const cell = document.querySelector(`.grid-cell[data-index='${start + index}']`);
+
+        if (correctWord[index] === letter) {
+            cell.classList.add('correct');
+            updateKeyboardKeyColor(letter, 'correct');
+        } else if (correctWord.includes(letter)) {
+            cell.classList.add('present');
+            updateKeyboardKeyColor(letter, 'present');
+        } else {
+            cell.classList.add('absent');
+            updateKeyboardKeyColor(letter, 'absent');
         }
+    });
+}
 
-        function generateGrid() {
-            const grid = document.getElementById('grid');
-            grid.innerHTML = "";
-            for (let i = 0; i < maxGuesses * 5; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'grid-cell';
-                cell.setAttribute('data-index', i);
-                grid.appendChild(cell);
-            }
+function updateKeyboardKeyColor(letter, status) {
+    const key = [...document.querySelectorAll('.key')].find(k => k.textContent === letter);
+    if (key) {
+        const currentStatus = key.className.split(' ').pop();
+        if (currentStatus === 'absent' && status !== 'absent') {
+            key.className = `key ${status}`;
+        } else if (currentStatus === 'present' && status === 'correct') {
+            key.className = `key ${status}`;
         }
-
-        function generateKeyboard() {
-            const keyboardLayout = [
-                ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-                ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-                ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
-                ['Enter', 'Del']
-            ];
-
-            const keyboard = document.getElementById('keyboard');
-            keyboard.innerHTML = "";
-
-            keyboardLayout.forEach(row => {
-                row.forEach(key => {
-                    const button = document.createElement('button');
-                    button.className = 'key';
-                    if (key === 'Enter' || key === 'Del') {
-                        button.classList.add('large');
-                        button.textContent = key;
-                        button.addEventListener('click', key === 'Enter' ? handleEnter : handleDelete);
-                    } else {
-                        button.textContent = key;
-                        button.addEventListener('click', () => handleKeyPress(key));
-                    }
-                    keyboard.appendChild(button);
-                });
-            });
-        }
-
-        function handleKeyPress(key) {
-            if (currentGuess.length < 5) {
-                currentGuess += key;
-                updateGrid();
-            }
-        }
-
-        function handleEnter() {
-            if (currentGuess.length === 5) {
-                checkGuess();
-                if (currentGuess === currentWord || rowIndex === maxGuesses - 1) {
-                    document.getElementById('message').textContent = currentGuess === currentWord ? 
-                        "Congratulations! You've guessed the word!" : 
-                        `Game Over! The word was ${currentWord}.`;
-                    document.getElementById('reset-button').style.display = 'block';
-                }
-                currentGuess = "";
-                rowIndex++;
-            }
-        }
-
-        function handleDelete() {
-            if (currentGuess.length > 0) {
-                currentGuess = currentGuess.slice(0, -1);
-                updateGrid();
-            }
-        }
-
-        function updateGrid() {
-            const start = rowIndex * 5;
-            const cells = document.querySelectorAll('.grid-cell');
-            for (let i = 0; i < 5; i++) {
-                const cell = cells[start + i];
-                cell.textContent = currentGuess[i] || '';
-            }
-        }
-
-        function checkGuess() {
-            const start = rowIndex * 5;
-            const guess = currentGuess.split('');
-            const correctWord = currentWord.split('');
-
-            guess.forEach((letter, index) => {
-                const cell = document.querySelector(`.grid-cell[data-index='${start + index}']`);
-                if (correctWord[index] === letter) {
-                    cell.classList.add('correct');
-                } else if (correctWord.includes(letter)) {
-                    cell.classList.add('present');
-                } else {
-                    cell.classList.add('absent');
-                }
-            });
-        }
-    </script>
-</body>
-</html>
+    }
+}
