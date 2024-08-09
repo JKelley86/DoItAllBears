@@ -31,39 +31,39 @@
         }
 
         /* Keyboard container */
-.keyboard {
-    display: grid;
-    grid-template-columns: repeat(10, 40px); /* Adjust as needed */
-    grid-gap: 5px;
-    justify-content: center;
-    margin: 20px auto;
-    max-width: 450px;
-}
+        .keyboard {
+            display: grid;
+            grid-template-columns: repeat(10, 40px); /* Adjust as needed */
+            grid-gap: 5px;
+            justify-content: center;
+            margin: 20px auto;
+            max-width: 450px;
+        }
 
-/* Adjust the layout based on key size */
-.key {
-    height: 40px;
-    background-color: #ccc;
-    border: none;
-    border-radius: 4px;
-    font-size: 18px;
-    font-weight: bold;
-    text-transform: uppercase;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        /* Adjust the layout based on key size */
+        .key {
+            height: 40px;
+            background-color: #ccc;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-.key.large {
-    width: 80px;
-}
+        .key.large {
+            width: 80px;
+        }
 
-/* Adjust the grid layout to accommodate various keyboard rows if needed */
-.keyboard-row {
-    display: flex;
-    justify-content: center;
-}
+        /* Adjust the grid layout to accommodate various keyboard rows if needed */
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+        }
 
         /* Colors for feedback */
         .correct {
@@ -82,13 +82,13 @@
         }
 
         /* Center the start and reset buttons */
-        #start-button, #reset-button {
+        #start-button, #reset-button, #hint-button {
             display: block;
             margin: 20px auto;
         }
 
-        /* Hide reset button initially */
-        #reset-button {
+        /* Hide reset and hint buttons initially */
+        #reset-button, #hint-button {
             display: none;
         }
 
@@ -115,6 +115,7 @@
             <div class="button-container">
                 <button id="start-button" class="key large">Start Game</button>
                 <button id="reset-button" class="key large">Reset Game</button>
+                <button id="hint-button" class="key large">Hint</button> <!-- New hint button -->
             </div>
 
             <p id="message"></p>
@@ -125,8 +126,7 @@
     </div>
 
     <script>
-        const wordList = ["rossa",
-];
+        const wordList = ["rossa"];
         let currentWord = "";
         let currentGuess = "";
         let rowIndex = 0;
@@ -134,6 +134,7 @@
 
         document.getElementById('start-button').addEventListener('click', startGame);
         document.getElementById('reset-button').addEventListener('click', resetGame);
+        document.getElementById('hint-button').addEventListener('click', giveHint);
 
         function startGame() {
             currentWord = wordList[Math.floor(Math.random() * wordList.length)];
@@ -144,10 +145,12 @@
             generateKeyboard();
             document.getElementById('start-button').style.display = 'none';
             document.getElementById('reset-button').style.display = 'none';
+            document.getElementById('hint-button').style.display = 'block'; // Show hint button
         }
 
         function resetGame() {
             startGame();
+            document.getElementById('hint-button').style.display = 'none'; // Hide hint button
         }
 
         function generateGrid() {
@@ -161,12 +164,12 @@
             }
         }
 
-function generateKeyboard() {
-    const keyboardLayout = [
-        'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
-        'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
-        'z', 'x', 'c', 'v', 'b', 'n', 'm'
-    ];
+        function generateKeyboard() {
+            const keyboardLayout = [
+                'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
+                'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+                'z', 'x', 'c', 'v', 'b', 'n', 'm'
+            ];
 
             const keyboard = document.getElementById('keyboard');
             keyboard.innerHTML = "";
@@ -259,6 +262,14 @@ function generateKeyboard() {
                 } else if (key.classList.contains('absent') && status !== 'absent') {
                     key.classList.replace('absent', status);
                 }
+            }
+        }
+
+        function giveHint() {
+            if (currentWord) {
+                const randomIndex = Math.floor(Math.random() * currentWord.length);
+                const hintLetter = currentWord[randomIndex];
+                document.getElementById('message').textContent = `Hint: One of the letters is '${hintLetter.toUpperCase()}'`;
             }
         }
     </script>
