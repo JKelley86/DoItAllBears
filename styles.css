@@ -15,7 +15,6 @@ html, body {
 body {
     text-align: center;
     margin: 0;
-    overflow: hidden;
 }
 
 .calculator.single-column {
