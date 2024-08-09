@@ -98,14 +98,16 @@
             let tipAmount = parseFloat(document.getElementById('tipAmount').value) || 0;
             let tipPercentage = parseFloat(document.getElementById('tipPercentage').value) || 0;
 
-            if (total && tipPercentage && !tipAmount) {
+            // Calculate Tip Amount and Tip Percentage based on input
+            if (total && tipPercentage) {
                 tipAmount = (total * tipPercentage) / 100;
                 document.getElementById('tipAmount').value = tipAmount.toFixed(2);
-            } else if (total && tipAmount && !tipPercentage) {
+            } else if (total && tipAmount) {
                 tipPercentage = (tipAmount / total) * 100;
                 document.getElementById('tipPercentage').value = tipPercentage.toFixed(2);
             }
 
+            // Display final total
             if (total && tipAmount) {
                 const finalTotal = total + tipAmount;
                 document.getElementById('finalResult').innerHTML = 
