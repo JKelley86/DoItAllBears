@@ -41,21 +41,23 @@
         }
 
         /* Adjust the layout based on key size */
-.key {
-    height: 10vw; /* Responsive height based on viewport width */
-    background-color: #ccc;
-    border: none;
-    border-radius: 4px;
-    font-size: 4vw; /* Responsive font size */
-    font-weight: bold;
-    text-transform: uppercase;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.key.large {
-    grid-column: span 2; /* Span two columns for larger keys like Enter and Delete */
+        .key {
+            height: 40px;
+            background-color: #ccc;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .key.large {
+            width: 85px;
+        }
 
         /* Adjust the grid layout to accommodate various keyboard rows if needed */
         .keyboard-row {
