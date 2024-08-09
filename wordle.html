@@ -18,6 +18,7 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
+            visibility: hidden; /* Hidden initially */
         }
         .letter-box {
             width: 40px;
@@ -56,6 +57,7 @@
             padding: 10px;
             width: 200px;
             text-transform: uppercase;
+            display: none; /* Hidden initially */
         }
         button {
             margin-top: 20px;
@@ -72,22 +74,33 @@
         }
     </style>
 </head>
-<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+<body>
 
 <h1>Wordle Game</h1>
+<button onclick="startGame()">Start Game</button>
 <div class="wordle-container" id="wordle-container"></div>
 <input type="text" id="guessInput" maxlength="5">
-<button onclick="checkGuess()">Submit</button>
+<button onclick="checkGuess()" id="submitBtn" style="display: none;">Submit</button>
 
 <p id="message"></p>
 
 <script>
     const wordList = ["apple", "baker", "candy", "delta", "eagle", "fjord", "globe", "hotel", "input", "joker"]; // Add more words to this list
-    const answer = wordList[Math.floor(Math.random() * wordList.length)].toUpperCase();
+    let answer = "";
     let attempts = 0;
+
+    function startGame() {
+        answer = wordList[Math.floor(Math.random() * wordList.length)].toUpperCase();
+        document.getElementById('wordle-container').style.visibility = 'visible';
+        document.getElementById('guessInput').style.display = 'block';
+        document.getElementById('submitBtn').style.display = 'block';
+        document.querySelector('button[onclick="startGame()"]').style.display = 'none'; // Hide the start button
+        createWordleGrid();
+    }
 
     function createWordleGrid() {
         const container = document.getElementById('wordle-container');
+        container.innerHTML = ''; // Clear any existing boxes
         for (let i = 0; i < 30; i++) { // 6 rows of 5 letters
             const div = document.createElement('div');
             div.className = 'letter-box';
@@ -144,8 +157,6 @@
             document.getElementById('message').textContent = `Game over! The word was ${answer}.`;
         }
     }
-
-    createWordleGrid();
 </script>
 
 </body>
