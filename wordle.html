@@ -36,7 +36,7 @@
             grid-gap: 5px;
             justify-content: center;
             margin: 20px auto;
-            max-width: 450px;
+            max-width: 480px;
         }
 
         /* Keyboard keys */
@@ -80,9 +80,9 @@
             margin: 20px auto;
         }
 
-        /* Hide reset button initially */
+        /* Reset button always visible */
         #reset-button {
-            display: none;
+            display: block;
         }
 
         /* Reset button positioning */
@@ -126,7 +126,8 @@
 
         document.getElementById('start-button').addEventListener('click', startGame);
         document.getElementById('reset-button').addEventListener('click', resetGame);
-
+        
+        // Start the game
         function startGame() {
             currentWord = wordList[Math.floor(Math.random() * wordList.length)];
             currentGuess = [];
@@ -135,13 +136,14 @@
             generateGrid();
             generateKeyboard();
             document.getElementById('start-button').style.display = 'none';
-            document.getElementById('reset-button').style.display = 'none';
         }
 
+        // Reset the game
         function resetGame() {
             startGame();
         }
 
+        // Generate the grid
         function generateGrid() {
             const grid = document.getElementById('grid');
             grid.innerHTML = "";
@@ -153,6 +155,7 @@
             }
         }
 
+        // Generate the keyboard
         function generateKeyboard() {
             const keyboardLayout = [
                 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
@@ -184,6 +187,7 @@
             keyboard.appendChild(deleteKey);
         }
 
+        // Handle key press
         function handleKeyPress(key) {
             if (currentGuess.length < 5) {
                 currentGuess.push(key);
@@ -191,6 +195,7 @@
             }
         }
 
+        // Handle Enter key
         function handleEnter() {
             if (currentGuess.length === 5) {
                 checkGuess();
@@ -198,13 +203,14 @@
                     document.getElementById('message').textContent = currentGuess.join('') === currentWord ? 
                         "Congratulations! You've guessed the word!" : 
                         `Game Over! The word was ${currentWord}.`;
-                    document.getElementById('reset-button').style.display = 'block';
+                    // Reset button is always visible
                 }
                 currentGuess = [];
                 rowIndex++;
             }
         }
 
+        // Handle Delete key
         function handleDelete() {
             if (currentGuess.length > 0) {
                 currentGuess.pop();
@@ -212,6 +218,7 @@
             }
         }
 
+        // Update the grid with current guess
         function updateGrid() {
             const start = rowIndex * 5;
             for (let i = 0; i < 5; i++) {
@@ -220,6 +227,7 @@
             }
         }
 
+        // Check the guess against the current word
         function checkGuess() {
             const start = rowIndex * 5;
             const guess = currentGuess;
@@ -241,6 +249,7 @@
             });
         }
 
+        // Update the color of keyboard keys based on feedback
         function updateKeyboardKeyColor(letter, status) {
             const key = [...document.querySelectorAll('.key')].find(k => k.textContent === letter);
             if (key) {
