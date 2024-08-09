@@ -12,14 +12,8 @@
             margin-bottom: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
             width: 80%;
             margin: 20px auto;
-            color: #333;
-        }
-        .calc-column {
-            width: 45%;
         }
         .calculator label {
             display: block;
@@ -50,7 +44,7 @@
         .result {
             margin-top: 10px;
             font-weight: bold;
-            color: #000;
+            color: #333;
         }
     </style>
 </head>
@@ -59,63 +53,63 @@
     <nav>
         <ul class="navbar-left">
             <li><a href="index.html">Home</a></li>
-            <!-- Add other navigation links here -->
+            <li><a href="shapes.html">Shapes</a></li>
+            <li><a href="speed.html">Speed</a></li>
+            <li><a href="conversions.html">Conversions</a></li>
+            <li><a href="electrical.html">Electrical</a></li>
+            <li><a href="algebra.html">Algebra</a></li>
+            <li><a href="conveyor.html">Conveyor</a></li>
+            <li><a href="binary.html">Binary</a></li>
+            <li><a href="cooking.html">Cooking</a></li>
+            <li><a href="weight.html">Weight</a></li>
+            <li><a href="physics.html">Physics</a></li>
+            <li><a href="calculus.html">Calculus</a></li>
+            <li><a href="chemistry.html">Chemistry</a></li>
+            <li><a href="trigonometry.html">Trigonometry</a></li>
         </ul>
     </nav>
-<main>
-    <h1>Tip Calculator</h1>
 
-    <div class="calculator">
-        <div class="calc-column">
-            <h3>Calculate Tip Percentage</h3>
-            <label for="totalAmount">Total Amount:</label>
-            <input type="number" id="totalAmount" step="0.01" placeholder="Enter total amount">
+    <main>
+        <h1>Tip Calculator</h1>
+
+        <div class="calculator">
+            <label for="total">Total Amount:</label>
+            <input type="number" id="total" step="0.01" oninput="calculateTip()">
+
             <label for="tipAmount">Tip Amount:</label>
-            <input type="number" id="tipAmount" step="0.01" placeholder="Enter tip amount">
-            <button onclick="calculatePercentage()">Calculate Percentage</button>
-            <div class="result" id="percentageResult"></div>
-        </div>
-        <div class="calc-column">
-            <h3>Calculate Tip Amount</h3>
-            <label for="totalAmount2">Total Amount:</label>
-            <input type="number" id="totalAmount2" step="0.01" placeholder="Enter total amount">
+            <input type="number" id="tipAmount" step="0.01" oninput="calculateTip()">
+
             <label for="tipPercentage">Tip Percentage:</label>
-            <input type="number" id="tipPercentage" step="0.01" placeholder="Enter tip percentage">
-            <button onclick="calculateTip()">Calculate Tip</button>
-            <div class="result" id="tipResult"></div>
+            <input type="number" id="tipPercentage" step="0.01" oninput="calculateTip()">
+
+            <div class="result" id="finalResult"></div>
         </div>
-    </div>
-</main>
+    </main>
+    
     <footer>
         <span>&copy; 2024 Justin's Calculations. All rights reserved.</span>
     </footer>
 
     <script>
-        function calculatePercentage() {
-            const totalAmount = parseFloat(document.getElementById('totalAmount').value);
-            const tipAmount = parseFloat(document.getElementById('tipAmount').value);
-            if (totalAmount > 0 && tipAmount > 0) {
-                const percentage = (tipAmount / totalAmount) * 100;
-                const totalWithTip = totalAmount + tipAmount;
-                document.getElementById('percentageResult').innerHTML = 
-                    `Tip Percentage: ${percentage.toFixed(2)}%<br>Total with Tip: $${totalWithTip.toFixed(2)}`;
-            } else {
-                document.getElementById('percentageResult').innerHTML = 
-                    `Please enter valid numbers for both total amount and tip amount.`;
-            }
-        }
-
         function calculateTip() {
-            const totalAmount = parseFloat(document.getElementById('totalAmount2').value);
-            const tipPercentage = parseFloat(document.getElementById('tipPercentage').value);
-            if (totalAmount > 0 && tipPercentage > 0) {
-                const tipAmount = (totalAmount * tipPercentage) / 100;
-                const totalWithTip = totalAmount + tipAmount;
-                document.getElementById('tipResult').innerHTML = 
-                    `Tip Amount: $${tipAmount.toFixed(2)}<br>Total with Tip: $${totalWithTip.toFixed(2)}`;
+            let total = parseFloat(document.getElementById('total').value) || 0;
+            let tipAmount = parseFloat(document.getElementById('tipAmount').value) || 0;
+            let tipPercentage = parseFloat(document.getElementById('tipPercentage').value) || 0;
+
+            if (total && tipPercentage && !tipAmount) {
+                tipAmount = (total * tipPercentage) / 100;
+                document.getElementById('tipAmount').value = tipAmount.toFixed(2);
+            } else if (total && tipAmount && !tipPercentage) {
+                tipPercentage = (tipAmount / total) * 100;
+                document.getElementById('tipPercentage').value = tipPercentage.toFixed(2);
+            }
+
+            if (total && tipAmount) {
+                const finalTotal = total + tipAmount;
+                document.getElementById('finalResult').innerHTML = 
+                    `Tip Amount: $${tipAmount.toFixed(2)}<br>Tip Percentage: ${tipPercentage.toFixed(2)}%<br>Total Price: $${finalTotal.toFixed(2)}`;
             } else {
-                document.getElementById('tipResult').innerHTML = 
-                    `Please enter valid numbers for both total amount and tip percentage.`;
+                document.getElementById('finalResult').innerHTML = '';
             }
         }
     </script>
