@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Tip Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .calculator {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin: 20px auto;
+            color: #333;
+        }
+        .calc-column {
+            width: 45%;
+        }
+        .calculator label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .calculator input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            color: #333;
+            touch-action: manipulation;
+        }
+        .calculator button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .calculator button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #000;
+        }
+    </style>
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+<div class="container">
+    <nav>
+        <ul class="navbar-left">
+            <li><a href="index.html">Home</a></li>
+            <!-- Add other navigation links here -->
+        </ul>
+    </nav>
+<main>
+    <h1>Tip Calculator</h1>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Calculate Tip Percentage</h3>
+            <label for="totalAmount">Total Amount:</label>
+            <input type="number" id="totalAmount" step="0.01" placeholder="Enter total amount">
+            <label for="tipAmount">Tip Amount:</label>
+            <input type="number" id="tipAmount" step="0.01" placeholder="Enter tip amount">
+            <button onclick="calculatePercentage()">Calculate Percentage</button>
+            <div class="result" id="percentageResult"></div>
+        </div>
+        <div class="calc-column">
+            <h3>Calculate Tip Amount</h3>
+            <label for="totalAmount2">Total Amount:</label>
+            <input type="number" id="totalAmount2" step="0.01" placeholder="Enter total amount">
+            <label for="tipPercentage">Tip Percentage:</label>
+            <input type="number" id="tipPercentage" step="0.01" placeholder="Enter tip percentage">
+            <button onclick="calculateTip()">Calculate Tip</button>
+            <div class="result" id="tipResult"></div>
+        </div>
+    </div>
+</main>
+    <footer>
+        <span>&copy; 2024 Justin's Calculations. All rights reserved.</span>
+    </footer>
+
+    <script>
+        function calculatePercentage() {
+            const totalAmount = parseFloat(document.getElementById('totalAmount').value);
+            const tipAmount = parseFloat(document.getElementById('tipAmount').value);
+            if (totalAmount > 0 && tipAmount > 0) {
+                const percentage = (tipAmount / totalAmount) * 100;
+                const totalWithTip = totalAmount + tipAmount;
+                document.getElementById('percentageResult').innerHTML = 
+                    `Tip Percentage: ${percentage.toFixed(2)}%<br>Total with Tip: $${totalWithTip.toFixed(2)}`;
+            } else {
+                document.getElementById('percentageResult').innerHTML = 
+                    `Please enter valid numbers for both total amount and tip amount.`;
+            }
+        }
+
+        function calculateTip() {
+            const totalAmount = parseFloat(document.getElementById('totalAmount2').value);
+            const tipPercentage = parseFloat(document.getElementById('tipPercentage').value);
+            if (totalAmount > 0 && tipPercentage > 0) {
+                const tipAmount = (totalAmount * tipPercentage) / 100;
+                const totalWithTip = totalAmount + tipAmount;
+                document.getElementById('tipResult').innerHTML = 
+                    `Tip Amount: $${tipAmount.toFixed(2)}<br>Total with Tip: $${totalWithTip.toFixed(2)}`;
+            } else {
+                document.getElementById('tipResult').innerHTML = 
+                    `Please enter valid numbers for both total amount and tip percentage.`;
+            }
+        }
+    </script>
+</div>
+</body>
+</html>
