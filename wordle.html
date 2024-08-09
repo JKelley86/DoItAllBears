@@ -2,162 +2,204 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wordle Game</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f3f3f3;
-            text-align: center;
-            padding: 20px;
-        }
-        .wordle-container {
-            margin: 20px auto;
-            width: 300px;
-            display: flex;
-            flex-wrap: wrap;
+        /* Grid container */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 60px);
+            grid-gap: 5px;
             justify-content: center;
-            visibility: hidden; /* Hidden initially */
+            margin-top: 20px;
         }
-        .letter-box {
+
+        /* Grid cells */
+        .grid-cell {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #ccc;
+            font-size: 24px;
+            text-align: center;
+            line-height: 60px;
+            font-weight: bold;
+            text-transform: uppercase;
+            background-color: #fff;
+            user-select: none;
+        }
+
+        /* Keyboard container */
+        .keyboard {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+
+        /* Keyboard keys */
+        .key {
             width: 40px;
             height: 40px;
             margin: 5px;
-            border: 2px solid #ccc;
-            font-size: 24px;
-            font-weight: bold;
-            line-height: 40px;
-            text-transform: uppercase;
-            box-sizing: border-box;
-        }
-        .correct {
-            background-color: green;
-            color: white;
-            border-color: green;
-        }
-        .misplaced {
-            background-color: yellow;
-            color: black;
-            border-color: yellow;
-        }
-        .wrong {
-            background-color: lightgray;
-            color: black;
-            border-color: lightgray;
-        }
-        #message {
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        input[type="text"] {
-            margin-top: 20px;
-            font-size: 18px;
-            padding: 10px;
-            width: 200px;
-            text-transform: uppercase;
-            display: none; /* Hidden initially */
-        }
-        button {
-            margin-top: 20px;
-            font-size: 18px;
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
+            background-color: #ccc;
             border: none;
             border-radius: 4px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
             cursor: pointer;
         }
-        button:hover {
-            background-color: #0056b3;
+
+        .key.large {
+            width: 80px;
+        }
+
+        /* Colors for feedback */
+        .correct {
+            background-color: #6aaa64; /* green */
+            color: #fff;
+        }
+
+        .present {
+            background-color: #c9b458; /* yellow */
+            color: #fff;
+        }
+
+        .absent {
+            background-color: #787c7e; /* gray */
+            color: #fff;
         }
     </style>
 </head>
-<body>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <h1>Wordle Game</h1>
 
-<h1>Wordle Game</h1>
-<button onclick="startGame()">Start Game</button>
-<div class="wordle-container" id="wordle-container"></div>
-<input type="text" id="guessInput" maxlength="5">
-<button onclick="checkGuess()" id="submitBtn" style="display: none;">Submit</button>
+        <!-- Grid -->
+        <div id="grid" class="grid">
+            <!-- The grid cells will be dynamically populated here -->
+        </div>
 
-<p id="message"></p>
+        <!-- Keyboard -->
+        <div id="keyboard" class="keyboard">
+            <!-- Keyboard keys will be dynamically generated here -->
+        </div>
 
-<script>
-    const wordList = ["apple", "baker", "candy", "delta", "eagle", "fjord", "globe", "hotel", "input", "joker"]; // Add more words to this list
-    let answer = "";
-    let attempts = 0;
+        <button id="start-button" class="key large">Start Game</button>
+    </div>
 
-    function startGame() {
-        answer = wordList[Math.floor(Math.random() * wordList.length)].toUpperCase();
-        document.getElementById('wordle-container').style.visibility = 'visible';
-        document.getElementById('guessInput').style.display = 'block';
-        document.getElementById('submitBtn').style.display = 'block';
-        document.querySelector('button[onclick="startGame()"]').style.display = 'none'; // Hide the start button
-        createWordleGrid();
-    }
+    <script>
+        // Word list (example)
+        const wordList = ["apple", "bread", "crane", "drive", "eagle", "flame", "grape"];
 
-    function createWordleGrid() {
-        const container = document.getElementById('wordle-container');
-        container.innerHTML = ''; // Clear any existing boxes
-        for (let i = 0; i < 30; i++) { // 6 rows of 5 letters
-            const div = document.createElement('div');
-            div.className = 'letter-box';
-            container.appendChild(div);
-        }
-    }
+        // Variables
+        let currentWord = "";
+        let currentGuess = "";
+        let rowIndex = 0;
+        let grid;
 
-    function checkGuess() {
-        const guess = document.getElementById('guessInput').value.toUpperCase();
-        if (guess.length !== 5) {
-            alert("Please enter a 5-letter word.");
-            return;
+        // Initialize game
+        document.getElementById('start-button').addEventListener('click', startGame);
+
+        function startGame() {
+            currentWord = wordList[Math.floor(Math.random() * wordList.length)];
+            currentGuess = "";
+            rowIndex = 0;
+            generateGrid();
+            generateKeyboard();
+            document.getElementById('start-button').style.display = 'none';
         }
 
-        const wordleContainer = document.getElementById('wordle-container');
-        const letterBoxes = wordleContainer.children;
-        let currentBox = attempts * 5;
-
-        let guessResult = [];
-        let answerArray = answer.split('');
-
-        // First pass: check for correct letters in the correct position
-        for (let i = 0; i < 5; i++) {
-            if (guess[i] === answer[i]) {
-                guessResult[i] = 'correct';
-                answerArray[i] = null; // Remove the letter from the answer array to prevent it from being reused
+        function generateGrid() {
+            grid = document.getElementById('grid');
+            grid.innerHTML = "";
+            for (let i = 0; i < 30; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'grid-cell';
+                cell.setAttribute('data-index', i);
+                grid.appendChild(cell);
             }
         }
 
-        // Second pass: check for correct letters in the wrong position
-        for (let i = 0; i < 5; i++) {
-            if (!guessResult[i]) { // If this position wasn't marked as correct
-                if (answerArray.includes(guess[i])) {
-                    guessResult[i] = 'misplaced';
-                    answerArray[answerArray.indexOf(guess[i])] = null; // Remove the letter from the answer array
+        function generateKeyboard() {
+            const keys = "abcdefghijklmnopqrstuvwxyz".split('');
+            const keyboard = document.getElementById('keyboard');
+            keyboard.innerHTML = "";
+
+            keys.forEach(key => {
+                const button = document.createElement('button');
+                button.className = 'key';
+                button.textContent = key;
+                button.addEventListener('click', () => handleKeyPress(key));
+                keyboard.appendChild(button);
+            });
+
+            const enterKey = document.createElement('button');
+            enterKey.className = 'key large';
+            enterKey.textContent = 'Enter';
+            enterKey.addEventListener('click', handleEnter);
+            keyboard.appendChild(enterKey);
+
+            const deleteKey = document.createElement('button');
+            deleteKey.className = 'key large';
+            deleteKey.textContent = 'Del';
+            deleteKey.addEventListener('click', handleDelete);
+            keyboard.appendChild(deleteKey);
+        }
+
+        function handleKeyPress(key) {
+            if (currentGuess.length < 5) {
+                currentGuess += key;
+                updateGrid();
+            }
+        }
+
+        function handleEnter() {
+            if (currentGuess.length === 5) {
+                checkGuess();
+                currentGuess = "";
+                rowIndex++;
+            }
+        }
+
+        function handleDelete() {
+            if (currentGuess.length > 0) {
+                currentGuess = currentGuess.slice(0, -1);
+                updateGrid();
+            }
+        }
+
+        function updateGrid() {
+            const start = rowIndex * 5;
+            for (let i = 0; i < 5; i++) {
+                const cell = document.querySelector(`.grid-cell[data-index='${start + i}']`);
+                cell.textContent = currentGuess[i] || '';
+            }
+        }
+
+        function checkGuess() {
+            const start = rowIndex * 5;
+            const guess = currentGuess.split('');
+            const correctWord = currentWord.split('');
+
+            guess.forEach((letter, index) => {
+                const cell = document.querySelector(`.grid-cell[data-index='${start + index}']`);
+                const key = document.querySelector(`.key:contains('${letter}')`);
+
+                if (correctWord[index] === letter) {
+                    cell.classList.add('correct');
+                    key.classList.add('correct');
+                } else if (correctWord.includes(letter)) {
+                    cell.classList.add('present');
+                    key.classList.add('present');
                 } else {
-                    guessResult[i] = 'wrong';
+                    cell.classList.add('absent');
+                    key.classList.add('absent');
                 }
-            }
+            });
         }
-
-        for (let i = 0; i < 5; i++) {
-            letterBoxes[currentBox].textContent = guess[i];
-            letterBoxes[currentBox].classList.add(guessResult[i]);
-            currentBox++;
-        }
-
-        attempts++;
-        document.getElementById('guessInput').value = '';
-
-        if (guess === answer) {
-            document.getElementById('message').textContent = "Congratulations! You guessed the word!";
-        } else if (attempts >= 6) {
-            document.getElementById('message').textContent = `Game over! The word was ${answer}.`;
-        }
-    }
-</script>
-
+    </script>
 </body>
 </html>
