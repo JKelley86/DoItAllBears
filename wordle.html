@@ -31,11 +31,10 @@
 
         /* Keyboard container */
         .keyboard {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
+            display: flex;
             justify-content: center;
-            grid-gap: 5px;
-            max-width: 600px;
+            flex-wrap: wrap;
+            max-width: 400px;
             margin: 20px auto;
         }
 
@@ -57,7 +56,6 @@
         }
 
         .key.large {
-            grid-column: span 2;
             width: 80px;
         }
 
@@ -86,25 +84,27 @@
 </head>
 <body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
     <div class="container">
-    <main>
-        <h1>Wordle Game</h1>
+        <main>
+            <h1>Wordle Game</h1>
 
-        <!-- Grid -->
-        <div id="grid" class="grid">
-            <!-- The grid cells will be dynamically populated here -->
-        </div>
+            <!-- Grid -->
+            <div id="grid" class="grid">
+                <!-- The grid cells will be dynamically populated here -->
+            </div>
 
-        <!-- Keyboard -->
-        <div id="keyboard" class="keyboard">
-            <!-- Keyboard keys will be dynamically generated here -->
-        </div>
+            <!-- Keyboard -->
+            <div id="keyboard" class="keyboard">
+                <!-- Keyboard keys will be dynamically generated here -->
+            </div>
 
-        <button id="start-button" class="key large">Start Game</button>
+            <button id="start-button" class="key large">Start Game</button>
+            <p id="message"></p>
+        </main>
+        <footer>
+            <span>&copy; 2024 Justin's Calculations. All rights reserved.</span>
+        </footer>
     </div>
-</main>
-    <footer> 
-        <span>&copy; 2024 Justin's Calculations. All rights reserved.</span>
-    </footer>
+
     <script>
         // Word list (example)
         const wordList = ["apple", "bread", "crane", "drive", "eagle", "flame", "grape"];
@@ -114,6 +114,7 @@
         let currentGuess = "";
         let rowIndex = 0;
         let grid;
+        const maxGuesses = 6;
 
         // Initialize game
         document.getElementById('start-button').addEventListener('click', startGame);
@@ -122,6 +123,7 @@
             currentWord = wordList[Math.floor(Math.random() * wordList.length)];
             currentGuess = "";
             rowIndex = 0;
+            document.getElementById('message').textContent = "";
             generateGrid();
             generateKeyboard();
             document.getElementById('start-button').style.display = 'none';
@@ -130,7 +132,7 @@
         function generateGrid() {
             grid = document.getElementById('grid');
             grid.innerHTML = "";
-            for (let i = 0; i < 30; i++) {
+            for (let i = 0; i < maxGuesses * 5; i++) {
                 const cell = document.createElement('div');
                 cell.className = 'grid-cell';
                 cell.setAttribute('data-index', i);
@@ -139,26 +141,17 @@
         }
 
         function generateKeyboard() {
-            const row1 = "qwertyuiop".split('');
-            const row2 = "asdfghjkl".split('');
-            const row3 = "zxcvbnm".split('');
+            const keys = "abcdefghijklmnopqrstuvwxyz".split('');
             const keyboard = document.getElementById('keyboard');
             keyboard.innerHTML = "";
 
-            const createButton = (key) => {
+            keys.forEach(key => {
                 const button = document.createElement('button');
                 button.className = 'key';
                 button.textContent = key;
                 button.addEventListener('click', () => handleKeyPress(key));
-                return button;
-            };
-
-            row1.forEach(key => keyboard.appendChild(createButton(key)));
-            keyboard.appendChild(document.createElement('div')); // Spacer to align rows
-            row2.forEach(key => keyboard.appendChild(createButton(key)));
-            keyboard.appendChild(document.createElement('div')); // Spacer to align rows
-            keyboard.appendChild(document.createElement('div')); // Spacer for left alignment of row 3
-            row3.forEach(key => keyboard.appendChild(createButton(key)));
+                keyboard.appendChild(button);
+            });
 
             const enterKey = document.createElement('button');
             enterKey.className = 'key large';
@@ -185,6 +178,10 @@
                 checkGuess();
                 currentGuess = "";
                 rowIndex++;
+                if (rowIndex === maxGuesses && currentWord !== currentGuess) {
+                    document.getElementById('message').textContent = `Game Over! The word was ${currentWord}.`;
+                    document.getElementById('start-button').style.display = 'block';
+                }
             }
         }
 
@@ -210,7 +207,7 @@
 
             guess.forEach((letter, index) => {
                 const cell = document.querySelector(`.grid-cell[data-index='${start + index}']`);
-                const key = Array.from(document.querySelectorAll('.key')).find(k => k.textContent === letter);
+                const key = document.querySelector(`.key:contains('${letter}')`);
 
                 if (correctWord[index] === letter) {
                     cell.classList.add('correct');
@@ -223,6 +220,11 @@
                     if (key) key.classList.add('absent');
                 }
             });
+
+            if (currentGuess === currentWord) {
+                document.getElementById('message').textContent = "Congratulations! You've guessed the word!";
+                document.getElementById('start-button').style.display = 'block';
+            }
         }
     </script>
 </body>
