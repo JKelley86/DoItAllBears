@@ -84,6 +84,12 @@
         #reset-button {
             display: none;
         }
+
+        /* Reset button positioning */
+        .button-container {
+            display: flex;
+            justify-content: center;
+        }
     </style>
 </head>
 <body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
@@ -97,8 +103,11 @@
             <!-- Keyboard -->
             <div id="keyboard" class="keyboard"></div>
 
-            <button id="start-button" class="key large">Start Game</button>
-            <button id="reset-button" class="key large">Reset Game</button>
+            <div class="button-container">
+                <button id="start-button" class="key large">Start Game</button>
+                <button id="reset-button" class="key large">Reset Game</button>
+            </div>
+
             <p id="message"></p>
         </main>
         <footer>
