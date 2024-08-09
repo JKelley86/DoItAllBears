@@ -244,11 +244,12 @@
         function updateKeyboardKeyColor(letter, status) {
             const key = [...document.querySelectorAll('.key')].find(k => k.textContent === letter);
             if (key) {
-                const currentStatus = key.className.split(' ').pop();
-                if (currentStatus === 'absent' && status !== 'absent') {
-                    key.className = `key ${status}`;
-                } else if (currentStatus === 'present' && status === 'correct') {
-                    key.className = `key ${status}`;
+                if (!key.classList.contains('correct') && !key.classList.contains('present') && !key.classList.contains('absent')) {
+                    key.classList.add(status);
+                } else if (key.classList.contains('present') && status === 'correct') {
+                    key.classList.replace('present', 'correct');
+                } else if (key.classList.contains('absent') && status !== 'absent') {
+                    key.classList.replace('absent', status);
                 }
             }
         }
