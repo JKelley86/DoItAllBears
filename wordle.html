@@ -50,6 +50,9 @@
             font-weight: bold;
             text-transform: uppercase;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .key.large {
@@ -70,6 +73,12 @@
         .absent {
             background-color: #787c7e; /* gray */
             color: #fff;
+        }
+
+        /* Center the start button */
+        #start-button {
+            display: block;
+            margin: 20px auto;
         }
     </style>
 </head>
@@ -190,13 +199,13 @@
 
                 if (correctWord[index] === letter) {
                     cell.classList.add('correct');
-                    key.classList.add('correct');
+                    if (key) key.classList.add('correct');
                 } else if (correctWord.includes(letter)) {
                     cell.classList.add('present');
-                    key.classList.add('present');
+                    if (key) key.classList.add('present');
                 } else {
                     cell.classList.add('absent');
-                    key.classList.add('absent');
+                    if (key) key.classList.add('absent');
                 }
             });
         }
