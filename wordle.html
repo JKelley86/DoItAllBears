@@ -31,10 +31,11 @@
 
         /* Keyboard container */
         .keyboard {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
             justify-content: center;
-            flex-wrap: wrap;
-            max-width: 400px;
+            grid-gap: 5px;
+            max-width: 600px;
             margin: 20px auto;
         }
 
@@ -56,6 +57,7 @@
         }
 
         .key.large {
+            grid-column: span 2;
             width: 80px;
         }
 
@@ -137,17 +139,26 @@
         }
 
         function generateKeyboard() {
-            const keys = "abcdefghijklmnopqrstuvwxyz".split('');
+            const row1 = "qwertyuiop".split('');
+            const row2 = "asdfghjkl".split('');
+            const row3 = "zxcvbnm".split('');
             const keyboard = document.getElementById('keyboard');
             keyboard.innerHTML = "";
 
-            keys.forEach(key => {
+            const createButton = (key) => {
                 const button = document.createElement('button');
                 button.className = 'key';
                 button.textContent = key;
                 button.addEventListener('click', () => handleKeyPress(key));
-                keyboard.appendChild(button);
-            });
+                return button;
+            };
+
+            row1.forEach(key => keyboard.appendChild(createButton(key)));
+            keyboard.appendChild(document.createElement('div')); // Spacer to align rows
+            row2.forEach(key => keyboard.appendChild(createButton(key)));
+            keyboard.appendChild(document.createElement('div')); // Spacer to align rows
+            keyboard.appendChild(document.createElement('div')); // Spacer for left alignment of row 3
+            row3.forEach(key => keyboard.appendChild(createButton(key)));
 
             const enterKey = document.createElement('button');
             enterKey.className = 'key large';
@@ -199,7 +210,7 @@
 
             guess.forEach((letter, index) => {
                 const cell = document.querySelector(`.grid-cell[data-index='${start + index}']`);
-                const key = document.querySelector(`.key:contains('${letter}')`);
+                const key = Array.from(document.querySelectorAll('.key')).find(k => k.textContent === letter);
 
                 if (correctWord[index] === letter) {
                     cell.classList.add('correct');
