@@ -176,7 +176,6 @@
         function handleKeyPress(key) {
             if (currentGuess.length < 5) {
                 currentGuess += key;
-                console.log('Key Pressed:', key, 'Current Guess:', currentGuess); // Debugging log
                 updateGrid();
             }
         }
@@ -198,7 +197,6 @@
         function handleDelete() {
             if (currentGuess.length > 0) {
                 currentGuess = currentGuess.slice(0, -1);
-                console.log('Key Deleted', 'Current Guess:', currentGuess); // Debugging log
                 updateGrid();
             }
         }
@@ -207,10 +205,7 @@
             const start = rowIndex * 5;
             for (let i = 0; i < 5; i++) {
                 const cell = document.querySelector(`.grid-cell[data-index='${start + i}']`);
-                if (cell) {
-                    cell.textContent = currentGuess[i] || '';
-                    console.log('Updating Cell:', start + i, 'with:', currentGuess[i]); // Debugging log
-                }
+                cell.textContent = currentGuess[i] || '';
             }
         }
 
