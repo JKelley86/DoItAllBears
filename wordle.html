@@ -31,18 +31,17 @@
 
         /* Keyboard container */
         .keyboard {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(10, 40px);
+            grid-gap: 5px;
             justify-content: center;
-            flex-wrap: wrap;
-            max-width: 400px;
             margin: 20px auto;
+            max-width: 450px;
         }
 
         /* Keyboard keys */
         .key {
-            width: 40px;
             height: 40px;
-            margin: 5px;
             background-color: #ccc;
             border: none;
             border-radius: 4px;
@@ -75,10 +74,15 @@
             color: #fff;
         }
 
-        /* Center the start button */
-        #start-button {
+        /* Center the start and reset buttons */
+        #start-button, #reset-button {
             display: block;
             margin: 20px auto;
+        }
+
+        /* Hide reset button initially */
+        #reset-button {
+            display: none;
         }
     </style>
 </head>
@@ -88,16 +92,13 @@
             <h1>Wordle Game</h1>
 
             <!-- Grid -->
-            <div id="grid" class="grid">
-                <!-- The grid cells will be dynamically populated here -->
-            </div>
+            <div id="grid" class="grid"></div>
 
             <!-- Keyboard -->
-            <div id="keyboard" class="keyboard">
-                <!-- Keyboard keys will be dynamically generated here -->
-            </div>
+            <div id="keyboard" class="keyboard"></div>
 
             <button id="start-button" class="key large">Start Game</button>
+            <button id="reset-button" class="key large">Reset Game</button>
             <p id="message"></p>
         </main>
         <footer>
@@ -106,18 +107,14 @@
     </div>
 
     <script>
-        // Word list (example)
         const wordList = ["apple", "bread", "crane", "drive", "eagle", "flame", "grape"];
-
-        // Variables
         let currentWord = "";
         let currentGuess = "";
         let rowIndex = 0;
-        let grid;
         const maxGuesses = 6;
 
-        // Initialize game
         document.getElementById('start-button').addEventListener('click', startGame);
+        document.getElementById('reset-button').addEventListener('click', resetGame);
 
         function startGame() {
             currentWord = wordList[Math.floor(Math.random() * wordList.length)];
@@ -127,10 +124,15 @@
             generateGrid();
             generateKeyboard();
             document.getElementById('start-button').style.display = 'none';
+            document.getElementById('reset-button').style.display = 'none';
+        }
+
+        function resetGame() {
+            startGame();
         }
 
         function generateGrid() {
-            grid = document.getElementById('grid');
+            const grid = document.getElementById('grid');
             grid.innerHTML = "";
             for (let i = 0; i < maxGuesses * 5; i++) {
                 const cell = document.createElement('div');
@@ -141,11 +143,16 @@
         }
 
         function generateKeyboard() {
-            const keys = "abcdefghijklmnopqrstuvwxyz".split('');
+            const keyboardLayout = [
+                'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
+                'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+                'z', 'x', 'c', 'v', 'b', 'n', 'm'
+            ];
+
             const keyboard = document.getElementById('keyboard');
             keyboard.innerHTML = "";
 
-            keys.forEach(key => {
+            keyboardLayout.forEach(key => {
                 const button = document.createElement('button');
                 button.className = 'key';
                 button.textContent = key;
@@ -176,12 +183,14 @@
         function handleEnter() {
             if (currentGuess.length === 5) {
                 checkGuess();
+                if (currentGuess === currentWord || rowIndex === maxGuesses - 1) {
+                    document.getElementById('message').textContent = currentGuess === currentWord ? 
+                        "Congratulations! You've guessed the word!" : 
+                        `Game Over! The word was ${currentWord}.`;
+                    document.getElementById('reset-button').style.display = 'block';
+                }
                 currentGuess = "";
                 rowIndex++;
-                if (rowIndex === maxGuesses && currentWord !== currentGuess) {
-                    document.getElementById('message').textContent = `Game Over! The word was ${currentWord}.`;
-                    document.getElementById('start-button').style.display = 'block';
-                }
             }
         }
 
@@ -220,11 +229,6 @@
                     if (key) key.classList.add('absent');
                 }
             });
-
-            if (currentGuess === currentWord) {
-                document.getElementById('message').textContent = "Congratulations! You've guessed the word!";
-                document.getElementById('start-button').style.display = 'block';
-            }
         }
     </script>
 </body>
