@@ -20,23 +20,9 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            justify-content: space-between;
-        }
-
-        .game-container {
-            display: flex;
+            width: 100vw;
             justify-content: center;
             align-items: center;
-            flex: 1;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        canvas {
-            background-color: #000;
-            border: 5px solid #fff;
-            display: block;
-            margin: 0 auto;
         }
 
         nav ul {
@@ -62,6 +48,11 @@
             padding: 10px;
             background-color: rgba(0, 0, 0, 0.7);
             color: #fff;
+        }
+
+        canvas {
+            background-color: #000;
+            border: 5px solid #fff;
         }
 
         #game-over, #win-message {
@@ -90,7 +81,7 @@
             </ul>
         </nav>
 
-        <main class="game-container">
+        <main>
             <h1>Breakout Game</h1>
             <canvas id="breakout"></canvas>
             <div id="game-over">Game Over! <a href="breakout.html">Play Again</a></div>
@@ -109,9 +100,8 @@
         let canvasWidth, canvasHeight;
 
         function resizeCanvas() {
-            const container = document.querySelector('.game-container');
-            canvasWidth = container.clientWidth;
-            canvasHeight = container.clientHeight;
+            canvasWidth = window.innerWidth * 0.8; // 80% of viewport width
+            canvasHeight = window.innerHeight * 0.6; // 60% of viewport height
             canvas.width = canvasWidth;
             canvas.height = canvasHeight;
             resetGame();
@@ -223,15 +213,15 @@
 
         function movePaddle(event) {
             const rect = canvas.getBoundingClientRect();
-            const root = document.documentElement;
-            let x = event.clientX - rect.left - root.scrollLeft;
+            const x = (event.clientX - rect.left) / canvasWidth * canvasWidth;
 
             if (event.type === 'touchmove') {
                 const touch = event.touches[0];
-                x = touch.clientX - rect.left - root.scrollLeft;
-            }
-
-            if (x > paddleWidth / 2 && x < canvasWidth - paddleWidth / 2) {
+                const touchX = (touch.clientX - rect.left) / canvasWidth * canvasWidth;
+                if (touchX > paddleWidth / 2 && touchX < canvasWidth - paddleWidth / 2) {
+                    paddleX = touchX - paddleWidth / 2;
+                }
+            } else if (x > paddleWidth / 2 && x < canvasWidth - paddleWidth / 2) {
                 paddleX = x - paddleWidth / 2;
             }
         }
