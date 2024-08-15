@@ -10,43 +10,104 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-            background-image: url('background.jpg'); /* Update this with your image path */
-            background-size: cover; /* Scale the background image to cover the entire canvas */
+            background-image: url('picture1.jpg'); /* Ensure this is the correct path */
+            background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
         }
-        
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            justify-content: space-between;
+        }
+
+        .game-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
         canvas {
-            display: block;
-            margin: 0 auto;
             background-color: #000;
             border: 5px solid #fff;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
         }
     </style>
 </head>
 <body>
-    <canvas id="breakout"></canvas>
+    <div class="container">
+        <nav>
+            <ul>
+                <li><a href="../index.html">Back</a></li>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="wordle.html">Wordle</a></li>
+                <li><a href="tic-tac-toe.html">Tic-Tac-Toe</a></li>
+                <li><a href="breakout.html">Breakout</a></li>
+            </ul>
+        </nav>
+
+        <div class="game-container">
+            <canvas id="breakout"></canvas>
+        </div>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
     <script>
         const canvas = document.getElementById('breakout');
         const context = canvas.getContext('2d');
 
-        // Set initial canvas size
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        function resizeCanvas() {
+            const container = document.querySelector('.game-container');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            resetGame();
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-        // Paddle
         const paddleWidth = 100;
         const paddleHeight = 10;
         let paddleX = (canvas.width - paddleWidth) / 2;
 
-        // Ball
         const ballRadius = 10;
         let ballX = canvas.width / 2;
         let ballY = canvas.height - 30;
         let ballSpeedX = 2;
         let ballSpeedY = -2;
 
-        // Blocks
         const blockRowCount = 5;
         const blockColumnCount = 3;
         const blockWidth = 75;
@@ -63,7 +124,6 @@
             }
         }
 
-        // Draw functions
         function drawBall() {
             context.beginPath();
             context.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
@@ -152,7 +212,6 @@
             }
         }
 
-        // Game loop
         function game() {
             draw();
             requestAnimationFrame(game);
@@ -160,11 +219,7 @@
 
         canvas.addEventListener('mousemove', movePaddle);
         canvas.addEventListener('touchmove', movePaddle);
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            resetGame();
-        });
+        window.addEventListener('resize', resizeCanvas);
 
         function resetGame() {
             paddleX = (canvas.width - paddleWidth) / 2;
@@ -181,8 +236,7 @@
             }
         }
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        resizeCanvas();
         game();
     </script>
 </body>
