@@ -127,53 +127,65 @@
             user.y = event.clientY - rect.top - user.height / 2;
         }
 
-        // Collision detection
-        function collision(ball, paddle) {
-            return ball.x < paddle.x + paddle.width &&
-                   ball.x + ball.radius > paddle.x &&
-                   ball.y < paddle.y + paddle.height &&
-                   ball.y + ball.radius > paddle.y;
-        }
+// Collision detection function
+function collision(ball, paddle) {
+    paddle.top = paddle.y;
+    paddle.bottom = paddle.y + paddle.height;
+    paddle.left = paddle.x;
+    paddle.right = paddle.x + paddle.width;
 
-        // Reset the ball
-        function resetBall() {
-            ball.x = canvas.width / 2;
-            ball.y = canvas.height / 2;
-            ball.velocityX = -ball.velocityX;
-            ball.speed = 5;
-        }
+    ball.top = ball.y - ball.radius;
+    ball.bottom = ball.y + ball.radius;
+    ball.left = ball.x - ball.radius;
+    ball.right = ball.x + ball.radius;
 
-        // Update the game
-        function update() {
-            // Move the ball
-            ball.x += ball.velocityX;
-            ball.y += ball.velocityY;
+    return paddle.left < ball.right && paddle.top < ball.bottom && paddle.right > ball.left && paddle.bottom > ball.top;
+}
 
-            // Computer AI
-            computer.y += ((ball.y - (computer.y + computer.height / 2)) * 0.1);
+// Update the game
+function update() {
+    // Move the ball
+    ball.x += ball.velocityX;
+    ball.y += ball.velocityY;
 
-            // Ball collision with top and bottom walls
-            if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
-                ball.velocityY = -ball.velocityY;
-            }
+    // Computer AI (basic)
+    computer.y += (ball.y - (computer.y + computer.height / 2)) * 0.1;
 
-            // Ball collision with paddles
-            let player = (ball.x < canvas.width / 2) ? user : computer;
+    // Ball collision with top and bottom walls
+    if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+        ball.velocityY = -ball.velocityY;
+    }
 
-            if (collision(ball, player)) {
-                ball.velocityX = -ball.velocityX;
-                ball.speed += 0.5;
-            }
+    // Ball collision with paddles
+    let player = (ball.x < canvas.width / 2) ? user : computer;
 
-            // Score points
-            if (ball.x - ball.radius < 0) {
-                computer.score++;
-                resetBall();
-            } else if (ball.x + ball.radius > canvas.width) {
-                user.score++;
-                resetBall();
-            }
-        }
+    if (collision(ball, player)) {
+        // Reflect the ball direction
+        ball.velocityX = -ball.velocityX;
+        ball.speed += 0.1; // Optional: Increase ball speed for more challenge
+
+        // Determine the ball's collision point with the paddle
+        let collidePoint = (ball.y - (player.y + player.height / 2));
+        collidePoint = collidePoint / (player.height / 2);
+
+        // Adjust the ball's angle based on where it hits the paddle
+        let angleRad = (Math.PI / 4) * collidePoint;
+
+        // Update ball direction
+        let direction = (ball.x < canvas.width / 2) ? 1 : -1;
+        ball.velocityX = direction * ball.speed * Math.cos(angleRad);
+        ball.velocityY = ball.speed * Math.sin(angleRad);
+    }
+
+    // Check for score points
+    if (ball.x - ball.radius < 0) {
+        computer.score++;
+        resetBall();
+    } else if (ball.x + ball.radius > canvas.width) {
+        user.score++;
+        resetBall();
+    }
+}
 
         // Render the game
         function render() {
