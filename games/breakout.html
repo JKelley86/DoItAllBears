@@ -98,32 +98,35 @@
         const context = canvas.getContext('2d');
         
         let canvasWidth, canvasHeight;
+        let paddleWidth, paddleHeight;
+        let ballRadius;
+        let brickWidth, brickHeight;
+        const brickRowCount = 5;
+        const brickColumnCount = 5;
+        const brickPadding = 10;
+        const brickOffsetTop = 30;
+        const brickOffsetLeft = 30;
 
         function resizeCanvas() {
             canvasWidth = window.innerWidth * 0.8; // 80% of viewport width
             canvasHeight = window.innerHeight * 0.6; // 60% of viewport height
             canvas.width = canvasWidth;
             canvas.height = canvasHeight;
+
+            // Adjust game parameters relative to canvas size
+            paddleWidth = canvasWidth * 0.15; // 15% of canvas width
+            paddleHeight = canvasHeight * 0.03; // 3% of canvas height
+            ballRadius = canvasHeight * 0.02; // 2% of canvas height
+            brickWidth = (canvasWidth - brickOffsetLeft * 2 - brickPadding * (brickColumnCount - 1)) / brickColumnCount;
+            brickHeight = canvasHeight * 0.05; // 5% of canvas height
+
             resetGame();
         }
 
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        const paddleWidth = 100;
-        const paddleHeight = 10;
-        const ballRadius = 10;
-        const brickRowCount = 5;
-        const brickColumnCount = 5;
-        const brickWidth = 75;
-        const brickHeight = 20;
-        const brickPadding = 10;
-        const brickOffsetTop = 30;
-        const brickOffsetLeft = 30;
-
-        let paddleX = (canvasWidth - paddleWidth) / 2;
-        let ballX = canvasWidth / 2;
-        let ballY = canvasHeight - 30;
+        let paddleX, ballX, ballY;
         let ballDX = 2;
         let ballDY = -2;
         let rightPressed = false;
@@ -213,15 +216,14 @@
 
         function movePaddle(event) {
             const rect = canvas.getBoundingClientRect();
-            const x = (event.clientX - rect.left) / canvasWidth * canvasWidth;
+            let x = (event.clientX - rect.left) / canvasWidth * canvasWidth;
 
             if (event.type === 'touchmove') {
                 const touch = event.touches[0];
-                const touchX = (touch.clientX - rect.left) / canvasWidth * canvasWidth;
-                if (touchX > paddleWidth / 2 && touchX < canvasWidth - paddleWidth / 2) {
-                    paddleX = touchX - paddleWidth / 2;
-                }
-            } else if (x > paddleWidth / 2 && x < canvasWidth - paddleWidth / 2) {
+                x = (touch.clientX - rect.left) / canvasWidth * canvasWidth;
+            }
+
+            if (x > paddleWidth / 2 && x < canvasWidth - paddleWidth / 2) {
                 paddleX = x - paddleWidth / 2;
             }
         }
