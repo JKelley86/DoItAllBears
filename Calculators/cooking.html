@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Cooking/Baking Conversions</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .calculator {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin: 20px auto;
+        }
+        .calc-column {
+            width: 45%;
+            margin-bottom: 20px;
+        }
+        .calculator label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .calculator input, .calculator select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            color: #333;
+            touch-action: manipulation;
+        }
+        .calculator button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .calculator button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+<div class="container">
+    <nav>
+        <ul class="navbar-left">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="tip.html">Tips</a></li>
+            <li><a href="shapes.html">Shapes</a></li>
+            <li><a href="speed.html">Speed</a></li>
+            <li><a href="conversions.html">Conversions</a></li>
+            <li><a href="electrical.html">Electrical</a></li>
+            <li><a href="algebra.html">Algebra</a></li>
+            <li><a href="conveyor.html">Conveyor</a></li>
+            <li><a href="binary.html">Binary</a></li>
+            <li><a href="cooking.html">Cooking</a></li>
+            <li><a href="weight.html">Weight</a></li>
+            <li><a href="physics.html">Physics</a></li>
+            <li><a href="calculus.html">Calculus</a></li>
+            <li><a href="chemistry.html">Chemistry</a></li>
+            <li><a href="trigonometry.html">Trigonometry</a></li>
+            <li><a href="hmi.html">HMI</a></li>
+        </ul>
+    </nav>
+<main>
+    <h1>Cooking/Baking Conversions</h1>
+
+    <!-- Volume Conversions -->
+    <div class="calculator single-column">
+        <div class="calc-column">>
+            <h3>Volume Conversion</h3>
+            <label for="volumeValue">Value:</label>
+            <input type="number" id="volumeValue" step="0.01">
+            <label for="volumeFrom">From:</label>
+            <select id="volumeFrom">
+                <option value="cup">Cup</option>
+                <option value="tablespoon">Tablespoon</option>
+                <option value="teaspoon">Teaspoon</option>
+                <option value="liter">Liter</option>
+                <option value="milliliter">Milliliter</option>
+            </select>
+            <label for="volumeTo">To:</label>
+            <select id="volumeTo">
+                <option value="cup">Cup</option>
+                <option value="tablespoon">Tablespoon</option>
+                <option value="teaspoon">Teaspoon</option>
+                <option value="liter">Liter</option>
+                <option value="milliliter">Milliliter</option>
+            </select>
+            <button onclick="convertVolume()">Convert</button>
+            <div class="result" id="volumeResult"></div>
+        </div>
+    </div>
+
+    <!-- Weight Conversions -->
+    <div class="calculator single-column">
+        <div class="calc-column">>
+            <h3>Weight Conversion</h3>
+            <label for="weightValue">Value:</label>
+            <input type="number" id="weightValue" step="0.01">
+            <label for="weightFrom">From:</label>
+            <select id="weightFrom">
+                <option value="ounce">Ounce</option>
+                <option value="pound">Pound</option>
+                <option value="gram">Gram</option>
+                <option value="kilogram">Kilogram</option>
+            </select>
+            <label for="weightTo">To:</label>
+            <select id="weightTo">
+                <option value="ounce">Ounce</option>
+                <option value="pound">Pound</option>
+                <option value="gram">Gram</option>
+                <option value="kilogram">Kilogram</option>
+            </select>
+            <button onclick="convertWeight()">Convert</button>
+            <div class="result" id="weightResult"></div>
+        </div>
+    </div>
+
+    <!-- Temperature Conversions -->
+    <div class="calculator single-column">
+        <div class="calc-column">>
+            <h3>Temperature Conversion</h3>
+            <label for="temperatureValue">Value:</label>
+            <input type="number" id="temperatureValue" step="0.01">
+            <label for="temperatureFrom">From:</label>
+            <select id="temperatureFrom">
+                <option value="celsius">Celsius</option>
+                <option value="fahrenheit">Fahrenheit</option>
+                <option value="kelvin">Kelvin</option>
+            </select>
+            <label for="temperatureTo">To:</label>
+            <select id="temperatureTo">
+                <option value="celsius">Celsius</option>
+                <option value="fahrenheit">Fahrenheit</option>
+                <option value="kelvin">Kelvin</option>
+            </select>
+            <button onclick="convertTemperature()">Convert</button>
+            <div class="result" id="temperatureResult"></div>
+        </div>
+    </div>
+
+    <!-- Ingredient Amounts -->
+    <div class="calculator single-column">
+        <div class="calc-column">
+            <h3>Ingredient Conversion</h3>
+            <label for="ingredientAmount">Amount:</label>
+            <input type="number" id="ingredientAmount" step="0.01">
+            <label for="ingredientFrom">From:</label>
+            <select id="ingredientFrom">
+                <option value="cup">Cup</option>
+                <option value="tablespoon">Tablespoon</option>
+                <option value="teaspoon">Teaspoon</option>
+            </select>
+            <label for="ingredientTo">To:</label>
+            <select id="ingredientTo">
+                <option value="cup">Cup</option>
+                <option value="tablespoon">Tablespoon</option>
+                <option value="teaspoon">Teaspoon</option>
+            </select>
+            <button onclick="convertIngredients()">Convert</button>
+            <div class="result" id="ingredientResult"></div>
+        </div>
+    </div>
+</main>
+    <footer>
+        <span>&copy; 2024 Justin's Calculations. All rights reserved.</span>
+    </footer>
+
+    <script>
+        function convertVolume() {
+            const volumeValue = parseFloat(document.getElementById('volumeValue').value);
+            const volumeFrom = document.getElementById('volumeFrom').value;
+            const volumeTo = document.getElementById('volumeTo').value;
+            let result;
+
+            // Conversion rates (volume)
+            const volumeConversions = {
+                cup: { tablespoon: 16, teaspoon: 48, liter: 0.236588, milliliter: 236.588 },
+                tablespoon: { cup: 0.0625, teaspoon: 3, liter: 0.014787, milliliter: 14.787 },
+                teaspoon: { cup: 0.020833, tablespoon: 0.333333, liter: 0.004929, milliliter: 4.929 },
+                liter: { cup: 4.22675, tablespoon: 67.628, teaspoon: 202.884, milliliter: 1000 },
+                milliliter: { cup: 0.00422675, tablespoon: 0.067628, teaspoon: 0.202884, liter: 0.001 }
+            };
+
+            if (volumeConversions[volumeFrom] && volumeConversions[volumeFrom][volumeTo] !== undefined) {
+                result = volumeValue * volumeConversions[volumeFrom][volumeTo];
+                document.getElementById('volumeResult').innerHTML = `${result.toFixed(2)} ${volumeTo}`;
+            } else {
+                document.getElementById('volumeResult').innerHTML = "Invalid conversion";
+            }
+        }
+
+        function convertWeight() {
+            const weightValue = parseFloat(document.getElementById('weightValue').value);
+            const weightFrom = document.getElementById('weightFrom').value;
+            const weightTo = document.getElementById('weightTo').value;
+            let result;
+
+            // Conversion rates (weight)
+            const weightConversions = {
+                ounce: { pound: 0.0625, gram: 28.3495, kilogram: 0.0283495 },
+                pound: { ounce: 16, gram: 453.592, kilogram: 0.453592 },
+                gram: { ounce: 0.035274, pound: 0.00220462, kilogram: 0.001 },
+                kilogram: { ounce: 35.274, pound: 2.20462, gram: 1000 }
+            };
+
+            if (weightConversions[weightFrom] && weightConversions[weightFrom][weightTo] !== undefined) {
+                result = weightValue * weightConversions[weightFrom][weightTo];
+                document.getElementById('weightResult').innerHTML = `${result.toFixed(2)} ${weightTo}`;
+            } else {
+                document.getElementById('weightResult').innerHTML = "Invalid conversion";
+            }
+        }
+
+        function convertTemperature() {
+            const temperatureValue = parseFloat(document.getElementById('temperatureValue').value);
+            const temperatureFrom = document.getElementById('temperatureFrom').value;
+            const temperatureTo = document.getElementById('temperatureTo').value;
+            let result;
+
+            if (temperatureFrom === 'celsius' && temperatureTo === 'fahrenheit') {
+                result = (temperatureValue * 9/5) + 32;
+            } else if (temperatureFrom === 'fahrenheit' && temperatureTo === 'celsius') {
+                result = (temperatureValue - 32) * 5/9;
+            } else if (temperatureFrom === 'celsius' && temperatureTo === 'kelvin') {
+                result = temperatureValue + 273.15;
+            } else if (temperatureFrom === 'kelvin' && temperatureTo === 'celsius') {
+                result = temperatureValue - 273.15;
+            } else if (temperatureFrom === 'fahrenheit' && temperatureTo === 'kelvin') {
+                result = (temperatureValue - 32) * 5/9 + 273.15;
+            } else if (temperatureFrom === 'kelvin' && temperatureTo === 'fahrenheit') {
+                result = (temperatureValue - 273.15) * 9/5 + 32;
+            } else {
+                result = temperatureValue; // Same units
+            }
+
+            document.getElementById('temperatureResult').innerHTML = `${result.toFixed(2)} ${temperatureTo}`;
+        }
+
+        function convertIngredients() {
+            const ingredientAmount = parseFloat(document.getElementById('ingredientAmount').value);
+            const ingredientFrom = document.getElementById('ingredientFrom').value;
+            const ingredientTo = document.getElementById('ingredientTo').value;
+            let result;
+
+            // Conversion rates (ingredients)
+            const ingredientConversions = {
+                cup: { tablespoon: 16, teaspoon: 48 },
+                tablespoon: { cup: 0.0625, teaspoon: 3 },
+                teaspoon: { cup: 0.020833, tablespoon: 0.333333 }
+            };
+
+            if (ingredientConversions[ingredientFrom] && ingredientConversions[ingredientFrom][ingredientTo] !== undefined) {
+                result = ingredientAmount * ingredientConversions[ingredientFrom][ingredientTo];
+                document.getElementById('ingredientResult').innerHTML = `${result.toFixed(2)} ${ingredientTo}`;
+            } else {
+                document.getElementById('ingredientResult').innerHTML = "Invalid conversion";
+            }
+        }
+    </script>
+</div>
+</body>
+</html>
