@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Tic-Tac-Toe AI</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: black;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 10px;
+            margin: 20px auto;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #fff;
+            border: 2px solid #333;
+            font-size: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .cell.disabled {
+            cursor: not-allowed;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-size: 24px;
+        }
+
+        #reset {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tic-Tac-Toe AI</h1>
+        <div id="board" class="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+        <div id="message"></div>
+        <button id="reset">Reset Game</button>
+    </div>
+
+    <script>
+        const boardElement = document.getElementById('board');
+        const messageElement = document.getElementById('message');
+        const resetButton = document.getElementById('reset');
+        let board = ['', '', '', '', '', '', '', '', ''];
+        let currentPlayer = 'X';
+
+        const winningCombinations = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        function checkWinner() {
+            for (const combination of winningCombinations) {
+                const [a, b, c] = combination;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    return board[a];
+                }
+            }
+            return board.includes('') ? null : 'Draw';
+        }
+
+        function makeMove(index) {
+            if (board[index] !== '') return;
+
+            board[index] = currentPlayer;
+            document.querySelector(`[data-index='${index}']`).textContent = currentPlayer;
+            document.querySelector(`[data-index='${index}']`).classList.add('disabled');
+
+            const winner = checkWinner();
+            if (winner) {
+                endGame(winner);
+            } else {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                if (currentPlayer === 'O') {
+                    aiMove();
+                }
+            }
+        }
+
+        function aiMove() {
+            let emptyCells = board
+                .map((cell, index) => (cell === '' ? index : null))
+                .filter((index) => index !== null);
+
+            let move = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            makeMove(move);
+        }
+
+        function endGame(winner) {
+            messageElement.textContent = winner === 'Draw' ? 'It\'s a Draw!' : `${winner} Wins!`;
+            boardElement.querySelectorAll('.cell').forEach(cell => cell.classList.add('disabled'));
+        }
+
+        function resetGame() {
+            board = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = 'X';
+            messageElement.textContent = '';
+            boardElement.querySelectorAll('.cell').forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('disabled');
+            });
+        }
+
+        boardElement.addEventListener('click', (e) => {
+            if (e.target.classList.contains('cell')) {
+                makeMove(e.target.dataset.index);
+            }
+        });
+
+        resetButton.addEventListener('click', resetGame);
+    </script>
+</body>
+</html>
