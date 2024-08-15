@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Trigonometry Calculators</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .calculator {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            margin: 20px auto;
+        }
+        .calculator label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .calculator input, .calculator select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            color: #333;
+            touch-action: manipulation;
+        }
+        .calculator button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .calculator button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+<div class="container">
+    <nav>
+        <ul class="navbar-left">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="tip.html">Tips</a></li>
+            <li><a href="shapes.html">Shapes</a></li>
+            <li><a href="speed.html">Speed</a></li>
+            <li><a href="conversions.html">Conversions</a></li>
+            <li><a href="electrical.html">Electrical</a></li>
+            <li><a href="algebra.html">Algebra</a></li>
+            <li><a href="conveyor.html">Conveyor</a></li>
+            <li><a href="binary.html">Binary</a></li>
+            <li><a href="cooking.html">Cooking</a></li>
+            <li><a href="weight.html">Weight</a></li>
+            <li><a href="physics.html">Physics</a></li>
+            <li><a href="calculus.html">Calculus</a></li>
+            <li><a href="chemistry.html">Chemistry</a></li>
+            <li><a href="trigonometry.html">Trigonometry</a></li>
+            <li><a href="hmi.html">HMI</a></li>
+        </ul>
+    </nav>
+<main>
+    <h1>Trigonometry Calculators</h1>
+
+    <div class="calculator single-column">
+        <div class="calc-column">
+            <h3>Right Triangle Calculator</h3>
+            <label for="a">Side A:</label>
+            <input type="number" id="a" oninput="calculateRightTriangle()">
+            <label for="b">Side B:</label>
+            <input type="number" id="b" oninput="calculateRightTriangle()">
+            <label for="c">Hypotenuse (C):</label>
+            <input type="number" id="c" oninput="calculateRightTriangle()">
+            <div class="result" id="rightTriangleResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator single-column">
+        <div class="calc-column">
+            <h3>Sine Calculator</h3>
+            <label for="sine-angle">Angle (in degrees):</label>
+            <input type="number" id="sine-angle" oninput="calculateSine()">
+            <div class="result" id="sineResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator single-column">
+        <div class="calc-column">
+            <h3>Cosine Calculator</h3>
+            <label for="cosine-angle">Angle (in degrees):</label>
+            <input type="number" id="cosine-angle" oninput="calculateCosine()">
+            <div class="result" id="cosineResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator single-column">
+        <div class="calc-column">
+            <h3>Tangent Calculator</h3>
+            <label for="tangent-angle">Angle (in degrees):</label>
+            <input type="number" id="tangent-angle" oninput="calculateTangent()">
+            <div class="result" id="tangentResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator single-column">
+        <div class="calc-column">
+            <h3>Law of Sines Calculator</h3>
+            <label for="law-sines-a">Side A:</label>
+            <input type="number" id="law-sines-a" oninput="calculateLawOfSines()">
+            <label for="law-sines-angleA">Angle A (in degrees):</label>
+            <input type="number" id="law-sines-angleA" oninput="calculateLawOfSines()">
+            <label for="law-sines-b">Side B:</label>
+            <input type="number" id="law-sines-b" oninput="calculateLawOfSines()">
+            <label for="law-sines-angleB">Angle B (in degrees):</label>
+            <input type="number" id="law-sines-angleB" oninput="calculateLawOfSines()">
+            <div class="result" id="lawOfSinesResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator single-column">
+        <div class="calc-column">
+            <h3>Law of Cosines Calculator</h3>
+            <label for="law-cosines-a">Side A:</label>
+            <input type="number" id="law-cosines-a" oninput="calculateLawOfCosines()">
+            <label for="law-cosines-b">Side B:</label>
+            <input type="number" id="law-cosines-b" oninput="calculateLawOfCosines()">
+            <label for="law-cosines-c">Side C:</label>
+            <input type="number" id="law-cosines-c" oninput="calculateLawOfCosines()">
+            <label for="law-cosines-angle">Angle (opposite Side C, in degrees):</label>
+            <input type="number" id="law-cosines-angle" oninput="calculateLawOfCosines()">
+            <div class="result" id="lawOfCosinesResult"></div>
+        </div>
+    </div>
+</main>
+    <footer>
+        <span>&copy; 2024 Justin's Calculations. All rights reserved.</span>
+    </footer>
+    <script>
+        function calculateRightTriangle() {
+            const a = parseFloat(document.getElementById('a').value);
+            const b = parseFloat(document.getElementById('b').value);
+            const c = parseFloat(document.getElementById('c').value);
+            let resultText = "";
+
+            if (a && b) {
+                resultText = "C = " + Math.sqrt(a * a + b * b).toFixed(2);
+            } else if (a && c) {
+                resultText = "B = " + Math.sqrt(c * c - a * a).toFixed(2);
+            } else if (b && c) {
+                resultText = "A = " + Math.sqrt(c * c - b * b).toFixed(2);
+            }
+
+            document.getElementById('rightTriangleResult').innerText = resultText;
+        }
+
+        function calculateSine() {
+            const angle = parseFloat(document.getElementById('sine-angle').value);
+            const result = Math.sin(angle * Math.PI / 180).toFixed(4);
+            document.getElementById('sineResult').innerText = "sin(" + angle + ") = " + result;
+        }
+
+        function calculateCosine() {
+            const angle = parseFloat(document.getElementById('cosine-angle').value);
+            const result = Math.cos(angle * Math.PI / 180).toFixed(4);
+            document.getElementById('cosineResult').innerText = "cos(" + angle + ") = " + result;
+        }
+
+        function calculateTangent() {
+            const angle = parseFloat(document.getElementById('tangent-angle').value);
+            const result = Math.tan(angle * Math.PI / 180).toFixed(4);
+            document.getElementById('tangentResult').innerText = "tan(" + angle + ") = " + result;
+        }
+
+        function calculateLawOfSines() {
+            const a = parseFloat(document.getElementById('law-sines-a').value);
+            const angleA = parseFloat(document.getElementById('law-sines-angleA').value);
+            const b = parseFloat(document.getElementById('law-sines-b').value);
+            const angleB = parseFloat(document.getElementById('law-sines-angleB').value);
+            let resultText = "";
+
+            if (a && angleA && b) {
+                resultText = "Angle B = " + (Math.asin(b * Math.sin(angleA * Math.PI / 180) / a) * 180 / Math.PI).toFixed(2) + "°";
+            } else if (a && angleA && angleB) {
+                resultText = "Side B = " + (a * Math.sin(angleB * Math.PI / 180) / Math.sin(angleA * Math.PI / 180)).toFixed(2);
+            } else if (b && angleB && angleA) {
+                resultText = "Side A = " + (b * Math.sin(angleA * Math.PI / 180) / Math.sin(angleB * Math.PI / 180)).toFixed(2);
+            } else if (b && angleB && a) {
+                resultText = "Angle A = " + (Math.asin(a * Math.sin(angleB * Math.PI / 180) / b) * 180 / Math.PI).toFixed(2) + "°";
+            }
+
+            document.getElementById('lawOfSinesResult').innerText = resultText;
+        }
+
+        function calculateLawOfCosines() {
+            const a = parseFloat(document.getElementById('law-cosines-a').value);
+            const b = parseFloat(document.getElementById('law-cosines-b').value);
+            const c = parseFloat(document.getElementById('law-cosines-c').value);
+            const angle = parseFloat(document.getElementById('law-cosines-angle').value);
+            let resultText = "";
+
+            if (a && b && angle) {
+                resultText = "Side C = " + Math.sqrt(a * a + b * b - 2 * a * b * Math.cos(angle * Math.PI / 180)).toFixed(2);
+            } else if (a && c && angle) {
+                resultText = "Side B = " + Math.sqrt(a * a + c * c - 2 * a * c * Math.cos(angle * Math.PI / 180)).toFixed(2);
+            } else if (b && c && angle) {
+                resultText = "Side A = " + Math.sqrt(b * b + c * c - 2 * b * c * Math.cos(angle * Math.PI / 180)).toFixed(2);
+            } else if (a && b && c) {
+                resultText = "Angle = " + (Math.acos((a * a + b * b - c * c) / (2 * a * b)) * 180 / Math.PI).toFixed(2) + "°";
+            }
+
+            document.getElementById('lawOfCosinesResult').innerText = resultText;
+        }
+    </script>
+</div>
+</body>
+</html>
