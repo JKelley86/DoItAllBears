@@ -47,7 +47,7 @@
 
         <main>
             <h1>Pong Game</h1>
-            <canvas id="pong" width="800" height="400"></canvas>
+            <canvas id="pong"></canvas>
         </main>
 
         <footer>
@@ -59,80 +59,30 @@
         const canvas = document.getElementById('pong');
         const context = canvas.getContext('2d');
 
-        // Create the user paddle
-        const user = {
-            x: 0,
-            y: canvas.height / 2 - 50,
-            width: 10,
-            height: 100,
-            color: '#fff',
-            score: 0
-        };
-
-        // Create the computer paddle
-        const computer = {
-            x: canvas.width - 10,
-            y: canvas.height / 2 - 50,
-            width: 10,
-            height: 100,
-            color: '#fff',
-            score: 0
-        };
-
-        // Create the ball
-        const ball = {
-            x: canvas.width / 2,
-            y: canvas.height / 2,
-            radius: 10,
-            speed: 5,
-            velocityX: 5,
-            velocityY: 5,
-            color: '#fff'
-        };
-
-        // Reset the ball to the center of the canvas after a point is scored
-        function resetBall() {
-            ball.x = canvas.width / 2;
-            ball.y = canvas.height / 2;
-            ball.velocityX = -ball.velocityX;
-            ball.speed = 5; // Reset the speed if you are increasing it during the game
+        // Responsive canvas size
+        function resizeCanvas() {
+            canvas.width = Math.min(window.innerWidth * 0.9, 800); // Max width 800px
+            canvas.height = Math.min(window.innerHeight * 0.5, 400); // Max height 400px
+            user.height = canvas.height / 5;
+            computer.height = canvas.height / 5;
+            ball.radius = canvas.height / 30;
         }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
 
-        // Draw the net
-        function drawNet() {
-            for (let i = 0; i <= canvas.height; i += 15) {
-                context.fillStyle = '#fff';
-                context.fillRect(canvas.width / 2 - 1, i, 2, 10);
-            }
-        }
+        // Create paddles and ball with responsive sizes
+        const user = { x: 0, y: canvas.height / 2 - 50, width: 10, height: canvas.height / 5, color: '#fff', score: 0 };
+        const computer = { x: canvas.width - 10, y: canvas.height / 2 - 50, width: 10, height: canvas.height / 5, color: '#fff', score: 0 };
+        const ball = { x: canvas.width / 2, y: canvas.height / 2, radius: canvas.height / 30, speed: 5, velocityX: 5, velocityY: 5, color: '#fff' };
 
-        // Draw the score
-        function drawScore(x, y, score) {
-            context.fillStyle = '#fff';
-            context.font = '35px Arial';
-            context.fillText(score, x, y);
-        }
-
-        // Draw the paddle
-        function drawPaddle(x, y, width, height, color) {
-            context.fillStyle = color;
-            context.fillRect(x, y, width, height);
-        }
-
-        // Draw the ball
-        function drawBall(x, y, radius, color) {
-            context.fillStyle = color;
-            context.beginPath();
-            context.arc(x, y, radius, 0, Math.PI * 2, false);
-            context.closePath();
-            context.fill();
-        }
-
-        // Move the paddle
+        // Handle paddle movement for both mouse and touch devices
         canvas.addEventListener('mousemove', movePaddle);
+        canvas.addEventListener('touchmove', movePaddle);
+
         function movePaddle(event) {
             const rect = canvas.getBoundingClientRect();
-            user.y = event.clientY - rect.top - user.height / 2;
+            const clientY = event.clientY || event.touches[0].clientY;
+            user.y = clientY - rect.top - user.height / 2;
         }
 
         // Collision detection function
@@ -148,6 +98,14 @@
             ball.right = ball.x + ball.radius;
 
             return paddle.left < ball.right && paddle.top < ball.bottom && paddle.right > ball.left && paddle.bottom > ball.top;
+        }
+
+        // Reset ball to center after a score
+        function resetBall() {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+            ball.speed = 5;
+            ball.velocityX = -ball.velocityX;
         }
 
         // Update the game
@@ -193,6 +151,36 @@
                 user.score++;
                 resetBall();
             }
+        }
+
+        // Draw the net
+        function drawNet() {
+            for (let i = 0; i <= canvas.height; i += 15) {
+                context.fillStyle = '#fff';
+                context.fillRect(canvas.width / 2 - 1, i, 2, 10);
+            }
+        }
+
+        // Draw the score
+        function drawScore(x, y, score) {
+            context.fillStyle = '#fff';
+            context.font = '35px Arial';
+            context.fillText(score, x, y);
+        }
+
+        // Draw the paddle
+        function drawPaddle(x, y, width, height, color) {
+            context.fillStyle = color;
+            context.fillRect(x, y, width, height);
+        }
+
+        // Draw the ball
+        function drawBall(x, y, radius, color) {
+            context.fillStyle = color;
+            context.beginPath();
+            context.arc(x, y, radius, 0, Math.PI * 2, false);
+            context.closePath();
+            context.fill();
         }
 
         // Render the game
