@@ -6,31 +6,62 @@
     <title>Breakout Game</title>
     <link rel="stylesheet" href="../styles.css">
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-image: url('picture1.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            justify-content: space-between;
+        }
+
+        .game-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
         canvas {
-            display: block;
-            margin: 0 auto;
             background-color: #000;
             border: 5px solid #fff;
+            display: block;
+            margin: 0 auto;
         }
 
-        .nav-button {
-            display: inline-block;
-            width: 90px;
-            height: 90px;
-            margin: 10px;
-            border-radius: 50%;
-            background-color: #000;
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 10px;
+        }
+
+        nav ul li a {
             color: #fff;
-            text-align: center;
-            line-height: 80px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            font-size: 18px;
         }
 
-        .nav-button:hover {
-            background-color: #333;
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
         }
 
         #game-over, #win-message {
@@ -46,10 +77,10 @@
         }
     </style>
 </head>
-<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+<body>
     <div class="container">
         <nav>
-            <ul class="navbar-left">
+            <ul>
                 <li><a href="../index.html">Back</a></li>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="wordle.html">Wordle</a></li>
@@ -59,9 +90,9 @@
             </ul>
         </nav>
 
-        <main>
+        <main class="game-container">
             <h1>Breakout Game</h1>
-            <canvas id="breakout" width="800" height="400"></canvas>
+            <canvas id="breakout"></canvas>
             <div id="game-over">Game Over! <a href="breakout.html">Play Again</a></div>
             <div id="win-message">You Win! <a href="breakout.html">Play Again</a></div>
         </main>
@@ -74,6 +105,21 @@
     <script>
         const canvas = document.getElementById('breakout');
         const context = canvas.getContext('2d');
+        
+        let canvasWidth, canvasHeight;
+
+        function resizeCanvas() {
+            const container = document.querySelector('.game-container');
+            canvasWidth = container.clientWidth;
+            canvasHeight = container.clientHeight;
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            resetGame();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
         const paddleWidth = 100;
         const paddleHeight = 10;
         const ballRadius = 10;
@@ -85,9 +131,9 @@
         const brickOffsetTop = 30;
         const brickOffsetLeft = 30;
 
-        let paddleX = (canvas.width - paddleWidth) / 2;
-        let ballX = canvas.width / 2;
-        let ballY = canvas.height - 30;
+        let paddleX = (canvasWidth - paddleWidth) / 2;
+        let ballX = canvasWidth / 2;
+        let ballY = canvasHeight - 30;
         let ballDX = 2;
         let ballDY = -2;
         let rightPressed = false;
@@ -116,7 +162,7 @@
 
         function drawPaddle() {
             context.beginPath();
-            context.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+            context.rect(paddleX, canvasHeight - paddleHeight, paddleWidth, paddleHeight);
             context.fillStyle = '#fff';
             context.fill();
             context.closePath();
@@ -149,7 +195,7 @@
         function drawLives() {
             context.font = '16px Arial';
             context.fillStyle = '#fff';
-            context.fillText('Lives: ' + lives, canvas.width - 65, 20);
+            context.fillText('Lives: ' + lives, canvasWidth - 65, 20);
         }
 
         function detectCollision() {
@@ -178,9 +224,14 @@
         function movePaddle(event) {
             const rect = canvas.getBoundingClientRect();
             const root = document.documentElement;
-            const x = event.clientX - rect.left - root.scrollLeft;
+            let x = event.clientX - rect.left - root.scrollLeft;
 
-            if (x > paddleWidth / 2 && x < canvas.width - paddleWidth / 2) {
+            if (event.type === 'touchmove') {
+                const touch = event.touches[0];
+                x = touch.clientX - rect.left - root.scrollLeft;
+            }
+
+            if (x > paddleWidth / 2 && x < canvasWidth - paddleWidth / 2) {
                 paddleX = x - paddleWidth / 2;
             }
         }
@@ -194,9 +245,9 @@
         }
 
         function resetGame() {
-            paddleX = (canvas.width - paddleWidth) / 2;
-            ballX = canvas.width / 2;
-            ballY = canvas.height - 30;
+            paddleX = (canvasWidth - paddleWidth) / 2;
+            ballX = canvasWidth / 2;
+            ballY = canvasHeight - 30;
             ballDX = 2;
             ballDY = -2;
             score = 0;
@@ -214,12 +265,12 @@
             ballY += ballDY;
 
             // Ball collision with walls
-            if (ballX + ballDX > canvas.width - ballRadius || ballX + ballDX < ballRadius) {
+            if (ballX + ballDX > canvasWidth - ballRadius || ballX + ballDX < ballRadius) {
                 ballDX = -ballDX;
             }
             if (ballY + ballDY < ballRadius) {
                 ballDY = -ballDY;
-            } else if (ballY + ballDY > canvas.height - ballRadius) {
+            } else if (ballY + ballDY > canvasHeight - ballRadius) {
                 if (ballX > paddleX && ballX < paddleX + paddleWidth) {
                     ballDY = -ballDY;
                 } else {
@@ -228,11 +279,11 @@
                         gameOver = true;
                         drawGameOver();
                     } else {
-                        ballX = canvas.width / 2;
-                        ballY = canvas.height - 30;
+                        ballX = canvasWidth / 2;
+                        ballY = canvasHeight - 30;
                         ballDX = 2;
                         ballDY = -2;
-                        paddleX = (canvas.width - paddleWidth) / 2;
+                        paddleX = (canvasWidth - paddleWidth) / 2;
                     }
                 }
             }
@@ -244,7 +295,7 @@
         }
 
         function render() {
-            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.clearRect(0, 0, canvasWidth, canvasHeight);
             drawBricks();
             drawBall();
             drawPaddle();
@@ -262,33 +313,6 @@
         // Add event listeners
         canvas.addEventListener('mousemove', movePaddle);
         canvas.addEventListener('touchmove', movePaddle);
-
-        // Adjust canvas size on resize
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            resetGame();
-        });
-
-        // Adjust canvas size initially
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        function movePaddle(event) {
-            const rect = canvas.getBoundingClientRect();
-            const root = document.documentElement;
-            let x = event.clientX - rect.left - root.scrollLeft;
-
-            if (event.type === 'touchmove') {
-                const touch = event.touches[0];
-                x = touch.clientX - rect.left - root.scrollLeft;
-            }
-
-            if (x > paddleWidth / 2 && x < canvas.width - paddleWidth / 2) {
-                paddleX = x - paddleWidth / 2;
-            }
-        }
     </script>
 </body>
 </html>
-     
