@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Pong Game</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #000;
+            border: 5px solid #fff;
+        }
+
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button:hover {
+            background-color: #333;
+        }
+    </style>
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <ul class="navbar-left">
+                <li><a href="../index.html">Back</a></li>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="wordle.html">Wordle</a></li>
+                <li><a href="ponge.html">Pong(Easy)</a></li>
+                <li><a href="pongh.html">Pong(Hard)</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <h1>Pong Game</h1>
+            <canvas id="pong"></canvas>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('pong');
+        const context = canvas.getContext('2d');
+
+        let user, computer, ball;
+
+        // Initialize paddles and ball
+        function initializeGame() {
+            user = {
+                x: 0,
+                y: canvas.height / 2 - 50,
+                width: 10,
+                height: canvas.height / 4,
+                color: '#fff',
+                score: 0
+            };
+
+            computer = {
+                x: canvas.width - 10,
+                y: canvas.height / 2 - 50,
+                width: 10,
+                height: canvas.height / 4,
+                color: '#fff',
+                score: 0
+            };
+
+            ball = {
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                radius: canvas.height / 20,
+                speed: 5,
+                velocityX: 5,
+                velocityY: 5,
+                color: '#fff'
+            };
+        }
+
+        // Resize canvas to be responsive
+        function resizeCanvas() {
+            canvas.width = Math.min(window.innerWidth * 0.9, 800);
+            canvas.height = canvas.width / 2;
+            initializeGame(); // Reinitialize game elements after resizing
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas(); // Initialize canvas and game elements on load
+
+        // Move the paddle
+        canvas.addEventListener('mousemove', movePaddle);
+        canvas.addEventListener('touchmove', movePaddle);
+
+        function movePaddle(event) {
+            const rect = canvas.getBoundingClientRect();
+            const clientY = event.clientY || event.touches[0].clientY;
+            user.y = clientY - rect.top - user.height / 2;
+        }
+
+        // Collision detection function
+        function collision(ball, paddle) {
+            paddle.top = paddle.y;
+            paddle.bottom = paddle.y + paddle.height;
+            paddle.left = paddle.x;
+            paddle.right = paddle.x + paddle.width;
+
+            ball.top = ball.y - ball.radius;
+            ball.bottom = ball.y + ball.radius;
+            ball.left = ball.x - ball.radius;
+            ball.right = ball.x + ball.radius;
+
+            return paddle.left < ball.right && paddle.top < ball.bottom && paddle.right > ball.left && paddle.bottom > ball.top;
+        }
+
+        // Reset ball
+        function resetBall() {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+            ball.speed = 5;
+            ball.velocityX = -ball.velocityX;
+        }
+
+        // Update game state
+        function update() {
+            ball.x += ball.velocityX;
+            ball.y += ball.velocityY;
+
+            computer.y += (ball.y - (computer.y + computer.height / 2)) * 0.1;
+
+            if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+                ball.velocityY = -ball.velocityY;
+            }
+
+            let player = (ball.x < canvas.width / 2) ? user : computer;
+
+            if (collision(ball, player)) {
+                ball.velocityX = -ball.velocityX;
+                ball.speed += 0.5;
+
+                let collidePoint = (ball.y - (player.y + player.height / 2));
+                collidePoint = collidePoint / (player.height / 2);
+
+                let angleRad = (Math.PI / 4) * collidePoint;
+
+                let direction = (ball.x < canvas.width / 2) ? 1 : -1;
+                ball.velocityX = direction * ball.speed * Math.cos(angleRad);
+                ball.velocityY = ball.speed * Math.sin(angleRad);
+            }
+
+            if (ball.x - ball.radius < 0) {
+                computer.score++;
+                resetBall();
+            } else if (ball.x + ball.radius > canvas.width) {
+                user.score++;
+                resetBall();
+            }
+        }
+
+        // Render game elements
+        function render() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i <= canvas.height; i += 15) {
+                context.fillStyle = '#fff';
+                context.fillRect(canvas.width / 2 - 1, i, 2, 10);
+            }
+
+            context.fillStyle = '#fff';
+            context.font = '35px Arial';
+            context.fillText(user.score, canvas.width / 4, canvas.height / 5);
+            context.fillText(computer.score, 3 * canvas.width / 4, canvas.height / 5);
+
+            context.fillStyle = user.color;
+            context.fillRect(user.x, user.y, user.width, user.height);
+
+            context.fillStyle = computer.color;
+            context.fillRect(computer.x, computer.y, computer.width, computer.height);
+
+            context.fillStyle = ball.color;
+            context.beginPath();
+            context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2, false);
+            context.closePath();
+            context.fill();
+        }
+
+        // Game loop
+        function game() {
+            update();
+            render();
+        }
+
+        setInterval(game, 1000 / 50);
+    </script>
+</body>
+</html>
