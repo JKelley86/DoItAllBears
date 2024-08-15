@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Conversion Calculators</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .calculator {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin: 20px auto;
+        }
+        .calc-column {
+            width: 45%;
+        }
+        .calculator label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .calculator input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            color: #333;
+            touch-action: manipulation;
+        }
+        .calculator button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .calculator button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+<div class="container">
+    <nav>
+        <ul class="navbar-left">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="tip.html">Tips</a></li>
+            <li><a href="shapes.html">Shapes</a></li>
+            <li><a href="speed.html">Speed</a></li>
+            <li><a href="conversions.html">Conversions</a></li>
+            <li><a href="electrical.html">Electrical</a></li>
+            <li><a href="algebra.html">Algebra</a></li>
+            <li><a href="conveyor.html">Conveyor</a></li>
+            <li><a href="binary.html">Binary</a></li>
+            <li><a href="cooking.html">Cooking</a></li>
+            <li><a href="weight.html">Weight</a></li>
+            <li><a href="physics.html">Physics</a></li>
+            <li><a href="calculus.html">Calculus</a></li>
+            <li><a href="chemistry.html">Chemistry</a></li>
+            <li><a href="trigonometry.html">Trigonometry</a></li>
+            <li><a href="hmi.html">HMI</a></li>
+        </ul>
+    </nav>
+<main>
+    <h1>Conversion Calculators</h1>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Inches to Feet, Yards, Miles</h3>
+            <label for="inches">Inches:</label>
+            <input type="number" id="inches" step="0.01">
+            <button onclick="convertInches()">Convert</button>
+            <div class="result" id="inchesResult"></div>
+        </div>
+        <div class="calc-column">
+            <h3>Centimeters to Meters, Kilometers</h3>
+            <label for="centimeters">Centimeters:</label>
+            <input type="number" id="centimeters" step="0.01">
+            <button onclick="convertCentimeters()">Convert</button>
+            <div class="result" id="centimetersResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Feet to Inches, Yards, Miles</h3>
+            <label for="feet">Feet:</label>
+            <input type="number" id="feet" step="0.01">
+            <button onclick="convertFeet()">Convert</button>
+            <div class="result" id="feetResult"></div>
+        </div>
+        <div class="calc-column">
+            <h3>Meters to Centimeters, Kilometers</h3>
+            <label for="meters">Meters:</label>
+            <input type="number" id="meters" step="0.01">
+            <button onclick="convertMeters()">Convert</button>
+            <div class="result" id="metersResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Yards to Inches, Feet, Miles</h3>
+            <label for="yards">Yards:</label>
+            <input type="number" id="yards" step="0.01">
+            <button onclick="convertYards()">Convert</button>
+            <div class="result" id="yardsResult"></div>
+        </div>
+        <div class="calc-column">
+            <h3>Kilometers to Centimeters, Meters</h3>
+            <label for="kilometers">Kilometers:</label>
+            <input type="number" id="kilometers" step="0.01">
+            <button onclick="convertKilometers()">Convert</button>
+            <div class="result" id="kilometersResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Miles to Inches, Feet, Yards</h3>
+            <label for="miles">Miles:</label>
+            <input type="number" id="miles" step="0.01">
+            <button onclick="convertMiles()">Convert</button>
+            <div class="result" id="milesResult"></div>
+        </div>
+        <div class="calc-column">
+            <h3>Imperial to Metric</h3>
+            <label for="imperialValue">Value:</label>
+            <input type="number" id="imperialValue" step="0.01">
+            <select id="imperialUnit">
+                <option value="inches">Inches</option>
+                <option value="feet">Feet</option>
+                <option value="yards">Yards</option>
+                <option value="miles">Miles</option>
+            </select>
+            <button onclick="convertImperialToMetric()">Convert</button>
+            <div class="result" id="imperialToMetricResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator single-column">
+        <div class="calc-column">
+            <h3>Metric to Imperial</h3>
+            <label for="metricValue">Value:</label>
+            <input type="number" id="metricValue" step="0.01">
+            <select id="metricUnit">
+                <option value="centimeters">Centimeters</option>
+                <option value="meters">Meters</option>
+                <option value="kilometers">Kilometers</option>
+            </select>
+            <button onclick="convertMetricToImperial()">Convert</button>
+            <div class="result" id="metricToImperialResult"></div>
+        </div>
+    </div>
+</main>
+    <footer>
+        <span>&copy; 2024 Justin's Calculations. All rights reserved.</span>
+    </footer>
+
+    <script>
+        function convertInches() {
+            const inches = parseFloat(document.getElementById('inches').value);
+            const feet = inches / 12;
+            const yards = inches / 36;
+            const miles = inches / 63360;
+            document.getElementById('inchesResult').innerHTML = 
+                `Feet: ${feet.toFixed(2)} ft<br>Yards: ${yards.toFixed(2)} yd<br>Miles: ${miles.toFixed(6)} mi`;
+        }
+
+        function convertCentimeters() {
+            const centimeters = parseFloat(document.getElementById('centimeters').value);
+            const meters = centimeters / 100;
+            const kilometers = centimeters / 100000;
+            document.getElementById('centimetersResult').innerHTML = 
+                `Meters: ${meters.toFixed(2)} m<br>Kilometers: ${kilometers.toFixed(6)} km`;
+        }
+
+        function convertFeet() {
+            const feet = parseFloat(document.getElementById('feet').value);
+            const inches = feet * 12;
+            const yards = feet / 3;
+            const miles = feet / 5280;
+            document.getElementById('feetResult').innerHTML = 
+                `Inches: ${inches.toFixed(2)} in<br>Yards: ${yards.toFixed(2)} yd<br>Miles: ${miles.toFixed(6)} mi`;
+        }
+
+        function convertMeters() {
+            const meters = parseFloat(document.getElementById('meters').value);
+            const centimeters = meters * 100;
+            const kilometers = meters / 1000;
+            document.getElementById('metersResult').innerHTML = 
+                `Centimeters: ${centimeters.toFixed(2)} cm<br>Kilometers: ${kilometers.toFixed(6)} km`;
+        }
+
+        function convertYards() {
+            const yards = parseFloat(document.getElementById('yards').value);
+            const inches = yards * 36;
+            const feet = yards * 3;
+            const miles = yards / 1760;
+            document.getElementById('yardsResult').innerHTML = 
+                `Inches: ${inches.toFixed(2)} in<br>Feet: ${feet.toFixed(2)} ft<br>Miles: ${miles.toFixed(6)} mi`;
+        }
+
+        function convertKilometers() {
+            const kilometers = parseFloat(document.getElementById('kilometers').value);
+            const centimeters = kilometers * 100000;
+            const meters = kilometers * 1000;
+            document.getElementById('kilometersResult').innerHTML = 
+                `Centimeters: ${centimeters.toFixed(2)} cm<br>Meters: ${meters.toFixed(2)} m`;
+        }
+
+        function convertMiles() {
+            const miles = parseFloat(document.getElementById('miles').value);
+            const inches = miles * 63360;
+            const feet = miles * 5280;
+            const yards = miles * 1760;
+            document.getElementById('milesResult').innerHTML = 
+                `Inches: ${inches.toFixed(2)} in<br>Feet: ${feet.toFixed(2)} ft<br>Yards: ${yards.toFixed(2)} yd`;
+        }
+
+        function convertImperialToMetric() {
+            const value = parseFloat(document.getElementById('imperialValue').value);
+            const unit = document.getElementById('imperialUnit').value;
+            let result;
+            switch (unit) {
+                case 'inches':
+                    result = `${value * 2.54} cm`;
+                    break;
+                case 'feet':
+                    result = `${(value * 0.3048).toFixed(2)} m`;
+                    break;
+                case 'yards':
+                    result = `${(value * 0.9144).toFixed(2)} m`;
+                    break;
+                case 'miles':
+                    result = `${(value * 1.60934).toFixed(2)} km`;
+                    break;
+            }
+            document.getElementById('imperialToMetricResult').innerHTML = `Metric: ${result}`;
+        }
+
+        function convertMetricToImperial() {
+            const value = parseFloat(document.getElementById('metricValue').value);
+            const unit = document.getElementById('metricUnit').value;
+            let result;
+            switch (unit) {
+                case 'centimeters':
+                    result = `${(value / 2.54).toFixed(2)} in`;
+                    break;
+                case 'meters':
+                    result = `${(value / 0.3048).toFixed(2)} ft<br>${(value / 0.9144).toFixed(2)} yd`;
+                    break;
+                case 'kilometers':
+                    result = `${(value / 1.60934).toFixed(2)} mi`;
+                    break;
+            }
+            document.getElementById('metricToImperialResult').innerHTML = `Imperial: ${result}`;
+        }
+    </script>
+</div>
+</body>
+</html>
