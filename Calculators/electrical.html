@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Electrical Calculators</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .calculator {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            margin: 20px auto;
+        }
+        .calculator label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .calculator input, .calculator select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            color: #333;
+            touch-action: manipulation;
+        }
+        .calculator button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .calculator button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+        .resistor {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            justify-content: center;
+        }
+        .resistor-band {
+            width: 20px;
+            height: 20px;
+            margin: 0 2px;
+            border: 1px solid #000;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+<div class="container">
+    <nav>
+        <ul class="navbar-left">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="tip.html">Tips</a></li>
+            <li><a href="shapes.html">Shapes</a></li>
+            <li><a href="speed.html">Speed</a></li>
+            <li><a href="conversions.html">Conversions</a></li>
+            <li><a href="electrical.html">Electrical</a></li>
+            <li><a href="algebra.html">Algebra</a></li>
+            <li><a href="conveyor.html">Conveyor</a></li>
+            <li><a href="binary.html">Binary</a></li>
+            <li><a href="cooking.html">Cooking</a></li>
+            <li><a href="weight.html">Weight</a></li>
+            <li><a href="physics.html">Physics</a></li>
+            <li><a href="calculus.html">Calculus</a></li>
+            <li><a href="chemistry.html">Chemistry</a></li>
+            <li><a href="trigonometry.html">Trigonometry</a></li>
+            <li><a href="hmi.html">HMI</a></li>
+        </ul>
+    </nav>
+<main>
+    <h1>Electrical Calculators</h1>
+
+    <div class="calculator single-column">
+        <div class="calc-column">
+        <h3>4-Band Resistor Calculator</h3>
+        <label for="band1">Band 1:</label>
+        <select id="band1" onchange="calculateResistor4Band()">
+            <option value="0">Black</option>
+            <option value="1">Brown</option>
+            <option value="2">Red</option>
+            <option value="3">Orange</option>
+            <option value="4">Yellow</option>
+            <option value="5">Green</option>
+            <option value="6">Blue</option>
+            <option value="7">Violet</option>
+            <option value="8">Gray</option>
+            <option value="9">White</option>
+        </select>
+        <label for="band2">Band 2:</label>
+        <select id="band2" onchange="calculateResistor4Band()">
+            <option value="0">Black</option>
+            <option value="1">Brown</option>
+            <option value="2">Red</option>
+            <option value="3">Orange</option>
+            <option value="4">Yellow</option>
+            <option value="5">Green</option>
+            <option value="6">Blue</option>
+            <option value="7">Violet</option>
+            <option value="8">Gray</option>
+            <option value="9">White</option>
+        </select>
+        <label for="multiplier">Multiplier:</label>
+        <select id="multiplier" onchange="calculateResistor4Band()">
+            <option value="1">Black</option>
+            <option value="10">Brown</option>
+            <option value="100">Red</option>
+            <option value="1000">Orange</option>
+            <option value="10000">Yellow</option>
+            <option value="100000">Green</option>
+            <option value="1000000">Blue</option>
+            <option value="10000000">Violet</option>
+            <option value="0.1">Gold</option>
+            <option value="0.01">Silver</option>
+        </select>
+        <label for="tolerance">Tolerance:</label>
+        <select id="tolerance" onchange="calculateResistor4Band()">
+            <option value="1">Brown ±1%</option>
+            <option value="2">Red ±2%</option>
+            <option value="5">Gold ±5%</option>
+            <option value="10">Silver ±10%</option>
+        </select>
+        <button onclick="calculateResistor4Band()">Calculate</button>
+        <div class="result" id="resistor4BandResult"></div>
+        <div class="resistor">
+            <div id="resistor-band1" class="resistor-band"></div>
+            <div id="resistor-band2" class="resistor-band"></div>
+            <div id="resistor-multiplier" class="resistor-band"></div>
+            <div id="resistor-tolerance" class="resistor-band"></div>
+        </div>
+    </div>
+</div>
+    <div class="calculator single-column">
+        <div class="calc-column">
+        <h3>5-Band Resistor Calculator</h3>
+        <label for="band1-5">Band 1:</label>
+        <select id="band1-5" onchange="calculateResistor5Band()">
+            <option value="0">Black</option>
+            <option value="1">Brown</option>
+            <option value="2">Red</option>
+            <option value="3">Orange</option>
+            <option value="4">Yellow</option>
+            <option value="5">Green</option>
+            <option value="6">Blue</option>
+            <option value="7">Violet</option>
+            <option value="8">Gray</option>
+            <option value="9">White</option>
+        </select>
+        <label for="band2-5">Band 2:</label>
+        <select id="band2-5" onchange="calculateResistor5Band()">
+            <option value="0">Black</option>
+            <option value="1">Brown</option>
+            <option value="2">Red</option>
+            <option value="3">Orange</option>
+            <option value="4">Yellow</option>
+            <option value="5">Green</option>
+            <option value="6">Blue</option>
+            <option value="7">Violet</option>
+            <option value="8">Gray</option>
+            <option value="9">White</option>
+        </select>
+        <label for="band3-5">Band 3:</label>
+        <select id="band3-5" onchange="calculateResistor5Band()">
+            <option value="0">Black</option>
+            <option value="1">Brown</option>
+            <option value="2">Red</option>
+            <option value="3">Orange</option>
+            <option value="4">Yellow</option>
+            <option value="5">Green</option>
+            <option value="6">Blue</option>
+            <option value="7">Violet</option>
+            <option value="8">Gray</option>
+            <option value="9">White</option>
+        </select>
+        <label for="multiplier-5">Multiplier:</label>
+        <select id="multiplier-5" onchange="calculateResistor5Band()">
+            <option value="1">Black</option>
+            <option value="10">Brown</option>
+            <option value="100">Red</option>
+            <option value="1000">Orange</option>
+            <option value="10000">Yellow</option>
+            <option value="100000">Green</option>
+            <option value="1000000">Blue</option>
+            <option value="10000000">Violet</option>
+            <option value="0.1">Gold</option>
+            <option value="0.01">Silver</option>
+        </select>
+        <label for="tolerance-5">Tolerance:</label>
+        <select id="tolerance-5" onchange="calculateResistor5Band()">
+            <option value="1">Brown ±1%</option>
+            <option value="2">Red ±2%</option>
+            <option value="5">Gold ±5%</option>
+            <option value="10">Silver ±10%</option>
+        </select>
+        <button onclick="calculateResistor5Band()">Calculate</button>
+        <div class="result" id="resistor5BandResult"></div>
+        <div class="resistor">
+            <div id="resistor-band1-5" class="resistor-band"></div>
+            <div id="resistor-band2-5" class="resistor-band"></div>
+            <div id="resistor-band3-5" class="resistor-band"></div>
+            <div id="resistor-multiplier-5" class="resistor-band"></div>
+            <div id="resistor-tolerance-5" class="resistor-band"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calculateResistor4Band() {
+        const band1 = parseInt(document.getElementById('band1').value);
+        const band2 = parseInt(document.getElementById('band2').value);
+        const multiplier = parseFloat(document.getElementById('multiplier').value);
+        const tolerance = parseFloat(document.getElementById('tolerance').value);
+        
+        const resistance = (band1 * 10 + band2) * multiplier;
+        document.getElementById('resistor4BandResult').textContent = `${resistance} Ω ±${tolerance}%`;
+        
+        const colorCodes = ['black', 'brown', 'red', 'orange', 'yellow', 'green', 'blue', 'violet', 'gray', 'white', 'gold', 'silver'];
+        
+        document.getElementById('resistor-band1').style.backgroundColor = colorCodes[band1];
+        document.getElementById('resistor-band2').style.backgroundColor = colorCodes[band2];
+        document.getElementById('resistor-multiplier').style.backgroundColor = colorCodes[[1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 0.1, 0.01].indexOf(multiplier)];
+        document.getElementById('resistor-tolerance').style.backgroundColor = colorCodes[[1, 2, 5, 10].indexOf(tolerance) + 1];
+    }
+
+    function calculateResistor5Band() {
+        const band1 = parseInt(document.getElementById('band1-5').value);
+        const band2 = parseInt(document.getElementById('band2-5').value);
+        const band3 = parseInt(document.getElementById('band3-5').value);
+        const multiplier = parseFloat(document.getElementById('multiplier-5').value);
+        const tolerance = parseFloat(document.getElementById('tolerance-5').value);
+        
+        const resistance = (band1 * 100 + band2 * 10 + band3) * multiplier;
+        document.getElementById('resistor5BandResult').textContent = `${resistance} Ω ±${tolerance}%`;
+        
+        const colorCodes = ['black', 'brown', 'red', 'orange', 'yellow', 'green', 'blue', 'violet', 'gray', 'white', 'gold', 'silver'];
+        
+        console.log(document.getElementById('resistor-band1-5')); // Debugging
+        document.getElementById('resistor-band1-5').style.backgroundColor = colorCodes[band1];
+        document.getElementById('resistor-band2-5').style.backgroundColor = colorCodes[band2];
+        document.getElementById('resistor-band3-5').style.backgroundColor = colorCodes[band3];
+        document.getElementById('resistor-multiplier-5').style.backgroundColor = colorCodes[[1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 0.1, 0.01].indexOf(multiplier)];
+        document.getElementById('resistor-tolerance-5').style.backgroundColor = colorCodes[[1, 2, 5, 10].indexOf(tolerance) + 1];
+    }
+</script>
+
+    <div class="calculator single-column">
+        <div class="calc-column">
+        <h3>Ohm's Law Calculator</h3>
+        <label for="voltage">Voltage (V):</label>
+        <input type="number" id="voltage" oninput="calculateOhmsLaw()">
+        <label for="current">Current (I):</label>
+        <input type="number" id="current" oninput="calculateOhmsLaw()">
+        <label for="resistance">Resistance (R):</label>
+        <input type="number" id="resistance" oninput="calculateOhmsLaw()">
+        <div class="result" id="ohmsLawResult"></div>
+    </div>
+ </div>
+    <div class="calculator single-column">
+        <div class="calc-column">
+        <h3>Power Calculator</h3>
+        <label for="power-voltage">Voltage (V):</label>
+        <input type="number" id="power-voltage" oninput="calculatePower()">
+        <label for="power-current">Current (I):</label>
+        <input type="number" id="power-current" oninput="calculatePower()">
+        <label for="power-resistance">Resistance (R):</label>
+        <input type="number" id="power-resistance" oninput="calculatePower()">
+        <div class="result" id="powerResult"></div>
+    </div>
+</div>
+    <script>
+        function calculateOhmsLaw() {
+            const voltage = parseFloat(document.getElementById('voltage').value);
+            const current = parseFloat(document.getElementById('current').value);
+            const resistance = parseFloat(document.getElementById('resistance').value);
+            let resultText = "";
+
+            if (voltage && current) {
+                resultText = "R = " + (voltage / current).toFixed(2) + " Ω";
+            } else if (voltage && resistance) {
+                resultText = "I = " + (voltage / resistance).toFixed(2) + " A";
+            } else if (current && resistance) {
+                resultText = "V = " + (current * resistance).toFixed(2) + " V";
+            }
+
+            document.getElementById('ohmsLawResult').innerText = resultText;
+        }
+
+        function calculatePower() {
+            const voltage = parseFloat(document.getElementById('power-voltage').value);
+            const current = parseFloat(document.getElementById('power-current').value);
+            const resistance = parseFloat(document.getElementById('power-resistance').value);
+            let resultText = "";
+
+            if (voltage && current) {
+                resultText = "P = " + (voltage * current).toFixed(2) + " W";
+            } else if (voltage && resistance) {
+                resultText = "P = " + (voltage * voltage / resistance).toFixed(2) + " W";
+            } else if (current && resistance) {
+                resultText = "P = " + (current * current * resistance).toFixed(2) + " W";
+            }
+
+            document.getElementById('powerResult').innerText = resultText;
+        }
+    </script>
+</main>
+<footer>
+        <span>&copy; 2024 Justin's Calculations. All rights reserved.</span>
+</footer>
+</body>
+</html>
