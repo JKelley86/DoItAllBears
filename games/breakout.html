@@ -28,7 +28,7 @@
 
         <main>
             <h1>Breakout Game</h1>
-            <canvas id="breakout" width="800" height="400"></canvas>
+            <canvas id="breakout"></canvas>
         </main>
 
         <footer>
@@ -42,10 +42,13 @@
 
         // Adjust canvas size on window resize
         function resizeCanvas() {
-            const width = window.innerWidth * 0.9;
-            const height = window.innerHeight * 0.7;
-            canvas.width = Math.min(width, 800);
-            canvas.height = Math.min(height, 400);
+            const width = Math.min(window.innerWidth * 0.9, 800);
+            const height = Math.min(window.innerHeight * 0.7, 400);
+            canvas.width = width;
+            canvas.height = height;
+
+            // Center the paddle
+            paddle.x = canvas.width / 2 - paddle.width / 2;
         }
 
         // Create the paddle
@@ -121,7 +124,7 @@
         // Move the paddle
         function movePaddle(event) {
             const rect = canvas.getBoundingClientRect();
-            const mouseX = event.clientX - rect.left;
+            const mouseX = (event.clientX - rect.left) / (rect.width / canvas.width);
             paddle.x = mouseX - paddle.width / 2;
             paddle.x = Math.max(0, Math.min(paddle.x, canvas.width - paddle.width));
         }
@@ -170,7 +173,6 @@
 
             // Reset ball if it falls below paddle
             if (ball.y + ball.radius > canvas.height) {
-                // Reset ball and paddle positions here
                 ball.x = canvas.width / 2;
                 ball.y = canvas.height - 30;
                 ball.velocityX = 4;
