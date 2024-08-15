@@ -63,16 +63,24 @@
         function resizeCanvas() {
             canvas.width = Math.min(window.innerWidth * 0.9, 800); // Max width 800px
             canvas.height = Math.min(window.innerHeight * 0.5, 400); // Max height 400px
-            user.height = canvas.height / 5;
-            computer.height = canvas.height / 5;
-            ball.radius = canvas.height / 30;
+            updateGameElements();
         }
+
+        // Update game elements after resizing
+        function updateGameElements() {
+            user.height = canvas.height / 4;
+            computer.height = canvas.height / 4;
+            ball.radius = canvas.height / 30;
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+        }
+
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
         // Create paddles and ball with responsive sizes
-        const user = { x: 0, y: canvas.height / 2 - 50, width: 10, height: canvas.height / 5, color: '#fff', score: 0 };
-        const computer = { x: canvas.width - 10, y: canvas.height / 2 - 50, width: 10, height: canvas.height / 5, color: '#fff', score: 0 };
+        const user = { x: 0, y: canvas.height / 2 - 50, width: 10, height: canvas.height / 4, color: '#fff', score: 0 };
+        const computer = { x: canvas.width - 10, y: canvas.height / 2 - 50, width: 10, height: canvas.height / 4, color: '#fff', score: 0 };
         const ball = { x: canvas.width / 2, y: canvas.height / 2, radius: canvas.height / 30, speed: 5, velocityX: 5, velocityY: 5, color: '#fff' };
 
         // Handle paddle movement for both mouse and touch devices
