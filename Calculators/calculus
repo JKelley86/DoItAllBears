@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Calculus Calculators</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.5.0/math.min.js"></script>
+    <style>
+        .calculator {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin: 20px auto; /* Center table horizontally */
+        }
+        .calc-column {
+            width: 40%;
+        }
+        .calculator label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .calculator input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            color: #333;
+            touch-action: manipulation;
+        }
+        .calculator button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .calculator button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+<div class="container">
+    <nav>
+        <ul class="navbar-left">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="tip.html">Tips</a></li>
+            <li><a href="shapes.html">Shapes</a></li>
+            <li><a href="speed.html">Speed</a></li>
+            <li><a href="conversions.html">Conversions</a></li>
+            <li><a href="electrical.html">Electrical</a></li>
+            <li><a href="algebra.html">Algebra</a></li>
+            <li><a href="conveyor.html">Conveyor</a></li>
+            <li><a href="binary.html">Binary</a></li>
+            <li><a href="cooking.html">Cooking</a></li>
+            <li><a href="weight.html">Weight</a></li>
+            <li><a href="physics.html">Physics</a></li>
+            <li><a href="calculus.html">Calculus</a></li>
+            <li><a href="chemistry.html">Chemistry</a></li>
+            <li><a href="trigonometry.html">Trigonometry</a></li>
+            <li><a href="hmi.html">HMI</a></li>
+        </ul>
+    </nav>
+<main>
+    <h1>Calculus Calculators</h1>
+
+    <div class="calculator">
+        <div class="calc-column">
+            <h3>Derivative of a Function</h3>
+            <label for="functionDerivative">Function (f(x)):</label>
+            <input type="text" id="functionDerivative" placeholder="e.g., x^2 + 3*x + 2">
+            <button onclick="calculateDerivative()">Calculate Derivative</button>
+            <div class="result" id="derivativeResult"></div>
+        </div>
+
+        <div class="calc-column">
+            <h3>Integral of a Function</h3>
+            <label for="functionIntegral">Function (f(x)):</label>
+            <input type="text" id="functionIntegral" placeholder="e.g., x^2 + 3*x + 2">
+            <button onclick="calculateIntegral()">Calculate Integral</button>
+            <div class="result" id="integralResult"></div>
+        </div>
+    </div>
+    <div class="calculator single-column">
+        <div class="calc-column">
+            <h3>Definite Integral</h3>
+            <label for="defIntegralFunction">Function (f(x)):</label>
+            <input type="text" id="defIntegralFunction" placeholder="e.g., x^2 + 3*x + 2">
+            <label for="defIntegralLower">Lower Limit:</label>
+            <input type="number" id="defIntegralLower" step="0.01">
+            <label for="defIntegralUpper">Upper Limit:</label>
+            <input type="number" id="defIntegralUpper" step="0.01">
+            <button onclick="calculateDefiniteIntegral()">Calculate Definite Integral</button>
+            <div class="result" id="defIntegralResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator single-column">
+        <div class="calc-column">
+            <h3>Limit of a Function</h3>
+            <label for="functionLimit">Function (f(x)):</label>
+            <input type="text" id="functionLimit" placeholder="e.g., (x^2 - 4)/(x - 2)">
+            <label for="limitPoint">Limit Point (x → ?):</label>
+            <input type="number" id="limitPoint" step="0.01">
+            <button onclick="calculateLimit()">Calculate Limit</button>
+            <div class="result" id="limitResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator single-column">
+        <div class="calc-column">
+            <h3>Partial Derivative</h3>
+            <label for="functionPartial">Function (f(x, y)):</label>
+            <input type="text" id="functionPartial" placeholder="e.g., x^2*y + y^3">
+            <label for="partialVariable">Variable (x or y):</label>
+            <input type="text" id="partialVariable" placeholder="e.g., x">
+            <button onclick="calculatePartialDerivative()">Calculate Partial Derivative</button>
+            <div class="result" id="partialDerivativeResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator single-column">
+        <div class="calc-column">
+            <h3>Critical Points</h3>
+            <label for="functionCritical">Function (f(x)):</label>
+            <input type="text" id="functionCritical" placeholder="e.g., x^3 - 3*x^2 + 2">
+            <button onclick="calculateCriticalPoints()">Calculate Critical Points</button>
+            <div class="result" id="criticalPointsResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator single-column">
+        <div class="calc-column">
+            <h3>Concavity</h3>
+            <label for="functionConcavity">Function (f(x)):</label>
+            <input type="text" id="functionConcavity" placeholder="e.g., x^3 - 3*x^2 + 2">
+            <button onclick="calculateConcavity()">Calculate Concavity</button>
+            <div class="result" id="concavityResult"></div>
+        </div>
+    </div>
+</main>
+    <footer> 
+        <span>&copy; 2024 Justin's Calculations. All rights reserved.</span>
+    </footer>
+
+    <script>
+        function calculateDerivative() {
+            const expr = document.getElementById('functionDerivative').value;
+            try {
+                const derivative = math.derivative(expr, 'x').toString();
+                document.getElementById('derivativeResult').innerHTML = `Derivative: ${derivative}`;
+            } catch (error) {
+                document.getElementById('derivativeResult').innerHTML = 'Error: Invalid function.';
+            }
+        }
+
+        function calculateIntegral() {
+            const expr = document.getElementById('functionIntegral').value;
+            try {
+                const integral = math.integral(expr, 'x').toString();
+                document.getElementById('integralResult').innerHTML = `Integral: ${integral}`;
+            } catch (error) {
+                document.getElementById('integralResult').innerHTML = 'Error: Invalid function.';
+            }
+        }
+
+        function calculateDefiniteIntegral() {
+            const expr = document.getElementById('defIntegralFunction').value;
+            const lower = parseFloat(document.getElementById('defIntegralLower').value);
+            const upper = parseFloat(document.getElementById('defIntegralUpper').value);
+            try {
+                const integral = math.integral(expr, 'x');
+                const result = math.evaluate(integral.toString(), {x: upper}) - math.evaluate(integral.toString(), {x: lower});
+                document.getElementById('defIntegralResult').innerHTML = `Definite Integral: ${result.toFixed(2)}`;
+            } catch (error) {
+                document.getElementById('defIntegralResult').innerHTML = 'Error: Invalid function or limits.';
+            }
+        }
+
+        function calculateLimit() {
+            const expr = document.getElementById('functionLimit').value;
+            const point = parseFloat(document.getElementById('limitPoint').value);
+            try {
+                const limit = math.limit(expr, 'x', point).toString();
+                document.getElementById('limitResult').innerHTML = `Limit: ${limit}`;
+            } catch (error) {
+                document.getElementById('limitResult').innerHTML = 'Error: Invalid function or limit point.';
+            }
+        }
+
+        function calculatePartialDerivative() {
+            const expr = document.getElementById('functionPartial').value;
+            const variable = document.getElementById('partialVariable').value;
+            try {
+                const partialDerivative = math.derivative(expr, variable).toString();
+                document.getElementById('partialDerivativeResult').innerHTML = `Partial Derivative: ${partialDerivative}`;
+            } catch (error) {
+                document.getElementById('partialDerivativeResult').innerHTML = 'Error: Invalid function or variable.';
+            }
+        }
+
+        function calculateCriticalPoints() {
+            const expr = document.getElementById('functionCritical').value;
+            try {
+                const derivative = math.derivative(expr, 'x').toString();
+                const criticalPoints = math.solve(derivative, 'x');
+                document.getElementById('criticalPointsResult').innerHTML = `Critical Points: ${criticalPoints}`;
+            } catch (error) {
+                document.getElementById('criticalPointsResult').innerHTML = 'Error: Invalid function.';
+            }
+        }
+
+        function calculateConcavity() {
+            const expr = document.getElementById('functionConcavity').value;
+            try {
+                const secondDerivative = math.derivative(math.derivative(expr, 'x').toString(), 'x').toString();
+                document.getElementById('concavityResult').innerHTML = `Concavity (Second Derivative): ${secondDerivative}`;
+            } catch (error) {
+                document.getElementById('concavityResult').innerHTML = 'Error: Invalid function.';
+            }
+        }
+    </script>
+</body>
+</html>
