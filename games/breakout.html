@@ -13,6 +13,11 @@
             border: 5px solid #fff;
         }
 
+        /* Colors for the game elements */
+        .paddle, .ball, .brick {
+            fill: #fff;
+        }
+
         .nav-button {
             display: inline-block;
             width: 90px;
@@ -40,7 +45,7 @@
             <ul class="navbar-left">
                 <li><a href="../index.html">Back</a></li>
                 <li><a href="index.html">Home</a></li>
-                <li><a href="tic_tac_toe.html">Tic Tac Toe</a></li>
+                <li><a href="tic-tac-toe.html">Tic-Tac-Toe</a></li>
                 <li><a href="breakout.html">Breakout</a></li>
             </ul>
         </nav>
@@ -59,35 +64,33 @@
         const canvas = document.getElementById('breakout');
         const context = canvas.getContext('2d');
 
-        // Paddle
         const paddle = {
-            x: canvas.width / 2 - 50,
-            y: canvas.height - 30,
             width: 100,
             height: 10,
-            color: '#fff',
-            dx: 5
+            x: canvas.width / 2 - 50,
+            y: canvas.height - 30,
+            dx: 0,
+            speed: 8,
+            color: '#fff'
         };
 
-        // Ball
         const ball = {
-            x: canvas.width / 2,
-            y: canvas.height - 40,
             radius: 10,
+            x: canvas.width / 2,
+            y: canvas.height / 2,
             speed: 4,
             dx: 4,
             dy: -4,
             color: '#fff'
         };
 
-        // Bricks
         const brickRowCount = 5;
         const brickColumnCount = 9;
-        const brickWidth = 75;
+        const brickWidth = 70;
         const brickHeight = 20;
         const brickPadding = 10;
         const brickOffsetTop = 30;
-        const brickOffsetLeft = 30;
+        const brickOffsetLeft = 35;
 
         const bricks = [];
         for (let c = 0; c < brickColumnCount; c++) {
@@ -97,16 +100,11 @@
             }
         }
 
-        // Draw paddle
         function drawPaddle() {
-            context.beginPath();
-            context.rect(paddle.x, paddle.y, paddle.width, paddle.height);
             context.fillStyle = paddle.color;
-            context.fill();
-            context.closePath();
+            context.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
         }
 
-        // Draw ball
         function drawBall() {
             context.beginPath();
             context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
@@ -115,117 +113,86 @@
             context.closePath();
         }
 
-        // Draw bricks
         function drawBricks() {
             for (let c = 0; c < brickColumnCount; c++) {
                 for (let r = 0; r < brickRowCount; r++) {
-                    if (bricks[c][r].status == 1) {
+                    if (bricks[c][r].status === 1) {
                         const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
                         const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
                         bricks[c][r].x = brickX;
                         bricks[c][r].y = brickY;
-                        context.beginPath();
-                        context.rect(brickX, brickY, brickWidth, brickHeight);
                         context.fillStyle = '#fff';
-                        context.fill();
-                        context.closePath();
+                        context.fillRect(brickX, brickY, brickWidth, brickHeight);
                     }
                 }
             }
         }
 
-        // Move paddle
-        function movePaddle() {
-            if (rightPressed && paddle.x < canvas.width - paddle.width) {
-                paddle.x += paddle.dx;
-            }
-            if (leftPressed && paddle.x > 0) {
-                paddle.x -= paddle.dx;
+        function movePaddle(event) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+            paddle.x = clientX - rect.left - paddle.width / 2;
+
+            // Ensure the paddle doesn't move out of the canvas
+            if (paddle.x < 0) {
+                paddle.x = 0;
+            } else if (paddle.x + paddle.width > canvas.width) {
+                paddle.x = canvas.width - paddle.width;
             }
         }
 
-        // Move ball
+        function draw() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            drawPaddle();
+            drawBall();
+            drawBricks();
+            moveBall();
+            detectCollision();
+
+            requestAnimationFrame(draw);
+        }
+
         function moveBall() {
             ball.x += ball.dx;
             ball.y += ball.dy;
 
-            // Wall collision (left/right)
+            // Wall collision detection
             if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
                 ball.dx *= -1;
             }
 
-            // Wall collision (top/bottom)
             if (ball.y - ball.radius < 0) {
                 ball.dy *= -1;
             } else if (ball.y + ball.radius > canvas.height) {
-                // Check if ball hits the paddle
-                if (ball.x > paddle.x && ball.x < paddle.x + paddle.width) {
-                    ball.dy = -ball.speed;
-                } else {
-                    document.location.reload();
-                }
+                document.location.reload(); // Reload the page to reset the game
             }
 
-            // Brick collision
+            // Paddle collision detection
+            if (ball.y + ball.radius > paddle.y &&
+                ball.x > paddle.x && ball.x < paddle.x + paddle.width) {
+                ball.dy = -ball.speed;
+            }
+        }
+
+        function detectCollision() {
             for (let c = 0; c < brickColumnCount; c++) {
                 for (let r = 0; r < brickRowCount; r++) {
-                    const b = bricks[c][r];
-                    if (b.status == 1) {
-                        if (
-                            ball.x > b.x &&
-                            ball.x < b.x + brickWidth &&
-                            ball.y > b.y &&
-                            ball.y < b.y + brickHeight
-                        ) {
+                    const brick = bricks[c][r];
+                    if (brick.status === 1) {
+                        if (ball.x > brick.x && ball.x < brick.x + brickWidth &&
+                            ball.y > brick.y && ball.y < brick.y + brickHeight) {
                             ball.dy *= -1;
-                            b.status = 0;
+                            brick.status = 0;
                         }
                     }
                 }
             }
         }
 
-        // Draw everything
-        function draw() {
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            drawBricks();
-            drawBall();
-            drawPaddle();
-        }
+        canvas.addEventListener('mousemove', movePaddle);
+        canvas.addEventListener('touchmove', movePaddle);
 
-        // Update game canvas
-        function update() {
-            movePaddle();
-            moveBall();
-            draw();
-            requestAnimationFrame(update);
-        }
-
-        // Keyboard controls
-        let rightPressed = false;
-        let leftPressed = false;
-
-        document.addEventListener('keydown', keyDownHandler, false);
-        document.addEventListener('keyup', keyUpHandler, false);
-
-        function keyDownHandler(e) {
-            if (e.key === 'Right' || e.key === 'ArrowRight') {
-                rightPressed = true;
-            } else if (e.key === 'Left' || e.key === 'ArrowLeft') {
-                leftPressed = true;
-            }
-        }
-
-        function keyUpHandler(e) {
-            if (e.key === 'Right' || e.key === 'ArrowRight') {
-                rightPressed = false;
-            } else if (e.key === 'Left' || e.key === 'ArrowLeft') {
-                leftPressed = false;
-            }
-        }
-
-        // Start the game
-        update();
+        draw();
     </script>
 </body>
 </html>
