@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Shape Calculators</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .calculator {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin: 20px auto; /* Center table horizontally */
+        }
+        .calc-column {
+            width: 40%;
+        }
+        .calculator label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .calculator input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            color: #333;
+            touch-action: manipulation;
+        }
+        .calculator button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .calculator button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+<div class="container">
+    <nav>
+        <ul class="navbar-left">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="tip.html">Tips</a></li>
+            <li><a href="shapes.html">Shapes</a></li>
+            <li><a href="speed.html">Speed</a></li>
+            <li><a href="conversions.html">Conversions</a></li>
+            <li><a href="electrical.html">Electrical</a></li>
+            <li><a href="algebra.html">Algebra</a></li>
+            <li><a href="conveyor.html">Conveyor</a></li>
+            <li><a href="binary.html">Binary</a></li>
+            <li><a href="cooking.html">Cooking</a></li>
+            <li><a href="weight.html">Weight</a></li>
+            <li><a href="physics.html">Physics</a></li>
+            <li><a href="calculus.html">Calculus</a></li>
+            <li><a href="chemistry.html">Chemistry</a></li>
+            <li><a href="trigonometry.html">Trigonometry</a></li>
+            <li><a href="hmi.html">HMI</a></li>
+        </ul>
+    </nav>
+<main>
+    <div class="calculator single-column">
+        <div class="calc-column">
+        <h3>Number Sequence Generator</h3>
+        <label for="startNumber">Starting Number:</label>
+        <input type="number" id="startNumber">
+        
+        <label for="difference">Difference:</label>
+        <input type="number" id="difference">
+        
+        <button onclick="generateSequence()">Generate Sequence</button>
+    </div>
+ </div>
+            <ul id="numberList"></ul>
+</main>
+    <footer>
+        <span></span>&copy; 2024 Your Website. All rights reserved.</span>
+    </footer>
+
+    <script>
+        function generateSequence() {
+            const startNumber = parseFloat(document.getElementById('startNumber').value);
+            const difference = parseFloat(document.getElementById('difference').value);
+            const numberList = document.getElementById('numberList');
+            
+            numberList.innerHTML = ''; // Clear any previous list
+            
+            if (!isNaN(startNumber) && !isNaN(difference)) {
+                let currentNumber = startNumber;
+                for (let i = 0; i < 15; i++) {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = currentNumber;
+                    numberList.appendChild(listItem);
+                    currentNumber += difference;
+                }
+            } else {
+                alert('Please enter valid numbers for both fields.');
+            }
+        }
+    </script>
+</body>
+</html>
