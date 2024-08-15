@@ -59,19 +59,9 @@
         const canvas = document.getElementById('pong');
         const context = canvas.getContext('2d');
 
-        // Resize canvas to be responsive
-        function resizeCanvas() {
-            canvas.width = Math.min(window.innerWidth * 0.9, 800);
-            canvas.height = canvas.width / 2;
-            initializeGame();
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        // Initialize paddles and ball
         let user, computer, ball;
 
+        // Initialize paddles and ball
         function initializeGame() {
             user = {
                 x: 0,
@@ -101,6 +91,16 @@
                 color: '#fff'
             };
         }
+
+        // Resize canvas to be responsive
+        function resizeCanvas() {
+            canvas.width = Math.min(window.innerWidth * 0.9, 800);
+            canvas.height = canvas.width / 2;
+            initializeGame(); // Reinitialize game elements after resizing
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas(); // Initialize canvas and game elements on load
 
         // Move the paddle
         canvas.addEventListener('mousemove', movePaddle);
