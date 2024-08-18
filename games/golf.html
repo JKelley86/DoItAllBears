@@ -9,9 +9,9 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            text-align: center;
             margin: 0;
             padding: 20px;
+            color: #333;
         }
 
         .player-container {
@@ -50,30 +50,28 @@
 <div class="container">
     <nav>
         <ul class="navbar-left">
-                <li><a href="../index.html">Back</a></li>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="wordle.html">Wordle</a></li>
-                <li><a href="pongselection.html">Pong</a></li>
-                <li><a href="tictactoeselection.html">Tic-Tac-Toe</a></li>
-                <li><a href="breakout.html">Breakout</a></li>
-                <li><a href="golf.html">Golf</a></li>
-
-
+            <li><a href="../index.html">Back</a></li>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="wordle.html">Wordle</a></li>
+            <li><a href="pongselection.html">Pong</a></li>
+            <li><a href="tictactoeselection.html">Tic-Tac-Toe</a></li>
+            <li><a href="breakout.html">Breakout</a></li>
+            <li><a href="golf.html">Golf</a></li>
         </ul>
     </nav>
     <main>
-    <h1>Golf Game</h1>
+        <h1>Golf Game</h1>
 
-    <div id="setup">
-        <label for="playerCount">Number of Players (1-6): </label>
-        <input type="number" id="playerCount" min="1" max="6">
-        <button onclick="setupPlayers()">Start Game</button>
-    </div>
+        <div id="setup">
+            <label for="playerCount">Number of Players (1-6): </label>
+            <input type="number" id="playerCount" min="1" max="6">
+            <button onclick="setupPlayers()">Start Game</button>
+        </div>
 
-    <div id="players"></div>
+        <div id="players"></div>
 
-    <button id="next-hole" onclick="nextHole()" style="display:none;">Next Hole</button>
-    <button id="reset" onclick="resetGame()" style="display:none;">Reset Game</button>
+        <button id="next-hole" onclick="nextHole()" style="display:none;">Next Hole</button>
+        <button id="reset" onclick="resetGame()" style="display:none;">Reset Game</button>
     </main>
     <footer> 
         <span>&copy; 2024 Justin's Website. All rights reserved.</span>
@@ -143,6 +141,5 @@
             document.getElementById('reset').style.display = 'none';
         }
     </script>
-
 </body>
 </html>
