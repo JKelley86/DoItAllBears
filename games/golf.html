@@ -1,4 +1,4 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en"> 
 <head>
     <meta charset="UTF-8">
@@ -41,6 +41,10 @@
         #next-hole, #reset {
             margin-top: 20px;
         }
+
+        .player-selection button {
+            margin: 5px;
+        }
     </style>
 </head>
 <body style="background-image: url('golfbackground.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
@@ -61,9 +65,15 @@
             <h1>Golf Game</h1>
 
             <div id="setup">
-                <label for="playerCount">Number of Players (1-6): </label>
-                <input type="number" id="playerCount" min="1" max="6">
-                <button onclick="setupPlayers()">Start Game</button>
+                <div class="player-selection">
+                    <p>Select Number of Players (1-6):</p>
+                    <button onclick="setupPlayers(1)">1 Player</button>
+                    <button onclick="setupPlayers(2)">2 Players</button>
+                    <button onclick="setupPlayers(3)">3 Players</button>
+                    <button onclick="setupPlayers(4)">4 Players</button>
+                    <button onclick="setupPlayers(5)">5 Players</button>
+                    <button onclick="setupPlayers(6)">6 Players</button>
+                </div>
             </div>
 
             <div id="players"></div>
@@ -81,12 +91,8 @@
         let playerCount = 0;
         let players = [];
 
-        function setupPlayers() {
-            playerCount = parseInt(document.getElementById('playerCount').value);
-            if (playerCount < 1 || playerCount > 6 || isNaN(playerCount)) {
-                alert('Please enter a number between 1 and 6.');
-                return;
-            }
+        function setupPlayers(count) {
+            playerCount = count;
 
             players = [];
             document.getElementById('setup').style.display = 'none';
@@ -95,7 +101,7 @@
 
             for (let i = 0; i < playerCount; i++) {
                 const player = {
-                    name: prompt('Enter the name of Player ' + (i + 1)),
+                    name: '',
                     hits: 0,
                     totalHits: 0
                 };
@@ -103,7 +109,8 @@
 
                 playersDiv.innerHTML += `
                     <div class="player-container">
-                        <div class="player-name">${player.name}</div>
+                        <div class="player-name">Player ${i + 1} Name:</div>
+                        <input type="text" id="playerName${i}" placeholder="Enter name">
                         <div class="player-stats">
                             <span>Hits: </span>
                             <input type="number" id="hits${i}" value="${player.hits}" readonly>
@@ -126,6 +133,7 @@
 
         function nextHole() {
             players.forEach((player, index) => {
+                player.name = document.getElementById('playerName' + index).value || `Player ${index + 1}`;
                 player.totalHits += player.hits;
                 player.hits = 0;
                 document.getElementById('totalHits' + index).value = player.totalHits;
