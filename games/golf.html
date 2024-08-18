@@ -32,6 +32,8 @@
             border: none;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            box-sizing: border-box;
         }
 
         button:hover {
@@ -47,12 +49,37 @@
         }
 
         #playerSelectButtons {
-            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
         }
 
-        #players {
-            max-width: 600px;
+        .player-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .container {
+            max-width: 800px;
             margin: 0 auto;
+            padding: 20px;
+        }
+
+        @media screen and (max-width: 600px) {
+            button {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+
+            .player-name {
+                font-size: 18px;
+            }
+
+            .player-stats {
+                flex-direction: column;
+                gap: 5px;
+            }
         }
     </style>
 </head>
@@ -80,8 +107,6 @@
                     <button onclick="selectPlayerCount(1)">1 Player</button>
                     <button onclick="selectPlayerCount(2)">2 Players</button>
                     <button onclick="selectPlayerCount(3)">3 Players</button>
-                </div>
-                <div id="playerSelectButtons" style="margin-top: 10px;">
                     <button onclick="selectPlayerCount(4)">4 Players</button>
                     <button onclick="selectPlayerCount(5)">5 Players</button>
                     <button onclick="selectPlayerCount(6)">6 Players</button>
@@ -91,7 +116,7 @@
             <!-- Step 2: Enter Player Names -->
             <div id="step2" class="step-container" style="display:none;">
                 <h2>Enter Player Names:</h2>
-                <div id="nameInputs"></div>
+                <div id="nameInputs" class="player-inputs"></div>
                 <button onclick="confirmNames()">Confirm Names</button>
             </div>
 
