@@ -1,11 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
+\<!DOCTYPE html>
+<html lang="en"> 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Golf</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Golf Game</title>
+    <link rel="stylesheet" href="../styles.css">
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-image: url('picture1.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            color: #fff;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+        }
 
         .player-container {
             margin-bottom: 20px;
@@ -28,48 +43,81 @@
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
+            background-color: #000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
-        #players {
-            margin-bottom: 30px;
+        button:hover {
+            background-color: #333;
         }
 
         #next-hole, #reset {
             margin-top: 20px;
         }
+
+        .navbar-left {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .navbar-left li {
+            display: inline-block;
+        }
+
+        .navbar-left a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .navbar-left a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
-<body style="background-image: url('golfbackground.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
-<div class="container">
-    <nav>
-        <ul class="navbar-left">
-            <li><a href="../index.html">Back</a></li>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="wordle.html">Wordle</a></li>
-            <li><a href="pongselection.html">Pong</a></li>
-            <li><a href="tictactoeselection.html">Tic-Tac-Toe</a></li>
-            <li><a href="breakout.html">Breakout</a></li>
-            <li><a href="golf.html">Golf</a></li>
-        </ul>
-    </nav>
-    <main>
-        <h1>Golf Game</h1>
+<body>
+    <div class="container">
+        <nav>
+            <ul class="navbar-left">
+                <li><a href="../index.html">Back</a></li>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="wordle.html">Wordle</a></li>
+                <li><a href="pongselection.html">Pong</a></li>
+                <li><a href="tictactoeselection.html">Tic-Tac-Toe</a></li>
+                <li><a href="breakout.html">Breakout</a></li>
+                <li><a href="golf.html">Golf</a></li>
+            </ul>
+        </nav>
 
-        <div id="setup">
-            <label for="playerCount">Number of Players (1-6): </label>
-            <input type="number" id="playerCount" min="1" max="6">
-            <button onclick="setupPlayers()">Start Game</button>
-        </div>
+        <main>
+            <h1>Golf Game</h1>
 
-        <div id="players"></div>
+            <div id="setup">
+                <label for="playerCount">Number of Players (1-6): </label>
+                <input type="number" id="playerCount" min="1" max="6">
+                <button onclick="setupPlayers()">Start Game</button>
+            </div>
 
-        <button id="next-hole" onclick="nextHole()" style="display:none;">Next Hole</button>
-        <button id="reset" onclick="resetGame()" style="display:none;">Reset Game</button>
-    </main>
-    <footer> 
-        <span>&copy; 2024 Justin's Website. All rights reserved.</span>
-    </footer>
-</div>
+            <div id="players"></div>
+
+            <button id="next-hole" onclick="nextHole()" style="display:none;">Next Hole</button>
+            <button id="reset" onclick="resetGame()" style="display:none;">Reset Game</button>
+        </main>
+
+        <footer> 
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer> 
+    </div>
+
     <script>
         let playerCount = 0;
         let players = [];
@@ -134,5 +182,6 @@
             document.getElementById('reset').style.display = 'none';
         }
     </script>
+
 </body>
 </html>
