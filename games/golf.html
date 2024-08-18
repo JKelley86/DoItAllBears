@@ -41,10 +41,6 @@
         #next-hole, #reset {
             margin-top: 20px;
         }
-
-        .player-selection button {
-            margin: 5px;
-        }
     </style>
 </head>
 <body style="background-image: url('golfbackground.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
@@ -64,19 +60,22 @@
         <main>
             <h1>Golf Game</h1>
 
+            <!-- Step 1: Select Number of Players -->
             <div id="setup">
-                <div class="player-selection">
-                    <p>Select Number of Players (1-6):</p>
-                    <button onclick="setupPlayers(1)">1 Player</button>
-                    <button onclick="setupPlayers(2)">2 Players</button>
-                    <button onclick="setupPlayers(3)">3 Players</button>
-                    <button onclick="setupPlayers(4)">4 Players</button>
-                    <button onclick="setupPlayers(5)">5 Players</button>
-                    <button onclick="setupPlayers(6)">6 Players</button>
-                </div>
+                <label for="playerCount">Number of Players (1-6): </label>
+                <input type="number" id="playerCount" min="1" max="6">
+                <button onclick="setupPlayers()">Next</button>
             </div>
 
-            <div id="players"></div>
+            <!-- Step 2: Input Player Names -->
+            <div id="nameInput" style="display:none;">
+                <h2>Enter Player Names</h2>
+                <div id="nameFields"></div>
+                <button onclick="startGame()">Start Game</button>
+            </div>
+
+            <!-- Step 3: Play the Game -->
+            <div id="players" style="display:none;"></div>
 
             <button id="next-hole" onclick="nextHole()" style="display:none;">Next Hole</button>
             <button id="reset" onclick="resetGame()" style="display:none;">Reset Game</button>
@@ -91,17 +90,38 @@
         let playerCount = 0;
         let players = [];
 
-        function setupPlayers(count) {
-            playerCount = count;
+        function setupPlayers() {
+            playerCount = parseInt(document.getElementById('playerCount').value);
+            if (playerCount < 1 || playerCount > 6 || isNaN(playerCount)) {
+                alert('Please enter a number between 1 and 6.');
+                return;
+            }
 
             players = [];
             document.getElementById('setup').style.display = 'none';
+            document.getElementById('nameInput').style.display = 'block';
+
+            const nameFields = document.getElementById('nameFields');
+            nameFields.innerHTML = '';
+
+            for (let i = 0; i < playerCount; i++) {
+                nameFields.innerHTML += `
+                    <div>
+                        <label for="playerName${i}">Player ${i + 1} Name:</label>
+                        <input type="text" id="playerName${i}">
+                    </div>
+                `;
+            }
+        }
+
+        function startGame() {
             const playersDiv = document.getElementById('players');
             playersDiv.innerHTML = '';
 
             for (let i = 0; i < playerCount; i++) {
+                const playerName = document.getElementById('playerName' + i).value || 'Player ' + (i + 1);
                 const player = {
-                    name: '',
+                    name: playerName,
                     hits: 0,
                     totalHits: 0
                 };
@@ -109,8 +129,7 @@
 
                 playersDiv.innerHTML += `
                     <div class="player-container">
-                        <div class="player-name">Player ${i + 1} Name:</div>
-                        <input type="text" id="playerName${i}" placeholder="Enter name">
+                        <div class="player-name">${player.name}</div>
                         <div class="player-stats">
                             <span>Hits: </span>
                             <input type="number" id="hits${i}" value="${player.hits}" readonly>
@@ -122,6 +141,8 @@
                 `;
             }
 
+            document.getElementById('nameInput').style.display = 'none';
+            document.getElementById('players').style.display = 'block';
             document.getElementById('next-hole').style.display = 'inline-block';
             document.getElementById('reset').style.display = 'inline-block';
         }
@@ -133,7 +154,6 @@
 
         function nextHole() {
             players.forEach((player, index) => {
-                player.name = document.getElementById('playerName' + index).value || `Player ${index + 1}`;
                 player.totalHits += player.hits;
                 player.hits = 0;
                 document.getElementById('totalHits' + index).value = player.totalHits;
@@ -142,11 +162,15 @@
         }
 
         function resetGame() {
-            players = [];
-            document.getElementById('setup').style.display = 'block';
-            document.getElementById('players').innerHTML = '';
-            document.getElementById('next-hole').style.display = 'none';
-            document.getElementById('reset').style.display = 'none';
+            if (confirm('Are you sure you want to reset the game?')) {
+                players = [];
+                document.getElementById('setup').style.display = 'block';
+                document.getElementById('nameInput').style.display = 'none';
+                document.getElementById('players').innerHTML = '';
+                document.getElementById('players').style.display = 'none';
+                document.getElementById('next-hole').style.display = 'none';
+                document.getElementById('reset').style.display = 'none';
+            }
         }
     </script>
 
