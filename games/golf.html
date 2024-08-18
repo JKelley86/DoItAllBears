@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -41,6 +41,10 @@
         #next-hole, #reset {
             margin-top: 20px;
         }
+
+        .step-container {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body style="background-image: url('golfbackground.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
@@ -61,88 +65,94 @@
             <h1>Golf Game</h1>
 
             <!-- Step 1: Select Number of Players -->
-            <div id="setup">
-                <label for="playerCount">Number of Players (1-6): </label>
-                <input type="number" id="playerCount" min="1" max="6">
-                <button onclick="setupPlayers()">Next</button>
+            <div id="step1" class="step-container">
+                <h2>Select Number of Players:</h2>
+                <div id="playerSelectButtons">
+                    <button onclick="selectPlayerCount(1)">1 Player</button>
+                    <button onclick="selectPlayerCount(2)">2 Players</button>
+                    <button onclick="selectPlayerCount(3)">3 Players</button>
+                    <button onclick="selectPlayerCount(4)">4 Players</button>
+                    <button onclick="selectPlayerCount(5)">5 Players</button>
+                    <button onclick="selectPlayerCount(6)">6 Players</button>
+                </div>
             </div>
 
-            <!-- Step 2: Input Player Names -->
-            <div id="nameInput" style="display:none;">
-                <h2>Enter Player Names</h2>
-                <div id="nameFields"></div>
-                <button onclick="startGame()">Start Game</button>
+            <!-- Step 2: Enter Player Names -->
+            <div id="step2" class="step-container" style="display:none;">
+                <h2>Enter Player Names:</h2>
+                <div id="nameInputs"></div>
+                <button onclick="confirmNames()">Confirm Names</button>
             </div>
 
-            <!-- Step 3: Play the Game -->
-            <div id="players" style="display:none;"></div>
-
-            <button id="next-hole" onclick="nextHole()" style="display:none;">Next Hole</button>
-            <button id="reset" onclick="resetGame()" style="display:none;">Reset Game</button>
+            <!-- Step 3: Play Game -->
+            <div id="step3" style="display:none;">
+                <div id="players"></div>
+                <button id="next-hole" onclick="nextHole()" style="display:none;">Next Hole</button>
+                <button id="reset" onclick="resetGame()" style="display:none;">Reset Game</button>
+            </div>
         </main>
 
         <footer> 
             <span>&copy; 2024 Justin's Website. All rights reserved.</span>
-        </footer> 
+        </footer>
     </div>
 
     <script>
         let playerCount = 0;
         let players = [];
 
-        function setupPlayers() {
-            playerCount = parseInt(document.getElementById('playerCount').value);
-            if (playerCount < 1 || playerCount > 6 || isNaN(playerCount)) {
-                alert('Please enter a number between 1 and 6.');
-                return;
-            }
+        function selectPlayerCount(count) {
+            playerCount = count;
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+            displayNameInputs();
+        }
 
-            players = [];
-            document.getElementById('setup').style.display = 'none';
-            document.getElementById('nameInput').style.display = 'block';
-
-            const nameFields = document.getElementById('nameFields');
-            nameFields.innerHTML = '';
-
+        function displayNameInputs() {
+            const nameInputsDiv = document.getElementById('nameInputs');
+            nameInputsDiv.innerHTML = '';
             for (let i = 0; i < playerCount; i++) {
-                nameFields.innerHTML += `
-                    <div>
-                        <label for="playerName${i}">Player ${i + 1} Name:</label>
-                        <input type="text" id="playerName${i}">
+                nameInputsDiv.innerHTML += `
+                    <div class="player-container">
+                        <label for="player${i}">Player ${i + 1} Name:</label>
+                        <input type="text" id="player${i}" placeholder="Enter name">
                     </div>
                 `;
             }
         }
 
-        function startGame() {
-            const playersDiv = document.getElementById('players');
-            playersDiv.innerHTML = '';
-
+        function confirmNames() {
+            players = [];
             for (let i = 0; i < playerCount; i++) {
-                const playerName = document.getElementById('playerName' + i).value || 'Player ' + (i + 1);
-                const player = {
+                const playerName = document.getElementById(`player${i}`).value || `Player ${i + 1}`;
+                players.push({
                     name: playerName,
                     hits: 0,
                     totalHits: 0
-                };
-                players.push(player);
+                });
+            }
+            document.getElementById('step2').style.display = 'none';
+            displayPlayerStats();
+        }
 
+        function displayPlayerStats() {
+            const playersDiv = document.getElementById('players');
+            playersDiv.innerHTML = '';
+            players.forEach((player, index) => {
                 playersDiv.innerHTML += `
                     <div class="player-container">
                         <div class="player-name">${player.name}</div>
                         <div class="player-stats">
                             <span>Hits: </span>
-                            <input type="number" id="hits${i}" value="${player.hits}" readonly>
-                            <button onclick="incrementHits(${i})">Hit</button>
+                            <input type="number" id="hits${index}" value="${player.hits}" readonly>
+                            <button onclick="incrementHits(${index})">Hit</button>
                             <span>Total Hits: </span>
-                            <input type="number" id="totalHits${i}" value="${player.totalHits}" readonly>
+                            <input type="number" id="totalHits${index}" value="${player.totalHits}" readonly>
                         </div>
                     </div>
                 `;
-            }
-
-            document.getElementById('nameInput').style.display = 'none';
-            document.getElementById('players').style.display = 'block';
+            });
+            document.getElementById('step3').style.display = 'block';
             document.getElementById('next-hole').style.display = 'inline-block';
             document.getElementById('reset').style.display = 'inline-block';
         }
@@ -164,15 +174,13 @@
         function resetGame() {
             if (confirm('Are you sure you want to reset the game?')) {
                 players = [];
-                document.getElementById('setup').style.display = 'block';
-                document.getElementById('nameInput').style.display = 'none';
-                document.getElementById('players').innerHTML = '';
-                document.getElementById('players').style.display = 'none';
+                document.getElementById('step1').style.display = 'block';
+                document.getElementById('step2').style.display = 'none';
+                document.getElementById('step3').style.display = 'none';
                 document.getElementById('next-hole').style.display = 'none';
                 document.getElementById('reset').style.display = 'none';
             }
         }
     </script>
-
 </body>
 </html>
