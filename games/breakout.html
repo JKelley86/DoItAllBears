@@ -94,9 +94,7 @@
     </div>
 
     <script>
-        const canvas = document.getElementById('breakout');
-        const context = canvas.getContext('2d');
-        
+        let paddleX, ballX, ballY, ballDX = 2, ballDY = -2;
         let canvasWidth, canvasHeight;
         let paddleWidth, paddleHeight;
         let ballRadius;
@@ -106,8 +104,38 @@
         const brickPadding = 10;
         const brickOffsetTop = 30;
         const brickOffsetLeft = 30;
+        let bricks = [];
+        let score = 0;
+        let lives = 3;
+        let gameOver = false;
+        let win = false;
+
+        // Initialize bricks array before the game starts
+        for (let c = 0; c < brickColumnCount; c++) {
+            bricks[c] = [];
+            for (let r = 0; r < brickRowCount; r++) {
+                bricks[c][r] = { x: 0, y: 0, status: 1 };
+            }
+        }
+
+        function resetGame() {
+            paddleX = (canvasWidth - paddleWidth) / 2;
+            ballX = canvasWidth / 2;
+            ballY = canvasHeight - 30;
+            ballDX = 2;
+            ballDY = -2;
+            score = 0;
+            lives = 3;
+            win = false;
+            gameOver = false;
+            document.getElementById('game-over').style.display = 'none';
+            document.getElementById('win-message').style.display = 'none';
+        }
 
         function resizeCanvas() {
+            const canvas = document.getElementById('breakout');
+            const context = canvas.getContext('2d');
+            
             canvasWidth = window.innerWidth * 0.8; // 80% of viewport width
             canvasHeight = window.innerHeight * 0.6; // 60% of viewport height
             canvas.width = canvasWidth;
@@ -126,26 +154,7 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        let paddleX, ballX, ballY;
-        let ballDX = 2;
-        let ballDY = -2;
-        let rightPressed = false;
-        let leftPressed = false;
-        let bricks = [];
-        let score = 0;
-        let lives = 3;
-        let gameOver = false;
-        let win = false;
-
-        // Initialize bricks
-        for (let c = 0; c < brickColumnCount; c++) {
-            bricks[c] = [];
-            for (let r = 0; r < brickRowCount; r++) {
-                bricks[c][r] = { x: 0, y: 0, status: 1 };
-            }
-        }
-
-        function drawBall() {
+        function drawBall(context) {
             context.beginPath();
             context.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
             context.fillStyle = '#fff';
@@ -153,7 +162,7 @@
             context.closePath();
         }
 
-        function drawPaddle() {
+        function drawPaddle(context) {
             context.beginPath();
             context.rect(paddleX, canvasHeight - paddleHeight, paddleWidth, paddleHeight);
             context.fillStyle = '#fff';
@@ -161,7 +170,7 @@
             context.closePath();
         }
 
-        function drawBricks() {
+        function drawBricks(context) {
             for (let c = 0; c < brickColumnCount; c++) {
                 for (let r = 0; r < brickRowCount; r++) {
                     if (bricks[c][r].status === 1) {
@@ -179,13 +188,13 @@
             }
         }
 
-        function drawScore() {
+        function drawScore(context) {
             context.font = '16px Arial';
             context.fillStyle = '#fff';
             context.fillText('Score: ' + score, 8, 20);
         }
 
-        function drawLives() {
+        function drawLives(context) {
             context.font = '16px Arial';
             context.fillStyle = '#fff';
             context.fillText('Lives: ' + lives, canvasWidth - 65, 20);
@@ -215,12 +224,12 @@
         }
 
         function movePaddle(event) {
-            const rect = canvas.getBoundingClientRect();
-            let x = (event.clientX - rect.left) / (rect.right - rect.left) * canvasWidth;
+            const rect = document.getElementById('breakout').getBoundingClientRect();
+            let x = (event.clientX - rect.left) / canvasWidth * canvasWidth;
 
             if (event.type === 'touchmove') {
                 const touch = event.touches[0];
-                x = (touch.clientX - rect.left) / (rect.right - rect.left) * canvasWidth;
+                x = (touch.clientX - rect.left) / canvasWidth * canvasWidth;
             }
 
             if (x > paddleWidth / 2 && x < canvasWidth - paddleWidth / 2) {
@@ -234,20 +243,6 @@
 
         function drawWinMessage() {
             document.getElementById('win-message').style.display = 'block';
-        }
-
-        function resetGame() {
-            paddleX = (canvasWidth - paddleWidth) / 2;
-            ballX = canvasWidth / 2;
-            ballY = canvasHeight - 30;
-            ballDX = 2;
-            ballDY = -2;
-            score = 0;
-            lives = 3;
-            win = false;
-            gameOver = false;
-            document.getElementById('game-over').style.display = 'none';
-            document.getElementById('win-message').style.display = 'none';
         }
 
         function update() {
@@ -265,47 +260,40 @@
             } else if (ballY + ballDY > canvasHeight - ballRadius) {
                 if (ballX > paddleX && ballX < paddleX + paddleWidth) {
                     ballDY = -ballDY;
-
-                    // Speed up the ball slightly after each paddle hit
-                    ballDX *= 1.05;
-                    ballDY *= 1.05;
                 } else {
                     lives--;
                     if (!lives) {
                         gameOver = true;
                         drawGameOver();
                     } else {
-                        ballX = canvasWidth / 2;
-                        ballY = canvasHeight - 30;
-                        ballDX = 2 * (Math.random() > 0.5 ? 1 : -1); // Randomize the ball's horizontal direction
-                        ballDY = -2;
-                        paddleX = (canvasWidth - paddleWidth) / 2;
+                        resetGame();
                     }
                 }
             }
 
             detectCollision();
+
+            const canvas = document.getElementById('breakout');
+            const context = canvas.getContext('2d');
+
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            drawBricks(context);
+            drawBall(context);
+            drawPaddle(context);
+            drawScore(context);
+            drawLives(context);
+
             if (win) {
                 drawWinMessage();
             }
-        }
 
-        function draw() {
-            context.clearRect(0, 0, canvasWidth, canvasHeight);
-            drawBricks();
-            drawBall();
-            drawPaddle();
-            drawScore();
-            drawLives();
-            update();
-
-            requestAnimationFrame(draw);
+            requestAnimationFrame(update);
         }
 
         document.addEventListener('mousemove', movePaddle);
         document.addEventListener('touchmove', movePaddle);
 
-        draw();
+        update();
     </script>
 </body>
 </html>
