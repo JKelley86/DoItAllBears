@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golf Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .player-container {
+            margin-bottom: 20px;
+        }
+
+        .player-name {
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .player-stats {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #players {
+            margin-bottom: 30px;
+        }
+
+        #next-hole, #reset {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Golf Game</h1>
+
+    <div id="setup">
+        <label for="playerCount">Number of Players (1-6): </label>
+        <input type="number" id="playerCount" min="1" max="6">
+        <button onclick="setupPlayers()">Start Game</button>
+    </div>
+
+    <div id="players"></div>
+
+    <button id="next-hole" onclick="nextHole()" style="display:none;">Next Hole</button>
+    <button id="reset" onclick="resetGame()" style="display:none;">Reset Game</button>
+
+    <script>
+        let playerCount = 0;
+        let players = [];
+
+        function setupPlayers() {
+            playerCount = parseInt(document.getElementById('playerCount').value);
+            if (playerCount < 1 || playerCount > 6 || isNaN(playerCount)) {
+                alert('Please enter a number between 1 and 6.');
+                return;
+            }
+
+            players = [];
+            document.getElementById('setup').style.display = 'none';
+            const playersDiv = document.getElementById('players');
+            playersDiv.innerHTML = '';
+
+            for (let i = 0; i < playerCount; i++) {
+                const player = {
+                    name: prompt('Enter the name of Player ' + (i + 1)),
+                    hits: 0,
+                    totalHits: 0
+                };
+                players.push(player);
+
+                playersDiv.innerHTML += `
+                    <div class="player-container">
+                        <div class="player-name">${player.name}</div>
+                        <div class="player-stats">
+                            <span>Hits: </span>
+                            <input type="number" id="hits${i}" value="${player.hits}" readonly>
+                            <button onclick="incrementHits(${i})">Hit</button>
+                            <span>Total Hits: </span>
+                            <input type="number" id="totalHits${i}" value="${player.totalHits}" readonly>
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('next-hole').style.display = 'inline-block';
+            document.getElementById('reset').style.display = 'inline-block';
+        }
+
+        function incrementHits(index) {
+            players[index].hits++;
+            document.getElementById('hits' + index).value = players[index].hits;
+        }
+
+        function nextHole() {
+            players.forEach((player, index) => {
+                player.totalHits += player.hits;
+                player.hits = 0;
+                document.getElementById('totalHits' + index).value = player.totalHits;
+                document.getElementById('hits' + index).value = player.hits;
+            });
+        }
+
+        function resetGame() {
+            players = [];
+            document.getElementById('setup').style.display = 'block';
+            document.getElementById('players').innerHTML = '';
+            document.getElementById('next-hole').style.display = 'none';
+            document.getElementById('reset').style.display = 'none';
+        }
+    </script>
+
+</body>
+</html>
