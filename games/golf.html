@@ -141,7 +141,7 @@
                 <div id="players"></div>
                 <div id="parSection" style="display:none;">
                     <h3>Enter Par for This Hole:</h3>
-                    <input type="number" id="parInput" value="0">
+                    <input type="number" id="parInput" value="4">
                 </div>
                 <button id="next-hole" onclick="nextHole()" style="display:none;">Next Hole</button>
                 <button id="reset" onclick="resetGame()" style="display:none;">Reset Game</button>
@@ -228,10 +228,12 @@
             const parValue = parseInt(document.getElementById('parInput').value, 10);
             players.forEach((player, index) => {
                 player.totalHits += player.hits;
+                const result = getScoreResult(player.hits, parValue);
                 player.scores.push({
                     hole: currentHole,
                     hits: player.hits,
-                    par: parValue
+                    par: parValue,
+                    result: result
                 });
                 player.hits = 0;
                 document.getElementById('totalHits' + index).value = player.totalHits;
@@ -243,6 +245,48 @@
                 alert('Game over!');
             }
             updateScoreChart();
+        }
+
+        function getScoreResult(hits, par) {
+            const difference = hits - par;
+            if (difference === -2) return 'Eagle';
+            if (difference === -1) return 'Birdie';
+            if (difference === 0) return 'Par';
+            if (difference === 1) return 'Bogey';
+            if (difference === 2) return 'Double Bogey';
+            if (difference > 2) return 'Over Par';
+            if (difference < -2) return 'Albatross';
+        }
+
+        function updateScoreChart() {
+            let chartHTML = '<table><tr><th>Hole</th><th>Par</th>';
+            for (let i = 0; i < playerCount; i++) {
+                chartHTML += `<th>${players[i].name} Hits</th><th>${players[i].name} Result</th>`;
+            }
+            chartHTML += '</tr>';
+
+            for (let hole = 1; hole <= currentHole; hole++) {
+                chartHTML += `<tr><td>${hole}</td>`;
+                let par = players[0].scores.find(score => score.hole === hole)?.par || '';
+                chartHTML += `<td>${par}</td>`;
+                players.forEach(player => {
+                    const score = player.scores.find(s => s.hole === hole);
+                    if (score) {
+                        chartHTML += `<td>${score.hits}</td><td>${score.result}</td>`;
+                    } else {
+                        chartHTML += `<td></td><td></td>`;
+                    }
+                });
+                chartHTML += '</tr>';
+            }
+
+            // Add total hits row
+            chartHTML += `<tr><td>Total</td><td></td>`;
+            players.forEach(player => {
+                chartHTML += `<td>${player.totalHits}</td><td></td>`;
+            });
+            chartHTML += '</table>';
+            document.getElementById('scoreChart').innerHTML = chartHTML;
         }
 
         function resetGame() {
@@ -258,30 +302,7 @@
                 document.getElementById('scoreChart').innerHTML = '';
             }
         }
-
-        function updateScoreChart() {
-            let chartHTML = '<table><tr><th>Hole</th>';
-            for (let i = 0; i < playerCount; i++) {
-                chartHTML += `<th>${players[i].name} Hits</th><th>Par</th>`;
-            }
-            chartHTML += '</tr>';
-
-            for (let hole = 1; hole <= currentHole; hole++) {
-                chartHTML += `<tr><td>${hole}</td>`;
-                players.forEach(player => {
-                    const score = player.scores.find(s => s.hole === hole);
-                    if (score) {
-                        chartHTML += `<td>${score.hits}</td><td>${score.par}</td>`;
-                    } else {
-                        chartHTML += `<td></td><td></td>`;
-                    }
-                });
-                chartHTML += '</tr>';
-            }
-
-            chartHTML += '</table>';
-            document.getElementById('scoreChart').innerHTML = chartHTML;
-        }
     </script>
 </body>
 </html>
+
