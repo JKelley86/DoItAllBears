@@ -66,6 +66,22 @@
             padding: 20px;
         }
 
+        #scoreChart {
+            margin-top: 30px;
+            width: 100%;
+        }
+
+        #scoreChart table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #scoreChart th, #scoreChart td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: center;
+        }
+
         @media screen and (max-width: 600px) {
             button {
                 padding: 8px 15px;
@@ -123,8 +139,13 @@
             <!-- Step 3: Play Game -->
             <div id="step3" style="display:none;">
                 <div id="players"></div>
+                <div id="parSection" style="display:none;">
+                    <h3>Enter Par for This Hole:</h3>
+                    <input type="number" id="parInput" value="0">
+                </div>
                 <button id="next-hole" onclick="nextHole()" style="display:none;">Next Hole</button>
                 <button id="reset" onclick="resetGame()" style="display:none;">Reset Game</button>
+                <div id="scoreChart"></div>
             </div>
         </main>
 
@@ -136,6 +157,8 @@
     <script>
         let playerCount = 0;
         let players = [];
+        let currentHole = 1;
+        const totalHoles = 18;
 
         function selectPlayerCount(count) {
             playerCount = count;
@@ -164,11 +187,16 @@
                 players.push({
                     name: playerName,
                     hits: 0,
-                    totalHits: 0
+                    totalHits: 0,
+                    scores: []
                 });
             }
             document.getElementById('step2').style.display = 'none';
+            document.getElementById('parSection').style.display = 'block';
+            document.getElementById('next-hole').style.display = 'inline-block';
+            document.getElementById('reset').style.display = 'inline-block';
             displayPlayerStats();
+            updateScoreChart();
         }
 
         function displayPlayerStats() {
@@ -189,8 +217,6 @@
                 `;
             });
             document.getElementById('step3').style.display = 'block';
-            document.getElementById('next-hole').style.display = 'inline-block';
-            document.getElementById('reset').style.display = 'inline-block';
         }
 
         function incrementHits(index) {
@@ -199,23 +225,62 @@
         }
 
         function nextHole() {
+            const parValue = parseInt(document.getElementById('parInput').value, 10);
             players.forEach((player, index) => {
                 player.totalHits += player.hits;
+                player.scores.push({
+                    hole: currentHole,
+                    hits: player.hits,
+                    par: parValue
+                });
                 player.hits = 0;
                 document.getElementById('totalHits' + index).value = player.totalHits;
                 document.getElementById('hits' + index).value = player.hits;
             });
+            currentHole++;
+            if (currentHole > totalHoles) {
+                document.getElementById('next-hole').disabled = true;
+                alert('Game over!');
+            }
+            updateScoreChart();
         }
 
         function resetGame() {
             if (confirm('Are you sure you want to reset the game?')) {
                 players = [];
+                currentHole = 1;
                 document.getElementById('step1').style.display = 'block';
                 document.getElementById('step2').style.display = 'none';
                 document.getElementById('step3').style.display = 'none';
+                document.getElementById('parSection').style.display = 'none';
                 document.getElementById('next-hole').style.display = 'none';
                 document.getElementById('reset').style.display = 'none';
+                document.getElementById('scoreChart').innerHTML = '';
             }
+        }
+
+        function updateScoreChart() {
+            let chartHTML = '<table><tr><th>Hole</th>';
+            for (let i = 0; i < playerCount; i++) {
+                chartHTML += `<th>${players[i].name} Hits</th><th>Par</th>`;
+            }
+            chartHTML += '</tr>';
+
+            for (let hole = 1; hole <= currentHole; hole++) {
+                chartHTML += `<tr><td>${hole}</td>`;
+                players.forEach(player => {
+                    const score = player.scores.find(s => s.hole === hole);
+                    if (score) {
+                        chartHTML += `<td>${score.hits}</td><td>${score.par}</td>`;
+                    } else {
+                        chartHTML += `<td></td><td></td>`;
+                    }
+                });
+                chartHTML += '</tr>';
+            }
+
+            chartHTML += '</table>';
+            document.getElementById('scoreChart').innerHTML = chartHTML;
         }
     </script>
 </body>
