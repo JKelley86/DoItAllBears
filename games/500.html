@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>500 Card Game</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .player-container {
+            margin-bottom: 20px;
+        }
+
+        .player-name {
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .player-stats {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button:hover {
+            background-color: #333;
+        }
+
+        #next-round, #reset {
+            margin-top: 20px;
+        }
+
+        .step-container {
+            margin-bottom: 20px;
+        }
+
+        #playerSelectButtons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .player-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        #scoreChart {
+            margin-top: 30px;
+            width: 100%;
+        }
+
+        #scoreChart table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #scoreChart th, #scoreChart td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: center;
+        }
+
+        @media screen and (max-width: 600px) {
+            button {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+
+            .player-name {
+                font-size: 18px;
+            }
+
+            .player-stats {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body style="background-image: url('cardgamebackground.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <ul class="navbar-left">
+                <li><a href="../index.html">Back</a></li>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="wordle.html">Wordle</a></li>
+                <li><a href="pongselection.html">Pong</a></li>
+                <li><a href="tictactoeselection.html">Tic-Tac-Toe</a></li>
+                <li><a href="breakout.html">Breakout</a></li>
+                <li><a href="golf.html">Golf</a></li>
+                <li><a href="500.html">500 Card Game</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <h1>500 Card Game</h1>
+
+            <!-- Step 1: Select Number of Players -->
+            <div id="step1" class="step-container">
+                <h2>Select Number of Players:</h2>
+                <div id="playerSelectButtons">
+                    <button onclick="selectPlayerCount(2)">2 Players</button>
+                    <button onclick="selectPlayerCount(3)">3 Players</button>
+                    <button onclick="selectPlayerCount(4)">4 Players</button>
+                    <button onclick="selectPlayerCount(5)">5 Players</button>
+                    <button onclick="selectPlayerCount(6)">6 Players</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Enter Player Names -->
+            <div id="step2" class="step-container" style="display:none;">
+                <h2>Enter Player Names:</h2>
+                <div id="nameInputs" class="player-inputs"></div>
+                <button onclick="confirmNames()">Confirm Names</button>
+            </div>
+
+            <!-- Step 3: Play Game -->
+            <div id="step3" style="display:none;">
+                <div id="players"></div>
+                <button id="next-round" onclick="nextRound()" style="display:none;">Next Round</button>
+                <button id="reset" onclick="resetGame()" style="display:none;">Reset Game</button>
+                <div id="scoreChart"></div>
+            </div>
+        </main>
+
+        <footer> 
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        let playerCount = 0;
+        let players = [];
+        let currentRound = 1;
+
+        function selectPlayerCount(count) {
+            playerCount = count;
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+            displayNameInputs();
+        }
+
+        function displayNameInputs() {
+            const nameInputsDiv = document.getElementById('nameInputs');
+            nameInputsDiv.innerHTML = '';
+            for (let i = 0; i < playerCount; i++) {
+                nameInputsDiv.innerHTML += `
+                    <div class="player-container">
+                        <label for="player${i}">Player ${i + 1} Name:</label>
+                        <input type="text" id="player${i}" placeholder="Enter name">
+                    </div>
+                `;
+            }
+        }
+
+        function confirmNames() {
+            players = [];
+            for (let i = 0; i < playerCount; i++) {
+                const playerName = document.getElementById(`player${i}`).value || `Player ${i + 1}`;
+                players.push({
+                    name: playerName,
+                    roundPoints: 0,
+                    totalPoints: 0,
+                    scores: []
+                });
+            }
+            document.getElementById('step2').style.display = 'none';
+            displayPlayerStats();
+            updateScoreChart();
+        }
+
+        function displayPlayerStats() {
+            const playersDiv = document.getElementById('players');
+            playersDiv.innerHTML = '';
+            players.forEach((player, index) => {
+                playersDiv.innerHTML += `
+                    <div class="player-container">
+                        <div class="player-name">${player.name}</div>
+                        <div class="player-stats">
+                            <span>Points: </span>
+                            <input type="number" id="points${index}" value="${player.roundPoints}" placeholder="Enter points">
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('step3').style.display = 'block';
+            document.getElementById('next-round').style.display = 'inline-block';
+            document.getElementById('reset').style.display = 'inline-block';
+        }
+
+        function nextRound() {
+            players.forEach((player, index) => {
+                const roundPoints = parseInt(document.getElementById(`points${index}`).value, 10) || 0;
+                player.roundPoints = roundPoints;
+                player.totalPoints += roundPoints;
+                player.scores.push({
+                    round: currentRound,
+                    points: roundPoints
+                });
+                document.getElementById(`points${index}`).value = ''; // Clear the points input for next round
+            });
+            currentRound++;
+            updateScoreChart();
+        }
+
+        function updateScoreChart() {
+            let chartHTML = '<table><tr><th>Round</th>';
+            for (let i = 0; i < playerCount; i++) {
+                chartHTML += `<th>${players[i].name} Points</th>`;
+            }
+            chartHTML += '</tr>';
+
+            for (let round = 1; round < currentRound; round++) {
+                chartHTML += `<tr><td>${round}</td>`;
+                players.forEach(player => {
+                    const score = player.scores.find(s => s.round === round);
+                    if (score) {
+                        chartHTML += `<td>${score.points}</td>`;
+                    } else {
+                        chartHTML += `<td></td>`;
+                    }
+                });
+                chartHTML += '</tr>';
+            }
+
+            // Add total points row
+            chartHTML += `<tr><td>Total</td>`;
+            players.forEach(player => {
+                chartHTML += `<td>${player.totalPoints}</td>`;
+            });
+            chartHTML += '</table>';
+            document.getElementById('scoreChart').innerHTML = chartHTML;
+        }
+
+        function resetGame() {
+            if (confirm('Are you sure you want to reset the game?')) {
+                players = [];
+                currentRound = 1;
+                document.getElementById('step1').style.display = 'block';
+                document.getElementById('step2').style.display = 'none';
+                document.getElementById('step3').style.display = 'none';
+                document.getElementById('next-round').style.display = 'none';
+                document.getElementById('reset').style.display = 'none';
+                document.getElementById('scoreChart').innerHTML = '';
+            }
+        }
+    </script>
+</body>
+</html>
