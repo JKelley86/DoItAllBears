@@ -141,7 +141,7 @@
                 <div id="players"></div>
                 <div id="parSection" style="display:none;">
                     <h3>Enter Par for This Hole:</h3>
-                    <input type="number" id="parInput" value="4">
+                    <input type="number" id="parInput" value="">
                 </div>
                 <button id="next-hole" onclick="nextHole()" style="display:none;">Next Hole</button>
                 <button id="reset" onclick="resetGame()" style="display:none;">Reset Game</button>
@@ -210,8 +210,6 @@
                             <span>Hits: </span>
                             <input type="number" id="hits${index}" value="${player.hits}" readonly>
                             <button onclick="incrementHits(${index})">Hit</button>
-                            <span>Total Hits: </span>
-                            <input type="number" id="totalHits${index}" value="${player.totalHits}" readonly>
                         </div>
                     </div>
                 `;
@@ -236,9 +234,9 @@
                     result: result
                 });
                 player.hits = 0;
-                document.getElementById('totalHits' + index).value = player.totalHits;
                 document.getElementById('hits' + index).value = player.hits;
             });
+            document.getElementById('parInput').value = '';  // Clear the par input
             currentHole++;
             if (currentHole > totalHoles) {
                 document.getElementById('next-hole').disabled = true;
@@ -249,13 +247,13 @@
 
         function getScoreResult(hits, par) {
             const difference = hits - par;
+            if (difference === -3) return 'Albatross';
             if (difference === -2) return 'Eagle';
             if (difference === -1) return 'Birdie';
             if (difference === 0) return 'Par';
             if (difference === 1) return 'Bogey';
             if (difference === 2) return 'Double Bogey';
             if (difference > 2) return 'Over Par';
-            if (difference < -2) return 'Albatross';
         }
 
         function updateScoreChart() {
@@ -305,4 +303,3 @@
     </script>
 </body>
 </html>
-
