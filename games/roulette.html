@@ -29,8 +29,10 @@
         }
 
         #roulette-table {
-            width: 400px;
-            height: 400px;
+            width: 80vw; /* Scalable size based on screen width */
+            height: 80vw; /* Keep height equal to width for perfect circle */
+            max-width: 400px; /* Set max width for larger screens */
+            max-height: 400px;
             border: 5px solid #000;
             border-radius: 50%;
             margin: 50px auto;
@@ -50,13 +52,16 @@
 
         #ball {
             position: absolute;
-            width: 30px;
-            height: 30px;
+            width: 7vw; /* Make ball scalable as well */
+            height: 7vw;
+            max-width: 30px;
+            max-height: 30px;
             border-radius: 50%;
             background-color: white;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            top: 185px;
-            left: 185px;
+            top: 50%; /* Initially place it near the center */
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         #spin-result {
@@ -74,27 +79,41 @@
             font-size: 24px;
             margin: 20px;
         }
+
+        nav ul {
+            list-style-type: none;
+        }
+
+        nav ul li {
+            display: inline;
+            margin: 10px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
     </style>
 </head>
-        <nav>
+<body>
+    <nav>
         <ul class="navbar-left">
-                <li><a href="../index.html">Back</a></li>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="wordle.html">Wordle</a></li>
-                <li><a href="pongselection.html">Pong</a></li>
-                <li><a href="tictactoeselection.html">Tic-Tac-Toe</a></li>
-                <li><a href="breakout.html">Breakout</a></li>
-                <li><a href="golf.html">Golf</a></li>
-                <li><a href="500.html">500 Card Game</a></li>
-                <li><a href="roulette.html">Roulette</a></li>
-
-
+            <li><a href="../index.html">Back</a></li>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="wordle.html">Wordle</a></li>
+            <li><a href="pongselection.html">Pong</a></li>
+            <li><a href="tictactoeselection.html">Tic-Tac-Toe</a></li>
+            <li><a href="breakout.html">Breakout</a></li>
+            <li><a href="golf.html">Golf</a></li>
+            <li><a href="500.html">500 Card Game</a></li>
+            <li><a href="roulette.html">Roulette</a></li>
         </ul>
     </nav>
-<body>
+
     <h1>Roulette Game</h1>
     <div id="balance">Balance: $1000</div>
-    
+
     <div class="bet-section">
         <label for="bet-amount">Select Bet Amount:</label>
         <select id="bet-amount">
@@ -109,9 +128,15 @@
         <select id="bet-choice">
             <option value="red">Red</option>
             <option value="black">Black</option>
+            <option value="0">0</option>
+            <!-- Add numbers 1-36 -->
             <option value="1">1</option>
             <option value="2">2</option>
-            <!-- Add numbers as needed -->
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <!-- Continue up to 36 -->
+            <option value="36">36</option>
         </select>
         <button onclick="placeBet()">Place Bet</button>
     </div>
@@ -150,9 +175,9 @@
                 return;
             }
 
-            let randomSlot = Math.floor(Math.random() * 4) + 1; // Random number between 1 and 4
+            let randomSlot = Math.floor(Math.random() * 37); // Random number between 0 and 36
             let wheelSpin = Math.floor(Math.random() * 360) + 1440; // 4 full rotations + random angle
-            let ballRotation = 720 + randomSlot * 90; // Simulate ball spinning then landing
+            let ballRotation = 720 + randomSlot * 9.73; // Adjust for 37 slots (360 degrees / 37)
 
             wheel.style.transition = 'transform 4s ease-out';
             wheel.style.transform = `rotate(${wheelSpin}deg)`;
