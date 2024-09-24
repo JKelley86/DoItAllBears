@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Carrots</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #FFA07A;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #FF8C00;
+    }
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Carrots</h1>
+            <p>Carrots are a versatile and nutritious root vegetable that can be grown successfully in northern Minnesota.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Carrots (Daucus carota) are biennial plants usually grown as annuals for their edible taproots. They come in various colors, including orange, purple, yellow, and white, and are commonly used in salads, soups, and stews.</p>
+            </section>
+
+            <section>
+                <h2>Uses in Cooking</h2>
+                <ul>
+                    <li>Carrots can be eaten raw as a crunchy snack or in salads.</li>
+                    <li>They can be cooked in various dishes, such as soups, stews, and stir-fries.</li>
+                    <li>Carrots are often roasted or steamed as a side dish.</li>
+                    <li>Carrot juice is a popular beverage, known for its health benefits.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Grow Carrots</h2>
+                <ul>
+                    <li><strong>Soil:</strong> Carrots prefer loose, well-drained, sandy loam soil with a pH of 6.0 to 6.8. Remove rocks and debris to allow for straight growth.</li>
+                    <li><strong>Sunlight:</strong> Carrots need full sun, ideally 6 to 8 hours of direct sunlight per day.</li>
+                    <li><strong>Watering:</strong> Keep the soil consistently moist, especially during germination. Water deeply but infrequently to encourage deep root growth.</li>
+                    <li><strong>Plant Spacing:</strong> Sow seeds about 1/4 inch deep, spacing them 1 to 2 inches apart in rows that are 12 to 18 inches apart. Thin seedlings to allow for proper spacing.</li>
+                    <li><strong>Harvesting:</strong> Carrots can be harvested once they reach the desired size. Gently pull them from the soil, taking care not to break the roots.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Plant:</strong> Sow carrot seeds outdoors 2 to 3 weeks before the last frost date (around mid-April to early May) when the soil temperature is at least 50°F.</li>
+                    <li><strong>Average Growth Time:</strong> Carrots typically take 60 to 80 days to mature, depending on the variety.</li>
+                    <li><strong>Season Extension Tips:</strong> Use row covers to protect young seedlings from frost in the spring. Mulching can also help retain soil moisture and warmth.</li>
+                    <li><strong>Winterizing Tips:</strong> In northern climates, carrots can be left in the ground over winter if mulched with straw or leaves. This provides insulation and protects them from freezing. Alternatively, harvest carrots before the ground freezes and store them in a cool, dark place.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Health Benefits</h2>
+                <p>Carrots are an excellent source of beta-carotene, which the body converts into vitamin A, important for eye health. They also contain fiber, potassium, and antioxidants.</p>
+            </section>
+
+            <section>
+                <h2>Storage Tips</h2>
+                <ul>
+                    <li><strong>Fresh Carrots:</strong> Store carrots in the refrigerator, preferably in a perforated plastic bag, for up to 2 to 3 weeks.</li>
+                    <li><strong>Preserving:</strong> Carrots can be blanched and frozen for long-term storage. They can also be pickled or canned for use throughout the year.</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
