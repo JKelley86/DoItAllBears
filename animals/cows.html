@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Cows</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #8B4513;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #A0522D;
+    }
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Cows</h1>
+            <p>Cows are valuable livestock known for their milk and meat production, as well as their role in sustainable farming practices.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Cows (Bos taurus) are domesticated ungulates raised for their milk, meat, and hide. They are social animals that live in herds and can be found in various breeds.</p>
+            </section>
+
+            <section>
+                <h2>Uses of Cows</h2>
+                <ul>
+                    <li>Milk production for dairy products such as cheese, butter, and yogurt.</li>
+                    <li>Beef production for meat consumption.</li>
+                    <li>Natural fertilizers through manure.</li>
+                    <li>Some breeds are used for draft work in farming.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Raise Cows</h2>
+                <ul>
+                    <li><strong>Housing:</strong> Provide a clean, dry shelter that protects cows from extreme weather conditions. Ensure good ventilation and space to move around.</li>
+                    <li><strong>Food:</strong> Cows require a balanced diet that includes high-quality forage, grains, and minerals. Fresh water should always be available.</li>
+                    <li><strong>Exercise:</strong> Allow cows ample space for grazing and movement to maintain their health and well-being.</li>
+                    <li><strong>Social Needs:</strong> Cows are herd animals and thrive in social environments; keep them in groups to prevent stress.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Start:</strong> Begin raising cows in late spring (May) when grass is plentiful and weather is mild.</li>
+                    <li><strong>Average Growth Time:</strong> Calves typically reach weaning weight by 6 to 8 months and can be finished for market at around 12 to 18 months, depending on breed and management.</li>
+                    <li><strong>Winterizing Tips:</strong> Ensure that shelters are insulated and wind-resistant. Provide ample bedding and consider feeding hay and grain to supplement their diet during harsh winter months.</li>
+                    <li><strong>Cold-Hardy Breeds:</strong> Choose breeds that adapt well to cold climates, such as Angus, Hereford, or Holstein.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Health and Maintenance</h2>
+                <p>Regular veterinary care, vaccinations, and deworming are crucial for maintaining cow health. Keep their living area clean and monitor for signs of illness.</p>
+            </section>
+
+            <section>
+                <h2>Breeding</h2>
+                <p>Cows typically breed in the spring or fall, with a gestation period of about 9 months. Careful selection of breeding stock is important for maintaining herd quality.</p>
+            </section>
+
+            <section>
+                <h2>Milk Production</h2>
+                <p>Dairy cows can produce several gallons of milk per day, depending on breed and lactation stage. Regular milking and proper nutrition are key for optimal milk production.</p>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
