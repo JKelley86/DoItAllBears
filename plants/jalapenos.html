@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Jalapeños</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #228B22;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #2E8B57;
+    }
+</head>
+<body style="background-image: url('jalapeno-bg.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Jalapeños</h1>
+            <p>Jalapeños are a spicy pepper variety that can be grown in northern Minnesota with special attention to timing and temperature requirements.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Jalapeños (Capsicum annuum) are a type of medium-sized chili pepper prized for their bold heat and flavor. The peppers are typically green, but they can turn red as they mature. Jalapeños are commonly used in salsas, sauces, pickles, and many Mexican-inspired dishes.</p>
+            </section>
+
+            <section>
+                <h2>Uses in Cooking</h2>
+                <ul>
+                    <li>Jalapeños are a staple in salsas, guacamole, and other spicy dips.</li>
+                    <li>They can be stuffed with cheese and meats for appetizers, such as jalapeño poppers.</li>
+                    <li>Pickled jalapeños are commonly used as toppings for tacos, nachos, and burgers.</li>
+                    <li>Fresh jalapeños can be diced and added to salads, soups, and stir-fries for a spicy kick.</li>
+                    <li>Smoked jalapeños are known as chipotle peppers, used in sauces and seasoning blends.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Grow Jalapeños</h2>
+                <ul>
+                    <li><strong>Soil:</strong> Jalapeños thrive in well-drained, loamy soil with a pH between 6.0 and 6.8. Ensure the soil is enriched with organic matter to support healthy growth.</li>
+                    <li><strong>Sunlight:</strong> Jalapeños need full sun, with at least 6 to 8 hours of direct sunlight per day. In northern climates, it's crucial to maximize sunlight exposure to aid ripening.</li>
+                    <li><strong>Watering:</strong> Keep the soil evenly moist but not waterlogged. Water deeply once or twice a week, depending on weather conditions. Avoid getting water on the leaves to reduce the risk of disease.</li>
+                    <li><strong>Plant Spacing:</strong> Space plants about 18 inches apart in rows 2 to 3 feet apart to allow for airflow and easy access.</li>
+                    <li><strong>Harvesting:</strong> Jalapeños are typically harvested when they are 3 to 4 inches long and firm, either green or red. The more you harvest, the more peppers the plant will produce throughout the growing season.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Plant:</strong> In northern Minnesota, start jalapeño seeds indoors 8 to 10 weeks before the last frost, usually in late February or early March. Transplant seedlings outside after all danger of frost has passed, typically in late May or early June, when nighttime temperatures stay above 55°F.</li>
+                    <li><strong>Average Growth Time:</strong> Jalapeños take about 70 to 85 days to mature from transplanting, depending on the variety.</li>
+                    <li><strong>Growing Season Tips:</strong> Use row covers or black plastic mulch to help warm the soil in early spring. Consider growing jalapeños in raised beds or containers to ensure the soil stays warm, as they prefer temperatures between 70°F and 85°F during the day.</li>
+                    <li><strong>End-of-Season Tips:</strong> As the growing season winds down, harvest all remaining peppers before the first frost. Jalapeños can be pickled, dried, or frozen to preserve the harvest for later use.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Health Benefits</h2>
+                <p>Jalapeños are low in calories and rich in vitamins A, C, and B6. They contain capsaicin, a compound responsible for their heat, which has been linked to improved metabolism and pain relief.</p>
+            </section>
+
+            <section>
+                <h2>Storage Tips</h2>
+                <ul>
+                    <li><strong>Fresh Jalapeños:</strong> Store fresh jalapeños in the refrigerator for up to 1 to 2 weeks. Place them in a perforated plastic bag to maintain freshness.</li>
+                    <li><strong>Preserving:</strong> Jalapeños can be pickled, frozen, or dried. To freeze, slice the peppers and store them in airtight bags. Dried jalapeños can be stored for several months and are often ground into powder or flakes.</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
