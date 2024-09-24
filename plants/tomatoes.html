@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Tomatoes</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #FF6347;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #E5533A;
+    }
+</head>
+<body style="background-image: url('tomatoes-bg.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Tomatoes</h1>
+            <p>A comprehensive guide to growing and using tomatoes, with special considerations for northern Minnesota's climate.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Tomatoes (Solanum lycopersicum) are a popular warm-season vegetable that comes in a variety of sizes, shapes, and colors. Known for their juicy texture and rich flavor, tomatoes are used in a wide array of dishes and are an essential part of many gardens.</p>
+            </section>
+
+            <section>
+                <h2>Uses in Cooking</h2>
+                <ul>
+                    <li>Fresh tomatoes are great in salads, sandwiches, and salsas.</li>
+                    <li>They can be cooked into sauces for pasta, pizza, and stews.</li>
+                    <li>Tomatoes are often canned or made into tomato paste, ketchup, and soups for long-term storage.</li>
+                    <li>Sun-dried tomatoes are a flavorful addition to pasta dishes and salads.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Grow Tomatoes</h2>
+                <ul>
+                    <li><strong>Soil:</strong> Tomatoes thrive in well-drained soil rich in organic matter, with a pH between 6.0 and 6.8.</li>
+                    <li><strong>Sunlight:</strong> Tomatoes need full sun, with at least 6 to 8 hours of direct sunlight per day for optimal growth.</li>
+                    <li><strong>Watering:</strong> Water tomatoes deeply and consistently, keeping the soil evenly moist but not waterlogged. Mulching can help retain moisture.</li>
+                    <li><strong>Support:</strong> Tomato plants often need support such as stakes, cages, or trellises to keep the fruits off the ground and prevent damage.</li>
+                    <li><strong>Harvesting:</strong> Pick tomatoes when they are firm and fully colored, but before they over-ripen. Some varieties can be harvested while still slightly green and allowed to ripen indoors.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Plant:</strong> In northern Minnesota, start tomato seeds indoors about 6 to 8 weeks before the last frost date, typically around late March. Transplant seedlings outdoors after the last frost, usually in late May or early June, when the soil has warmed to at least 60°F.</li>
+                    <li><strong>Average Growth Time:</strong> Depending on the variety, tomatoes typically take 60 to 85 days from transplanting to reach maturity.</li>
+                    <li><strong>Winterizing Tips:</strong> Tomatoes are annuals and won't survive the winter outdoors. At the end of the growing season (typically in late September), pick any green tomatoes before the first frost. You can ripen them indoors or preserve them by canning or freezing. Remove and compost old plants to prevent disease buildup for the next year.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Health Benefits</h2>
+                <p>Tomatoes are rich in vitamins A, C, and K, as well as antioxidants such as lycopene, which has been linked to heart health and cancer prevention. They are also low in calories and high in fiber, making them a healthy addition to any diet.</p>
+            </section>
+
+            <section>
+                <h2>Storage Tips</h2>
+                <ul>
+                    <li><strong>Fresh Tomatoes:</strong> Store ripe tomatoes at room temperature for up to a week. Do not refrigerate fresh tomatoes as this can affect their texture and flavor.</li>
+                    <li><strong>Preserving:</strong> Tomatoes can be canned, frozen, or dried for longer-term storage. Blanching and freezing is a great way to keep them for sauces and soups during the winter months.</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
