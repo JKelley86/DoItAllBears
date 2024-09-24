@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Goats</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #C2B280;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #D2C6A0;
+    }
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Goats</h1>
+            <p>Goats are hardy animals known for their adaptability and usefulness in various agricultural settings.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Goats (Capra aegagrus hircus) are domesticated mammals kept for their milk, meat, and fiber. They are curious and social animals that require companionship.</p>
+            </section>
+
+            <section>
+                <h2>Uses of Goats</h2>
+                <ul>
+                    <li>Goat milk is highly nutritious and can be used for various dairy products.</li>
+                    <li>Goat meat, or chevon, is lean and popular in many cuisines.</li>
+                    <li>Some breeds provide fibers, such as cashmere or mohair.</li>
+                    <li>Goats can help clear brush and maintain pastures, making them excellent for land management.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Raise Goats</h2>
+                <ul>
+                    <li><strong>Housing:</strong> Provide a clean, dry shelter that protects goats from harsh weather and predators. Ensure good ventilation and plenty of space to roam.</li>
+                    <li><strong>Food:</strong> Goats are browsers and require a varied diet that includes hay, pasture, grains, and minerals. They also enjoy fruits and vegetables as treats.</li>
+                    <li><strong>Water:</strong> Fresh and clean water must be available at all times. Goats can drink a significant amount, especially when lactating.</li>
+                    <li><strong>Social Needs:</strong> Goats are social creatures and should be kept in groups to prevent loneliness and stress.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Start:</strong> Start raising goats in late spring (May) when temperatures are milder, allowing kids to acclimate before the colder months.</li>
+                    <li><strong>Average Growth Time:</strong> Kids typically reach market weight by 3 to 5 months, depending on the breed and purpose (meat or milk).</li>
+                    <li><strong>Winterizing Tips:</strong> Ensure the shelter is insulated and draft-free during winter. Provide extra bedding for warmth, and consider using heat lamps if necessary.</li>
+                    <li><strong>Cold-Hardy Breeds:</strong> Choose breeds that are known for their hardiness in colder climates, such as Nubian or Alpine goats.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Health and Maintenance</h2>
+                <p>Regular veterinary check-ups are important. Vaccinate against common diseases, and check for parasites. Maintain a clean living environment to promote health.</p>
+            </section>
+
+            <section>
+                <h2>Breeding</h2>
+                <p>Goats typically breed in the fall, and gestation lasts about 150 days. Plan for kidding in the spring when conditions are more favorable for newborns.</p>
+            </section>
+
+            <section>
+                <h2>Milk Production</h2>
+                <p>High-producing dairy breeds can produce 1 to 2 gallons of milk per day. Regular milking and proper nutrition will ensure good milk production.</p>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
