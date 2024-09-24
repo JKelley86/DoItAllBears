@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Rhubarb</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #DC143C;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #B22222;
+    }
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Rhubarb</h1>
+            <p>Rhubarb is a hardy perennial vegetable, often used like a fruit in cooking, with special considerations for northern Minnesota's climate.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Rhubarb (Rheum rhabarbarum) is a perennial plant known for its long, thick, sour stalks, which are typically cooked with sugar and used in desserts, jams, and sauces. The leaves of the rhubarb plant are toxic and should never be consumed.</p>
+            </section>
+
+            <section>
+                <h2>Uses in Cooking</h2>
+                <ul>
+                    <li>Rhubarb is commonly used in pies, crumbles, and tarts, often sweetened with sugar to offset its tart flavor.</li>
+                    <li>It can also be made into jams, sauces, and compotes, or added to beverages for a tangy twist.</li>
+                    <li>Rhubarb pairs well with strawberries, making it a popular combination in desserts.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Grow Rhubarb</h2>
+                <ul>
+                    <li><strong>Soil:</strong> Rhubarb prefers well-drained, fertile soil with a pH of 6.0 to 6.8. It grows best in rich, organic soil with plenty of compost or manure worked in.</li>
+                    <li><strong>Sunlight:</strong> Full sun is ideal for rhubarb, but it can also tolerate partial shade, especially in areas with very hot summers.</li>
+                    <li><strong>Watering:</strong> Rhubarb needs consistent moisture, particularly during dry spells, but make sure the soil drains well to prevent root rot.</li>
+                    <li><strong>Plant Spacing:</strong> Rhubarb plants need ample space to grow, so they should be planted at least 3 to 4 feet apart to allow the large leaves and stalks to spread.</li>
+                    <li><strong>Harvesting:</strong> Stalks are ready to harvest in their second growing season, typically in spring. Pick the stalks when they are 10 to 15 inches long by pulling them gently from the base, rather than cutting them. Avoid harvesting more than one-third of the stalks at a time to keep the plant healthy.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Plant:</strong> In northern Minnesota, plant rhubarb in early spring (April or May) as soon as the soil is workable. Rhubarb is very cold-tolerant and can withstand frost, making it ideal for colder climates.</li>
+                    <li><strong>Average Growth Time:</strong> Rhubarb is a perennial plant and will take about 2 years to establish fully. Once established, it can be harvested annually in the spring for 10 to 15 years.</li>
+                    <li><strong>Winterizing Tips:</strong> Rhubarb is a hardy perennial that will go dormant in winter. In late fall, after the first frost, cut back any remaining stalks and cover the plant with a thick layer of mulch or straw to protect the roots from extreme cold. This will help ensure healthy regrowth the following spring.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Health Benefits</h2>
+                <p>Rhubarb is a good source of vitamins C and K, as well as fiber. It is low in calories and has been linked to supporting digestive health and bone health due to its calcium content. However, the leaves contain oxalic acid and are toxic if ingested.</p>
+            </section>
+
+            <section>
+                <h2>Storage Tips</h2>
+                <ul>
+                    <li><strong>Fresh Rhubarb:</strong> Rhubarb stalks can be stored in the refrigerator for up to a week. Wrap them in plastic or place them in a perforated bag to retain moisture.</li>
+                    <li><strong>Preserving:</strong> Rhubarb freezes well. Slice the stalks into 1-inch pieces, blanch them in boiling water for a minute, then freeze for up to a year. Rhubarb can also be canned or made into jams and preserves.</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
