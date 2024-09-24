@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Sheep</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #8B4513;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #A0522D;
+    }
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Sheep</h1>
+            <p>Sheep are versatile animals known for their wool, meat, and milk, and they play an important role in sustainable agriculture.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Sheep (Ovis aries) are domesticated ruminants raised primarily for their fleece (wool), meat (lamb/mutton), and milk. They come in various breeds, each with unique characteristics and purposes.</p>
+            </section>
+
+            <section>
+                <h2>Uses of Sheep</h2>
+                <ul>
+                    <li>Wool production for textiles and garments.</li>
+                    <li>Meat production (lamb and mutton).</li>
+                    <li>Milk production for cheese and other dairy products.</li>
+                    <li>Land management through grazing, which helps maintain healthy pastures.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Raise Sheep</h2>
+                <ul>
+                    <li><strong>Housing:</strong> Provide a clean, dry shelter that protects sheep from extreme weather, including wind and rain. Adequate ventilation is essential.</li>
+                    <li><strong>Food:</strong> Sheep are herbivores that primarily eat grass, hay, and grains. Fresh water must always be available, along with minerals and salt licks.</li>
+                    <li><strong>Exercise:</strong> Ensure they have ample space to graze and roam, as exercise is crucial for their health.</li>
+                    <li><strong>Social Needs:</strong> Sheep are flock animals and should be kept in groups to prevent stress and loneliness.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Start:</strong> Late spring (May) is ideal for starting a sheep flock to help them adjust to their environment.</li>
+                    <li><strong>Average Growth Time:</strong> Lambs typically reach market weight by 5 to 6 months of age, while they continue to grow until 1 year old.</li>
+                    <li><strong>Winterizing Tips:</strong> Provide insulated shelters and plenty of bedding during winter. Ensure they have access to fresh water, which may need to be heated in freezing temperatures.</li>
+                    <li><strong>Cold-Hardy Breeds:</strong> Many sheep breeds are well-suited for colder climates, but care should be taken to monitor their health in extreme weather.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Health and Maintenance</h2>
+                <p>Regular veterinary care, vaccinations, and shearing (at least once a year) are important for sheep health. Keep their living area clean and watch for signs of illness.</p>
+            </section>
+
+            <section>
+                <h2>Breeding</h2>
+                <p>Sheep have a gestation period of about 5 months. Breeding should be done with careful consideration of genetics and health to produce strong offspring.</p>
+            </section>
+
+            <section>
+                <h2>Wool Production</h2>
+                <p>Sheep produce wool that can be sheared once or twice a year, depending on the breed. Proper shearing practices are essential to prevent overheating and maintain fleece quality.</p>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
