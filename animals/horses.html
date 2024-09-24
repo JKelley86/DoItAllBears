@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Horses</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #A0522D;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #C19A6B;
+    }
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Horses</h1>
+            <p>Horses are majestic and intelligent animals that have been companions to humans for thousands of years.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Horses (Equus ferus caballus) are large, strong mammals known for their speed and grace. They come in various breeds, each with unique characteristics and abilities.</p>
+            </section>
+
+            <section>
+                <h2>Uses of Horses</h2>
+                <ul>
+                    <li>Horses are used for riding, racing, and competition in various equestrian sports.</li>
+                    <li>They can be used for work, such as farming and pulling carts.</li>
+                    <li>Many people keep horses for leisure and companionship.</li>
+                    <li>Horses are also used in therapy and rehabilitation programs.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Raise Horses</h2>
+                <ul>
+                    <li><strong>Housing:</strong> Provide a spacious, well-ventilated stable or barn. Ensure the area is clean, dry, and free of hazards.</li>
+                    <li><strong>Food:</strong> Horses require a balanced diet of hay, pasture, grains, and supplements as needed. Fresh water should be available at all times.</li>
+                    <li><strong>Exercise:</strong> Regular exercise is essential for maintaining a horse's health. Provide ample space for grazing and exercise.</li>
+                    <li><strong>Social Needs:</strong> Horses are herd animals and thrive in social environments. Consider keeping more than one horse to prevent loneliness.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Start:</strong> Begin raising horses in late spring (May) when the weather is milder, allowing for acclimation to outdoor conditions.</li>
+                    <li><strong>Average Growth Time:</strong> Foals typically grow quickly and can be started under saddle around 2 to 3 years of age, depending on the breed.</li>
+                    <li><strong>Winterizing Tips:</strong> Ensure that the barn is insulated and draft-free during winter. Provide extra bedding and consider using blankets for cold-sensitive horses.</li>
+                    <li><strong>Cold-Hardy Breeds:</strong> Choose breeds that can tolerate cold weather, such as the Norwegian Fjord or Appaloosa.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Health and Maintenance</h2>
+                <p>Regular veterinary check-ups, vaccinations, and dental care are essential for maintaining horse health. Keep the living area clean to prevent disease.</p>
+            </section>
+
+            <section>
+                <h2>Training</h2>
+                <p>Proper training from an early age is crucial for a horse's development. Utilize positive reinforcement techniques and ensure consistency in training.</p>
+            </section>
+
+            <section>
+                <h2>Breeding</h2>
+                <p>Breeding horses should be done responsibly, taking into consideration the health and genetic history of both the mare and stallion.</p>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
