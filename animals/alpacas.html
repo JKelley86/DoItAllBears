@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Alpacas</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #B22222;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #DC143C;
+    }
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Alpacas</h1>
+            <p>Alpacas are gentle and intelligent animals, valued for their luxurious fiber and friendly demeanor.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Alpacas (Vicugna pacos) are domesticated camelids native to South America, known for their soft fleece and calm temperament. They come in two breeds: Huacaya and Suri, each with distinct fiber characteristics.</p>
+            </section>
+
+            <section>
+                <h2>Uses of Alpacas</h2>
+                <ul>
+                    <li>High-quality fleece used for textiles such as sweaters, blankets, and socks.</li>
+                    <li>Companionship and therapy animals.</li>
+                    <li>Guard animals for livestock, particularly sheep.</li>
+                    <li>Potentially for meat production in some regions.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Raise Alpacas</h2>
+                <ul>
+                    <li><strong>Housing:</strong> Provide a clean, dry shelter that protects them from rain, wind, and extreme temperatures. Adequate ventilation is essential.</li>
+                    <li><strong>Food:</strong> Alpacas are herbivores that primarily eat grass and hay, supplemented with minerals and vitamins as needed. Fresh water should always be available.</li>
+                    <li><strong>Exercise:</strong> Ensure they have ample space to roam and graze, as they need regular exercise to stay healthy.</li>
+                    <li><strong>Social Needs:</strong> Alpacas are social creatures that thrive in herds; keep at least two together to meet their social needs.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Start:</strong> Begin raising alpacas in late spring (May) to help them acclimate to their surroundings.</li>
+                    <li><strong>Average Growth Time:</strong> Alpacas typically reach maturity around 1 year of age, though they can continue to develop until 2 years old.</li>
+                    <li><strong>Winterizing Tips:</strong> Ensure that shelters are insulated and dry. Provide extra bedding and monitor for health issues during the winter months.</li>
+                    <li><strong>Cold-Hardy Breeds:</strong> Alpacas can adapt to colder climates, but their housing must provide adequate protection from harsh weather.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Health and Maintenance</h2>
+                <p>Regular veterinary care, vaccinations, and shearing (usually once a year) are important for maintaining alpaca health. Keep their living area clean and watch for signs of illness.</p>
+            </section>
+
+            <section>
+                <h2>Breeding</h2>
+                <p>Alpacas have a gestation period of about 11.5 months. Breeding should be approached responsibly, considering genetics and health of both parents.</p>
+            </section>
+
+            <section>
+                <h2>Fiber Production</h2>
+                <p>Alpacas produce fleece that is prized for its softness, warmth, and hypoallergenic properties. Regular shearing is necessary to maintain their comfort and prevent overheating.</p>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
