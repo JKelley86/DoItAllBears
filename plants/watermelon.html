@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Watermelon</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #32CD32;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #3CB371;
+    }
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Watermelon</h1>
+            <p>Watermelon is a refreshing summer fruit that can be grown in northern Minnesota with careful attention to timing and warmth.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Watermelon (Citrullus lanatus) is a large, sweet fruit with a thick rind, native to Africa. It is popular in summer due to its juicy, refreshing flesh, which is mostly water. Watermelons come in various sizes and shapes, and can be seedless or seeded, with red, pink, or even yellow flesh.</p>
+            </section>
+
+            <section>
+                <h2>Uses in Cooking</h2>
+                <ul>
+                    <li>Watermelon is often eaten fresh, on its own or in fruit salads.</li>
+                    <li>It can be blended into smoothies or used to make refreshing drinks, such as watermelon juice or lemonade.</li>
+                    <li>Grilled watermelon adds a sweet, smoky flavor to summer barbecues.</li>
+                    <li>Watermelon can be used in savory dishes, paired with feta cheese and mint in salads, or as a topping for tacos.</li>
+                    <li>The rind can be pickled and eaten as a crunchy side dish.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Grow Watermelon</h2>
+                <ul>
+                    <li><strong>Soil:</strong> Watermelon grows best in well-drained, sandy loam soil with a pH between 6.0 and 6.8. The soil should be rich in organic matter, as watermelon plants are heavy feeders.</li>
+                    <li><strong>Sunlight:</strong> Watermelon requires full sun, at least 8 hours per day. Northern Minnesota’s cooler temperatures mean that maximizing sunlight is essential for successful fruit ripening.</li>
+                    <li><strong>Watering:</strong> Keep the soil consistently moist but not waterlogged. Watermelons need regular watering, especially during the flowering and fruit-setting stages. Deep, infrequent watering is preferable to shallow, frequent watering.</li>
+                    <li><strong>Plant Spacing:</strong> Watermelon vines need plenty of room to spread. Space plants 3 to 5 feet apart in rows that are 6 to 10 feet apart, depending on the variety.</li>
+                    <li><strong>Harvesting:</strong> Watermelons are ready to harvest when the tendrils near the fruit start to dry out and turn brown, the underside turns yellow, and the fruit makes a hollow sound when tapped.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Plant:</strong> In northern Minnesota, start watermelon seeds indoors 4 to 6 weeks before the last frost date (around mid-April). Transplant seedlings outdoors in late May or early June, when the soil temperature is at least 70°F.</li>
+                    <li><strong>Average Growth Time:</strong> Watermelons take 80 to 100 days to mature, depending on the variety.</li>
+                    <li><strong>Season Extension Tips:</strong> To maximize the growing season, use black plastic mulch or row covers to keep the soil warm and protect the plants from cooler temperatures. Growing watermelons in raised beds can also help with soil warmth.</li>
+                    <li><strong>End-of-Season Tips:</strong> As the growing season winds down, ensure that the watermelons have enough time to ripen before the first frost. Consider covering plants at night to extend the season. Harvest all watermelons before a hard frost, as frost will damage the fruit.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Health Benefits</h2>
+                <p>Watermelon is incredibly hydrating, as it contains over 90% water. It’s rich in vitamins A and C and contains antioxidants like lycopene, which may help reduce the risk of certain cancers and promote heart health.</p>
+            </section>
+
+            <section>
+                <h2>Storage Tips</h2>
+                <ul>
+                    <li><strong>Fresh Watermelon:</strong> Store whole watermelons at room temperature for 1 to 2 weeks. Once cut, store in the refrigerator, wrapped or covered, for up to 5 days.</li>
+                    <li><strong>Preserving:</strong> Watermelon flesh can be pureed and frozen for use in smoothies or drinks. The rind can be pickled and stored in the refrigerator for several weeks.</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
