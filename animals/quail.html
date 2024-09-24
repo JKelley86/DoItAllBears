@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Quail</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #8B4513;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #A0522D;
+    }
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Quail</h1>
+            <p>Quail are small, versatile birds that are easy to raise and provide delicious eggs and meat.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Quail are small game birds belonging to the family Phasianidae. They are known for their distinctive calls, small size, and ability to adapt to various environments.</p>
+            </section>
+
+            <section>
+                <h2>Uses of Quail</h2>
+                <ul>
+                    <li>Quail eggs are a delicacy and can be used in a variety of dishes.</li>
+                    <li>Quail meat is tender and flavorful, making it a gourmet choice for many recipes.</li>
+                    <li>Quail can be raised for hunting and sport.</li>
+                    <li>They can be kept as pets or for educational purposes.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Raise Quail</h2>
+                <ul>
+                    <li><strong>Housing:</strong> Quail require a clean, secure enclosure that protects them from predators and harsh weather. Ensure adequate ventilation and space for movement.</li>
+                    <li><strong>Food:</strong> Feed quail a high-protein diet specifically formulated for game birds, along with grains and greens.</li>
+                    <li><strong>Water:</strong> Provide fresh, clean water in shallow dishes or waterers to prevent drowning.</li>
+                    <li><strong>Breeding:</strong> Quail can be bred in small spaces. Males should be kept with multiple females to reduce aggression.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Start:</strong> Start raising quail indoors in early spring (April) when temperatures begin to warm up. This allows them to acclimate before being moved outside.</li>
+                    <li><strong>Average Growth Time:</strong> Quail typically reach maturity in about 6 to 8 weeks, depending on the breed.</li>
+                    <li><strong>Winterizing Tips:</strong> Ensure the enclosure is insulated and draft-free during winter. Use heat lamps if necessary to maintain warmth. Providing bedding like straw or shavings can help insulate the ground.</li>
+                    <li><strong>Cold-Hardy Breeds:</strong> Choose breeds that can withstand colder temperatures, such as Coturnix quail, which are known for their hardiness.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Health and Maintenance</h2>
+                <p>Regularly check for signs of illness and keep their environment clean to prevent disease. Provide ample space for movement to reduce stress.</p>
+            </section>
+
+            <section>
+                <h2>Egg Production</h2>
+                <p>Quail hens typically start laying eggs at about 6 to 8 weeks of age. They can lay between 200 to 300 eggs per year.</p>
+            </section>
+
+            <section>
+                <h2>Storage Tips for Eggs</h2>
+                <ul>
+                    <li><strong>Fresh Eggs:</strong> Store quail eggs in a cool, dry place, preferably in the refrigerator, where they can last for several weeks.</li>
+                    <li><strong>Preserving Eggs:</strong> Consider pickling or freezing quail eggs for longer storage options.</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
