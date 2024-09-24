@@ -53,4 +53,11 @@
         <a href="tictactoeai.html" class="button">1-Player Game (vs AI)</a>
     </div>
 </body>
+<script>
+    fetch('navbar.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('navbar').innerHTML = data;
+    });
+</script>
 </html>
