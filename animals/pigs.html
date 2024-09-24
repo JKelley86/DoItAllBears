@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Pigs</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #FF4500;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #FF6347;
+    }
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Pigs</h1>
+            <p>Pigs are intelligent and social animals, raised for their meat, and they play a crucial role in sustainable farming practices.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Pigs (Sus scrofa domesticus) are domesticated members of the swine family, known for their adaptability and intelligence. They come in various breeds, each suited for different farming purposes.</p>
+            </section>
+
+            <section>
+                <h2>Uses of Pigs</h2>
+                <ul>
+                    <li>Meat production (pork), which includes various cuts and products such as bacon and sausage.</li>
+                    <li>Source of by-products such as leather and gelatin.</li>
+                    <li>Utilization in some cultures for land management through natural rooting behavior.</li>
+                    <li>Potential for companionship and pet ownership in smaller breeds.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Raise Pigs</h2>
+                <ul>
+                    <li><strong>Housing:</strong> Provide a clean, dry shelter that protects pigs from extreme weather, including rain and cold. Ensure adequate ventilation and space to move around.</li>
+                    <li><strong>Food:</strong> Pigs are omnivores and require a balanced diet that includes grains, fruits, vegetables, and commercially formulated feed to meet their nutritional needs.</li>
+                    <li><strong>Exercise:</strong> Allow plenty of space for pigs to roam and root around, as exercise is crucial for their well-being.</li>
+                    <li><strong>Social Needs:</strong> Pigs are social animals and should be kept in groups to prevent stress and encourage natural behavior.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Start:</strong> Spring (April to May) is the best time to start raising pigs to allow them to adapt before harsh winter conditions.</li>
+                    <li><strong>Average Growth Time:</strong> Pigs typically reach market weight (around 250-300 pounds) in about 5 to 6 months, depending on the breed and diet.</li>
+                    <li><strong>Winterizing Tips:</strong> Ensure housing is insulated, dry, and has proper bedding to keep pigs warm during winter. Provide a heated water source to prevent freezing.</li>
+                    <li><strong>Cold-Hardy Breeds:</strong> Some pig breeds are more resilient to cold; choose breeds like the Berkshire or Hampshire for northern climates.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Health and Maintenance</h2>
+                <p>Regular veterinary care, vaccinations, and parasite control are vital for maintaining pig health. Keep living areas clean and monitor for signs of illness.</p>
+            </section>
+
+            <section>
+                <h2>Breeding</h2>
+                <p>Pigs have a gestation period of about 3.5 months. Responsible breeding practices involve considering genetics and health to produce strong offspring.</p>
+            </section>
+
+            <section>
+                <h2>Meat Production</h2>
+                <p>Pigs are often raised for meat, with different cuts produced based on the animal's age and breed. Proper processing techniques are essential for quality meat.</p>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
