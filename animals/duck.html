@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Ducks</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #4682B4;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #5F9EA0;
+    }
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Ducks</h1>
+            <p>Ducks are versatile waterfowl known for their hardiness, adaptability, and ability to provide eggs and meat for homesteaders.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Ducks (Anas platyrhynchos domesticus) are domesticated waterfowl that come in various breeds, each with unique characteristics, including size, color, and temperament.</p>
+            </section>
+
+            <section>
+                <h2>Uses of Ducks</h2>
+                <ul>
+                    <li>Egg production, with duck eggs being larger and richer than chicken eggs.</li>
+                    <li>Meat production, providing a flavorful alternative to chicken and turkey.</li>
+                    <li>Pest control, as ducks forage for insects, slugs, and weeds.</li>
+                    <li>Companionship, as many people enjoy keeping ducks as pets.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Raise Ducks</h2>
+                <ul>
+                    <li><strong>Housing:</strong> Provide a clean, dry shelter that protects ducks from extreme weather and predators. Ensure access to a secure water source for swimming and cleaning.</li>
+                    <li><strong>Food:</strong> Ducks are omnivores and require a balanced diet that includes grains, greens, and waterfowl pellets formulated for their nutritional needs.</li>
+                    <li><strong>Exercise:</strong> Allow ample space for ducks to forage and swim, as regular activity is important for their health and well-being.</li>
+                    <li><strong>Social Needs:</strong> Ducks are social creatures and should be kept in groups to promote natural behavior and reduce stress.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Start:</strong> Spring (April to May) is ideal for starting a duck flock, allowing them to acclimate before winter.</li>
+                    <li><strong>Average Growth Time:</strong> Ducklings typically reach market weight in about 8 to 12 weeks, depending on the breed.</li>
+                    <li><strong>Winterizing Tips:</strong> Provide insulated housing and bedding to keep ducks warm. Ensure they have access to fresh water, which may need to be heated to prevent freezing.</li>
+                    <li><strong>Cold-Hardy Breeds:</strong> Choose breeds like the Pekin or Khaki Campbell, which are well-suited for colder climates.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Health and Maintenance</h2>
+                <p>Regular veterinary care, vaccinations, and parasite control are vital for duck health. Keep their living area clean and monitor for signs of illness.</p>
+            </section>
+
+            <section>
+                <h2>Breeding</h2>
+                <p>Ducks have a shorter breeding cycle than other poultry, typically laying eggs that can be incubated for about 28 days. Consider genetics and health when breeding for strong offspring.</p>
+            </section>
+
+            <section>
+                <h2>Egg Production</h2>
+                <p>Ducks usually begin laying eggs at around 5 to 6 months of age. They can lay between 100 to 300 eggs per year, depending on the breed.</p>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
