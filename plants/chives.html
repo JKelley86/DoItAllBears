@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Chives</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #228B22;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #006400;
+    }
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Chives</h1>
+            <p>Everything you need to know about chives—from growing to culinary uses and health benefits.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Chives (Allium schoenoprasum) are a perennial herb closely related to onions, garlic, and leeks. They have a mild onion-like flavor and are commonly used to add a fresh, delicate taste to a variety of dishes.</p>
+            </section>
+
+            <section>
+                <h2>Uses in Cooking</h2>
+                <ul>
+                    <li>Chopped chives are often used as a garnish for soups, salads, and baked potatoes.</li>
+                    <li>They can be incorporated into dips, spreads, and sauces to add a mild onion flavor.</li>
+                    <li>Chives are great for seasoning omelets, fish, and other savory dishes.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Grow Chives</h2>
+                <ul>
+                    <li><strong>Soil:</strong> Chives grow best in well-drained soil with a high organic content.</li>
+                    <li><strong>Sunlight:</strong> They thrive in full sun but can tolerate partial shade.</li>
+                    <li><strong>Watering:</strong> Keep the soil consistently moist, especially during dry periods.</li>
+                    <li><strong>Propagation:</strong> Chives can be grown from seeds or by dividing existing plants.</li>
+                    <li><strong>Harvesting:</strong> Snip the leaves close to the ground when they reach about 6 inches tall, but leave at least 2 inches of growth for regrowth.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Plant:</strong> Chives can be planted in early spring after the last frost, usually around mid-to-late May in northern Minnesota.</li>
+                    <li><strong>Average Growth Time:</strong> Chives typically take about 30 days to sprout and will be ready for harvest within 60 days.</li>
+                    <li><strong>Winterizing Tips:</strong> Chives are hardy perennials and can survive northern Minnesota winters. Mulch the plants heavily with straw or leaves in late fall to protect the roots from freezing. In early spring, remove the mulch to allow new growth.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Health Benefits</h2>
+                <p>Chives are rich in vitamins A, C, and K and also contain compounds that have antioxidant, antimicrobial, and anti-inflammatory properties. Regular consumption may help boost immunity, improve digestion, and promote heart health.</p>
+            </section>
+
+            <section>
+                <h2>Storage Tips</h2>
+                <ul>
+                    <li><strong>Refrigeration:</strong> Store fresh chives in the fridge wrapped in a damp paper towel for up to a week.</li>
+                    <li><strong>Freezing:</strong> You can also chop and freeze chives for long-term storage.</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
