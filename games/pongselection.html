@@ -53,4 +53,11 @@
         <a href="pongh.html" class="button">Pong (Hard)</a>
     </div>
 </body>
+<script>
+    fetch('navbar.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('navbar').innerHTML = data;
+    });
+</script>
 </html>
