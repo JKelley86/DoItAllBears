@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Llamas</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #D2691E;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #CD853F;
+    }
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Llamas</h1>
+            <p>Llamas are intelligent and social animals known for their gentle nature and versatility in various farming practices.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Llamas (Lama glama) are domesticated South American camelids known for their thick wool, long necks, and friendly disposition. They are often used as pack animals and for their fiber.</p>
+            </section>
+
+            <section>
+                <h2>Uses of Llamas</h2>
+                <ul>
+                    <li>Pack animals for transporting goods.</li>
+                    <li>Sources of high-quality fiber for textiles.</li>
+                    <li>Companionship and therapy animals.</li>
+                    <li>Used for guarding livestock against predators.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Raise Llamas</h2>
+                <ul>
+                    <li><strong>Housing:</strong> Provide a dry, secure shelter that protects them from extreme weather. Ensure there is adequate ventilation and space for them to move freely.</li>
+                    <li><strong>Food:</strong> Llamas primarily eat grass, hay, and grains. Fresh water should always be available, and they may also require mineral supplements.</li>
+                    <li><strong>Exercise:</strong> Allow llamas plenty of space to roam and graze, as they are active animals that need regular exercise.</li>
+                    <li><strong>Social Needs:</strong> Llamas are social animals and should ideally be kept in groups to prevent loneliness and stress.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Start:</strong> Start raising llamas in late spring (May) to ensure they acclimate well to their environment.</li>
+                    <li><strong>Average Growth Time:</strong> Llamas typically reach maturity at around 2 to 3 years of age, though they may continue to grow until 4 years.</li>
+                    <li><strong>Winterizing Tips:</strong> Provide insulated shelter and plenty of bedding during winter. Monitor their health closely, as cold weather can affect their well-being.</li>
+                    <li><strong>Cold-Hardy Breeds:</strong> Most llamas are adaptable to colder climates, but ensure they have adequate shelter and care.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Health and Maintenance</h2>
+                <p>Regular veterinary check-ups, vaccinations, and dental care are essential for maintaining llama health. Keep their living area clean and monitor for signs of illness.</p>
+            </section>
+
+            <section>
+                <h2>Training</h2>
+                <p>Llamas can be trained for various tasks, including packing, leading, and showing. Utilize positive reinforcement methods for effective training.</p>
+            </section>
+
+            <section>
+                <h2>Breeding</h2>
+                <p>Llamas have a gestation period of about 11.5 months. Breeding should be done responsibly, considering genetic diversity and health.</p>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
