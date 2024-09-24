@@ -48,3 +48,12 @@
         <span>&copy; 2024 Justin's Website. All rights reserved.</span>
     </footer> 
  </div>
+<script>
+    fetch('navbar.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('navbar').innerHTML = data;
+    });
+</script>
+</body>
+</html>
