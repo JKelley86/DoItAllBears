@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Chickens</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #FFD700;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #FFC107;
+    }
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Chickens</h1>
+            <p>Chickens are versatile birds that can provide fresh eggs and meat, making them a valuable addition to any homestead.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Chickens (Gallus gallus domesticus) are domesticated fowl kept for their eggs and meat. They come in various breeds, each with unique characteristics and egg-laying abilities.</p>
+            </section>
+
+            <section>
+                <h2>Uses of Chickens</h2>
+                <ul>
+                    <li>Chickens provide a source of fresh eggs, which are nutritious and versatile for cooking.</li>
+                    <li>They can be raised for meat, known as broilers.</li>
+                    <li>Chicken manure is an excellent fertilizer for gardens and crops.</li>
+                    <li>Chickens can help control pests in the garden by foraging for insects.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Raise Chickens</h2>
+                <ul>
+                    <li><strong>Housing:</strong> Provide a secure, clean coop that protects chickens from predators and harsh weather. Ensure good ventilation and access to nesting boxes.</li>
+                    <li><strong>Food:</strong> Chickens require a balanced diet of commercial feed, grains, and access to greens. Supplement their diet with kitchen scraps and grit for digestion.</li>
+                    <li><strong>Water:</strong> Fresh, clean water must be available at all times. Use waterers that prevent contamination.</li>
+                    <li><strong>Social Needs:</strong> Chickens are social animals and should be kept in groups. A minimum of three to six chickens is recommended.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Start:</strong> Start chicks indoors in late winter (February to March) for an early spring outdoor transition. This timing helps them grow before the coldest weather hits.</li>
+                    <li><strong>Average Growth Time:</strong> Chickens typically reach maturity in about 20 weeks for egg-laying hens and 6 to 8 weeks for broilers.</li>
+                    <li><strong>Winterizing Tips:</strong> Ensure the coop is well-insulated and draft-free. Use deep litter bedding to provide warmth and absorb moisture. Consider supplemental heating during extreme cold spells, but ensure it's safe to prevent fires.</li>
+                    <li><strong>Cold-Hardy Breeds:</strong> Choose breeds that are known for their cold hardiness, such as Rhode Island Reds, Plymouth Rocks, and Orpingtons, which can withstand colder temperatures.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Health and Maintenance</h2>
+                <p>Regularly check for signs of illness, parasites, and injuries. Maintain a clean coop to prevent disease, and provide access to outdoor space for foraging and exercise.</p>
+            </section>
+
+            <section>
+                <h2>Egg Production</h2>
+                <p>Egg-laying hens typically start producing eggs at around 5 to 6 months of age. The production rate varies by breed but can average 250 to 300 eggs per year per hen.</p>
+            </section>
+
+            <section>
+                <h2>Storage Tips for Eggs</h2>
+                <ul>
+                    <li><strong>Fresh Eggs:</strong> Store eggs in a cool, dry place, preferably in the refrigerator, where they can last for several weeks.</li>
+                    <li><strong>Preserving Eggs:</strong> Consider preserving eggs by pickling or dehydrating them for long-term storage.</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
