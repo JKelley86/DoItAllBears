@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Corn</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #FFA500;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #FF8C00;
+    }
+</head>
+<body style="background-image: url('corn-bg.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Corn</h1>
+            <p>Everything you need to know about growing and using corn, especially for northern Minnesota conditions.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Corn (Zea mays) is a cereal grain that has been grown for thousands of years. It is a staple food in many parts of the world and can be eaten fresh, used as livestock feed, or processed into a wide range of products.</p>
+            </section>
+
+            <section>
+                <h2>Uses in Cooking</h2>
+                <ul>
+                    <li>Corn can be eaten fresh, either boiled or grilled, as corn on the cob.</li>
+                    <li>Kernels can be removed and added to soups, salads, and casseroles.</li>
+                    <li>Cornmeal, a ground product of corn, is used to make polenta, cornbread, and tortillas.</li>
+                    <li>Popcorn is another popular snack derived from specific types of corn.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Grow Corn</h2>
+                <ul>
+                    <li><strong>Soil:</strong> Corn requires well-drained, fertile soil with a lot of organic matter. It grows best in loamy soil.</li>
+                    <li><strong>Sunlight:</strong> Full sunlight is essential for corn. It should receive at least 6 to 8 hours of direct sunlight per day.</li>
+                    <li><strong>Watering:</strong> Corn has shallow roots, so it needs regular watering, especially during the growing season. Keep the soil consistently moist.</li>
+                    <li><strong>Plant Spacing:</strong> Corn should be planted in blocks rather than single rows to ensure proper pollination.</li>
+                    <li><strong>Harvesting:</strong> Corn is typically ready to harvest when the silk turns brown and the ears feel full when squeezed.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Plant:</strong> In northern Minnesota, plant corn in late May to early June, when the soil temperature reaches at least 50°F. Corn is sensitive to frost, so make sure to plant after the last frost.</li>
+                    <li><strong>Average Growth Time:</strong> Corn typically takes 60 to 100 days to mature, depending on the variety.</li>
+                    <li><strong>Winterizing Tips:</strong> Corn is an annual plant and does not need to be winterized. However, after the harvest, till the leftover stalks back into the soil to add organic matter for the next season.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Health Benefits</h2>
+                <p>Corn is a good source of fiber, vitamins, and minerals such as magnesium and potassium. It contains antioxidants and has been shown to support digestive health, promote eye health due to its lutein content, and provide sustained energy through its carbohydrates.</p>
+            </section>
+
+            <section>
+                <h2>Storage Tips</h2>
+                <ul>
+                    <li><strong>Fresh Corn:</strong> Corn can be kept in its husk in the refrigerator for up to a week. For longer storage, blanch the corn and freeze the kernels.</li>
+                    <li><strong>Dried Corn:</strong> Cornmeal, popcorn, and dried kernels should be stored in airtight containers in a cool, dry place.</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
