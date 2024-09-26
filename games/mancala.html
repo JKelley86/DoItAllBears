@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mancala Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 80px);
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pit, .mancala {
+            background-color: #a0522d;
+            border-radius: 50%;
+            height: 80px;
+            width: 80px;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .mancala {
+            height: 160px;
+            width: 80px;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mancala Game</h1>
+
+    <div id="status">Your Turn</div>
+
+    <div class="board">
+        <!-- Player 2 Pits (AI) -->
+        <div class="pit" id="p2pit5" onclick="makeMove(5, 'AI')">4</div>
+        <div class="pit" id="p2pit4" onclick="makeMove(4, 'AI')">4</div>
+        <div class="pit" id="p2pit3" onclick="makeMove(3, 'AI')">4</div>
+        <div class="pit" id="p2pit2" onclick="makeMove(2, 'AI')">4</div>
+        <div class="pit" id="p2pit1" onclick="makeMove(1, 'AI')">4</div>
+        <div class="pit" id="p2pit0" onclick="makeMove(0, 'AI')">4</div>
+
+        <!-- Player 2 Mancala -->
+        <div class="mancala" id="p2mancala">0</div>
+
+        <!-- Empty space -->
+        <div class="empty"></div>
+
+        <!-- Player 1 Mancala (Your side) -->
+        <div class="mancala" id="p1mancala">0</div>
+
+        <!-- Player 1 Pits (Your side) -->
+        <div class="pit" id="p1pit0" onclick="makeMove(0, 'player')">4</div>
+        <div class="pit" id="p1pit1" onclick="makeMove(1, 'player')">4</div>
+        <div class="pit" id="p1pit2" onclick="makeMove(2, 'player')">4</div>
+        <div class="pit" id="p1pit3" onclick="makeMove(3, 'player')">4</div>
+        <div class="pit" id="p1pit4" onclick="makeMove(4, 'player')">4</div>
+        <div class="pit" id="p1pit5" onclick="makeMove(5, 'player')">4</div>
+    </div>
+
+    <button onclick="restartGame()">Restart Game</button>
+
+    <script>
+        // Mancala game state
+        let board = {
+            p1pits: [4, 4, 4, 4, 4, 4],
+            p2pits: [4, 4, 4, 4, 4, 4],
+            p1mancala: 0,
+            p2mancala: 0
+        };
+
+        let currentPlayer = 'player';  // Player's turn or AI's turn
+
+        function makeMove(pitIndex, player) {
+            if (currentPlayer !== player) return;  // Only allow moves on the player's turn
+
+            let pits = player === 'player' ? board.p1pits : board.p2pits;
+            let mancala = player === 'player' ? 'p1mancala' : 'p2mancala';
+
+            let stones = pits[pitIndex];
+            pits[pitIndex] = 0;  // Empty the selected pit
+
+            // Spread stones
+            let index = pitIndex;
+            while (stones > 0) {
+                index = (index + 1) % 6;
+                pits[index]++;
+                stones--;
+            }
+
+            updateBoard();
+            switchTurns();
+        }
+
+        function switchTurns() {
+            currentPlayer = currentPlayer === 'player' ? 'AI' : 'player';
+            document.getElementById('status').innerText = currentPlayer === 'player' ? "Your Turn" : "AI's Turn";
+            
+            if (currentPlayer === 'AI') {
+                setTimeout(aiMove, 1000);  // Simulate AI thinking for 1 second
+            }
+        }
+
+        function aiMove() {
+            // Simple AI logic: pick a random pit to play from
+            let aiPits = board.p2pits;
+            let validPits = aiPits.map((stones, i) => stones > 0 ? i : -1).filter(i => i !== -1);
+            let randomPit = validPits[Math.floor(Math.random() * validPits.length)];
+            makeMove(randomPit, 'AI');
+        }
+
+        function updateBoard() {
+            // Update Player 1 pits and mancala
+            for (let i = 0; i < 6; i++) {
+                document.getElementById('p1pit' + i).innerText = board.p1pits[i];
+                document.getElementById('p2pit' + i).innerText = board.p2pits[i];
+            }
+            document.getElementById('p1mancala').innerText = board.p1mancala;
+            document.getElementById('p2mancala').innerText = board.p2mancala;
+        }
+
+        function restartGame() {
+            board.p1pits = [4, 4, 4, 4, 4, 4];
+            board.p2pits = [4, 4, 4, 4, 4, 4];
+            board.p1mancala = 0;
+            board.p2mancala = 0;
+            currentPlayer = 'player';
+            updateBoard();
+            document.getElementById('status').innerText = "Your Turn";
+        }
+
+        updateBoard();  // Initialize board on page load
+    </script>
+</body>
+</html>
