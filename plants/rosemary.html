@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Rosemary</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #556B2F;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #6B8E23;
+    }
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Rosemary</h1>
+            <p>Rosemary is a fragrant, evergreen herb native to the Mediterranean, often used for culinary, medicinal, and ornamental purposes.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Rosemary (Rosmarinus officinalis) is an aromatic herb with needle-like leaves and small blue, purple, or white flowers. It is drought-tolerant and thrives in warm climates.</p>
+            </section>
+
+            <section>
+                <h2>Uses of Rosemary</h2>
+                <ul>
+                    <li>Culinary herb in dishes such as roasted meats, potatoes, and stews.</li>
+                    <li>Aromatic for sachets, oils, and potpourri.</li>
+                    <li>Medicinal uses in teas and essential oils to aid digestion and improve concentration.</li>
+                    <li>Ornamental in landscapes and container gardens for its beauty and scent.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Grow Rosemary</h2>
+                <ul>
+                    <li><strong>Soil:</strong> Rosemary prefers well-drained, sandy soil with a pH of 6.0 to 7.0. Avoid overly moist or clay-heavy soils.</li>
+                    <li><strong>Water:</strong> Water regularly but allow the soil to dry between waterings, as rosemary dislikes soggy roots.</li>
+                    <li><strong>Light:</strong> Rosemary thrives in full sunlight and requires at least 6 to 8 hours of sun per day for optimal growth.</li>
+                    <li><strong>Pests and Diseases:</strong> Watch for aphids, spider mites, and powdery mildew. Keep plants well-ventilated and prune to avoid overcrowding.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Plant:</strong> Plant rosemary indoors or in containers in early spring (April) and move them outdoors once the danger of frost has passed, usually by late May.</li>
+                    <li><strong>Average Growth Time:</strong> Rosemary is a slow-growing herb that takes about 6 to 12 months to fully establish.</li>
+                    <li><strong>Winterizing Tips:</strong> Since rosemary is not cold-hardy below 20°F, it’s best to grow it in containers that can be brought indoors during the winter months. Place the plant in a sunny window or under grow lights.</li>
+                    <li><strong>Overwintering Indoors:</strong> Reduce watering during winter and ensure good air circulation to prevent mildew. Trim rosemary lightly to maintain its shape.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Harvesting Rosemary</h2>
+                <p>Snip the stems as needed, starting when the plant is large enough to withstand light pruning. You can harvest rosemary throughout the growing season and dry or freeze it for later use.</p>
+            </section>
+
+            <section>
+                <h2>Companion Planting</h2>
+                <p>Rosemary grows well with plants like carrots, cabbage, and beans, as it repels pests such as cabbage moths and bean beetles.</p>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
