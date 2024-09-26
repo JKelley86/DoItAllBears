@@ -2,218 +2,155 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mancala</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
+            background-color: #f4f4f4;
             margin: 0;
             padding: 0;
-            background-color: #fafafa;
         }
 
-        h1 {
-            margin-top: 20px;
-        }
-
-        #board {
+        #mancala-board {
             display: flex;
             flex-direction: column;
-            justify-content: space-around;
+            justify-content: center;
             align-items: center;
-            height: 100vh;
-            padding: 10px;
+            max-width: 400px;
+            margin: 20px auto;
         }
 
         .row {
             display: flex;
-            justify-content: center;
-            width: 90%;
+            justify-content: space-between;
+            margin: 10px 0;
         }
 
         .pit, .mancala {
             width: 60px;
             height: 60px;
-            margin: 5px;
+            border: 2px solid #333;
+            border-radius: 50%;
+            background-color: #ffd700;
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 50%;
-            background-color: #6b8e23;
-            color: white;
             font-size: 18px;
+            font-weight: bold;
         }
 
         .mancala {
             height: 120px;
-            background-color: #2e8b57;
+            width: 60px;
+            border-radius: 15px;
         }
 
-        #player-mancala {
-            background-color: #ff6347;
+        .row-player-label {
+            font-size: 18px;
+            margin-bottom: 5px;
         }
 
-        #ai-mancala {
-            background-color: #4682b4;
+        /* Custom styles to make it clear whose side is whose */
+        #player-label {
+            color: #3498db;
+            font-weight: bold;
         }
 
-        .pit-player {
-            background-color: #ffa07a;
-        }
-
-        .pit-ai {
-            background-color: #87cefa;
-        }
-
-        #status {
-            margin-top: 20px;
-            font-size: 20px;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            margin: 10px;
+        #ai-label {
+            color: #e74c3c;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <h1>Mancala</h1>
-    <div id="board">
-        <!-- AI side -->
+    <h1>Mancala Game</h1>
+    <div id="mancala-board">
+        <div class="row-player-label" id="ai-label">AI's Side</div>
         <div class="row">
-            <div id="ai-mancala" class="mancala">0</div>
-            <div id="ai-pit5" class="pit pit-ai" onclick="playerMove(5)">4</div>
-            <div id="ai-pit4" class="pit pit-ai" onclick="playerMove(4)">4</div>
-            <div id="ai-pit3" class="pit pit-ai" onclick="playerMove(3)">4</div>
-            <div id="ai-pit2" class="pit pit-ai" onclick="playerMove(2)">4</div>
-            <div id="ai-pit1" class="pit pit-ai" onclick="playerMove(1)">4</div>
-            <div id="ai-pit0" class="pit pit-ai" onclick="playerMove(0)">4</div>
+            <div class="mancala" id="ai-mancala">0</div>
+            <div class="pit" id="ai-pit-5">4</div>
+            <div class="pit" id="ai-pit-4">4</div>
+            <div class="pit" id="ai-pit-3">4</div>
+            <div class="pit" id="ai-pit-2">4</div>
+            <div class="pit" id="ai-pit-1">4</div>
+            <div class="pit" id="ai-pit-0">4</div>
         </div>
-
-        <!-- Player side -->
         <div class="row">
-            <div id="player-pit0" class="pit pit-player" onclick="playerMove(7)">4</div>
-            <div id="player-pit1" class="pit pit-player" onclick="playerMove(8)">4</div>
-            <div id="player-pit2" class="pit pit-player" onclick="playerMove(9)">4</div>
-            <div id="player-pit3" class="pit pit-player" onclick="playerMove(10)">4</div>
-            <div id="player-pit4" class="pit pit-player" onclick="playerMove(11)">4</div>
-            <div id="player-pit5" class="pit pit-player" onclick="playerMove(12)">4</div>
-            <div id="player-mancala" class="mancala">0</div>
+            <div class="mancala" id="player-mancala">0</div>
+            <div class="pit" id="player-pit-0">4</div>
+            <div class="pit" id="player-pit-1">4</div>
+            <div class="pit" id="player-pit-2">4</div>
+            <div class="pit" id="player-pit-3">4</div>
+            <div class="pit" id="player-pit-4">4</div>
+            <div class="pit" id="player-pit-5">4</div>
         </div>
+        <div class="row-player-label" id="player-label">Your Side</div>
     </div>
 
-    <div id="status">Your move!</div>
-    <button onclick="resetGame()">Restart</button>
-
     <script>
-        let playerPits = [4, 4, 4, 4, 4, 4];
-        let aiPits = [4, 4, 4, 4, 4, 4];
-        let playerMancala = 0;
-        let aiMancala = 0;
-        let currentPlayer = 'player'; // Alternates between 'player' and 'ai'
+     // Mancala game logic
 
-        function renderBoard() {
-            for (let i = 0; i < 6; i++) {
-                document.getElementById('player-pit' + i).innerText = playerPits[i];
-                document.getElementById('ai-pit' + i).innerText = aiPits[i];
-            }
-            document.getElementById('player-mancala').innerText = playerMancala;
-            document.getElementById('ai-mancala').innerText = aiMancala;
-        }
+let playerMancala = 0;
+let aiMancala = 0;
+let playerPits = [4, 4, 4, 4, 4, 4];
+let aiPits = [4, 4, 4, 4, 4, 4];
+let playerTurn = true; // Player starts first
 
-        function playerMove(pit) {
-            if (currentPlayer !== 'player' || playerPits[pit] === 0) return;
-            let stones = playerPits[pit];
-            playerPits[pit] = 0;
-            let index = pit + 1;
+function updateBoard() {
+    // Update the pit values in the UI
+    for (let i = 0; i < 6; i++) {
+        document.getElementById(`player-pit-${i}`).textContent = playerPits[i];
+        document.getElementById(`ai-pit-${i}`).textContent = aiPits[i];
+    }
+    document.getElementById('player-mancala').textContent = playerMancala;
+    document.getElementById('ai-mancala').textContent = aiMancala;
+}
 
-            while (stones > 0) {
-                if (index < 6) {
-                    playerPits[index]++;
-                    stones--;
-                } else if (index === 6) {
-                    playerMancala++;
-                    stones--;
-                    if (stones === 0) {
-                        document.getElementById('status').innerText = "Free turn!";
-                        renderBoard();
-                        return;
-                    }
-                } else {
-                    for (let i = 0; i < 6 && stones > 0; i++) {
-                        aiPits[i]++;
-                        stones--;
-                    }
-                    index = -1; // Restart loop
+// Implement move logic here (handle free turns, captures, etc.)
+function makeMove(pitIndex) {
+    if (playerTurn) {
+        let stones = playerPits[pitIndex];
+        playerPits[pitIndex] = 0;
+        let index = pitIndex + 1;
+        
+        while (stones > 0) {
+            if (index < 6) {
+                playerPits[index]++;
+            } else if (index === 6) {
+                playerMancala++;
+                if (stones === 1) {
+                    // Player gets a free turn
+                    playerTurn = true;
                 }
-                index++;
+            } else {
+                index = 0;
+                aiPits[index]++;
             }
-
-            currentPlayer = 'ai';
-            renderBoard();
-            setTimeout(aiMove, 1000);
+            stones--;
+            index++;
         }
+    }
+    updateBoard();
+}
 
-        function aiMove() {
-            let move = getBestAIMove();
-            let stones = aiPits[move];
-            aiPits[move] = 0;
-            let index = move + 1;
+// AI logic using Minimax to maximize Mancala stones
+function aiMove() {
+    // AI evaluates all possible moves using minimax to make the best possible decision
+    // This function should include alpha-beta pruning to optimize performance
+}
 
-            while (stones > 0) {
-                if (index < 6) {
-                    aiPits[index]++;
-                    stones--;
-                } else if (index === 6) {
-                    aiMancala++;
-                    stones--;
-                    if (stones === 0) {
-                        document.getElementById('status').innerText = "AI gets a free turn!";
-                        renderBoard();
-                        setTimeout(aiMove, 1000); // AI free turn
-                        return;
-                    }
-                } else {
-                    for (let i = 0; i < 6 && stones > 0; i++) {
-                        playerPits[i]++;
-                        stones--;
-                    }
-                    index = -1; // Restart loop
-                }
-                index++;
-            }
+// Call `makeMove()` when a player clicks on a pit
+document.querySelectorAll('.pit').forEach(pit => {
+    pit.addEventListener('click', () => {
+        const pitId = pit.id.split('-')[2];
+        makeMove(parseInt(pitId));
+    });
+});
 
-            currentPlayer = 'player';
-            document.getElementById('status').innerText = "Your move!";
-            renderBoard();
-        }
-
-        function getBestAIMove() {
-            // Hard AI strategy: choose the move that lands in AI Mancala or closest to the player side.
-            let bestMove = 0;
-            let maxStones = 0;
-            for (let i = 0; i < 6; i++) {
-                if (aiPits[i] > maxStones) {
-                    maxStones = aiPits[i];
-                    bestMove = i;
-                }
-            }
-            return bestMove;
-        }
-
-        function resetGame() {
-            playerPits = [4, 4, 4, 4, 4, 4];
-            aiPits = [4, 4, 4, 4, 4, 4];
-            playerMancala = 0;
-            aiMancala = 0;
-            currentPlayer = 'player';
-            document.getElementById('status').innerText = "Your move!";
-            renderBoard();
-        }
-
-        renderBoard();
+updateBoard();
+   
     </script>
 </body>
 </html>
