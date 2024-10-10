@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Onions</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .nav-button {
+            display: inline-block;
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #FFA500;
+            color: #fff;
+            text-align: center;
+            line-height: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <nav-button:hover {
+        background-color: #FF8C00;
+    }
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+        <main>
+            <h1>All About Onions</h1>
+            <p>Onions are a popular root vegetable with a pungent flavor, used in various culinary dishes worldwide, from salads to cooked meals.</p>
+
+            <section>
+                <h2>Description</h2>
+                <p>Onions (Allium cepa) come in many varieties, including red, yellow, white, and green onions (scallions). They grow underground, developing a bulb that can be harvested and stored for long periods.</p>
+            </section>
+
+            <section>
+                <h2>Uses of Onions</h2>
+                <ul>
+                    <li>Commonly used in soups, stews, stir-fries, and as a seasoning in many savory dishes.</li>
+                    <li>Fresh onions can be used in salads and sandwiches for added flavor.</li>
+                    <li>Pickled onions are a popular side dish or condiment.</li>
+                    <li>Onions are also used in traditional medicine to treat colds and reduce inflammation.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>How to Grow Onions</h2>
+                <ul>
+                    <li><strong>Soil:</strong> Onions thrive in loose, well-drained soil rich in organic matter. A pH of 6.0 to 7.0 is ideal for onion growth.</li>
+                    <li><strong>Water:</strong> Onions need regular watering, especially during bulb formation. Keep the soil moist but not waterlogged.</li>
+                    <li><strong>Light:</strong> Onions prefer full sun, needing at least 6 hours of sunlight per day to grow healthy bulbs.</li>
+                    <li><strong>Pests and Diseases:</strong> Watch out for onion maggots, thrips, and fungal diseases like downy mildew and onion rot. Crop rotation can help reduce disease risk.</li>
+                </ul>
+                <h3>Specific Tips for Northern MN</h3>
+                <ul>
+                    <li><strong>Best Time to Plant:</strong> In northern Minnesota, plant onion sets or transplants in early spring, usually in late April or early May, once the soil is workable and frost danger has passed.</li>
+                    <li><strong>Average Growth Time:</strong> Onions take about 90 to 120 days to mature, depending on the variety.</li>
+                    <li><strong>Winterizing Tips:</strong> Onions are typically harvested in late summer. For overwintering onions, plant specific winter-hardy varieties in late summer or fall and cover them with mulch for insulation.</li>
+                    <li><strong>Storage Tips:</strong> Cure onions by letting them dry for several weeks in a warm, well-ventilated area. Once dried, store them in a cool, dry place.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Harvesting Onions</h2>
+                <p>Onions are ready to harvest when the tops turn yellow and start to fall over. After pulling them from the ground, let them cure in a warm, dry, and well-ventilated area for a few weeks before storing them.</p>
+            </section>
+
+            <section>
+                <h2>Companion Planting</h2>
+                <p>Onions make excellent companion plants for carrots, lettuce, tomatoes, and cabbage. They help deter pests like aphids and beetles.</p>
+            </section>
+        </main>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <script>
+        fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+    </script>
+</body>
+</html>
