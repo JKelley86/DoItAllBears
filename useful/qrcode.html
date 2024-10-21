@@ -23,11 +23,71 @@
         cursor: pointer;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-</style>
 .nav-button:hover {
     background-color: #333;
 }
+  .wifi-form {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
 
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-size: 14px;
+    color: #495057;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+
+  .password-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  .toggle-password {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    padding: 0 10px;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  .btn:hover {
+    background-color: #0056b3;
+  }
+
+  #qrcode {
+    margin-top: 20px;
+    text-align: center;
+  }
+</style>
 </head>
 <body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
  <div class="container">
@@ -36,20 +96,27 @@
         </nav>
 
        <main>
-<form id="wifiForm">
-  <label for="ssid">WiFi Name (SSID):</label>
-  <input type="text" id="ssid" name="ssid" required>
+<form id="wifiForm" class="wifi-form">
+  <div class="form-group">
+    <label for="ssid">WiFi Name (SSID):</label>
+    <input type="text" id="ssid" name="ssid" required class="form-control">
+  </div>
   
-  <label for="password">Password:</label>
-  <input type="password" id="password" name="password" required>
+  <div class="form-group">
+    <label for="password">Password:</label>
+    <div class="password-wrapper">
+      <input type="password" id="password" name="password" required class="form-control">
+      <button type="button" id="togglePassword" class="toggle-password">Show</button>
+    </div>
+  </div>
 
-  <button type="submit">Generate QR Code</button>
+  <button type="submit" class="btn">Generate QR Code</button>
 </form>
 
 <div id="qrcode"></div>
 
 <!-- Button to save the QR code -->
-<button id="saveBtn" style="display: none;">Save QR Code</button>
+<button id="saveBtn" class="btn" style="display: none;">Save QR Code</button>
 
     </main>
 
@@ -99,6 +166,15 @@
       // Trigger the download
       downloadLink.click();
     };
+  });
+
+  // Toggle password visibility
+  const togglePassword = document.getElementById('togglePassword');
+  togglePassword.addEventListener('click', function() {
+    const passwordField = document.getElementById('password');
+    const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordField.setAttribute('type', type);
+    togglePassword.textContent = type === 'password' ? 'Show' : 'Hide';
   });
 </script>
 
