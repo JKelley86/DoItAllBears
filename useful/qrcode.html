@@ -1,0 +1,106 @@
+
+
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>QRCode</title>
+    <link rel="stylesheet" href="../styles.css">
+<style>
+    .nav-button {
+        display: inline-block;
+        width: 90px;
+        height: 90px;
+        margin: 10px;
+        border-radius: 50%;
+        background-color: #000;
+        color: #fff;
+        text-align: center;
+        line-height: 80px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+</style>
+.nav-button:hover {
+    background-color: #333;
+}
+
+</head>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+ <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
+
+       <main>
+<form id="wifiForm">
+  <label for="ssid">WiFi Name (SSID):</label>
+  <input type="text" id="ssid" name="ssid" required>
+  
+  <label for="password">Password:</label>
+  <input type="password" id="password" name="password" required>
+
+  <button type="submit">Generate QR Code</button>
+</form>
+
+<div id="qrcode"></div>
+
+<!-- Button to save the QR code -->
+<button id="saveBtn" style="display: none;">Save QR Code</button>
+
+    </main>
+
+    <footer> 
+        <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+    </footer> 
+ </div>
+<script>
+    fetch('navbar.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('navbar').innerHTML = data;
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  document.getElementById('wifiForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const ssid = document.getElementById('ssid').value;
+    const password = document.getElementById('password').value;
+    const wifiData = `WIFI:S:${ssid};T:WPA;P:${password};;`;
+
+    // Clear any previous QR code
+    document.getElementById('qrcode').innerHTML = '';
+
+    // Generate the QR code
+    const qrCode = new QRCode(document.getElementById('qrcode'), {
+      text: wifiData,
+      width: 256,
+      height: 256
+    });
+
+    // Show the save button
+    document.getElementById('saveBtn').style.display = 'block';
+    
+    // Attach the click event for saving the QR code image
+    document.getElementById('saveBtn').onclick = function() {
+      const qrCanvas = document.querySelector('#qrcode canvas');
+      const qrImage = qrCanvas.toDataURL('image/png');
+
+      // Create a link element to download the image
+      const downloadLink = document.createElement('a');
+      downloadLink.href = qrImage;
+      downloadLink.download = 'wifi_qrcode.png';
+      
+      // Trigger the download
+      downloadLink.click();
+    };
+  });
+</script>
+
+</body>
+</html>
