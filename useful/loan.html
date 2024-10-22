@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan/Mortgage Calculator</title>
+  <style>
+    /* General Page Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f4f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .calculator-form {
+      max-width: 450px;
+      margin: 20px;
+      padding: 30px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Form group and input styles */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-size: 15px;
+      color: #333;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: border-color 0.2s ease-in-out;
+    }
+
+    .form-control:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .btn:hover {
+      background-color: #0056b3;
+    }
+
+    /* Result Display */
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .result p {
+      font-size: 16px;
+      color: #333;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .calculator-form {
+        width: 100%;
+        padding: 20px;
+      }
+
+      .form-control {
+        font-size: 14px;
+        padding: 10px;
+      }
+
+      .btn {
+        padding: 10px;
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="calculator-form">
+    <h2>Loan/Mortgage Calculator</h2>
+    <div class="form-group">
+      <label for="loanAmount">Loan Amount ($)</label>
+      <input type="number" id="loanAmount" class="form-control" placeholder="Enter loan amount">
+    </div>
+    <div class="form-group">
+      <label for="interestRate">Annual Interest Rate (%)</label>
+      <input type="number" step="0.01" id="interestRate" class="form-control" placeholder="Enter interest rate">
+    </div>
+    <div class="form-group">
+      <label for="loanTerm">Loan Term (Years)</label>
+      <input type="number" id="loanTerm" class="form-control" placeholder="Enter loan term">
+    </div>
+    <button class="btn" onclick="calculateLoan()">Calculate</button>
+
+    <div class="result" id="result" style="display: none;">
+      <p id="monthlyPayment">Monthly Payment: </p>
+      <p id="totalInterest">Total Interest: </p>
+    </div>
+  </div>
+
+  <script>
+    function calculateLoan() {
+      // Get the user inputs
+      const loanAmount = document.getElementById('loanAmount').value;
+      const interestRate = document.getElementById('interestRate').value;
+      const loanTerm = document.getElementById('loanTerm').value;
+
+      // Validation: Ensure values are not empty or zero
+      if (loanAmount === '' || interestRate === '' || loanTerm === '') {
+        alert('Please fill in all fields');
+        return;
+      }
+
+      // Convert the interest rate to a monthly rate and calculate the number of payments
+      const monthlyInterestRate = (interestRate / 100) / 12;
+      const numberOfPayments = loanTerm * 12;
+
+      // Calculate the monthly payment using the formula: 
+      // M = P[r(1+r)^n] / [(1+r)^n - 1]
+      const monthlyPayment = (loanAmount * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, numberOfPayments)) /
+        (Math.pow(1 + monthlyInterestRate, numberOfPayments) - 1);
+
+      // Calculate total interest paid over the life of the loan
+      const totalPayment = monthlyPayment * numberOfPayments;
+      const totalInterest = totalPayment - loanAmount;
+
+      // Display the results
+      document.getElementById('monthlyPayment').textContent = 'Monthly Payment: $' + monthlyPayment.toFixed(2);
+      document.getElementById('totalInterest').textContent = 'Total Interest: $' + totalInterest.toFixed(2);
+      document.getElementById('result').style.display = 'block';
+    }
+  </script>
+
+</body>
+</html>
