@@ -126,7 +126,13 @@
       <p id="totalInterest">Total Interest: </p>
     </div>
   </div>
-
+<script>
+    fetch('navbar.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('navbar').innerHTML = data;
+    });
+</script>
   <script>
     function calculateLoan() {
       // Get the user inputs
