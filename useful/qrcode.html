@@ -8,50 +8,51 @@
     <title>QRCode</title>
     <link rel="stylesheet" href="../styles.css">
 <style>
-    .nav-button {
-        display: inline-block;
-        width: 90px;
-        height: 90px;
-        margin: 10px;
-        border-radius: 50%;
-        background-color: #000;
-        color: #fff;
-        text-align: center;
-        line-height: 80px;
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-.nav-button:hover {
-    background-color: #333;
-}
-  .wifi-form {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  /* General Page Styles */
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f4f8;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
   }
 
+  .qr-menu-form {
+    max-width: 450px;
+    margin: 20px;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Form group and input styles */
   .form-group {
     margin-bottom: 20px;
   }
 
   label {
-    font-size: 14px;
-    color: #495057;
+    font-size: 15px;
+    color: #333;
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
   }
 
   .form-control {
-    width: 90%;
-    padding: 10px;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-    font-size: 14px;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: border-color 0.2s ease-in-out;
+  }
+
+  .form-control:focus {
+    border-color: #007bff;
+    outline: none;
   }
 
   .password-wrapper {
@@ -64,30 +65,92 @@
     border: none;
     color: #007bff;
     cursor: pointer;
-    padding: 0 10px;
+    padding: 0 12px;
+    font-size: 14px;
   }
 
+  /* Buttons */
   .btn {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     background-color: #007bff;
-    color: white;
+    color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
-    margin-top: 10px;
+    transition: background-color 0.2s ease-in-out;
   }
 
   .btn:hover {
     background-color: #0056b3;
   }
 
+  /* QR Code Display */
   #qrcode {
     margin-top: 20px;
     text-align: center;
   }
+
+  /* Save QR Code Button */
+  #saveBtn {
+    display: block;
+    margin: 20px auto 0;
+    padding: 10px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  #saveBtn:hover {
+    background-color: #218838;
+  }
+
+  /* Navigation Buttons (in case you have them on your page) */
+  .nav-button {
+    display: inline-block;
+    width: 90px;
+    height: 90px;
+    margin: 10px;
+    border-radius: 50%;
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    line-height: 80px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .nav-button:hover {
+    background-color: #333;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .qr-menu-form {
+      width: 100%;
+      padding: 20px;
+    }
+
+    .form-control {
+      font-size: 14px;
+      padding: 10px;
+    }
+
+    .btn, #saveBtn {
+      padding: 10px;
+      font-size: 15px;
+    }
+  }
 </style>
+
 </head>
 <body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
  <div class="container">
