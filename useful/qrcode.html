@@ -95,29 +95,52 @@
             <div id="navbar"></div>
         </nav>
 
-       <main>
-<form id="wifiForm" class="wifi-form">
+    <main>
+        <form id="qrMenuForm" class="qr-menu-form">
   <div class="form-group">
-    <label for="ssid">WiFi Name (SSID):</label>
-    <input type="text" id="ssid" name="ssid" required class="form-control">
+    <label for="qrType">Select QR Code Type:</label>
+    <select id="qrType" class="form-control" required>
+      <option value="">--Choose an option--</option>
+      <option value="wifi">WiFi</option>
+      <option value="url">URL</option>
+      <option value="contact">Contact Information</option>
+    </select>
   </div>
-  
-  <div class="form-group">
-    <label for="password">Password:</label>
-    <div class="password-wrapper">
-      <input type="password" id="password" name="password" required class="form-control">
-      <button type="button" id="togglePassword" class="toggle-password">Show</button>
-    </div>
+
+  <!-- WiFi Input Fields -->
+  <div id="wifiFields" class="form-group" style="display: none;">
+    <label for="ssid">WiFi Name (SSID):</label>
+    <input type="text" id="ssid" name="ssid" class="form-control">
+    
+    <label for="wifiPassword">Password:</label>
+    <input type="password" id="wifiPassword" name="wifiPassword" class="form-control">
+    
+    <button type="button" id="togglePassword" class="toggle-password">Show</button>
+  </div>
+
+  <!-- URL Input Fields -->
+  <div id="urlFields" class="form-group" style="display: none;">
+    <label for="url">URL:</label>
+    <input type="url" id="url" name="url" class="form-control">
+  </div>
+
+  <!-- Contact Information Input Fields -->
+  <div id="contactFields" class="form-group" style="display: none;">
+    <label for="contactName">Name:</label>
+    <input type="text" id="contactName" name="contactName" class="form-control">
+    
+    <label for="contactPhone">Phone Number:</label>
+    <input type="tel" id="contactPhone" name="contactPhone" class="form-control">
+    
+    <label for="contactEmail">Email:</label>
+    <input type="email" id="contactEmail" name="contactEmail" class="form-control">
   </div>
 
   <button type="submit" class="btn">Generate QR Code</button>
 </form>
 
 <div id="qrcode"></div>
-
-<!-- Button to save the QR code -->
 <button id="saveBtn" class="btn" style="display: none;">Save QR Code</button>
-
     </main>
 
     <footer> 
@@ -133,48 +156,78 @@
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
-  document.getElementById('wifiForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    
-    const ssid = document.getElementById('ssid').value;
-    const password = document.getElementById('password').value;
-    const wifiData = `WIFI:S:${ssid};T:WPA;P:${password};;`;
+  const qrTypeSelect = document.getElementById('qrType');
+  const wifiFields = document.getElementById('wifiFields');
+  const urlFields = document.getElementById('urlFields');
+  const contactFields = document.getElementById('contactFields');
+  const saveBtn = document.getElementById('saveBtn');
 
-    // Clear any previous QR code
-    document.getElementById('qrcode').innerHTML = '';
+  qrTypeSelect.addEventListener('change', function() {
+    // Hide all fields initially
+    wifiFields.style.display = 'none';
+    urlFields.style.display = 'none';
+    contactFields.style.display = 'none';
+
+    // Show relevant fields based on selected QR code type
+    if (this.value === 'wifi') {
+      wifiFields.style.display = 'block';
+    } else if (this.value === 'url') {
+      urlFields.style.display = 'block';
+    } else if (this.value === 'contact') {
+      contactFields.style.display = 'block';
+    }
+  });
+
+  document.getElementById('qrMenuForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    let qrData = '';
+
+    // Get QR data based on the selected type
+    if (qrTypeSelect.value === 'wifi') {
+      const ssid = document.getElementById('ssid').value;
+      const password = document.getElementById('wifiPassword').value;
+      qrData = `WIFI:S:${ssid};T:WPA;P:${password};;`;
+    } else if (qrTypeSelect.value === 'url') {
+      const url = document.getElementById('url').value;
+      qrData = url;
+    } else if (qrTypeSelect.value === 'contact') {
+      const name = document.getElementById('contactName').value;
+      const phone = document.getElementById('contactPhone').value;
+      const email = document.getElementById('contactEmail').value;
+      qrData = `MECARD:N:${name};TEL:${phone};EMAIL:${email};;`;
+    }
 
     // Generate the QR code
-    const qrCode = new QRCode(document.getElementById('qrcode'), {
-      text: wifiData,
+    document.getElementById('qrcode').innerHTML = '';
+    new QRCode(document.getElementById('qrcode'), {
+      text: qrData,
       width: 256,
       height: 256
     });
 
     // Show the save button
-    document.getElementById('saveBtn').style.display = 'block';
+    saveBtn.style.display = 'block';
     
     // Attach the click event for saving the QR code image
-    document.getElementById('saveBtn').onclick = function() {
+    saveBtn.onclick = function() {
       const qrCanvas = document.querySelector('#qrcode canvas');
       const qrImage = qrCanvas.toDataURL('image/png');
 
-      // Create a link element to download the image
       const downloadLink = document.createElement('a');
       downloadLink.href = qrImage;
-      downloadLink.download = 'wifi_qrcode.png';
+      downloadLink.download = 'generated_qrcode.png';
       
-      // Trigger the download
       downloadLink.click();
     };
   });
 
-  // Toggle password visibility
-  const togglePassword = document.getElementById('togglePassword');
-  togglePassword.addEventListener('click', function() {
-    const passwordField = document.getElementById('password');
+  // Toggle password visibility for WiFi
+  document.getElementById('togglePassword').addEventListener('click', function() {
+    const passwordField = document.getElementById('wifiPassword');
     const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
     passwordField.setAttribute('type', type);
-    togglePassword.textContent = type === 'password' ? 'Show' : 'Hide';
+    this.textContent = type === 'password' ? 'Show' : 'Hide';
   });
 </script>
 
