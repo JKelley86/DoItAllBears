@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Format Converter</title>
+  <style>
+    /* General Page Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f4f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .converter-form {
+      max-width: 500px;
+      margin: 20px;
+      padding: 30px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    /* File Input Styles */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-size: 15px;
+      color: #333;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: border-color 0.2s ease-in-out;
+    }
+
+    .form-control:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    /* Select Input Styles */
+    .form-select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .btn:hover {
+      background-color: #0056b3;
+    }
+
+    /* Result Display */
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .result p {
+      font-size: 16px;
+      color: #333;
+    }
+
+    .output {
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .converter-form {
+        width: 100%;
+        padding: 20px;
+      }
+
+      .form-control,
+      .form-select {
+        font-size: 14px;
+        padding: 10px;
+      }
+
+      .btn {
+        padding: 10px;
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="converter-form">
+    <h2>File Format Converter</h2>
+    <div class="form-group">
+      <label for="fileInput">Choose a file (Text-based files only):</label>
+      <input type="file" id="fileInput" class="form-control" accept=".txt,.json">
+    </div>
+    <div class="form-group">
+      <label for="formatSelect">Convert to:</label>
+      <select id="formatSelect" class="form-select">
+        <option value="plain">Plain Text</option>
+        <option value="base64">Base64 Encoding</option>
+        <option value="json">JSON</option>
+      </select>
+    </div>
+    <button class="btn" onclick="convertFile()">Convert</button>
+
+    <div class="result" id="result" style="display: none;">
+      <p><strong>Converted Output:</strong></p>
+      <div class="output" id="output"></div>
+      <button class="btn" onclick="downloadFile()">Download Converted File</button>
+    </div>
+  </div>
+
+  <script>
+    let fileContent = '';
+
+    document.getElementById('fileInput').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        fileContent = e.target.result;
+      };
+
+      reader.readAsText(file);
+    });
+
+    function convertFile() {
+      const format = document.getElementById('formatSelect').value;
+      let output = '';
+      
+      // Conversion Logic
+      if (format === 'plain') {
+        output = fileContent;
+      } else if (format === 'base64') {
+        output = btoa(fileContent);
+      } else if (format === 'json') {
+        try {
+          output = JSON.stringify(JSON.parse(fileContent), null, 2);
+        } catch (error) {
+          output = 'Invalid JSON content';
+        }
+      }
+
+      document.getElementById('output').textContent = output;
+      document.getElementById('result').style.display = 'block';
+    }
+
+    function downloadFile() {
+      const format = document.getElementById('formatSelect').value;
+      let blob = null;
+      let fileName = '';
+
+      if (format === 'plain') {
+        blob = new Blob([fileContent], { type: 'text/plain' });
+        fileName = 'converted.txt';
+      } else if (format === 'base64') {
+        blob = new Blob([btoa(fileContent)], { type: 'text/plain' });
+        fileName = 'converted_base64.txt';
+      } else if (format === 'json') {
+        try {
+          const jsonContent = JSON.stringify(JSON.parse(fileContent), null, 2);
+          blob = new Blob([jsonContent], { type: 'application/json' });
+          fileName = 'converted.json';
+        } catch (error) {
+          alert('Error converting to JSON');
+          return;
+        }
+      }
+
+      // Create a link to download the file
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName;
+      link.click();
+    }
+  </script>
+
+</body>
+</html>
