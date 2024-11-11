@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secret Santa</title>
+    <title>Secret Santa Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <h1>Secret Santa Generator</h1>
@@ -29,102 +37,83 @@
     </div>
 
     <script>
-let participants = [];
+        let participants = [];
 
-document.getElementById("addParticipantButton").addEventListener("click", function () {
-    const nameInput = document.getElementById("participantName");
-    const name = nameInput.value.trim();
-    
-    if (name) {
-        participants.push({ name, assigned: null });
-        updateParticipantsList();
-    }
-    
-    // Clear the input field
-    nameInput.value = "";
-});
+        // Add participant
+        document.getElementById("addParticipantButton").addEventListener("click", function () {
+            const nameInput = document.getElementById("participantName");
+            const name = nameInput.value.trim();
 
-document.getElementById("startButton").addEventListener("click", function () {
-    assignSecretSanta();
-});
-
-function updateParticipantsList() {
-    const participantsList = document.getElementById("participantsList");
-    participantsList.innerHTML = "";
-    
-    participants.forEach(p => {
-        const li = document.createElement("li");
-        li.textContent = p.name;
-        participantsList.appendChild(li);
-    });
-}
-
-function assignSecretSanta() {
-    const maxAttempts = 10; // Maximum number of shuffling attempts
-    let success = false;
-
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        // Clear previous assignments before each attempt
-        participants.forEach(p => p.assigned = null);
-
-        // Shuffle the participants to randomize assignment
-        const recipients = [...participants].sort(() => Math.random() - 0.5);
-        success = true;
-
-        // Attempt to assign each participant a recipient
-        for (let i = 0; i < participants.length; i++) {
-            const santa = participants[i];
-            const possibleRecipients = recipients.filter(p => 
-                p.name !== santa.name &&  // Cannot assign to themselves
-                p.assigned === null  // Ensure the recipient isn't already assigned
-            );
-
-            if (possibleRecipients.length === 0) {
-                success = false;
-                break; // Stop if we can't find a valid recipient for this Santa
+            if (name) {
+                participants.push({ name, assigned: null });
+                updateParticipantsList();
             }
 
-            // Randomly pick a recipient from the valid choices
-            const recipient = possibleRecipients[Math.floor(Math.random() * possibleRecipients.length)];
-            santa.assigned = recipient.name;
-            recipient.assigned = true; // Mark recipient as assigned
-        }
-
-        if (success) {
-            break; // Exit the loop if all participants are successfully assigned
-        }
-    }
-
-    if (success) {
-        alert("Secret Santa assignments complete!");
-        document.getElementById("setup").classList.add("hidden");
-        document.getElementById("play").classList.remove("hidden");
-
-        // Show the assignments in the play section
-        const assignmentsList = document.getElementById("assignmentsList");
-        assignmentsList.innerHTML = "";
-        
-        participants.forEach(p => {
-            const li = document.createElement("li");
-            li.textContent = `${p.name} → ${p.assigned}`;
-            assignmentsList.appendChild(li);
+            // Clear the input field
+            nameInput.value = "";
         });
-    } else {
-        alert("Could not assign Secret Santas after multiple attempts. Try adjusting the participant list.");
-    }
-}
-        // Reveal assignment based on player name entered
-        function revealAssignment() {
-            const playerName = document.getElementById("playerName").value.trim();
-            const participant = participants.find(p => p.name.toLowerCase() === playerName.toLowerCase());
 
-            if (participant && participant.assigned) {
-                document.getElementById("assignmentResult").textContent = `Hello ${participant.name}, you are assigned to ${participant.assigned}.`;
-            } else {
-                document.getElementById("assignmentResult").textContent = "Name not found or no assignment available.";
+        // Start Secret Santa
+        document.getElementById("startButton").addEventListener("click", function () {
+            assignSecretSanta();
+        });
+
+        // Update participants list on UI
+        function updateParticipantsList() {
+            const participantsList = document.getElementById("participantsList");
+            participantsList.innerHTML = "";
+
+            participants.forEach(p => {
+                const li = document.createElement("li");
+                li.textContent = p.name;
+                participantsList.appendChild(li);
+            });
+        }
+
+        // Assign Secret Santa
+        function assignSecretSanta() {
+            let success = false;
+
+            // Continue trying until assignments succeed
+            while (!success) {
+                // Clear previous assignments before each attempt
+                participants.forEach(p => p.assigned = null);
+
+                // Shuffle the participants to randomize assignment
+                const shuffledParticipants = [...participants].sort(() => Math.random() - 0.5);
+                success = true;
+
+                // Attempt to assign each participant a recipient
+                for (let i = 0; i < participants.length; i++) {
+                    const santa = participants[i];
+                    const recipient = shuffledParticipants[i];
+
+                    // Ensure no one is assigned to themselves
+                    if (santa.name === recipient.name) {
+                        success = false;
+                        break; // Restart if a participant is assigned to themselves
+                    }
+
+                    // Assign the recipient to the Santa
+                    santa.assigned = recipient.name;
+                }
             }
+
+            // If the assignment was successful, display the results
+            alert("Secret Santa assignments complete!");
+            document.getElementById("setup").classList.add("hidden");
+            document.getElementById("play").classList.remove("hidden");
+
+            // Show the assignments in the play section
+            const assignmentsList = document.getElementById("assignmentsList");
+            assignmentsList.innerHTML = "";
+
+            participants.forEach(p => {
+                const li = document.createElement("li");
+                li.textContent = `${p.name} → ${p.assigned}`;
+                assignmentsList.appendChild(li);
+            });
         }
     </script>
-
 </body>
 </html>
