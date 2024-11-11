@@ -49,41 +49,49 @@
 
         // Shuffle and assign Secret Santas
 function assignSecretSanta() {
-    // Clear previous assignments
-    participants.forEach(p => p.assigned = null);
-    
-    // Create a shuffled list of participants to assign as recipients
-    const recipients = [...participants].sort(() => Math.random() - 0.5);
-    
-    // Loop over each participant to assign them a Secret Santa
-    for (let i = 0; i < participants.length; i++) {
-        const santa = participants[i];
+    const maxAttempts = 10; // Maximum number of shuffling attempts
+    let success = false;
 
-        // Find a recipient who is not the same person and is not their partner
-        let possibleRecipients = recipients.filter(p => 
-            p.name !== santa.name && 
-            p.name !== santa.partner && 
-            p.assigned === null
-        );
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        // Clear previous assignments before each attempt
+        participants.forEach(p => p.assigned = null);
 
-        if (possibleRecipients.length === 0) {
-            // If no valid recipient, re-run the function to try again
-            alert("Unable to assign Secret Santa without conflicts. Trying again.");
-            assignSecretSanta();
-            return;
+        // Shuffle the participants list to randomize assignments
+        const recipients = [...participants].sort(() => Math.random() - 0.5);
+        success = true;
+
+        // Attempt to assign each participant a recipient
+        for (let i = 0; i < participants.length; i++) {
+            const santa = participants[i];
+            const possibleRecipients = recipients.filter(p => 
+                p.name !== santa.name && 
+                p.name !== santa.partner && 
+                p.assigned === null
+            );
+
+            if (possibleRecipients.length === 0) {
+                success = false;
+                break; // Stop if we can't find a valid recipient for this Santa
+            }
+
+            // Select a recipient randomly from the valid choices
+            const recipient = possibleRecipients[Math.floor(Math.random() * possibleRecipients.length)];
+            santa.assigned = recipient.name;
+            recipient.assigned = true; // Mark the recipient as assigned
         }
 
-        // Select a random recipient from the possible ones
-        const recipient = possibleRecipients[Math.floor(Math.random() * possibleRecipients.length)];
-        santa.assigned = recipient.name;
-
-        // Mark the recipient as "assigned" by giving them a temporary property
-        recipient.assigned = true;
+        if (success) {
+            break; // Exit the loop if assignments were successful
+        }
     }
 
-    alert("Secret Santa assignments complete!");
-    document.getElementById("setup").classList.add("hidden");
-    document.getElementById("play").classList.remove("hidden");
+    if (success) {
+        alert("Secret Santa assignments complete!");
+        document.getElementById("setup").classList.add("hidden");
+        document.getElementById("play").classList.remove("hidden");
+    } else {
+        alert("Could not assign Secret Santas without pairing issues after multiple attempts. Try adjusting the participant list or constraints.");
+    }
 }
         // Reveal assignment based on player name entered
         function revealAssignment() {
