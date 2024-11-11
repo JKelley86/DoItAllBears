@@ -2,31 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secret Santa</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .hidden { display: none; }
-        .form-group { margin-bottom: 10px; }
-    </style>
 </head>
 <body>
+    <h1>Secret Santa Generator</h1>
 
-    <h1>Secret Santa Setup</h1>
-
+    <!-- Form to add participants -->
     <div id="setup">
         <h2>Enter Participants</h2>
-        <div id="participants"></div>
-        <button onclick="addParticipant()">Add Participant</button>
-        <button onclick="assignSecretSanta()">Assign Secret Santa</button>
+        <form id="participantsForm">
+            <input type="text" id="participantName" placeholder="Enter participant name" required>
+            <button type="button" id="addParticipantButton">Add Participant</button>
+        </form>
+
+        <h3>Participants List:</h3>
+        <ul id="participantsList"></ul>
+
+        <button type="button" id="startButton">Start Secret Santa</button>
     </div>
 
+    <!-- Display Secret Santa assignments -->
     <div id="play" class="hidden">
-        <h2>Check Assignment</h2>
-        <p>Enter your name to see your assigned Secret Santa recipient:</p>
-        <input type="text" id="playerName" placeholder="Enter your name">
-        <button onclick="revealAssignment()">See Assignment</button>
-        <p id="assignmentResult"></p>
+        <h2>Assignments:</h2>
+        <ul id="assignmentsList"></ul>
     </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
 
     <script>
 let participants = [];
