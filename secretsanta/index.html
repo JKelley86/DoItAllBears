@@ -16,11 +16,12 @@
 <body>
     <h1>Secret Santa Generator</h1>
 
-    <!-- Form to add participants -->
+    <!-- Form to add participants and partners -->
     <div id="setup">
         <h2>Enter Participants</h2>
         <form id="participantsForm">
             <input type="text" id="participantName" placeholder="Enter participant name" required>
+            <input type="text" id="partnerName" placeholder="Enter partner's name (optional)">
             <button type="button" id="addParticipantButton">Add Participant</button>
         </form>
 
@@ -39,18 +40,22 @@
     <script>
         let participants = [];
 
-        // Add participant
+        // Add participant with optional partner
         document.getElementById("addParticipantButton").addEventListener("click", function () {
             const nameInput = document.getElementById("participantName");
+            const partnerInput = document.getElementById("partnerName");
+
             const name = nameInput.value.trim();
+            const partner = partnerInput.value.trim();
 
             if (name) {
-                participants.push({ name, assigned: null });
+                participants.push({ name, partner: partner || null, assigned: null });
                 updateParticipantsList();
             }
 
-            // Clear the input field
+            // Clear the input fields
             nameInput.value = "";
+            partnerInput.value = "";
         });
 
         // Start Secret Santa
@@ -65,12 +70,12 @@
 
             participants.forEach(p => {
                 const li = document.createElement("li");
-                li.textContent = p.name;
+                li.textContent = `${p.name} (Partner: ${p.partner || 'None'})`;
                 participantsList.appendChild(li);
             });
         }
 
-        // Assign Secret Santa
+        // Assign Secret Santa while avoiding partners
         function assignSecretSanta() {
             let success = false;
 
@@ -88,10 +93,10 @@
                     const santa = participants[i];
                     const recipient = shuffledParticipants[i];
 
-                    // Ensure no one is assigned to themselves
-                    if (santa.name === recipient.name) {
+                    // Ensure no one is assigned to themselves or their partner
+                    if (santa.name === recipient.name || santa.partner === recipient.name) {
                         success = false;
-                        break; // Restart if a participant is assigned to themselves
+                        break; // Restart if a participant is assigned to themselves or their partner
                     }
 
                     // Assign the recipient to the Santa
