@@ -163,6 +163,7 @@
 
     <script>
         let participants = [];
+        let assignments = [];
 
         // Add participant with optional partner
         document.getElementById("addParticipantButton").addEventListener("click", function () {
@@ -239,11 +240,13 @@
             document.getElementById("setup").classList.add("hidden");
             document.getElementById("play").classList.remove("hidden");
 
-            // Hide the assignments list for secrecy
-            document.getElementById("assignmentsList").classList.add("hidden");
-
             // Show the button to view individual assignment
             document.getElementById("viewAssignmentButton").classList.remove("hidden");
+
+            // Populate assignments list for secrecy (hidden until user enters name)
+            assignments = participants.map(p => `${p.name} is assigned to ${p.assigned}`);
+            const assignmentsList = document.getElementById("assignmentsList");
+            assignmentsList.innerHTML = "";
         }
 
         // Show assigned person based on entered name
