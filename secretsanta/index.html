@@ -34,7 +34,7 @@
     <!-- Display Secret Santa assignments -->
     <div id="play" class="hidden">
         <h2>Assignments:</h2>
-        <ul id="assignmentsList"></ul>
+        <div id="assignmentsList" class="hidden"></div>
 
         <h3>Find Out Who You're Assigned To</h3>
         <input type="text" id="viewerName" placeholder="Enter your name to see your assignment">
@@ -124,15 +124,11 @@
             document.getElementById("setup").classList.add("hidden");
             document.getElementById("play").classList.remove("hidden");
 
-            // Show the assignments in the play section
-            const assignmentsList = document.getElementById("assignmentsList");
-            assignmentsList.innerHTML = "";
+            // Hide the assignments list for secrecy
+            document.getElementById("assignmentsList").classList.add("hidden");
 
-            participants.forEach(p => {
-                const li = document.createElement("li");
-                li.textContent = `${p.name} → ${p.assigned}`;
-                assignmentsList.appendChild(li);
-            });
+            // Show the button to view individual assignment
+            document.getElementById("viewAssignmentButton").classList.remove("hidden");
         }
 
         // Show assigned person based on entered name
