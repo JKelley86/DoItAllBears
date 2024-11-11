@@ -48,29 +48,43 @@
         }
 
         // Shuffle and assign Secret Santas
-        function assignSecretSanta() {
-            // Clear previous assignments
-            participants.forEach(p => p.assigned = null);
-            const shuffled = [...participants].sort(() => Math.random() - 0.5);
+function assignSecretSanta() {
+    // Clear previous assignments
+    participants.forEach(p => p.assigned = null);
+    
+    // Create a shuffled list of participants to assign as recipients
+    const recipients = [...participants].sort(() => Math.random() - 0.5);
+    
+    // Loop over each participant to assign them a Secret Santa
+    for (let i = 0; i < participants.length; i++) {
+        const santa = participants[i];
 
-            for (let i = 0; i < participants.length; i++) {
-                const santa = participants[i];
-                let recipient = shuffled.find(p => p !== santa && p.name !== santa.partner && p.assigned === null);
+        // Find a recipient who is not the same person and is not their partner
+        let possibleRecipients = recipients.filter(p => 
+            p.name !== santa.name && 
+            p.name !== santa.partner && 
+            p.assigned === null
+        );
 
-                if (!recipient) {
-                    alert("Could not assign Secret Santas without pairing issues. Try again.");
-                    return;
-                }
-
-                santa.assigned = recipient.name;
-                recipient.assigned = santa.name; // To mark recipient as "taken"
-            }
-
-            alert("Secret Santa assignments complete!");
-            document.getElementById("setup").classList.add("hidden");
-            document.getElementById("play").classList.remove("hidden");
+        if (possibleRecipients.length === 0) {
+            // If no valid recipient, re-run the function to try again
+            alert("Unable to assign Secret Santa without conflicts. Trying again.");
+            assignSecretSanta();
+            return;
         }
 
+        // Select a random recipient from the possible ones
+        const recipient = possibleRecipients[Math.floor(Math.random() * possibleRecipients.length)];
+        santa.assigned = recipient.name;
+
+        // Mark the recipient as "assigned" by giving them a temporary property
+        recipient.assigned = true;
+    }
+
+    alert("Secret Santa assignments complete!");
+    document.getElementById("setup").classList.add("hidden");
+    document.getElementById("play").classList.remove("hidden");
+}
         // Reveal assignment based on player name entered
         function revealAssignment() {
             const playerName = document.getElementById("playerName").value.trim();
