@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Tic-Tac-Toe AI</title>
-    <link rel="stylesheet" href="../styles.css">
     <style>
         body {
             display: flex;
@@ -39,7 +38,7 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            color: #000; /* Text color set to black */
+            color: #000;
         }
 
         .cell.disabled {
@@ -59,9 +58,6 @@
         }
     </style>
 </head>
-    <nav>
-        <div id="navbar"></div>
-    </nav>
 <body>
     <div class="container">
         <h1>Tic-Tac-Toe AI</h1>
@@ -127,12 +123,57 @@
         }
 
         function aiMove() {
-            let emptyCells = board
+            const bestMove = minimax(board, 'O').index;
+            makeMove(bestMove);
+        }
+
+        function minimax(newBoard, player) {
+            const emptyCells = newBoard
                 .map((cell, index) => (cell === '' ? index : null))
                 .filter((index) => index !== null);
 
-            let move = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-            makeMove(move);
+            const winner = checkWinner();
+            if (winner === 'X') return { score: -10 };
+            if (winner === 'O') return { score: 10 };
+            if (emptyCells.length === 0) return { score: 0 };
+
+            const moves = [];
+            for (const cell of emptyCells) {
+                const move = {};
+                move.index = cell;
+                newBoard[cell] = player;
+
+                if (player === 'O') {
+                    const result = minimax(newBoard, 'X');
+                    move.score = result.score;
+                } else {
+                    const result = minimax(newBoard, 'O');
+                    move.score = result.score;
+                }
+
+                newBoard[cell] = '';
+                moves.push(move);
+            }
+
+            let bestMove;
+            if (player === 'O') {
+                let bestScore = -Infinity;
+                for (const move of moves) {
+                    if (move.score > bestScore) {
+                        bestScore = move.score;
+                        bestMove = move;
+                    }
+                }
+            } else {
+                let bestScore = Infinity;
+                for (const move of moves) {
+                    if (move.score < bestScore) {
+                        bestScore = move.score;
+                        bestMove = move;
+                    }
+                }
+            }
+            return bestMove;
         }
 
         function endGame(winner) {
@@ -158,12 +199,5 @@
 
         resetButton.addEventListener('click', resetGame);
     </script>
-    <script>
-    fetch('navbar.html')
-    .then(response => response.text())
-    .then(data => {
-        document.getElementById('navbar').innerHTML = data;
-    });
-</script>
 </body>
 </html>
