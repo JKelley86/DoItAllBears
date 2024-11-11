@@ -56,17 +56,17 @@ function assignSecretSanta() {
         // Clear previous assignments before each attempt
         participants.forEach(p => p.assigned = null);
 
-        // Shuffle the participants list to randomize assignments
+        // Shuffle the recipients to randomize assignment
         const recipients = [...participants].sort(() => Math.random() - 0.5);
         success = true;
 
         // Attempt to assign each participant a recipient
         for (let i = 0; i < participants.length; i++) {
             const santa = participants[i];
-            const possibleRecipients = recipients.filter(p => 
-                p.name !== santa.name && 
-                p.name !== santa.partner && 
-                p.assigned === null
+            const possibleRecipients = recipients.filter(p =>
+                p.name !== santa.name &&  // Cannot assign to themselves
+                p.name !== santa.partner &&  // Cannot assign to their significant other
+                p.assigned === null  // Ensure the recipient isn't already assigned
             );
 
             if (possibleRecipients.length === 0) {
@@ -74,14 +74,14 @@ function assignSecretSanta() {
                 break; // Stop if we can't find a valid recipient for this Santa
             }
 
-            // Select a recipient randomly from the valid choices
+            // Randomly pick a recipient from the valid choices
             const recipient = possibleRecipients[Math.floor(Math.random() * possibleRecipients.length)];
             santa.assigned = recipient.name;
-            recipient.assigned = true; // Mark the recipient as assigned
+            recipient.assigned = true; // Mark recipient as assigned
         }
 
         if (success) {
-            break; // Exit the loop if assignments were successful
+            break; // Exit the loop if all participants are successfully assigned
         }
     }
 
