@@ -1,1 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Secret Santa</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Secret Santa</h1>
+    <form id="participantForm">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" required>
+        </div>
+        <div class="form-group">
+            <label for="phone">Phone Number:</label>
+            <input type="tel" class="form-control" id="phone" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Participant</button>
+    </form>
+    <button class="btn btn-success mt-3" onclick="startSecretSanta()">Start Secret Santa</button>
+    <ul id="participantsList" class="list-group mt-3"></ul>
+</div>
+
+<script>
+    // Firebase config (replace with your Firebase project details)
+    const firebaseConfig = {
+        apiKey: "AIzaSyBFRv7jXQ0dlJb_ngkKcLxbaYm86-pJzzo",
+        authDomain: "secret-santa-130a4.firebaseapp.com",
+        projectId: "secret-santa-130a4",
+        storageBucket: "secret-santa-130a4.firebasestorage.app",
+        messagingSenderId: "1052215402422",
+        appId: "1:1052215402422:web:3c97432651891c5a76ab17"
+    };
+    // Twilio Recovery Code "L8R7K3MRUAPAPDP4SQ8RZN35"
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Function to add participant
+    document.getElementById('participantForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        
+        await db.collection('participants').add({ name, phone });
+        alert('Participant added!');
+        document.getElementById('participantForm').reset();
+        loadParticipants();
+    });
+
+    // Function to load participants
+    async function loadParticipants() {
+        const list = document.getElementById('participantsList');
+        list.innerHTML = '';
+        const snapshot = await db.collection('participants').get();
+        snapshot.forEach(doc => {
+            const participant = doc.data();
+            const li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.textContent = `${participant.name} (${participant.phone})`;
+            list.appendChild(li);
+        });
+    }
+
+    // Function to start Secret Santa
+    async function startSecretSanta() {
+        const participants = [];
+        const snapshot = await db.collection('participants').get();
+        snapshot.forEach(doc => participants.push(doc.data()));
+
+        if (participants.length < 2) {
+            alert("At least two participants are required.");
+            return;
+        }
+
+        // Shuffle participants and create pairs
+        participants.sort(() => Math.random() - 0.5);
+        for (let i = 0; i < participants.length; i++) {
+            const santa = participants[i];
+            const giftee = participants[(i + 1) % participants.length];
+            sendSMS(santa.phone, `Hello ${santa.name}, you are the Secret Santa for ${giftee.name}!`);
+        }
+
+        alert("Secret Santa assignments sent!");
+    }
+
+    // Function to send SMS using Twilio Function
+    async function sendSMS(to, message) {
+        const response = await fetch('YOUR_TWILIO_FUNCTION_URL', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ to, message })
+        });
+        if (!response.ok) {
+            console.error("Error sending SMS:", response.statusText);
+        }
+    }
+
+    // Load participants on page load
+    loadParticipants();
+</script>
+</body>
+</html>
 
