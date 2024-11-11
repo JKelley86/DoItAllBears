@@ -35,6 +35,15 @@
     <div id="play" class="hidden">
         <h2>Assignments:</h2>
         <ul id="assignmentsList"></ul>
+
+        <h3>Find Out Who You're Assigned To</h3>
+        <input type="text" id="viewerName" placeholder="Enter your name to see your assignment">
+        <button type="button" id="viewAssignmentButton">View Assignment</button>
+
+        <div id="assignedPerson" class="hidden">
+            <h4>You're assigned to: <span id="assignedName"></span></h4>
+            <button type="button" id="backButton">Back</button>
+        </div>
     </div>
 
     <script>
@@ -125,6 +134,26 @@
                 assignmentsList.appendChild(li);
             });
         }
+
+        // Show assigned person based on entered name
+        document.getElementById("viewAssignmentButton").addEventListener("click", function () {
+            const viewerName = document.getElementById("viewerName").value.trim();
+
+            const participant = participants.find(p => p.name === viewerName);
+            if (participant) {
+                // Show assigned person
+                document.getElementById("assignedName").textContent = participant.assigned;
+                document.getElementById("assignedPerson").classList.remove("hidden");
+            } else {
+                alert("Name not found, please try again.");
+            }
+        });
+
+        // Back button functionality
+        document.getElementById("backButton").addEventListener("click", function () {
+            document.getElementById("assignedPerson").classList.add("hidden");
+            document.getElementById("viewerName").value = "";  // Clear the input
+        });
     </script>
 </body>
 </html>
