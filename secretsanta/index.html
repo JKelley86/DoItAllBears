@@ -29,25 +29,36 @@
     </div>
 
     <script>
-        let participants = [];
+let participants = [];
 
-        // Add participant and optional significant other
-        function addParticipant() {
-            const name = prompt("Enter participant's name:");
-            if (!name) return;
+document.getElementById("addParticipantButton").addEventListener("click", function () {
+    const nameInput = document.getElementById("participantName");
+    const name = nameInput.value.trim();
+    
+    if (name) {
+        participants.push({ name, assigned: null });
+        updateParticipantsList();
+    }
+    
+    // Clear the input field
+    nameInput.value = "";
+});
 
-            const partner = prompt(`Enter ${name}'s significant other (leave blank if none):`);
-            participants.push({ name, partner, assigned: null });
-            renderParticipants();
-        }
+document.getElementById("startButton").addEventListener("click", function () {
+    assignSecretSanta();
+});
 
-        // Display participants and their partners
-        function renderParticipants() {
-            const list = document.getElementById('participants');
-            list.innerHTML = participants.map(p => `<div>${p.name} ${p.partner ? `(Partner: ${p.partner})` : ''}</div>`).join('');
-        }
+function updateParticipantsList() {
+    const participantsList = document.getElementById("participantsList");
+    participantsList.innerHTML = "";
+    
+    participants.forEach(p => {
+        const li = document.createElement("li");
+        li.textContent = p.name;
+        participantsList.appendChild(li);
+    });
+}
 
-        // Shuffle and assign Secret Santas
 function assignSecretSanta() {
     const maxAttempts = 10; // Maximum number of shuffling attempts
     let success = false;
@@ -63,11 +74,8 @@ function assignSecretSanta() {
         // Attempt to assign each participant a recipient
         for (let i = 0; i < participants.length; i++) {
             const santa = participants[i];
-
-            // If no partner, don't check for partner constraints
             const possibleRecipients = recipients.filter(p => 
                 p.name !== santa.name &&  // Cannot assign to themselves
-                (!santa.partner || p.name !== santa.partner) &&  // If partner exists, exclude partner
                 p.assigned === null  // Ensure the recipient isn't already assigned
             );
 
@@ -91,8 +99,18 @@ function assignSecretSanta() {
         alert("Secret Santa assignments complete!");
         document.getElementById("setup").classList.add("hidden");
         document.getElementById("play").classList.remove("hidden");
+
+        // Show the assignments in the play section
+        const assignmentsList = document.getElementById("assignmentsList");
+        assignmentsList.innerHTML = "";
+        
+        participants.forEach(p => {
+            const li = document.createElement("li");
+            li.textContent = `${p.name} → ${p.assigned}`;
+            assignmentsList.appendChild(li);
+        });
     } else {
-        alert("Could not assign Secret Santas without pairing issues after multiple attempts. Try adjusting the participant list or constraints.");
+        alert("Could not assign Secret Santas after multiple attempts. Try adjusting the participant list.");
     }
 }
         // Reveal assignment based on player name entered
