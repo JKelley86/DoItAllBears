@@ -2,68 +2,208 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Music Search</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spotify Genre & Song Search</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #222;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    h1 {
+      color: #1DB954;
+    }
+
+    .search-box {
+      margin: 20px 0;
+    }
+
+    .input-field {
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      margin-right: 10px;
+      background-color: #333;
+      color: white;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border: 2px solid #1DB954;
+    }
+
+    button {
+      padding: 10px 15px;
+      background-color: #1DB954;
+      border: none;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1ed760;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #333;
+      border-radius: 4px;
+    }
+
+    .error-message {
+      color: red;
+    }
+  </style>
 </head>
 <body>
-  <h1>Music Search</h1>
-  <input id="searchInput" type="text" placeholder="Enter genre or song name">
-  <button onclick="searchMusic()">Search</button>
-  <div id="results"></div>
 
+  <div class="container">
+    <h1>Spotify Genre & Song Search</h1>
+    <div id="login" style="display: none;">
+      <button id="loginButton">Login to Spotify</button>
+    </div>
+    
+    <div id="searchBox">
+      <div class="search-box">
+        <input type="text" id="genreInput" class="input-field" placeholder="Enter Genre (e.g., rock, pop)" />
+        <button id="searchGenreButton">Search Top Songs by Genre</button>
+      </div>
+      <div class="search-box">
+        <input type="text" id="songInput" class="input-field" placeholder="Enter Song Name" />
+        <button id="searchSongButton">Search Similar Songs</button>
+      </div>
+    </div>
+
+    <div id="searchResults"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/spotify-web-api-js"></script>
   <script>
-    const accessToken = '63c344ed973e43959100ba9a9293c8f2'; // Replace with your Spotify API access token
+    const config = {
+      spotifyClientId: '7b870f29a9d64f74b2ec49025d030b0a',
+      spotifyRedirectUri: 'https://jkelley86.github.io/Calculations/useful/song.html',
+    };
 
-    async function searchMusic() {
-      const query = document.getElementById('searchInput').value.trim();
-      
-      if (!query) {
-        document.getElementById('results').innerText = 'Please enter a genre or song name.';
+    const spotifyApi = new SpotifyWebApi();
+    let accessToken = null;
+
+    function getHashParams() {
+      const hashParams = {};
+      let e, r = /([^&;=]+)=?([^&]*)/g, q = window.location.hash.substring(1);
+      while (e = r.exec(q)) {
+        hashParams[e[1]] = decodeURIComponent(e[2]);
+      }
+      return hashParams;
+    }
+
+    const params = getHashParams();
+    accessToken = params.access_token;
+
+    if (!accessToken) {
+      document.getElementById('login').style.display = 'block';
+      document.getElementById('loginButton').onclick = () => {
+        const url = `https://accounts.spotify.com/authorize?client_id=${config.spotifyClientId}&response_type=token&redirect_uri=${encodeURIComponent(config.spotifyRedirectUri)}&scope=playlist-modify-public playlist-modify-private`;
+        window.location = url;
+      };
+    } else {
+      spotifyApi.setAccessToken(accessToken);
+      document.getElementById('login').style.display = 'none';
+    }
+
+    document.getElementById('searchGenreButton').onclick = () => {
+      const genre = document.getElementById('genreInput').value;
+      searchByGenre(genre);
+    };
+
+    document.getElementById('searchSongButton').onclick = () => {
+      const song = document.getElementById('songInput').value;
+      searchSimilarSongs(song);
+    };
+
+    function searchByGenre(genre) {
+      fetch(`https://api.spotify.com/v1/search?q=genre:${encodeURIComponent(genre)}&type=track&limit=50`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      })
+      .then(response => response.json())
+      .then(data => displaySearchResults(data.tracks.items))
+      .catch(error => {
+        console.error('Error searching for genre:', error);
+        displayError('Error searching for genre. Please try again.');
+      });
+    }
+
+    function searchSimilarSongs(songName) {
+      fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(songName)}&type=track&limit=1`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        const track = data.tracks.items[0];
+        if (track) {
+          fetch(`https://api.spotify.com/v1/audio-features/${track.id}`, {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
+            }
+          })
+          .then(response => response.json())
+          .then(audioFeatures => {
+            const { tempo, key, danceability } = audioFeatures;
+            fetch(`https://api.spotify.com/v1/recommendations?seed_tracks=${track.id}&target_tempo=${tempo}&target_key=${key}&target_danceability=${danceability}&limit=20`, {
+              headers: {
+                'Authorization': `Bearer ${accessToken}`
+              }
+            })
+            .then(response => response.json())
+            .then(data => displaySearchResults(data.tracks))
+            .catch(error => console.error('Error fetching similar songs:', error));
+          });
+        } else {
+          displayError('No song found with that name.');
+        }
+      })
+      .catch(error => {
+        console.error('Error searching for song:', error);
+        displayError('Error searching for song. Please try again.');
+      });
+    }
+
+    function displaySearchResults(tracks) {
+      const searchResults = document.getElementById('searchResults');
+      if (!tracks || !Array.isArray(tracks) || tracks.length === 0) {
+        searchResults.innerHTML = '<p>No results found.</p>';
         return;
       }
-
-      // Decide if it's a genre or a song
-      if (isGenre(query)) {
-        const songs = await fetchTopSongsByGenre(query);
-        displayResults(songs, `Top 50 songs in the genre: ${query}`);
-      } else {
-        const similarSongs = await fetchSimilarSongs(query);
-        displayResults(similarSongs, `Top 20 songs similar to: ${query}`);
-      }
+      searchResults.innerHTML = '<ul>' + 
+        tracks.map(track => `<li>${track.name} by ${track.artists.map(artist => artist.name).join(', ')}</li>`).join('') + 
+        '</ul>';
     }
 
-    function isGenre(query) {
-      // Basic logic to decide if it's a genre or song - refine as needed
-      const commonGenres = ['pop', 'rock', 'hip-hop', 'jazz', 'classical']; // Add more genres here
-      return commonGenres.includes(query.toLowerCase());
-    }
-
-    async function fetchTopSongsByGenre(genre) {
-      const response = await fetch(`https://api.spotify.com/v1/search?q=genre:%22${encodeURIComponent(genre)}%22&type=track&limit=50`, {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      });
-      const data = await response.json();
-      return data.tracks.items;
-    }
-
-    async function fetchSimilarSongs(songName) {
-      const searchResponse = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(songName)}&type=track&limit=1`, {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      });
-      const searchData = await searchResponse.json();
-      if (!searchData.tracks.items.length) return [];
-
-      const songId = searchData.tracks.items[0].id;
-
-      const recommendationsResponse = await fetch(`https://api.spotify.com/v1/recommendations?seed_tracks=${songId}&limit=20`, {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      });
-      const recommendationsData = await recommendationsResponse.json();
-      return recommendationsData.tracks;
-    }
-
-    function displayResults(songs, header) {
-      const resultsDiv = document.getElementById('results');
-      resultsDiv.innerHTML = `<h2>${header}</h2><ul>` + songs.map(song => `<li>${song.name} by ${song.artists.map(artist => artist.name).join(', ')}</li>`).join('') + '</ul>';
+    function displayError(message) {
+      const searchResults = document.getElementById('searchResults');
+      searchResults.innerHTML = `<p class="error-message">${message}</p>`;
     }
   </script>
 </body>
