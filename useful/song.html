@@ -188,30 +188,30 @@
         if (genre) searchGenre(genre);
     };
 
-    function searchGenre(genre) {
-        fetch(`https://api.spotify.com/v1/browse/categories/${encodeURIComponent(genre)}/playlists?country=US`, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch genre data.');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.playlists.items.length > 0) {
-                displaySearchResults(data.playlists.items); // Display playlists from the genre
-            } else {
-                searchResults.innerHTML = 'No playlists found for this genre.';
-            }
-        })
-        .catch(error => {
-            console.error('Error searching genre:', error);
-            searchResults.innerHTML = 'Error searching genre. Please try again later.';
-        });
-    }
+function searchGenre(genre) {
+    fetch(`https://api.spotify.com/v1/recommendations?limit=10&seed_genres=${encodeURIComponent(genre)}`, {
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to fetch genre data.');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.tracks && data.tracks.length > 0) {
+            displaySearchResults(data.tracks); // Display tracks from the genre
+        } else {
+            searchResults.innerHTML = 'No tracks found for this genre.';
+        }
+    })
+    .catch(error => {
+        console.error('Error searching genre:', error);
+        searchResults.innerHTML = 'Error searching genre. Please try again later.';
+    });
+}
 
     // Display the search results with links to open in Spotify
     function displaySearchResults(items) {
