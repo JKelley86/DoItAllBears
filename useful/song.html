@@ -33,7 +33,9 @@
         }
 
         #songInput,
-        #searchButton {
+        #searchButton,
+        #genreInput,
+        #genreButton {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
@@ -50,6 +52,21 @@
 
         #searchButton:hover {
             background-color: #1AA34A;
+        }
+
+        #genreButton {
+            background-color: #1DB954;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #genreButton:hover {
+            background-color: #1AA34A;
+        }
+
+        #searchResults {
+            margin-top: 20px;
         }
 
         ul {
@@ -90,8 +107,14 @@
 
 <div class="container">
     <h1>Spotify Music Search</h1>
+    <!-- Song search input -->
     <input type="text" id="songInput" placeholder="Enter song name or artist...">
-    <button id="searchButton">Search</button>
+    <button id="searchButton">Search Song</button>
+
+    <!-- Genre search input -->
+    <input type="text" id="genreInput" placeholder="Enter genre (e.g., Pop, Rock, Jazz...)">
+    <button id="genreButton">Search Genre</button>
+
     <div id="searchResults"></div>
     <button id="login">Log in to Spotify</button>
 </div>
@@ -120,6 +143,7 @@
 
     const loginButton = document.getElementById('login');
     const searchButton = document.getElementById('searchButton');
+    const genreButton = document.getElementById('genreButton');
     const searchResults = document.getElementById('searchResults');
 
     // Show login button if no access token is available
@@ -133,7 +157,7 @@
         loginButton.style.display = 'none';
     }
 
-    // Search function to get tracks by query
+    // Song search function to get tracks by query
     searchButton.onclick = () => {
         const query = document.getElementById('songInput').value;
         if (query) searchSong(query);
@@ -158,13 +182,44 @@
         });
     }
 
+    // Genre search function to get top tracks by genre
+    genreButton.onclick = () => {
+        const genre = document.getElementById('genreInput').value;
+        if (genre) searchGenre(genre);
+    };
+
+    function searchGenre(genre) {
+        fetch(`https://api.spotify.com/v1/browse/categories/${encodeURIComponent(genre)}/playlists?country=US`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch genre data.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.playlists.items.length > 0) {
+                displaySearchResults(data.playlists.items); // Display playlists from the genre
+            } else {
+                searchResults.innerHTML = 'No playlists found for this genre.';
+            }
+        })
+        .catch(error => {
+            console.error('Error searching genre:', error);
+            searchResults.innerHTML = 'Error searching genre. Please try again later.';
+        });
+    }
+
     // Display the search results with links to open in Spotify
-    function displaySearchResults(tracks) {
+    function displaySearchResults(items) {
         searchResults.innerHTML = '<ul>' + 
-            tracks.map(track => `
+            items.map(item => `
                 <li>
-                    <a href="https://open.spotify.com/track/${track.id}" target="_blank">
-                        ${track.name} by ${track.artists.map(artist => artist.name).join(', ')}
+                    <a href="https://open.spotify.com/${item.type}/${item.id}" target="_blank">
+                        ${item.name}
                     </a>
                 </li>`).join('') +
             '</ul>';
