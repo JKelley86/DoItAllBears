@@ -1,210 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spotify Genre & Song Search</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #111;
-      color: white;
-      text-align: center;
-      margin: 0;
-      padding: 20px;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      background-color: #222;
-      padding: 20px;
-      border-radius: 8px;
-    }
-
-    h1 {
-      color: #1DB954;
-    }
-
-    .search-box {
-      margin: 20px 0;
-    }
-
-    .input-field {
-      padding: 10px;
-      border: none;
-      border-radius: 4px;
-      margin-right: 10px;
-      background-color: #333;
-      color: white;
-    }
-
-    .input-field:focus {
-      outline: none;
-      border: 2px solid #1DB954;
-    }
-
-    button {
-      padding: 10px 15px;
-      background-color: #1DB954;
-      border: none;
-      color: white;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #1ed760;
-    }
-
-    ul {
-      list-style-type: none;
-      padding: 0;
-    }
-
-    li {
-      margin: 10px 0;
-      padding: 10px;
-      background-color: #333;
-      border-radius: 4px;
-    }
-
-    .error-message {
-      color: red;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Music Search</title>
+    <style>
+        /* Basic responsive styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #1DB954;
+            color: white;
+        }
+        .container {
+            width: 90%;
+            max-width: 500px;
+            background-color: #2C2C2C;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            text-align: center;
+            color: #1DB954;
+        }
+        #songInput, #searchButton {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        #searchButton {
+            background-color: #1DB954;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        #searchButton:hover {
+            background-color: #1AA34A;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 4px;
+        }
+        a {
+            color: #1DB954;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        #login {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>Spotify Genre & Song Search</h1>
-    <div id="login" style="display: none;">
-      <button id="loginButton">Login to Spotify</button>
-    </div>
-    
-    <div id="searchBox">
-      <div class="search-box">
-        <input type="text" id="genreInput" class="input-field" placeholder="Enter Genre (e.g., rock, pop)" />
-        <button id="searchGenreButton">Search Top Songs by Genre</button>
-      </div>
-      <div class="search-box">
-        <input type="text" id="songInput" class="input-field" placeholder="Enter Song Name" />
-        <button id="searchSongButton">Search Similar Songs</button>
-      </div>
-    </div>
-
+<div class="container">
+    <h1>Spotify Music Search</h1>
+    <input type="text" id="songInput" placeholder="Enter song name or artist...">
+    <button id="searchButton">Search</button>
     <div id="searchResults"></div>
-  </div>
+    <button id="login">Log in to Spotify</button>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/spotify-web-api-js"></script>
-  <script>
+<script>
     const config = {
-      spotifyClientId: '7b870f29a9d64f74b2ec49025d030b0a',
-      spotifyRedirectUri: 'https://jkelley86.github.io/Calculations/useful/song.html',
+        spotifyClientId: '7b870f29a9d64f74b2ec49025d030b0a', // Replace with your Spotify Client ID
+        spotifyRedirectUri: window.location.origin, // Update redirect URI if needed
+        spotifyPlaylistID: 'YOUR_SPOTIFY_PLAYLIST_ID' // Optional, used if you have a specific playlist to fetch
     };
 
-    const spotifyApi = new SpotifyWebApi();
-    let accessToken = null;
+    const scopes = 'user-read-private playlist-modify-public playlist-modify-private';
 
+    // Utility function to parse URL hash for the access token
     function getHashParams() {
-      const hashParams = {};
-      let e, r = /([^&;=]+)=?([^&]*)/g, q = window.location.hash.substring(1);
-      while (e = r.exec(q)) {
-        hashParams[e[1]] = decodeURIComponent(e[2]);
-      }
-      return hashParams;
+        const hashParams = {};
+        let e, r = /([^&;=]+)=?([^&]*)/g,
+            q = window.location.hash.substring(1);
+        while (e = r.exec(q)) {
+            hashParams[e[1]] = decodeURIComponent(e[2]);
+        }
+        return hashParams;
     }
 
     const params = getHashParams();
-    accessToken = params.access_token;
+    const accessToken = params.access_token;
 
+    const loginButton = document.getElementById('login');
+    const searchButton = document.getElementById('searchButton');
+    const searchResults = document.getElementById('searchResults');
+
+    // Show login button if no access token is available
     if (!accessToken) {
-      document.getElementById('login').style.display = 'block';
-      document.getElementById('loginButton').onclick = () => {
-        const url = `https://accounts.spotify.com/authorize?client_id=${config.spotifyClientId}&response_type=token&redirect_uri=${encodeURIComponent(config.spotifyRedirectUri)}&scope=playlist-modify-public playlist-modify-private`;
-        window.location = url;
-      };
+        loginButton.style.display = 'block';
+        loginButton.onclick = () => {
+            const url = `https://accounts.spotify.com/authorize?client_id=${config.spotifyClientId}&response_type=token&redirect_uri=${encodeURIComponent(config.spotifyRedirectUri)}&scope=${encodeURIComponent(scopes)}`;
+            window.location = url;
+        };
     } else {
-      spotifyApi.setAccessToken(accessToken);
-      document.getElementById('login').style.display = 'none';
+        loginButton.style.display = 'none';
     }
 
-    document.getElementById('searchGenreButton').onclick = () => {
-      const genre = document.getElementById('genreInput').value;
-      searchByGenre(genre);
+    // Search function to get tracks by query
+    searchButton.onclick = () => {
+        const query = document.getElementById('songInput').value;
+        if (query) searchSong(query);
     };
 
-    document.getElementById('searchSongButton').onclick = () => {
-      const song = document.getElementById('songInput').value;
-      searchSimilarSongs(song);
-    };
-
-    function searchByGenre(genre) {
-      fetch(`https://api.spotify.com/v1/search?q=genre:${encodeURIComponent(genre)}&type=track&limit=50`, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
-      })
-      .then(response => response.json())
-      .then(data => displaySearchResults(data.tracks.items))
-      .catch(error => {
-        console.error('Error searching for genre:', error);
-        displayError('Error searching for genre. Please try again.');
-      });
-    }
-
-    function searchSimilarSongs(songName) {
-      fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(songName)}&type=track&limit=1`, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        const track = data.tracks.items[0];
-        if (track) {
-          fetch(`https://api.spotify.com/v1/audio-features/${track.id}`, {
+    function searchSong(query) {
+        fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`, {
             headers: {
-              'Authorization': `Bearer ${accessToken}`
-            }
-          })
-          .then(response => response.json())
-          .then(audioFeatures => {
-            const { tempo, key, danceability } = audioFeatures;
-            fetch(`https://api.spotify.com/v1/recommendations?seed_tracks=${track.id}&target_tempo=${tempo}&target_key=${key}&target_danceability=${danceability}&limit=20`, {
-              headers: {
                 'Authorization': `Bearer ${accessToken}`
-              }
-            })
-            .then(response => response.json())
-            .then(data => displaySearchResults(data.tracks))
-            .catch(error => console.error('Error fetching similar songs:', error));
-          });
-        } else {
-          displayError('No song found with that name.');
-        }
-      })
-      .catch(error => {
-        console.error('Error searching for song:', error);
-        displayError('Error searching for song. Please try again.');
-      });
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to search Spotify.');
+            }
+            return response.json();
+        })
+        .then(data => displaySearchResults(data.tracks.items))
+        .catch(error => {
+            console.error('Error searching song:', error);
+            searchResults.innerHTML = 'Error searching song. Please try again later.';
+        });
     }
 
+    // Display the search results with links to open in Spotify
     function displaySearchResults(tracks) {
-      const searchResults = document.getElementById('searchResults');
-      if (!tracks || !Array.isArray(tracks) || tracks.length === 0) {
-        searchResults.innerHTML = '<p>No results found.</p>';
-        return;
-      }
-      searchResults.innerHTML = '<ul>' + 
-        tracks.map(track => `<li>${track.name} by ${track.artists.map(artist => artist.name).join(', ')}</li>`).join('') + 
-        '</ul>';
-    }
-
-    function displayError(message) {
-      const searchResults = document.getElementById('searchResults');
-      searchResults.innerHTML = `<p class="error-message">${message}</p>`;
-    }
-  </script>
-</body>
-</html>
+        searchResults.innerHTML = '<ul>' + 
+            tracks.map(track => `
+                <li>
+                    <a href="https://open.spotify.com/track/${track.id}" target="_blank">
+                        ${track.name} by ${track.artists.map(artist => artist.name).join(', ')}
+                   
