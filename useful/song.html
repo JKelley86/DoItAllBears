@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Music Search</title>
+</head>
+<body>
+  <h1>Music Search</h1>
+  <input id="searchInput" type="text" placeholder="Enter genre or song name">
+  <button onclick="searchMusic()">Search</button>
+  <div id="results"></div>
+
+  <script>
+    const accessToken = '63c344ed973e43959100ba9a9293c8f2'; // Replace with your Spotify API access token
+
+    async function searchMusic() {
+      const query = document.getElementById('searchInput').value.trim();
+      
+      if (!query) {
+        document.getElementById('results').innerText = 'Please enter a genre or song name.';
+        return;
+      }
+
+      // Decide if it's a genre or a song
+      if (isGenre(query)) {
+        const songs = await fetchTopSongsByGenre(query);
+        displayResults(songs, `Top 50 songs in the genre: ${query}`);
+      } else {
+        const similarSongs = await fetchSimilarSongs(query);
+        displayResults(similarSongs, `Top 20 songs similar to: ${query}`);
+      }
+    }
+
+    function isGenre(query) {
+      // Basic logic to decide if it's a genre or song - refine as needed
+      const commonGenres = ['pop', 'rock', 'hip-hop', 'jazz', 'classical']; // Add more genres here
+      return commonGenres.includes(query.toLowerCase());
+    }
+
+    async function fetchTopSongsByGenre(genre) {
+      const response = await fetch(`https://api.spotify.com/v1/search?q=genre:%22${encodeURIComponent(genre)}%22&type=track&limit=50`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      const data = await response.json();
+      return data.tracks.items;
+    }
+
+    async function fetchSimilarSongs(songName) {
+      const searchResponse = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(songName)}&type=track&limit=1`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      const searchData = await searchResponse.json();
+      if (!searchData.tracks.items.length) return [];
+
+      const songId = searchData.tracks.items[0].id;
+
+      const recommendationsResponse = await fetch(`https://api.spotify.com/v1/recommendations?seed_tracks=${songId}&limit=20`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      const recommendationsData = await recommendationsResponse.json();
+      return recommendationsData.tracks;
+    }
+
+    function displayResults(songs, header) {
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = `<h2>${header}</h2><ul>` + songs.map(song => `<li>${song.name} by ${song.artists.map(artist => artist.name).join(', ')}</li>`).join('') + '</ul>';
+    }
+  </script>
+</body>
+</html>
