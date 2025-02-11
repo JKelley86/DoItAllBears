@@ -81,6 +81,7 @@
         <div class="tab" onclick="filterCategory('Dinner')">Dinner</div>
         <div class="tab" onclick="filterCategory('Dessert')">Dessert</div>
         <div class="tab" onclick="filterCategory('Snacks')">Snacks</div>
+        <div class="tab" onclick="filterCategory('All')">All</div> <!-- Add 'All' category -->
     </div>
     <input type="text" class="search" placeholder="Search recipes..." oninput="searchRecipes()">
     <ul class="recipe-list" id="recipe-list"></ul> 
@@ -98,7 +99,7 @@
             { name: "Avocado Fries", category: "Snacks", link: "avocadofries.html" }
         ];
 
-        let currentCategory = "Breakfast";
+        let currentCategory = "All";  // Default category is set to 'All'
 
         function filterCategory(category) {
             currentCategory = category;
@@ -117,8 +118,8 @@
             list.innerHTML = "";
 
             recipes.filter(recipe => 
-                recipe.name.toLowerCase().includes(searchTerm) &&
-                (currentCategory === 'All' || recipe.category === currentCategory)
+                recipe.name.toLowerCase().includes(searchTerm) && 
+                (currentCategory === 'All' || recipe.category === currentCategory)  // No category filter for 'All'
             ).forEach(recipe => {
                 const li = document.createElement('li');
                 const a = document.createElement('a');
@@ -129,7 +130,7 @@
             });
         }
 
-        displayRecipes();
+        displayRecipes();  // Display all recipes by default
     </script> 
 </body>
 </html>
