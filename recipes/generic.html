@@ -11,6 +11,8 @@
             margin: 0;
             padding: 0;
             color: #333;
+            position: relative;
+            padding-bottom: 60px; /* Ensures footer space */
         }
         
         header {
@@ -55,14 +57,12 @@
 
         footer {
             text-align: center;
-            margin-top: 30px;
             padding: 15px;
             background-color: #6c757d;
             color: white;
-            position: fixed;
+            position: absolute;
             width: 100%;
             bottom: 0;
-            left: 0;
         }
 
         footer p {
@@ -70,9 +70,8 @@
             font-size: 18px;
         }
 
-        footer button {
+        button {
             padding: 10px 20px;
-            background-color: #007bff;
             color: white;
             border: none;
             border-radius: 5px;
@@ -80,24 +79,20 @@
             font-size: 16px;
             position: absolute;
             top: 20px;
+        }
+
+        .print-button {
+            background-color: #007bff;
             right: 20px;
         }
 
-        footer button:hover {
-            background-color: #0056b3;
+        .share-button {
+            background-color: #28a745;
+            right: 120px;
         }
 
-        .share-button {
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            position: absolute;
-            top: 20px;
-            right: 120px;
+        button:hover {
+            background-color: #0056b3;
         }
 
         .share-button:hover {
@@ -123,11 +118,18 @@
                 font-size: 16px;
             }
 
-            footer button, .share-button {
+            button {
                 padding: 8px 16px;
                 font-size: 14px;
                 top: 15px;
+            }
+
+            .print-button {
                 right: 15px;
+            }
+
+            .share-button {
+                right: 95px;
             }
         }
     </style>
@@ -136,7 +138,7 @@
 
     <header>
         <h1>Recipe Title</h1>
-        <button onclick="window.print()">Print Recipe</button>
+        <button class="print-button" onclick="window.print()">Print Recipe</button>
         <button class="share-button" onclick="shareRecipe()">Share Recipe</button>
     </header>
 
