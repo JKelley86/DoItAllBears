@@ -4,9 +4,101 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recipe Title</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        
+        header {
+            background-color: #6c757d;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 36px;
+        }
+
+        #recipe-details, #ingredients, #instructions {
+            margin: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #343a40;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        p, ul, ol {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+        }
+
+        ul li, ol li {
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        footer button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        footer button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsive styling for smaller screens */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 28px;
+            }
+
+            #recipe-details, #ingredients, #instructions {
+                margin: 10px;
+                padding: 12px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            p, ul, ol {
+                font-size: 16px;
+            }
+
+            footer button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
 <body>
+
     <header>
         <h1>Recipe Title</h1>
     </header>
@@ -46,5 +138,6 @@
     <footer>
         <button onclick="window.print()">Print Recipe</button>
     </footer>
+
 </body>
 </html>
