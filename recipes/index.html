@@ -12,6 +12,7 @@
             padding: 20px; 
             background-color: #f8f8f8;
             text-align: center;
+            padding-bottom: 60px; /* Add padding to prevent footer overlap */
         }
         h1 {
             color: #333;
@@ -75,7 +76,7 @@
             padding: 15px;
             background-color: #6c757d;
             color: white;
-            position: absolute;
+            position: relative; /* Change to relative */
             width: 100%;
             bottom: 0;
         }
@@ -123,9 +124,11 @@
             const searchTerm = document.querySelector('.search').value.toLowerCase();
             const list = document.getElementById('recipe-list');
             list.innerHTML = "";
+
+            // Updated filter to search across all recipes
             recipes.filter(recipe => 
-                recipe.category === currentCategory && 
-                recipe.name.toLowerCase().includes(searchTerm)
+                recipe.name.toLowerCase().includes(searchTerm) &&
+                (currentCategory === 'All' || recipe.category === currentCategory)
             ).forEach(recipe => {
                 const li = document.createElement('li');
                 const a = document.createElement('a');
