@@ -71,22 +71,6 @@
         .recipe-list a:hover {
             text-decoration: underline;
         }
-        footer {
-            text-align: center;
-            padding: 15px;
-            background-color: #ffffff; /* Match the background of the recipe-list */
-            color: #333; /* Dark text to match the recipe-list */
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-top: 20px;
-            width: calc(100% - 40px); /* Ensures the footer is the same width as content */
-            margin-left: 20px; /* Align with body padding */
-        }
-
-        footer p {
-            margin: 0;
-            font-size: 18px;
-        }
     </style>
 </head>
 <body>
@@ -103,9 +87,13 @@
     <script>
         const recipes = [
             { name: "Pancakes", category: "Breakfast", link: "pancakes.html" },
+            
             { name: "Grilled Cheese", category: "Lunch", link: "grilled_cheese.html" },
+            
             { name: "Spaghetti", category: "Dinner", link: "spaghetti.html" },
+            
             { name: "Chocolate Cake", category: "Dessert", link: "chocolate_cake.html" },
+            
             { name: "Apple Salad", category: "Snacks", link: "applesalad.html" }
         ];
 
@@ -141,9 +129,6 @@
         }
 
         displayRecipes();
-    </script>
-    <footer>
-        <p>&copy; 2024 Bear Book. All rights reserved.</p>
-    </footer>   
+    </script> 
 </body>
 </html>
