@@ -71,32 +71,30 @@
         }
 
         button {
-            padding: 10px 20px;
+            padding: 10px;
             color: white;
             border: none;
-            border-radius: 5px;
+            background-color: transparent;
+            font-size: 24px;
             cursor: pointer;
-            font-size: 16px;
             position: absolute;
             top: 20px;
         }
 
         .print-button {
-            background-color: #007bff;
             right: 20px;
         }
 
         .share-button {
-            background-color: #28a745;
-            right: 120px;
+            right: 60px;
         }
 
         button:hover {
-            background-color: #0056b3;
+            opacity: 0.8;
         }
 
         .share-button:hover {
-            background-color: #218838;
+            opacity: 0.8;
         }
 
         /* Responsive styling for smaller screens */
@@ -119,8 +117,7 @@
             }
 
             button {
-                padding: 8px 16px;
-                font-size: 14px;
+                font-size: 20px;
                 top: 15px;
             }
 
@@ -129,7 +126,32 @@
             }
 
             .share-button {
-                right: 95px;
+                right: 55px;
+            }
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            button {
+                display: none; /* Hide buttons during print */
+            }
+
+            header {
+                background-color: #fff;
+                color: #000;
+            }
+
+            footer {
+                position: relative;
+                text-align: center;
+                padding: 15px;
+                background-color: #fff;
+                color: #000;
             }
         }
     </style>
@@ -138,8 +160,8 @@
 
     <header>
         <h1>Recipe Title</h1>
-        <button class="print-button" onclick="window.print()">Print Recipe</button>
-        <button class="share-button" onclick="shareRecipe()">Share Recipe</button>
+        <button class="print-button" onclick="window.print()">&#128424;</button> <!-- Printer Icon -->
+        <button class="share-button" onclick="shareRecipe()">&#128257;</button> <!-- Share Icon -->
     </header>
 
     <section id="recipe-details">
@@ -175,7 +197,7 @@
     </section>
 
     <footer>
-        <p>&copy; 2024 Bear Book. All Rights Reserved</p>
+        <p>Bear Book</p>
     </footer>
 
     <script>
