@@ -18,6 +18,7 @@
             color: white;
             padding: 20px;
             text-align: center;
+            position: relative;
         }
 
         header h1 {
@@ -55,6 +56,18 @@
         footer {
             text-align: center;
             margin-top: 30px;
+            padding: 15px;
+            background-color: #6c757d;
+            color: white;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            left: 0;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 18px;
         }
 
         footer button {
@@ -65,6 +78,9 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
         }
 
         footer button:hover {
@@ -93,6 +109,8 @@
             footer button {
                 padding: 8px 16px;
                 font-size: 14px;
+                top: 15px;
+                right: 15px;
             }
         }
     </style>
@@ -101,6 +119,7 @@
 
     <header>
         <h1>Recipe Title</h1>
+        <button onclick="window.print()">Print Recipe</button>
     </header>
 
     <section id="recipe-details">
@@ -136,7 +155,7 @@
     </section>
 
     <footer>
-        <button onclick="window.print()">Print Recipe</button>
+        <p>Bear Book</p>
     </footer>
 
 </body>
