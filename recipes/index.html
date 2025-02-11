@@ -74,11 +74,13 @@
         footer {
             text-align: center;
             padding: 15px;
-            background-color: #6c757d;
-            color: white;
-            position: relative; /* Change to relative */
-            width: 100%;
-            bottom: 0;
+            background-color: #ffffff; /* Match the background of the recipe-list */
+            color: #333; /* Dark text to match the recipe-list */
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            width: calc(100% - 40px); /* Ensures the footer is the same width as content */
+            margin-left: 20px; /* Align with body padding */
         }
 
         footer p {
@@ -125,7 +127,6 @@
             const list = document.getElementById('recipe-list');
             list.innerHTML = "";
 
-            // Updated filter to search across all recipes
             recipes.filter(recipe => 
                 recipe.name.toLowerCase().includes(searchTerm) &&
                 (currentCategory === 'All' || recipe.category === currentCategory)
