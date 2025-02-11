@@ -1,1 +1,72 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookbook</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 10px; }
+        .tab { padding: 5px 10px; background: lightgray; cursor: pointer; border-radius: 5px; }
+        .tab.active { background: blue; color: white; }
+        .search { width: 100%; padding: 5px; margin-bottom: 10px; }
+        .recipe-list { list-style: none; padding: 0; }
+        .recipe-list li { margin-bottom: 5px; }
+        .recipe-list a { color: blue; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1>Cookbook</h1>
+    <div class="tabs">
+        <div class="tab active" onclick="filterCategory('Breakfast')">Breakfast</div>
+        <div class="tab" onclick="filterCategory('Lunch')">Lunch</div>
+        <div class="tab" onclick="filterCategory('Dinner')">Dinner</div>
+        <div class="tab" onclick="filterCategory('Dessert')">Dessert</div>
+        <div class="tab" onclick="filterCategory('Snacks')">Snacks</div>
+    </div>
+    <input type="text" class="search" placeholder="Search recipes..." oninput="searchRecipes()">
+    <ul class="recipe-list" id="recipe-list"></ul>
+    
+    <script>
+        const recipes = [
+            { name: "Pancakes", category: "Breakfast", link: "pancakes.html" },
+            { name: "Grilled Cheese", category: "Lunch", link: "grilled_cheese.html" },
+            { name: "Spaghetti", category: "Dinner", link: "spaghetti.html" },
+            { name: "Chocolate Cake", category: "Dessert", link: "chocolate_cake.html" },
+            { name: "Trail Mix", category: "Snacks", link: "trail_mix.html" }
+        ];
+
+        let currentCategory = "Breakfast";
+        function filterCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.tab').forEach(tab => 
+                tab.classList.toggle('active', tab.textContent === category));
+            displayRecipes();
+        }
+
+        function searchRecipes() {
+            displayRecipes();
+        }
+
+        function displayRecipes() {
+            const searchTerm = document.querySelector('.search').value.toLowerCase();
+            const list = document.getElementById('recipe-list');
+            list.innerHTML = "";
+            recipes.filter(recipe => 
+                recipe.category === currentCategory && 
+                recipe.name.toLowerCase().includes(searchTerm)
+            ).forEach(recipe => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = recipe.link;
+                a.textContent = recipe.name;
+                li.appendChild(a);
+                list.appendChild(li);
+            });
+        }
+
+        displayRecipes();
+    </script>
+</body>
+</html>
