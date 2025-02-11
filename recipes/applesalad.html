@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Salad</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        
+        header {
+            background-color: #6c757d;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 36px;
+        }
+
+        #recipe-details, #ingredients, #instructions {
+            margin: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #343a40;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        p, ul, ol {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+        }
+
+        ul li, ol li {
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        footer button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        footer button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsive styling for smaller screens */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 28px;
+            }
+
+            #recipe-details, #ingredients, #instructions {
+                margin: 10px;
+                padding: 12px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            p, ul, ol {
+                font-size: 16px;
+            }
+
+            footer button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Apple Salad</h1>
+    </header>
+
+    <section id="recipe-details">
+        <h2>Recipe Details</h2>
+        <p><strong>Prep Time:</strong> 15 minutes</p>
+        <p><strong>Cook Time:</strong> 0 minutes</p>
+        <p><strong>Total Time:</strong> 15 minutes</p>
+    </section>
+
+    <section id="ingredients">
+        <h2>Ingredients</h2>
+        <ul>
+            <li>1 Large Cool Whip</li>
+            <li>1/2 Package of dry vanilla pudding mix</li>
+            <li>4 Granny smith apples</li>
+            <li>5 or 6 Large Snicker candy bars</li>
+            <!-- Add more ingredients as needed -->
+        </ul>
+    </section>
+
+    <section id="instructions">
+        <h2>Instructions</h2>
+        <ol>
+            <li>Mix cool whip and pudding mix in a large bowl.</li>
+            <li>Cut up apples and snickers.</li>
+            <li>Add apples and snickers to bowl and mix.</li>
+            <!-- Add more steps as needed -->
+        </ol>
+    </section>
+
+    <footer>
+        <button onclick="window.print()">Print Recipe</button>
+    </footer>
+
+</body>
+</html>
