@@ -76,25 +76,21 @@
 <body>
     <h1>Cookbook</h1>
     <div class="tabs">
-        <div class="tab active" onclick="filterCategory('Breakfast')">Breakfast</div>
+        <div class="tab active" onclick="filterCategory('All')">All</div> <!-- 'All' first and highlighted -->
+        <div class="tab" onclick="filterCategory('Breakfast')">Breakfast</div>
         <div class="tab" onclick="filterCategory('Lunch')">Lunch</div>
         <div class="tab" onclick="filterCategory('Dinner')">Dinner</div>
         <div class="tab" onclick="filterCategory('Dessert')">Dessert</div>
         <div class="tab" onclick="filterCategory('Snacks')">Snacks</div>
-        <div class="tab" onclick="filterCategory('All')">All</div> <!-- Add 'All' category -->
     </div>
     <input type="text" class="search" placeholder="Search recipes..." oninput="searchRecipes()">
     <ul class="recipe-list" id="recipe-list"></ul> 
     <script>
         const recipes = [
             { name: "Pancakes", category: "Breakfast", link: "pancakes.html" },
-            
             { name: "Grilled Cheese", category: "Lunch", link: "grilled_cheese.html" },
-            
             { name: "Spaghetti", category: "Dinner", link: "spaghetti.html" },
-            
             { name: "Banana Cream Cool Whip Bars", category: "Dessert", link: "bananabars.html" },
-            
             { name: "Apple Salad", category: "Snacks", link: "applesalad.html" },
             { name: "Avocado Fries", category: "Snacks", link: "avocadofries.html" }
         ];
