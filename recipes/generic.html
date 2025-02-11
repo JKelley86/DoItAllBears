@@ -87,6 +87,23 @@
             background-color: #0056b3;
         }
 
+        .share-button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            position: absolute;
+            top: 20px;
+            right: 120px;
+        }
+
+        .share-button:hover {
+            background-color: #218838;
+        }
+
         /* Responsive styling for smaller screens */
         @media (max-width: 600px) {
             header h1 {
@@ -106,7 +123,7 @@
                 font-size: 16px;
             }
 
-            footer button {
+            footer button, .share-button {
                 padding: 8px 16px;
                 font-size: 14px;
                 top: 15px;
@@ -120,6 +137,7 @@
     <header>
         <h1>Recipe Title</h1>
         <button onclick="window.print()">Print Recipe</button>
+        <button class="share-button" onclick="shareRecipe()">Share Recipe</button>
     </header>
 
     <section id="recipe-details">
@@ -157,6 +175,25 @@
     <footer>
         <p>Bear Book</p>
     </footer>
+
+    <script>
+        function shareRecipe() {
+            const recipeTitle = document.querySelector("h1").textContent;
+            const recipeURL = window.location.href;
+            const shareText = `Check out this recipe: ${recipeTitle}\n${recipeURL}`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: recipeTitle,
+                    text: shareText,
+                    url: recipeURL
+                })
+                .catch((error) => console.log("Error sharing: ", error));
+            } else {
+                alert("Sharing is not supported on this device.");
+            }
+        }
+    </script>
 
 </body>
 </html>
