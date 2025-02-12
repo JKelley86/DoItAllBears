@@ -1,1 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Buffalo Chicken Dip</title>
+    <!-- Add Font Awesome CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            position: relative;
+            padding-bottom: 60px; /* Ensures footer space */
+        }
+        
+        header {
+            background-color: #6c757d;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
 
+        header h1 {
+            margin: 0;
+            font-size: 36px;
+        }
+
+        #recipe-details, #ingredients, #instructions {
+            margin: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #343a40;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        p, ul, ol {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+        }
+
+        ul li, ol li {
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #6c757d;
+            color: white;
+            position: absolute;
+            width: 100%;
+            bottom: 0;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        button {
+            padding: 10px;
+            color: white;
+            border: none;
+            background-color: transparent;
+            font-size: 24px;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+        }
+
+        .print-button {
+            right: 20px;
+        }
+
+        .share-button {
+            right: 60px;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        /* Responsive styling for smaller screens */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 28px;
+            }
+
+            #recipe-details, #ingredients, #instructions {
+                margin: 10px;
+                padding: 12px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            p, ul, ol {
+                font-size: 16px;
+            }
+
+            button {
+                font-size: 20px;
+                top: 15px;
+            }
+
+            .print-button {
+                right: 15px;
+            }
+
+            .share-button {
+                right: 55px;
+            }
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            button {
+                display: none; /* Hide buttons during print */
+            }
+
+            header {
+                background-color: #fff;
+                color: #000;
+            }
+
+            footer {
+                position: relative;
+                text-align: center;
+                padding: 15px;
+                background-color: #fff;
+                color: #000;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Buffalo Chicken Dip</h1>
+        <button class="print-button" onclick="window.print()"><i class="fas fa-print"></i></button> <!-- Font Awesome print icon -->
+        <button class="share-button" onclick="shareRecipe()"><i class="fas fa-share-alt"></i></button> <!-- Font Awesome share icon -->
+    </header>
+
+    <section id="recipe-details">
+        <h2>Recipe Details</h2>
+        <p><strong>Prep Time:</strong> 15 minutes</p>
+        <p><strong>Cook Time:</strong> 20 minutes</p>
+        <p><strong>Total Time:</strong> 35 minutes</p>
+    </section>
+
+    <section id="ingredients">
+        <h2>Ingredients</h2>
+        <ul>
+            <li>3 Cups shredded cooked rotisserie chicken</li>
+            <li>2 (8 Ounch) packages of cream cheese (softened)</li>
+            <li>3/4 Cups hot sauce</li>
+            <li>1/2-1 Cup shredded pepper jack cheese</li>
+            <!-- Add more ingredients as needed -->
+        </ul>
+    </section>
+
+    <section id="instructions">
+        <h2>Instructions</h2>
+        <ol>
+            <li>Turn on crock pot to high.</li>
+            <li>Place Cream Cheese in crock pot.</li>
+            <li>Shred Chicken and put in crock pot.</li>
+            <li>Place shredded Pepper Jack Cheese in crock pot.</li>
+            <li>Pour Franks Red Hot in crock pot and Mix.</li>
+            <li>Let sit until cheese is completely melted.</li>
+            <!-- Add more steps as needed -->
+        </ol>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Bear Book. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function shareRecipe() {
+            const recipeTitle = document.querySelector("h1").textContent;
+            const recipeURL = window.location.href;
+            const shareText = `Check out this recipe: ${recipeTitle}\n${recipeURL}`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: recipeTitle,
+                    text: shareText,
+                    url: recipeURL
+                })
+                .catch((error) => console.log("Error sharing: ", error));
+            } else {
+                alert("Sharing is not supported on this device.");
+            }
+        }
+    </script>
+
+</body>
+</html>
