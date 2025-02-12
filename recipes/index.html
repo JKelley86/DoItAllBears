@@ -12,40 +12,29 @@
             padding: 20px; 
             background-color: #f8f8f8;
             text-align: center;
-            padding-bottom: 60px; /* Add padding to prevent footer overlap */
+            padding-bottom: 60px;
         }
-        h1 {
-            color: #333;
+        h1 { color: #333; }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: flex-start;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 10px;
         }
-/* Tab container with horizontal scrolling */
-.tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    justify-content: flex-start;
-    overflow-x: auto;  /* Enable horizontal scrolling */
-    -webkit-overflow-scrolling: touch;  /* For smoother scrolling on iOS */
-    padding-bottom: 10px;  /* Add padding to prevent scrollbar from touching the content */
-}
-
-.tab {
-    padding: 10px 15px;
-    background: #ddd;
-    cursor: pointer;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: background 0.3s;
-    white-space: nowrap;  /* Prevent text from wrapping */
-}
-
-.tab:hover {
-    background: #bbb;
-}
-
-.tab.active {
-    background: #4CAF50;
-    color: white;
-}
+        .tab {
+            padding: 10px 15px;
+            background: #ddd;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s;
+            white-space: nowrap;
+        }
+        .tab:hover { background: #bbb; }
+        .tab.active { background: #4CAF50; color: white; }
         .search { 
             width: 100%; 
             padding: 10px; 
@@ -54,69 +43,80 @@
             border-radius: 5px; 
             font-size: 16px;
         }
-        .recipe-list { 
-            list-style: none; 
+        .recipe-list {
+            list-style: none;
             padding: 0;
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             padding: 15px;
         }
-        .recipe-list li { 
-            margin: 20px 0; 
-            font-size: 18px; 
+        .recipe-list li {
+            margin: 20px 0;
+            font-size: 18px;
             padding: 10px;
             border-bottom: 1px solid #eee;
         }
-        .recipe-list li:last-child {
-            border-bottom: none;
-        }
-        .recipe-list a { 
-            color: #4CAF50; 
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .recipe-list a:hover {
-            text-decoration: underline;
-        }
+        .recipe-list li:last-child { border-bottom: none; }
+        .recipe-list a { color: #4CAF50; text-decoration: none; font-weight: bold; }
+        .recipe-list a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
     <h1>Cookbook</h1>
-    <div class="tabs">
-        <div class="tab active" onclick="filterCategory('All')">All</div> <!-- 'All' first and highlighted -->
+    
+    <div class="tabs" id="category-tabs">
+        <div class="tab active" onclick="filterCategory('All')">All</div>
         <div class="tab" onclick="filterCategory('Breakfast')">Breakfast</div>
         <div class="tab" onclick="filterCategory('Lunch')">Lunch</div>
         <div class="tab" onclick="filterCategory('Dinner')">Dinner</div>
         <div class="tab" onclick="filterCategory('Dessert')">Dessert</div>
         <div class="tab" onclick="filterCategory('Snacks')">Snacks/Appetizers</div>
     </div>
+    
+    <div class="tabs" id="diet-tabs">
+        <div class="tab active" onclick="filterDiet('All')">All</div>
+        <div class="tab" onclick="filterDiet('Vegan')">Vegan</div>
+        <div class="tab" onclick="filterDiet('Vegetarian')">Vegetarian</div>
+        <div class="tab" onclick="filterDiet('Carnivore')">Carnivore</div>
+        <div class="tab" onclick="filterDiet('General')">General</div>
+    </div>
+    
     <input type="text" class="search" placeholder="Search recipes..." oninput="searchRecipes()">
     <ul class="recipe-list" id="recipe-list"></ul> 
+    
     <script>
         const recipes = [
-            { name: "Biscuits And Gravy", category: "Breakfast", link: "biscuitsgravy.html" },
+            { name: "Biscuits And Gravy", category: "Breakfast", diet: "General", link: "biscuitsgravy.html" },
             
-            { name: "Grilled Cheese", category: "Lunch", link: "grilled_cheese.html" },
+            { name: "Grilled Cheese", category: "Lunch", diet: "Vegetarian", link: "grilled_cheese.html" },
             
-            { name: "Chicken And Rice Bake", category: "Dinner", link: "chickenricebake.html" },
+            { name: "Chicken And Rice Bake", category: "Dinner", diet: "General", link: "chickenricebake.html" },
             
-            { name: "Banana Cream Cool Whip Bars", category: "Dessert", link: "bananabars.html" },
-            { name: "Chocolate Chip Cookies", category: "Dessert", link: "chocolatechipcookie.html" },
+            { name: "Banana Cream Cool Whip Bars", category: "Dessert", diet: "General", link: "bananabars.html" },
+            { name: "Chocolate Chip Cookies", category: "Dessert", diet: "Vegetarian", link: "chocolatechipcookie.html" },
             
-            { name: "Apple Salad", category: "Snacks", link: "applesalad.html" },
-            { name: "Avocado Fries", category: "Snacks", link: "avocadofries.html" },
-            { name: "Blooming Onion", category: "Snacks", link: "bloomingonion.html" },
-            { name: "Buffalo Chicken Dip", category: "Snacks", link: "buffalochickendip.html" },
-            { name: "French Fries", category: "Snacks", link: "frenchfries.html" },
+            { name: "Apple Salad", category: "Snacks", diet: "Vegan", link: "applesalad.html" },
+            { name: "Avocado Fries", category: "Snacks", diet: "Vegan", link: "avocadofries.html" },
+            { name: "Blooming Onion", category: "Snacks", diet: "Vegetarian", link: "bloomingonion.html" },
+            { name: "Buffalo Chicken Dip", category: "Snacks", diet: "Carnivore", link: "buffalochickendip.html" },
+            { name: "French Fries", category: "Snacks", diet: "Vegan", link: "frenchfries.html" }
         ];
 
-        let currentCategory = "All";  // Default category is set to 'All'
+        let currentCategory = "All";
+        let currentDiet = "All";
 
         function filterCategory(category) {
             currentCategory = category;
-            document.querySelectorAll('.tab').forEach(tab => 
+            document.querySelectorAll('#category-tabs .tab').forEach(tab =>
                 tab.classList.toggle('active', tab.textContent === category));
+            displayRecipes();
+        }
+
+        function filterDiet(diet) {
+            currentDiet = diet;
+            document.querySelectorAll('#diet-tabs .tab').forEach(tab =>
+                tab.classList.toggle('active', tab.textContent === diet));
             displayRecipes();
         }
 
@@ -131,7 +131,8 @@
 
             recipes.filter(recipe => 
                 recipe.name.toLowerCase().includes(searchTerm) && 
-                (currentCategory === 'All' || recipe.category === currentCategory)  // No category filter for 'All'
+                (currentCategory === 'All' || recipe.category === currentCategory) &&
+                (currentDiet === 'All' || recipe.diet === currentDiet)
             ).forEach(recipe => {
                 const li = document.createElement('li');
                 const a = document.createElement('a');
@@ -142,7 +143,7 @@
             });
         }
 
-        displayRecipes();  // Display all recipes by default
+        displayRecipes();
     </script> 
 </body>
 </html>
