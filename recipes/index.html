@@ -17,27 +17,35 @@
         h1 {
             color: #333;
         }
-        .tabs { 
-            display: flex; 
-            gap: 10px; 
-            margin-bottom: 20px; 
-            justify-content: center;
-        }
-        .tab { 
-            padding: 10px 15px; 
-            background: #ddd; 
-            cursor: pointer; 
-            border-radius: 5px; 
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-        .tab:hover {
-            background: #bbb;
-        }
-        .tab.active { 
-            background: #4CAF50; 
-            color: white; 
-        }
+/* Tab container with horizontal scrolling */
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: flex-start;
+    overflow-x: auto;  /* Enable horizontal scrolling */
+    -webkit-overflow-scrolling: touch;  /* For smoother scrolling on iOS */
+    padding-bottom: 10px;  /* Add padding to prevent scrollbar from touching the content */
+}
+
+.tab {
+    padding: 10px 15px;
+    background: #ddd;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background 0.3s;
+    white-space: nowrap;  /* Prevent text from wrapping */
+}
+
+.tab:hover {
+    background: #bbb;
+}
+
+.tab.active {
+    background: #4CAF50;
+    color: white;
+}
         .search { 
             width: 100%; 
             padding: 10px; 
