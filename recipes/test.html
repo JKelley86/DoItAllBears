@@ -3,178 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Recipe Title</title>
-    <!-- Add Font Awesome CDN -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <title>Cookbook</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            background-color: #f8f9fa;
             margin: 0;
             padding: 0;
             color: #333;
-            position: relative;
-            padding-bottom: 60px; /* Ensures footer space */
+	    
         }
-        
         header {
             background-color: #6c757d;
             color: white;
             padding: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+	    margin-bottom: 20px;
         }
-
-        header h1 {
-            margin: 0;
-            font-size: 28px;
-            flex-grow: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            padding-right: 20px;
-        }
-
-        .button-container {
+        .tabs {
             display: flex;
             gap: 10px;
-        }
-
-        button {
-            padding: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 10px;
             color: white;
-            border: none;
-            background-color: transparent;
-            font-size: 20px;
+	    font-weight: bold;
+        }
+        .tab {
+            padding: 10px 15px;
+            background: #ddd;
             cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s;
+            white-space: nowrap;
         }
-
-        button:hover {
-            opacity: 0.8;
+        .tab:hover { background: #bbb; }
+        .tab.active { background: #6c757d; color: white; }
+        .search { 
+            width: 100%; 
+            padding: 10px; 
+            margin-bottom: 20px; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            font-size: 16px;
         }
-
-        section {
-            padding: 20px;
+        .recipe-list {
+            list-style: none;
+            padding: 0;
             background: white;
-            margin: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+	    gap: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .recipe-list li {
+            font-size: 18px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            background: #fff;
+            padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 {
-            border-bottom: 2px solid #6c757d;
-            padding-bottom: 5px;
-        }
-
-        ul, ol {
-            padding-left: 20px;
-        }
-
-        footer {
             text-align: center;
-            padding: 10px;
-            background-color: #6c757d;
-            color: white;
-            position: absolute;
-            bottom: 0;
-            width: 100%;
+            transition: transform 0.2s;
         }
-
-        /* Responsive styling for smaller screens */
-        @media (max-width: 600px) {
-            header h1 {
-                font-size: 22px;
-            }
-
-            section {
-                margin: 10px;
-                padding: 15px;
-            }
-        }
-
-        /* Print-specific styles */
-        @media print {
-            body {
-                margin: 0;
-                padding: 0;
-                background-color: white;
-            }
-
-            button {
-                display: none; /* Hide buttons during print */
-            }
-
-            header {
-                background-color: #fff;
-                color: #000;
-            }
-        }
+        .recipe-list li:last-child { border-bottom: none; }
+        .recipe-list a { color: #6c757d; text-decoration: none; font-weight: bold; }
+        .recipe-list a:hover { text-decoration: underline; transform: scale(1.05); }
     </style>
 </head>
 <body>
-
-    <header>
-        <h1>Super Long Recipe Name That Might Get Cut Off</h1>
-        <div class="button-container">
-            <button class="print-button" onclick="window.print()"><i class="fas fa-print"></i></button>
-            <button class="share-button" onclick="shareRecipe()"><i class="fas fa-share-alt"></i></button>
-        </div>
-    </header>
-
-    <section id="recipe-details">
-        <h2>Recipe Details</h2>
-        <p><strong>Prep Time:</strong> 15 minutes</p>
-        <p><strong>Cook Time:</strong> 30 minutes</p>
-        <p><strong>Total Time:</strong> 45 minutes</p>
-    </section>
-
-    <section id="ingredients">
-        <h2>Ingredients</h2>
-        <ul>
-            <li>1 cup of flour</li>
-            <li>2 eggs</li>
-            <li>1/2 cup of sugar</li>
-            <li>1/4 cup of milk</li>
-            <li>1 tsp of vanilla extract</li>
-        </ul>
-    </section>
-
-    <section id="instructions">
-        <h2>Instructions</h2>
-        <ol>
-            <li>Preheat the oven to 350°F (175°C).</li>
-            <li>In a bowl, mix the flour, sugar, and eggs together.</li>
-            <li>Add the milk and vanilla extract, and stir until smooth.</li>
-            <li>Pour the mixture into a greased baking pan.</li>
-            <li>Bake for 30 minutes or until golden brown.</li>
-            <li>Allow to cool before serving.</li>
-        </ol>
-    </section>
-
-    <footer>
-        <p>&copy; 2024 Bear Book. All rights reserved.</p>
-    </footer>
-
+    <header>Bear Book - Cookbook</header>
+    
+    <div class="tabs" id="category-tabs">
+        <div class="tab active" onclick="filterCategory('All')">All</div>
+        <div class="tab" onclick="filterCategory('Breakfast')">Breakfast</div>
+        <div class="tab" onclick="filterCategory('Lunch')">Lunch</div>
+        <div class="tab" onclick="filterCategory('Dinner')">Dinner</div>
+        <div class="tab" onclick="filterCategory('Dessert')">Dessert</div>
+        <div class="tab" onclick="filterCategory('Snacks')">Snacks/Appetizers</div>
+    </div>
+    
+    <div class="tabs" id="diet-tabs">
+        <div class="tab active" onclick="filterDiet('All')">All</div>
+        <div class="tab" onclick="filterDiet('Vegan')">Vegan</div>
+        <div class="tab" onclick="filterDiet('Vegetarian')">Vegetarian</div>
+        <div class="tab" onclick="filterDiet('Carnivore')">Carnivore</div>
+        <div class="tab" onclick="filterDiet('General')">General</div>
+    </div>
+    
+    <input type="text" class="search" placeholder="Search recipes..." oninput="searchRecipes()">
+    <ul class="recipe-list" id="recipe-list"></ul> 
+    
     <script>
-        function shareRecipe() {
-            const recipeTitle = document.querySelector("h1").textContent;
-            const recipeURL = window.location.href;
-            const shareText = `Check out this recipe: ${recipeTitle}\n${recipeURL}`;
+        const recipes = [
+                                        // Breakfeast //
+            { name: "Biscuits And Gravy", category: "Breakfast", diet: "General", link: "biscuitsgravy.html" },
+                                        // Lunch //
+            { name: "Chicken Mozzarella Sticks", category: "Lunch", diet: "Carnivore", link: "chickenmozzsticks.html" },
+            { name: "Mozzarella Sticks", category: "Lunch", diet: "General", link: "mozzarellasticks.html" },
+                                        // Dinner //
+            { name: "Chicken And Rice Bake", category: "Dinner", diet: "General", link: "chickenricebake.html" },
+            { name: "Lemon Garlic Salmon", category: "Dinner", diet: "Carnivore", link: "lemongarlicsalmon.html" },
+                                        // Dessert //  
+            { name: "Banana Cream Cool Whip Bars", category: "Dessert", diet: "General", link: "bananabars.html" },
+            { name: "Chocolate Chip Cookies", category: "Dessert", diet: "Vegetarian", link: "chocolatechipcookie.html" },
+            { name: "Fudge Topped Brownies", category: "Dessert", diet: "General", link: "fudgetoppedbrownies.html" },
+                                        // Snacks //
+            { name: "Apple Salad", category: "Snacks", diet: "Vegan", link: "applesalad.html" },
+            { name: "Avocado Fries", category: "Snacks", diet: "Vegan", link: "avocadofries.html" },
+            { name: "Blooming Onion", category: "Snacks", diet: "Vegetarian", link: "bloomingonion.html" },
+            { name: "Buffalo Chicken Dip", category: "Snacks", diet: "Carnivore", link: "buffalochickendip.html" },
+            { name: "French Fries", category: "Snacks", diet: "Vegan", link: "frenchfries.html" },
+            { name: "Green Beans", category: "Snacks", diet: "Vegan", link: "greenbeans.html" }
+        ];
 
-            if (navigator.share) {
-                navigator.share({
-                    title: recipeTitle,
-                    text: shareText,
-                    url: recipeURL
-                })
-                .catch((error) => console.log("Error sharing: ", error));
-            } else {
-                alert("Sharing is not supported on this device.");
-            }
+        let currentCategory = "All";
+        let currentDiet = "All";
+
+        function filterCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('#category-tabs .tab').forEach(tab =>
+                tab.classList.toggle('active', tab.textContent === category));
+            displayRecipes();
         }
-    </script>
 
+        function filterDiet(diet) {
+            currentDiet = diet;
+            document.querySelectorAll('#diet-tabs .tab').forEach(tab =>
+                tab.classList.toggle('active', tab.textContent === diet));
+            displayRecipes();
+        }
+
+        function searchRecipes() {
+            displayRecipes();
+        }
+
+        function displayRecipes() {
+            const searchTerm = document.querySelector('.search').value.toLowerCase();
+            const list = document.getElementById('recipe-list');
+            list.innerHTML = "";
+
+            recipes.filter(recipe => 
+                recipe.name.toLowerCase().includes(searchTerm) && 
+                (currentCategory === 'All' || recipe.category === currentCategory) &&
+                (currentDiet === 'All' || recipe.diet === currentDiet)
+            ).forEach(recipe => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = recipe.link;
+                a.textContent = recipe.name;
+                li.appendChild(a);
+                list.appendChild(li);
+            });
+        }
+
+        displayRecipes();
+    </script> 
 </body>
 </html>
