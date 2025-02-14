@@ -55,10 +55,42 @@
             opacity: 0.8;
         }
 
+        section {
+            padding: 20px;
+            background: white;
+            margin: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            border-bottom: 2px solid #6c757d;
+            padding-bottom: 5px;
+        }
+
+        ul, ol {
+            padding-left: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #6c757d;
+            color: white;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
         /* Responsive styling for smaller screens */
         @media (max-width: 600px) {
             header h1 {
                 font-size: 22px;
+            }
+
+            section {
+                margin: 10px;
+                padding: 15px;
             }
         }
 
@@ -67,6 +99,7 @@
             body {
                 margin: 0;
                 padding: 0;
+                background-color: white;
             }
 
             button {
@@ -83,7 +116,7 @@
 <body>
 
     <header>
-        <h1>Super long recipe name that might get cut off</h1>
+        <h1>Recipe Title</h1>
         <div class="button-container">
             <button class="print-button" onclick="window.print()"><i class="fas fa-print"></i></button>
             <button class="share-button" onclick="shareRecipe()"><i class="fas fa-share-alt"></i></button>
