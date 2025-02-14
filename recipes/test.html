@@ -11,7 +11,6 @@
             margin: 0;
             padding: 0;
             color: #333;
-	    
         }
         header {
             background-color: #6c757d;
@@ -20,7 +19,7 @@
             text-align: center;
             font-size: 24px;
             font-weight: bold;
-	    margin-bottom: 20px;
+            margin-bottom: 20px;
         }
         .tabs {
             display: flex;
@@ -31,7 +30,7 @@
             -webkit-overflow-scrolling: touch;
             padding-bottom: 10px;
             color: white;
-	    font-weight: bold;
+            font-weight: bold;
         }
         .tab {
             padding: 10px 15px;
@@ -39,18 +38,27 @@
             cursor: pointer;
             border-radius: 5px;
             font-weight: bold;
-            transition: background 0.3s;
+            transition: background 0.3s, transform 0.2s;
             white-space: nowrap;
         }
-        .tab:hover { background: #bbb; }
-        .tab.active { background: #6c757d; color: white; }
+        .tab:hover { 
+            background: #bbb; 
+            transform: scale(1.05);
+        }
+        .tab.active { 
+            background: #6c757d; 
+            color: white; 
+        }
         .search { 
-            width: 100%; 
+            width: 80%; 
             padding: 10px; 
+	    margin: 0 auto;
             margin-bottom: 20px; 
+	    display: block;
             border: 1px solid #ccc; 
             border-radius: 5px; 
             font-size: 16px;
+	    
         }
         .recipe-list {
             list-style: none;
@@ -61,44 +69,52 @@
             padding: 15px;
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-	    gap: 20px;
+            gap: 20px;
             border-radius: 8px;
             text-align: center;
         }
         .recipe-list li {
             font-size: 18px;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            background: #fff;
             padding: 15px;
+            background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             text-align: center;
             transition: transform 0.2s;
         }
-        .recipe-list li:last-child { border-bottom: none; }
-        .recipe-list a { color: #6c757d; text-decoration: none; font-weight: bold; }
-        .recipe-list a:hover { text-decoration: underline; transform: scale(1.05); }
+        .recipe-list li:hover {
+            transform: scale(1.05);
+        }
+        .recipe-list a { 
+            color: #6c757d; 
+            text-decoration: none; 
+            font-weight: bold;
+            display: block;
+            padding: 10px;
+        }
+        .recipe-list a:hover { 
+            text-decoration: underline; 
+        }
     </style>
 </head>
 <body>
     <header>Bear Book - Cookbook</header>
     
     <div class="tabs" id="category-tabs">
-        <div class="tab active" onclick="filterCategory('All')">All</div>
-        <div class="tab" onclick="filterCategory('Breakfast')">Breakfast</div>
-        <div class="tab" onclick="filterCategory('Lunch')">Lunch</div>
-        <div class="tab" onclick="filterCategory('Dinner')">Dinner</div>
-        <div class="tab" onclick="filterCategory('Dessert')">Dessert</div>
-        <div class="tab" onclick="filterCategory('Snacks')">Snacks/Appetizers</div>
+        <div class="tab active" data-category="All" onclick="filterCategory('All')">All</div>
+        <div class="tab" data-category="Breakfast" onclick="filterCategory('Breakfast')">Breakfast</div>
+        <div class="tab" data-category="Lunch" onclick="filterCategory('Lunch')">Lunch</div>
+        <div class="tab" data-category="Dinner" onclick="filterCategory('Dinner')">Dinner</div>
+        <div class="tab" data-category="Dessert" onclick="filterCategory('Dessert')">Dessert</div>
+        <div class="tab" data-category="Snacks" onclick="filterCategory('Snacks')">Snacks/Appetizers</div>
     </div>
     
     <div class="tabs" id="diet-tabs">
-        <div class="tab active" onclick="filterDiet('All')">All</div>
-        <div class="tab" onclick="filterDiet('Vegan')">Vegan</div>
-        <div class="tab" onclick="filterDiet('Vegetarian')">Vegetarian</div>
-        <div class="tab" onclick="filterDiet('Carnivore')">Carnivore</div>
-        <div class="tab" onclick="filterDiet('General')">General</div>
+        <div class="tab active" data-diet="All" onclick="filterDiet('All')">All</div>
+        <div class="tab" data-diet="Vegan" onclick="filterDiet('Vegan')">Vegan</div>
+        <div class="tab" data-diet="Vegetarian" onclick="filterDiet('Vegetarian')">Vegetarian</div>
+        <div class="tab" data-diet="Carnivore" onclick="filterDiet('Carnivore')">Carnivore</div>
+        <div class="tab" data-diet="General" onclick="filterDiet('General')">General</div>
     </div>
     
     <input type="text" class="search" placeholder="Search recipes..." oninput="searchRecipes()">
@@ -106,19 +122,14 @@
     
     <script>
         const recipes = [
-                                        // Breakfeast //
             { name: "Biscuits And Gravy", category: "Breakfast", diet: "General", link: "biscuitsgravy.html" },
-                                        // Lunch //
             { name: "Chicken Mozzarella Sticks", category: "Lunch", diet: "Carnivore", link: "chickenmozzsticks.html" },
             { name: "Mozzarella Sticks", category: "Lunch", diet: "General", link: "mozzarellasticks.html" },
-                                        // Dinner //
             { name: "Chicken And Rice Bake", category: "Dinner", diet: "General", link: "chickenricebake.html" },
             { name: "Lemon Garlic Salmon", category: "Dinner", diet: "Carnivore", link: "lemongarlicsalmon.html" },
-                                        // Dessert //  
             { name: "Banana Cream Cool Whip Bars", category: "Dessert", diet: "General", link: "bananabars.html" },
             { name: "Chocolate Chip Cookies", category: "Dessert", diet: "Vegetarian", link: "chocolatechipcookie.html" },
             { name: "Fudge Topped Brownies", category: "Dessert", diet: "General", link: "fudgetoppedbrownies.html" },
-                                        // Snacks //
             { name: "Apple Salad", category: "Snacks", diet: "Vegan", link: "applesalad.html" },
             { name: "Avocado Fries", category: "Snacks", diet: "Vegan", link: "avocadofries.html" },
             { name: "Blooming Onion", category: "Snacks", diet: "Vegetarian", link: "bloomingonion.html" },
@@ -133,14 +144,14 @@
         function filterCategory(category) {
             currentCategory = category;
             document.querySelectorAll('#category-tabs .tab').forEach(tab =>
-                tab.classList.toggle('active', tab.textContent === category));
+                tab.classList.toggle('active', tab.dataset.category === category));
             displayRecipes();
         }
 
         function filterDiet(diet) {
             currentDiet = diet;
             document.querySelectorAll('#diet-tabs .tab').forEach(tab =>
-                tab.classList.toggle('active', tab.textContent === diet));
+                tab.classList.toggle('active', tab.dataset.diet === diet));
             displayRecipes();
         }
 
