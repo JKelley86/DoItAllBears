@@ -20,56 +20,26 @@
         header {
             background-color: #6c757d;
             color: white;
-            padding: 20px;
-            text-align: center;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             position: relative;
         }
 
         header h1 {
             margin: 0;
-            font-size: 36px;
-        }
-
-        #recipe-details, #ingredients, #instructions {
-            margin: 20px;
-            padding: 15px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 {
-            color: #343a40;
             font-size: 28px;
-            margin-bottom: 10px;
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding-right: 20px;
         }
 
-        p, ul, ol {
-            font-size: 18px;
-            line-height: 1.6;
-        }
-
-        ul, ol {
-            margin-left: 20px;
-        }
-
-        ul li, ol li {
-            margin-bottom: 10px;
-        }
-
-        footer {
-            text-align: center;
-            padding: 15px;
-            background-color: #6c757d;
-            color: white;
-            position: absolute;
-            width: 100%;
-            bottom: 0;
-        }
-
-        footer p {
-            margin: 0;
-            font-size: 18px;
+        .button-container {
+            display: flex;
+            gap: 10px;
         }
 
         button {
@@ -77,54 +47,50 @@
             color: white;
             border: none;
             background-color: transparent;
-            font-size: 24px;
+            font-size: 20px;
             cursor: pointer;
-            position: absolute;
-            top: 20px;
-        }
-
-        .print-button {
-            right: 20px;
-        }
-
-        .share-button {
-            right: 60px;
         }
 
         button:hover {
             opacity: 0.8;
         }
 
+        section {
+            padding: 20px;
+            background: white;
+            margin: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            border-bottom: 2px solid #6c757d;
+            padding-bottom: 5px;
+        }
+
+        ul, ol {
+            padding-left: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #6c757d;
+            color: white;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
         /* Responsive styling for smaller screens */
         @media (max-width: 600px) {
             header h1 {
-                font-size: 28px;
+                font-size: 22px;
             }
 
-            #recipe-details, #ingredients, #instructions {
+            section {
                 margin: 10px;
-                padding: 12px;
-            }
-
-            h2 {
-                font-size: 24px;
-            }
-
-            p, ul, ol {
-                font-size: 16px;
-            }
-
-            button {
-                font-size: 20px;
-                top: 15px;
-            }
-
-            .print-button {
-                right: 15px;
-            }
-
-            .share-button {
-                right: 55px;
+                padding: 15px;
             }
         }
 
@@ -133,6 +99,7 @@
             body {
                 margin: 0;
                 padding: 0;
+                background-color: white;
             }
 
             button {
@@ -143,23 +110,17 @@
                 background-color: #fff;
                 color: #000;
             }
-
-            footer {
-                position: relative;
-                text-align: center;
-                padding: 15px;
-                background-color: #fff;
-                color: #000;
-            }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Recipe Title</h1>
-        <button class="print-button" onclick="window.print()"><i class="fas fa-print"></i></button> <!-- Font Awesome print icon -->
-        <button class="share-button" onclick="shareRecipe()"><i class="fas fa-share-alt"></i></button> <!-- Font Awesome share icon -->
+        <h1>Super Long Recipe Name That Might Get Cut Off</h1>
+        <div class="button-container">
+            <button class="print-button" onclick="window.print()"><i class="fas fa-print"></i></button>
+            <button class="share-button" onclick="shareRecipe()"><i class="fas fa-share-alt"></i></button>
+        </div>
     </header>
 
     <section id="recipe-details">
@@ -177,7 +138,6 @@
             <li>1/2 cup of sugar</li>
             <li>1/4 cup of milk</li>
             <li>1 tsp of vanilla extract</li>
-            <!-- Add more ingredients as needed -->
         </ul>
     </section>
 
@@ -190,7 +150,6 @@
             <li>Pour the mixture into a greased baking pan.</li>
             <li>Bake for 30 minutes or until golden brown.</li>
             <li>Allow to cool before serving.</li>
-            <!-- Add more steps as needed -->
         </ol>
     </section>
 
