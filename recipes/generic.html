@@ -94,23 +94,30 @@
             }
         }
 
-        /* Print-specific styles */
-        @media print {
-            body {
-                margin: 0;
-                padding: 0;
-                background-color: white;
-            }
+@media print {
+    body {
+        -webkit-print-color-adjust: exact; /* Ensures colors print accurately */
+        print-color-adjust: exact;
+    }
 
-            button {
-                display: none; /* Hide buttons during print */
-            }
+    .tabs, .search { /* Hide elements that aren’t needed in print */
+        display: none;
+    }
 
-            header {
-                background-color: #fff;
-                color: #000;
-            }
-        }
+    .recipe-list {
+        page-break-inside: avoid; /* Prevent recipes from splitting between pages */
+    }
+
+    .recipe-list li {
+        break-inside: avoid; /* Keep each recipe on a single page */
+        padding: 10px;
+        font-size: 16px; /* Adjust font for better readability */
+    }
+
+    * {
+        overflow: visible !important; /* Prevents content from being cut off */
+    }
+}
     </style>
 </head>
 <body>
