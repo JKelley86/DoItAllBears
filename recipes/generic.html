@@ -94,20 +94,26 @@
             }
         }
 
-@media print {
-    body {
-        margin: 0;
-        padding: 0;
-        background-color: white;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
+       @media print {
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: white;
+            }
 
-    * {
+               * {
         overflow: visible !important; /* Ensures all content is visible */
     }
 
-}
+            button {
+                display: none; /* Hide buttons during print */
+            }
+
+            header {
+                background-color: #fff;
+                color: #000;
+            }
+        }
     </style>
 </head>
 <body>
