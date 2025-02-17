@@ -52,13 +52,12 @@
         .search { 
             width: 80%; 
             padding: 10px; 
-	    margin: 0 auto;
+            margin: 0 auto;
             margin-bottom: 20px; 
-	    display: block;
+            display: block;
             border: 1px solid #ccc; 
             border-radius: 5px; 
             font-size: 16px;
-	    
         }
         .recipe-list {
             list-style: none;
@@ -81,6 +80,10 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             text-align: center;
             transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         .recipe-list li:hover {
             transform: scale(1.05);
@@ -94,6 +97,10 @@
         }
         .recipe-list a:hover { 
             text-decoration: underline; 
+        }
+        .paw-icon {
+            font-size: 20px;
+            color: #6c757d;
         }
     </style>
 </head>
@@ -122,20 +129,13 @@
     
     <script>
         const recipes = [
-            { name: "Biscuits And Gravy", category: "Breakfast", diet: "General", link: "biscuitsgravy.html" },
-            { name: "Chicken Mozzarella Sticks", category: "Lunch", diet: "Carnivore", link: "chickenmozzsticks.html" },
-            { name: "Mozzarella Sticks", category: "Lunch", diet: "General", link: "mozzarellasticks.html" },
-            { name: "Chicken And Rice Bake", category: "Dinner", diet: "General", link: "chickenricebake.html" },
-            { name: "Lemon Garlic Salmon", category: "Dinner", diet: "Carnivore", link: "lemongarlicsalmon.html" },
-            { name: "Banana Cream Cool Whip Bars", category: "Dessert", diet: "General", link: "bananabars.html" },
-            { name: "Chocolate Chip Cookies", category: "Dessert", diet: "Vegetarian", link: "chocolatechipcookie.html" },
-            { name: "Fudge Topped Brownies", category: "Dessert", diet: "General", link: "fudgetoppedbrownies.html" },
-            { name: "Apple Salad", category: "Snacks", diet: "Vegan", link: "applesalad.html" },
-            { name: "Avocado Fries", category: "Snacks", diet: "Vegan", link: "avocadofries.html" },
-            { name: "Blooming Onion", category: "Snacks", diet: "Vegetarian", link: "bloomingonion.html" },
-            { name: "Buffalo Chicken Dip", category: "Snacks", diet: "Carnivore", link: "buffalochickendip.html" },
-            { name: "French Fries", category: "Snacks", diet: "Vegan", link: "frenchfries.html" },
-            { name: "Green Beans", category: "Snacks", diet: "Vegan", link: "greenbeans.html" }
+            { name: "Biscuits And Gravy", category: "Breakfast", diet: "General", link: "biscuitsgravy.html", approved: true },
+            { name: "Chicken Mozzarella Sticks", category: "Lunch", diet: "Carnivore", link: "chickenmozzsticks.html", approved: true },
+            { name: "Mozzarella Sticks", category: "Lunch", diet: "General", link: "mozzarellasticks.html", approved: false },
+            { name: "Chicken And Rice Bake", category: "Dinner", diet: "General", link: "chickenricebake.html", approved: true },
+            { name: "Lemon Garlic Salmon", category: "Dinner", diet: "Carnivore", link: "lemongarlicsalmon.html", approved: false },
+            { name: "Steak And Butter", category: "Dinner", diet: "Carnivore", link: "steakandbutter.html", approved: true },
+            { name: "Chocolate Chip Cookies", category: "Dessert", diet: "Vegetarian", link: "chocolatechipcookie.html", approved: true },
         ];
 
         let currentCategory = "All";
@@ -173,6 +173,14 @@
                 const a = document.createElement('a');
                 a.href = recipe.link;
                 a.textContent = recipe.name;
+
+                if (recipe.approved) {
+                    const paw = document.createElement('span');
+                    paw.classList.add('paw-icon');
+                    paw.textContent = " 🐾";
+                    li.appendChild(paw);
+                }
+
                 li.appendChild(a);
                 list.appendChild(li);
             });
