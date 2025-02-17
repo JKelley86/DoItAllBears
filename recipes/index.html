@@ -122,26 +122,26 @@
     
     <script>
         const recipes = [
-            { name: "Biscuits And Gravy", category: "Breakfast", diet: "General", link: "biscuitsgravy.html" },
+            { name: "Biscuits And Gravy", category: "Breakfast", diet: "General", link: "biscuitsgravy.html",  approved: true },
             
-            { name: "Chicken Mozzarella Sticks", category: "Lunch", diet: "Carnivore", link: "chickenmozzsticks.html" },
-            { name: "Mozzarella Sticks", category: "Lunch", diet: "General", link: "mozzarellasticks.html" },
+            { name: "Chicken Mozzarella Sticks", category: "Lunch", diet: "Carnivore", link: "chickenmozzsticks.html",  approved: true },
+            { name: "Mozzarella Sticks", category: "Lunch", diet: "General", link: "mozzarellasticks.html",  approved: false },
             
-            { name: "Chicken And Rice Bake", category: "Dinner", diet: "General", link: "chickenricebake.html" },
-            { name: "Lemon Garlic Salmon", category: "Dinner", diet: "Carnivore", link: "lemongarlicsalmon.html" },
-	    { name: "Steak And Butter", category: "Dinner", diet: "Carnivore", link: "steakandbutter.html" },
+            { name: "Chicken And Rice Bake", category: "Dinner", diet: "General", link: "chickenricebake.html",  approved: false },
+            { name: "Lemon Garlic Salmon", category: "Dinner", diet: "Carnivore", link: "lemongarlicsalmon.html",  approved: false },
+	    { name: "Steak And Butter", category: "Dinner", diet: "Carnivore", link: "steakandbutter.html",  approved: true },
 	
-            { name: "Banana Cream Cool Whip Bars", category: "Dessert", diet: "General", link: "bananabars.html" },
-            { name: "Chocolate Chip Cookies", category: "Dessert", diet: "Vegetarian", link: "chocolatechipcookie.html" },
-            { name: "Fudge Topped Brownies", category: "Dessert", diet: "General", link: "fudgetoppedbrownies.html" },
+            { name: "Banana Cream Cool Whip Bars", category: "Dessert", diet: "General", link: "bananabars.html",  approved: false },
+            { name: "Chocolate Chip Cookies", category: "Dessert", diet: "Vegetarian", link: "chocolatechipcookie.html",  approved: false },
+            { name: "Fudge Topped Brownies", category: "Dessert", diet: "General", link: "fudgetoppedbrownies.html",  approved: false },
             
-            { name: "Apple Salad", category: "Snacks", diet: "Vegan", link: "applesalad.html" },
-            { name: "Avocado Fries", category: "Snacks", diet: "Vegan", link: "avocadofries.html" },
-            { name: "Blooming Onion", category: "Snacks", diet: "Vegetarian", link: "bloomingonion.html" },
-            { name: "Buffalo Chicken Dip", category: "Snacks", diet: "Carnivore", link: "buffalochickendip.html" },
-            { name: "French Fries", category: "Snacks", diet: "Vegan", link: "frenchfries.html" },
-            { name: "Green Beans", category: "Snacks", diet: "Vegan", link: "greenbeans.html" },
-	    { name: "Sweet Potato Fries", category: "Snacks", diet: "Vegan", link: "sweetpotatofries.html" }
+            { name: "Apple Salad", category: "Snacks", diet: "Vegan", link: "applesalad.html",  approved: true },
+            { name: "Avocado Fries", category: "Snacks", diet: "Vegan", link: "avocadofries.html",  approved: false },
+            { name: "Blooming Onion", category: "Snacks", diet: "Vegetarian", link: "bloomingonion.html",  approved: false },
+            { name: "Buffalo Chicken Dip", category: "Snacks", diet: "Carnivore", link: "buffalochickendip.html",  approved: true },
+            { name: "French Fries", category: "Snacks", diet: "Vegan", link: "frenchfries.html",  approved: true },
+            { name: "Green Beans", category: "Snacks", diet: "Vegan", link: "greenbeans.html",  approved: true },
+	        { name: "Sweet Potato Fries", category: "Snacks", diet: "Vegan", link: "sweetpotatofries.html",  approved: true }
         ];
 
         let currentCategory = "All";
@@ -179,6 +179,14 @@
                 const a = document.createElement('a');
                 a.href = recipe.link;
                 a.textContent = recipe.name;
+
+                if (recipe.approved) {
+                const paw = document.createElement('span');
+                paw.classList.add('paw-icon');
+                paw.textContent = " 🐾";
+                li.appendChild(paw);
+                }
+                
                 li.appendChild(a);
                 list.appendChild(li);
             });
