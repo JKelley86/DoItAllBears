@@ -1,0 +1,132 @@
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            position: relative;
+            padding-bottom: 60px; /* Ensures footer space */
+        }
+        
+        header {
+            background-color: #6c757d;
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding-right: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px;
+            color: white;
+            border: none;
+            background-color: transparent;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        section {
+            padding: 20px;
+            background: white;
+            margin: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            border-bottom: 2px solid #6c757d;
+            padding-bottom: 5px;
+        }
+
+        ul, ol {
+            padding-left: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #6c757d;
+            color: white;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* Responsive styling for smaller screens */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 22px;
+            }
+
+            section {
+                margin: 10px;
+                padding: 15px;
+            }
+        }
+
+       @media print {
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: white;
+            }
+
+    * {
+        overflow: visible !important; /* Ensures all content is visible */
+    }
+
+    header {
+        background-color: white !important;
+        color: black !important;
+        text-align: center;
+        padding: 10px 0;
+    }
+
+    button {
+        display: none !important; /* Hide all buttons */
+    }
+
+    section {
+        margin: 10px auto;
+        padding: 15px;
+        page-break-inside: avoid; /* Prevents content from splitting across pages */
+        max-width: 100%;
+    }
+
+    ul, ol {
+        page-break-before: auto;
+        page-break-inside: avoid;
+    }
+
+    footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: white !important;
+        color: black !important;
+        padding: 10px 0;
+        text-align: center;
+        font-size: 14px;
+    }
+}
