@@ -94,28 +94,49 @@
             }
         }
 
-@media print {
-    body {
-        -webkit-print-color-adjust: exact; /* Ensures colors print accurately */
-        print-color-adjust: exact;
-    }
-
-    .tabs, .search { /* Hide elements that aren’t needed in print */
-        display: none;
-    }
-
-    .recipe-list {
-        page-break-inside: avoid; /* Prevent recipes from splitting between pages */
-    }
-
-    .recipe-list li {
-        break-inside: avoid; /* Keep each recipe on a single page */
-        padding: 10px;
-        font-size: 16px; /* Adjust font for better readability */
-    }
+       @media print {
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: white;
+            }
 
     * {
-        overflow: visible !important; /* Prevents content from being cut off */
+        overflow: visible !important; /* Ensures all content is visible */
+    }
+
+    header {
+        background-color: white !important;
+        color: black !important;
+        text-align: center;
+        padding: 10px 0;
+    }
+
+    button {
+        display: none !important; /* Hide all buttons */
+    }
+
+    section {
+        margin: 10px auto;
+        padding: 15px;
+        page-break-inside: avoid; /* Prevents content from splitting across pages */
+        max-width: 100%;
+    }
+
+    ul, ol {
+        page-break-before: auto;
+        page-break-inside: avoid;
+    }
+
+    footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: white !important;
+        color: black !important;
+        padding: 10px 0;
+        text-align: center;
+        font-size: 14px;
     }
 }
     </style>
