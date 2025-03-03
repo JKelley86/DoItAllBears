@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camping Checklist</title>
+
+  <style>
+    /* Global Styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #e6f7ff;
+      color: #333;
+    }
+
+    header {
+      text-align: center;
+      background-color: #004d99;
+      color: white;
+      padding: 1rem 0;
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+    section {
+      padding: 2rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .category {
+      background-color: #cce7ff;
+      border: 1px solid #99cfff;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .category h2 {
+      margin-top: 0;
+    }
+
+    .item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+    }
+
+    label {
+      flex: 1;
+    }
+
+    .checkboxes {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .checkboxes input {
+      transform: scale(1.2);
+    }
+
+    #readyMessage {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #006600;
+      font-weight: bold;
+      display: none;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Camping Checklist</h1>
+  </header>
+
+  <section id="checklist">
+    <div class="category">
+      <h2>Cooler</h2>
+      <div class="item">
+        <label>Ice Packs</label>
+        <div class="checkboxes">
+          <input type="checkbox" class="packed">
+          <input type="checkbox" class="not-bringing">
+        </div>
+      </div>
+      <div class="item">
+        <label>Drinks</label>
+        <div class="checkboxes">
+          <input type="checkbox" class="packed">
+          <input type="checkbox" class="not-bringing">
+        </div>
+      </div>
+      <div class="item">
+        <label>Perishable Food</label>
+        <div class="checkboxes">
+          <input type="checkbox" class="packed">
+          <input type="checkbox" class="not-bringing">
+        </div>
+      </div>
+    </div>
+
+    <div class="category">
+      <h2>Camping Tote</h2>
+      <div class="item">
+        <label>Plates</label>
+        <div class="checkboxes">
+          <input type="checkbox" class="packed">
+          <input type="checkbox" class="not-bringing">
+        </div>
+      </div>
+      <div class="item">
+        <label>Paper Towels</label>
+        <div class="checkboxes">
+          <input type="checkbox" class="packed">
+          <input type="checkbox" class="not-bringing">
+        </div>
+      </div>
+      <div class="item">
+        <label>Trash Bags</label>
+        <div class="checkboxes">
+          <input type="checkbox" class="packed">
+          <input type="checkbox" class="not-bringing">
+        </div>
+      </div>
+    </div>
+
+    <div class="category">
+      <h2>Tools</h2>
+      <div class="item">
+        <label>Multi-Tool</label>
+        <div class="checkboxes">
+          <input type="checkbox" class="packed">
+          <input type="checkbox" class="not-bringing">
+        </div>
+      </div>
+      <div class="item">
+        <label>Flashlight</label>
+        <div class="checkboxes">
+          <input type="checkbox" class="packed">
+          <input type="checkbox" class="not-bringing">
+        </div>
+      </div>
+      <div class="item">
+        <label>Hatchet</label>
+        <div class="checkboxes">
+          <input type="checkbox" class="packed">
+          <input type="checkbox" class="not-bringing">
+        </div>
+      </div>
+    </div>
+
+    <div class="category">
+      <h2>Tent</h2>
+      <div class="item">
+        <label>Tent</label>
+        <div class="checkboxes">
+          <input type="checkbox" class="packed">
+          <input type="checkbox" class="not-bringing">
+        </div>
+      </div>
+      <div class="item">
+        <label>Sleeping Bag</label>
+        <div class="checkboxes">
+          <input type="checkbox" class="packed">
+          <input type="checkbox" class="not-bringing">
+        </div>
+      </div>
+      <div class="item">
+        <label>Camping Pillow</label>
+        <div class="checkboxes">
+          <input type="checkbox" class="packed">
+          <input type="checkbox" class="not-bringing">
+        </div>
+      </div>
+    </div>
+
+    <div id="readyMessage">
+      You are now ready to go camping! Have fun and be safe.
+    </div>
+  </section>
+
+  <script>
+    const checkboxes = document.querySelectorAll('.packed, .not-bringing');
+    const readyMessage = document.getElementById('readyMessage');
+
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+        // Uncheck the opposite box when one is checked
+        const siblings = checkbox.closest('.checkboxes').querySelectorAll('input');
+        siblings.forEach(sib => {
+          if (sib !== checkbox) sib.checked = false;
+        });
+
+        checkReadyStatus();
+      });
+    });
+
+    function checkReadyStatus() {
+      const totalItems = document.querySelectorAll('.item').length;
+      const totalChecked = document.querySelectorAll('.packed:checked, .not-bringing:checked').length;
+
+      if (totalChecked === totalItems) {
+        readyMessage.style.display = 'block';
+      } else {
+        readyMessage.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
