@@ -35,18 +35,19 @@
       border-radius: 8px;
       cursor: pointer;
       font-size: 1rem;
+      position: absolute;
     }
 
     .back-button {
-      position: absolute;
-      top: 10px;
+      top: 50%;
       left: 10px;
+      transform: translateY(-50%);
     }
 
     .clear-button {
-      position: absolute;
-      top: 10px;
+      top: 50%;
       right: 10px;
+      transform: translateY(-50%);
       background-color: #cc0000;
     }
 
@@ -131,18 +132,18 @@
       <h2>Cooler</h2>
       <div class="item">
         <label>Ice Packs</label>
-        <input type="checkbox" class="packed">
-        <input type="checkbox" class="not-bringing">
+        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
+        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
       </div>
       <div class="item">
         <label>Drinks</label>
-        <input type="checkbox" class="packed">
-        <input type="checkbox" class="not-bringing">
+        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
+        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
       </div>
       <div class="item">
         <label>Perishable Food</label>
-        <input type="checkbox" class="packed">
-        <input type="checkbox" class="not-bringing">
+        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
+        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
       </div>
     </div>
 
@@ -150,18 +151,18 @@
       <h2>Camping Tote</h2>
       <div class="item">
         <label>Plates</label>
-        <input type="checkbox" class="packed">
-        <input type="checkbox" class="not-bringing">
+        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
+        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
       </div>
       <div class="item">
         <label>Paper Towels</label>
-        <input type="checkbox" class="packed">
-        <input type="checkbox" class="not-bringing">
+        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
+        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
       </div>
       <div class="item">
         <label>Trash Bags</label>
-        <input type="checkbox" class="packed">
-        <input type="checkbox" class="not-bringing">
+        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
+        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
       </div>
     </div>
 
@@ -174,6 +175,22 @@
     function clearChecklist() {
       const checkboxes = document.querySelectorAll('input[type="checkbox"]');
       checkboxes.forEach(checkbox => checkbox.checked = false);
+      document.getElementById('readyMessage').style.display = 'none';
+    }
+
+    function toggleCheckbox(clicked) {
+      const siblings = clicked.parentElement.querySelectorAll('input[type="checkbox"]');
+      siblings.forEach(box => {
+        if (box !== clicked) box.checked = false;
+      });
+      checkReady();
+    }
+
+    function checkReady() {
+      const totalItems = document.querySelectorAll('.item').length;
+      const checkedItems = document.querySelectorAll('.packed:checked, .not-bringing:checked').length;
+      const readyMessage = document.getElementById('readyMessage');
+      readyMessage.style.display = (totalItems === checkedItems) ? 'block' : 'none';
     }
   </script>
 </body>
