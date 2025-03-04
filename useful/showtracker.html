@@ -1,65 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectItem } from '@/components/ui/select';
-
-const streamingServices = ['Netflix', 'Hulu', 'Disney+', 'Amazon Prime', 'HBO Max', 'Other'];
 
 const initialShows = [
   { name: 'Stranger Things', service: 'Netflix' },
   { name: 'The Mandalorian', service: 'Disney+' },
-  { name: 'The Boys', service: 'Amazon Prime' }
+  { name: 'The Boys', service: 'Amazon Prime' },
+  { name: 'Breaking Bad', service: 'Netflix' },
+  { name: 'Westworld', service: 'HBO Max' }
 ];
 
 export default function ShowTracker() {
-  const [shows, setShows] = useState(initialShows);
-  const [newShow, setNewShow] = useState('');
-  const [service, setService] = useState(streamingServices[0]);
-
-  const addShow = () => {
-    if (newShow.trim()) {
-      const updatedShows = [...shows, { name: newShow, service }];
-      setShows(updatedShows);
-      setNewShow('');
-      setService(streamingServices[0]);
-    }
-  };
-
-  const removeShow = (index) => {
-    const updatedShows = shows.filter((_, i) => i !== index);
-    setShows(updatedShows);
-  };
-
   return (
     <div className="p-4 flex flex-col items-center min-h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold mb-4">Show Tracker</h1>
-      <div className="flex flex-col sm:flex-row gap-2 mb-4 w-full max-w-md">
-        <Input
-          placeholder="Show name"
-          value={newShow}
-          onChange={(e) => setNewShow(e.target.value)}
-          className="flex-grow"
-        />
-        <Select value={service} onChange={setService}>
-          {streamingServices.map((service) => (
-            <SelectItem key={service} value={service}>
-              {service}
-            </SelectItem>
-          ))}
-        </Select>
-        <Button onClick={addShow}>Add Show</Button>
-      </div>
+      <h1 className="text-4xl font-extrabold mb-6 text-blue-600">Show Tracker</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-4xl">
-        {shows.map((show, index) => (
-          <Card key={index} className="bg-white shadow-lg rounded-2xl">
-            <CardHeader>{show.name}</CardHeader>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
+        {initialShows.map((show, index) => (
+          <Card key={index} className="bg-white shadow-2xl rounded-3xl transition-transform transform hover:scale-105">
+            <CardHeader className="text-xl font-bold text-gray-800">{show.name}</CardHeader>
             <CardContent>
-              <p>Streaming on: {show.service}</p>
-              <Button onClick={() => removeShow(index)} className="mt-2 bg-red-500 hover:bg-red-600">
-                Remove
-              </Button>
+              <p className="text-lg text-gray-600">Streaming on: <span className="font-semibold text-blue-500">{show.service}</span></p>
             </CardContent>
           </Card>
         ))}
