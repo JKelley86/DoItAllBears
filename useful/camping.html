@@ -240,6 +240,23 @@
    </section>
 
   <script>
+    document.addEventListener('DOMContentLoaded', loadChecklist);
+
+    function saveChecklist() {
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(checkbox => {
+        localStorage.setItem(checkbox.dataset.item, checkbox.checked);
+      });
+    }
+
+    function loadChecklist() {
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = localStorage.getItem(checkbox.dataset.item) === 'true';
+      });
+      checkReady();
+    }
+
     function clearChecklist() {
       const checkboxes = document.querySelectorAll('input[type="checkbox"]');
       checkboxes.forEach(checkbox => checkbox.checked = false);
