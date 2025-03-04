@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Travel Planner</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background-color: #1E2A47;
+      color: white;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .search-container {
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+    .search-bar {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .results-container {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .result-card {
+      background-color: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .result-card img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+    }
+    .result-card h3 {
+      margin: 10px 0;
+    }
+    .result-card p {
+      margin: 5px 0;
+    }
+    .result-card a {
+      text-decoration: none;
+      color: #1E2A47;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Free Travel Planner</h1>
+    <p>Your easy-to-use, completely free travel companion</p>
+  </div>
+
+  <div class="search-container">
+    <input type="text" id="destination" class="search-bar" placeholder="Enter your destination...">
+    <button onclick="search()">Search</button>
+  </div>
+
+  <div class="results-container" id="results-container">
+    <!-- Results will appear here -->
+  </div>
+
+  <script>
+    async function search() {
+      const destination = document.getElementById('destination').value;
+
+      // Example: Use the Roadtrippers API for attractions
+      const attractions = await fetch(`https://api.roadtrippers.com/v1/places?query=${destination}`)
+        .then(response => response.json())
+        .catch(err => console.log(err));
+
+      // Example: Displaying attractions
+      const resultsContainer = document.getElementById('results-container');
+      resultsContainer.innerHTML = '';  // Clear previous results
+
+      if (attractions && attractions.length > 0) {
+        attractions.forEach(attraction => {
+          const card = document.createElement('div');
+          card.classList.add('result-card');
+          card.innerHTML = `
+            <img src="${attraction.image_url}" alt="${attraction.name}">
+            <h3>${attraction.name}</h3>
+            <p>${attraction.address}</p>
+            <a href="${attraction.url}" target="_blank">More Info</a>
+          `;
+          resultsContainer.appendChild(card);
+        });
+      } else {
+        resultsContainer.innerHTML = `<p>No results found for ${destination}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
