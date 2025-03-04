@@ -65,18 +65,11 @@
 </head>
 <body>
   <h1>Movie & Show Tracker</h1>
-  <div class="show-form">
-    <input type="text" id="showName" placeholder="Show Name">
-    <select id="streamingService">
-      <option value="Netflix">Netflix</option>
-      <option value="Hulu">Hulu</option>
-      <option value="Disney+">Disney+</option>
-      <option value="Prime Video">Prime Video</option>
-      <option value="HBO Max">HBO Max</option>
-    </select>
-    <button onclick="addShow()">Add Show</button>
-  </div>
-  <div class="show-cards" id="showCards"></div>
+        <h3>${name}</h3>
+        <p>Streaming on: ${service}</p>
+        <button class="remove-btn" onclick="removeShow(this)">Remove</button>
+      `;
+
 
   <script>
     const showCards = document.getElementById('showCards');
