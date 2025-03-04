@@ -19,22 +19,12 @@
       color: #333;
     }
 
-    .show-form {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    input, select, button {
-      padding: 8px;
-      font-size: 1rem;
-    }
-
     .show-cards {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 10px;
       width: 80%;
+      margin-top: 20px;
     }
 
     .card {
@@ -65,33 +55,29 @@
 </head>
 <body>
   <h1>Movie & Show Tracker</h1>
-        <h3>${name}</h3>
-        <p>Streaming on: ${service}</p>
-        <button class="remove-btn" onclick="removeShow(this)">Remove</button>
-      `;
 
+  <div class="show-cards" id="showCards"></div>
 
   <script>
     const showCards = document.getElementById('showCards');
 
-    function addShow() {
-      const name = document.getElementById('showName').value;
-      const service = document.getElementById('streamingService').value;
+    // Hardcoded list of shows
+    const shows = [
+      { name: 'Stranger Things', service: 'Netflix' },
+      { name: 'The Mandalorian', service: 'Disney+' },
+      { name: 'The Boys', service: 'Amazon Prime' }
+    ];
 
-      if (!name) return alert('Please enter a show name!');
-
-      const card = [
-        { name: 'Stranger Things', service: 'Netflix' },
-        { name: 'The Mandalorian', service: 'Disney+' },
-        { name: 'The Boys', service: 'Amazon Prime' }
-      ];
+    // Generate the cards dynamically
+    shows.forEach(show => {
+      const card = document.createElement('div');
+      card.classList.add('card');
+      card.innerHTML = `
+        <h3>${show.name}</h3>
+        <p>Streaming on: ${show.service}</p>
+      `;
       showCards.appendChild(card);
-      document.getElementById('showName').value = '';
-    }
-
-    function removeShow(button) {
-      button.parentElement.remove();
-    }
+    });
   </script>
 </body>
 </html>
