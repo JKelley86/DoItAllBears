@@ -87,13 +87,6 @@
 
       if (!name) return alert('Please enter a show name!');
 
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <h3>${name}</h3>
-        <p>Streaming on: ${service}</p>
-        <button class="remove-btn" onclick="removeShow(this)">Remove</button>
-      `;
       const card = [
         { name: 'Stranger Things', service: 'Netflix' },
         { name: 'The Mandalorian', service: 'Disney+' },
