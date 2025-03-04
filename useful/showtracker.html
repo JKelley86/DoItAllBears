@@ -9,7 +9,7 @@
       font-family: 'Arial', sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #2c3e50; /* Dark background to match movie theatre feel */
+      background-color: #2c3e50;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -18,7 +18,7 @@
     }
 
     h1 {
-      color: #e74c3c; /* Movie red color */
+      color: #e74c3c;
       text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
       font-size: 3rem;
       margin-top: 20px;
@@ -34,7 +34,7 @@
     }
 
     .card {
-      background: #ecf0f1; /* Light gray background for the card */
+      background: #ecf0f1;
       padding: 15px;
       border-radius: 12px;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
@@ -97,36 +97,36 @@
   <script>
     const showCards = document.getElementById('showCards');
 
-    // Hardcoded list of shows with service logos
+    // Logo mapping for each streaming service
+    const logoMap = {
+      'Netflix': 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg',
+      'Disney+': 'https://upload.wikimedia.org/wikipedia/commons/e/ec/Disney%2B_Logo_2022.svg',
+      'Amazon Prime': 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_Prime_Video_logo.svg'
+    };
+
+    // Hardcoded list of shows with service names
     const shows = [
-      { 
-        name: 'Stranger Things', 
-        service: 'Netflix', 
-        logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg' 
-      },
-      { 
-        name: 'The Mandalorian', 
-        service: 'Disney+', 
-        logo: 'https://upload.wikimedia.org/wikipedia/commons/e/ec/Disney%2B_Logo_2022.svg' 
-      },
-      { 
-        name: 'The Boys', 
-        service: 'Amazon Prime', 
-        logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_Prime_Video_logo.svg' 
-      }
+      { name: 'Stranger Things', service: 'Netflix' },
+      { name: 'The Mandalorian', service: 'Disney+' },
+      { name: 'The Boys', service: 'Amazon Prime' }
     ];
 
     // Generate the cards dynamically
     shows.forEach(show => {
       const card = document.createElement('div');
       card.classList.add('card');
+      
+      // Fetch the logo URL from the logoMap using the service name
+      const logoUrl = logoMap[show.service];
+
       card.innerHTML = `
         <div class="logo-container">
-          <img src="${show.logo}" alt="${show.service} Logo">
+          <img src="${logoUrl}" alt="${show.service} Logo">
         </div>
         <h3>${show.name}</h3>
         <p>Streaming on: ${show.service}</p>
       `;
+      
       showCards.appendChild(card);
     });
   </script>
