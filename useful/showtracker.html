@@ -6,50 +6,86 @@
   <title>Movie & Show Tracker</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #f4f4f4;
+      background-color: #2c3e50; /* Dark background to match movie theatre feel */
       display: flex;
       flex-direction: column;
       align-items: center;
+      color: white;
+      background-image: linear-gradient(to bottom, #34495e, #2c3e50);
     }
 
     h1 {
-      color: #333;
+      color: #e74c3c; /* Movie red color */
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+      font-size: 3rem;
+      margin-top: 20px;
     }
 
     .show-cards {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
       width: 80%;
-      margin-top: 20px;
+      margin-top: 30px;
+      padding: 0 10px;
     }
 
     .card {
-      background: white;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      background: #ecf0f1; /* Light gray background for the card */
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
       text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     }
 
     .card h3 {
       margin: 0;
+      font-size: 1.5rem;
+      color: #333;
+      margin-bottom: 10px;
     }
 
     .card p {
       margin: 5px 0;
+      font-size: 1rem;
+      color: #7f8c8d;
+    }
+
+    .card img {
+      width: 50px;
+      height: auto;
+      margin-bottom: 10px;
     }
 
     .remove-btn {
-      background-color: #cc0000;
+      background-color: #e74c3c;
       color: white;
       border: none;
       border-radius: 4px;
       cursor: pointer;
       padding: 5px 10px;
+      font-size: 0.9rem;
+      margin-top: 10px;
+      transition: background-color 0.3s ease;
+    }
+
+    .remove-btn:hover {
+      background-color: #c0392b;
+    }
+
+    .logo-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
     }
   </style>
 </head>
@@ -61,11 +97,23 @@
   <script>
     const showCards = document.getElementById('showCards');
 
-    // Hardcoded list of shows
+    // Hardcoded list of shows with service logos
     const shows = [
-      { name: 'Stranger Things', service: 'Netflix' },
-      { name: 'The Mandalorian', service: 'Disney+' },
-      { name: 'The Boys', service: 'Amazon Prime' }
+      { 
+        name: 'Stranger Things', 
+        service: 'Netflix', 
+        logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg' 
+      },
+      { 
+        name: 'The Mandalorian', 
+        service: 'Disney+', 
+        logo: 'https://upload.wikimedia.org/wikipedia/commons/e/ec/Disney%2B_Logo_2022.svg' 
+      },
+      { 
+        name: 'The Boys', 
+        service: 'Amazon Prime', 
+        logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_Prime_Video_logo.svg' 
+      }
     ];
 
     // Generate the cards dynamically
@@ -73,6 +121,9 @@
       const card = document.createElement('div');
       card.classList.add('card');
       card.innerHTML = `
+        <div class="logo-container">
+          <img src="${show.logo}" alt="${show.service} Logo">
+        </div>
         <h3>${show.name}</h3>
         <p>Streaming on: ${show.service}</p>
       `;
