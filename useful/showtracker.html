@@ -66,26 +66,31 @@
       margin-bottom: 10px;
     }
 
-    .remove-btn {
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      padding: 5px 10px;
-      font-size: 0.9rem;
-      margin-top: 10px;
-      transition: background-color 0.3s ease;
-    }
-
-    .remove-btn:hover {
-      background-color: #c0392b;
-    }
-
     .logo-container {
       display: flex;
       justify-content: center;
       margin-bottom: 10px;
+    }
+
+    .random-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 10px 20px;
+      font-size: 1rem;
+      margin-top: 20px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .random-btn:hover {
+      background-color: #c0392b;
+      transform: scale(1.05);
+    }
+
+    .random-show {
+      margin-top: 30px;
     }
   </style>
 </head>
@@ -94,10 +99,14 @@
 
   <div class="show-cards" id="showCards"></div>
 
+  <button class="random-btn" onclick="pickRandomShow()">Pick a Random Show</button>
+
+  <div id="randomShow" class="random-show"></div>
+
   <script>
     const showCards = document.getElementById('showCards');
+    const randomShowDiv = document.getElementById('randomShow');
 
-    // Logo mapping for each streaming service
     const logoMap = {
       'Netflix': 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg',
       'Disney+': 'https://upload.wikimedia.org/wikipedia/commons/archive/7/77/20230514165915%21Disney_Plus_logo.svg',
@@ -109,10 +118,8 @@
       'Peacock' : 'https://upload.wikimedia.org/wikipedia/commons/d/d3/NBCUniversal_Peacock_Logo.svg',
       'Tubi' : 'https://upload.wikimedia.org/wikipedia/commons/c/c5/Tubi_logo_2024_purple.svg',
       'Apple TV' : 'https://commons.wikimedia.org/wiki/Category:Apple_TV_logos#/media/File:AppleTV.png'
-  
     };
 
-    // Hardcoded list of shows with service names
     const shows = [
       { name: 'Stranger Things', service: 'Netflix' },
       { name: 'The Mandalorian', service: 'Disney+' },
@@ -126,17 +133,12 @@
       { name: 'Landman', service: 'Paramount Plus' },
       { name: 'Fire Country', service: 'Paramount Plus' },
       { name: 'Chicago Med', service: 'Peacock' }
-      
     ];
 
-    // Generate the cards dynamically
     shows.forEach(show => {
       const card = document.createElement('div');
       card.classList.add('card');
-      
-      // Fetch the logo URL from the logoMap using the service name
       const logoUrl = logoMap[show.service];
-
       card.innerHTML = `
         <div class="logo-container">
           <img src="${logoUrl}" alt="${show.service} Logo">
@@ -144,9 +146,23 @@
         <h3>${show.name}</h3>
         <p>Streaming on: ${show.service}</p>
       `;
-      
       showCards.appendChild(card);
     });
+
+    function pickRandomShow() {
+      const randomIndex = Math.floor(Math.random() * shows.length);
+      const show = shows[randomIndex];
+      const logoUrl = logoMap[show.service];
+      randomShowDiv.innerHTML = `
+        <div class="card">
+          <div class="logo-container">
+            <img src="${logoUrl}" alt="${show.service} Logo">
+          </div>
+          <h3>${show.name}</h3>
+          <p>Streaming on: ${show.service}</p>
+        </div>
+      `;
+    }
   </script>
 </body>
 </html>
