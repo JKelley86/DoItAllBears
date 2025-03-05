@@ -1,109 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Free Travel Planner</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 0;
-    }
-    .header {
-      background-color: #1E2A47;
-      color: white;
-      text-align: center;
-      padding: 20px 0;
-    }
-    .search-container {
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-    }
-    .search-bar {
-      padding: 10px;
-      font-size: 1rem;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    .results-container {
-      padding: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-    }
-    .result-card {
-      background-color: white;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
-    .result-card img {
-      width: 100px;
-      height: 100px;
-      object-fit: contain;
-    }
-    .result-card h3 {
-      margin: 10px 0;
-    }
-    .result-card p {
-      margin: 5px 0;
-    }
-    .result-card a {
-      text-decoration: none;
-      color: #1E2A47;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
-  <div class="header">
-    <h1>Free Travel Planner</h1>
-    <p>Your easy-to-use, completely free travel companion</p>
-  </div>
+const TravelPlanner = () => {
+  const [selectedOption, setSelectedOption] = useState('');
 
-  <div class="search-container">
-    <input type="text" id="destination" class="search-bar" placeholder="Enter your destination...">
-    <button onclick="search()">Search</button>
-  </div>
+  const options = [
+    { name: 'Flights', description: 'Find the best flight deals and schedules.' },
+    { name: 'Hotels', description: 'Discover top-rated places to stay.' },
+    { name: 'Car Rentals', description: 'Choose a ride for your trip.' },
+    { name: 'Road Trip Attractions', description: 'Explore fun stops along the way.' }
+  ];
 
-  <div class="results-container" id="results-container">
-    <!-- Results will appear here -->
-  </div>
+  const handleOptionClick = (option) => {
+    setSelectedOption(option);
+  };
 
-  <script>
-    async function search() {
-      const destination = document.getElementById('destination').value;
+  return (
+    <div className="p-4 flex flex-col items-center min-h-screen bg-gray-100">
+      <h1 className="text-4xl font-extrabold mb-6 text-blue-600">Travel Planner</h1>
 
-      // Example: Use the Roadtrippers API for attractions
-      const attractions = await fetch(`https://api.roadtrippers.com/v1/places?query=${destination}`)
-        .then(response => response.json())
-        .catch(err => console.log(err));
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+        {options.map((option) => (
+          <Card
+            key={option.name}
+            className="bg-white shadow-2xl rounded-3xl transition-transform transform hover:scale-105 cursor-pointer"
+            onClick={() => handleOptionClick(option.name)}
+          >
+            <CardHeader className="text-xl font-bold text-gray-800">{option.name}</CardHeader>
+            <CardContent>
+              <p className="text-lg text-gray-600">{option.description}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-      // Example: Displaying attractions
-      const resultsContainer = document.getElementById('results-container');
-      resultsContainer.innerHTML = '';  // Clear previous results
+      {selectedOption && (
+        <div className="mt-8 p-6 bg-white rounded-3xl shadow-2xl w-full max-w-4xl">
+          <h2 className="text-2xl font-bold text-blue-600">{selectedOption}</h2>
+          <p className="text-lg text-gray-600 mt-2">More details about {selectedOption} will go here.</p>
+        </div>
+      )}
+    </div>
+  );
+};
 
-      if (attractions && attractions.length > 0) {
-        attractions.forEach(attraction => {
-          const card = document.createElement('div');
-          card.classList.add('result-card');
-          card.innerHTML = `
-            <img src="${attraction.image_url}" alt="${attraction.name}">
-            <h3>${attraction.name}</h3>
-            <p>${attraction.address}</p>
-            <a href="${attraction.url}" target="_blank">More Info</a>
-          `;
-          resultsContainer.appendChild(card);
-        });
-      } else {
-        resultsContainer.innerHTML = `<p>No results found for ${destination}</p>`;
-      }
-    }
-  </script>
-</body>
-</html>
+export default TravelPlanner;
