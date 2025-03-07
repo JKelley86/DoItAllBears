@@ -1,70 +1,60 @@
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"> 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Travel Planner</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-      text-align: center;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Home</title>
+    <link rel="stylesheet" href="../styles.css">
+<style>
+    .nav-button {
+        display: inline-block;
+        width: 90px;
+        height: 90px;
+        margin: 10px;
+        border-radius: 50%;
+        background-color: #000;
+        color: #fff;
+        text-align: center;
+        line-height: 80px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
+</style>
+.nav-button:hover {
+    background-color: #333;
+}
 
-    h1 {
-      color: #007BFF;
-      margin-top: 20px;
-    }
-
-    .options-container {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 30px;
-    }
-
-    .option {
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      cursor: pointer;
-    }
-
-    .option:hover {
-      transform: scale(1.05);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    }
-  </style>
 </head>
-<body>
-  <h1>Travel Planner</h1>
-  <div class="options-container">
-    <div class="option" onclick="showFlights()">Flights</div>
-    <div class="option" onclick="showHotels()">Hotels</div>
-    <div class="option" onclick="showRentals()">Car Rentals</div>
-    <div class="option" onclick="showAttractions()">Road Trip Attractions</div>
-  </div>
+<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+ <div class="container">
+        <nav>
+            <div id="navbar"></div>
+        </nav>
 
-  <script>
-    function showFlights() {
-      alert('Showing flight options...');
-    }
+       <main>
+        <h1>Welcome To The Home Page Of Useful items</h1>
+        <p>This is a one stop shop to anything you may need!.</p>
+        
+        <section>
+            <h2>Description</h2>
+            <p>On the top navigation bar theres buttons to each type of page. To navigate to each page simply click or tap on the text. Each page will have a variety of pages to choose from.</p>
+        </section>
+    </main>
 
-    function showHotels() {
-      alert('Showing hotel options...');
-    }
-
-    function showRentals() {
-      alert('Showing car rental options...');
-    }
-
-    function showAttractions() {
-      alert('Showing road trip attractions...');
-    }
-  </script>
+    <footer> 
+        <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+    </footer> 
+ </div>
+<script>
+    fetch('navbar.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('navbar').innerHTML = data;
+    });
+</script>
 </body>
 </html>
