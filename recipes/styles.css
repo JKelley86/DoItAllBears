@@ -142,6 +142,7 @@
         position: relative;
         margin: 20px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-left: 20px; /* Added margin to move modal away from the left edge */
     }
 
     .close-button {
