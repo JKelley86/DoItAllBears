@@ -41,6 +41,41 @@
         font-size: 24px;
         cursor: pointer;
     }
+    .nutrition-facts {
+    margin-top: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.nutrition-facts h2 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.nutrition-facts table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.nutrition-facts table td {
+    padding: 5px;
+    font-size: 16px;
+}
+
+.nutrition-facts table td:first-child {
+    width: 60%;
+    font-weight: bold;
+}
+
+.nutrition-facts table td:last-child {
+    text-align: right;
+}
+
+.nutrition-facts p {
+    font-size: 16px;
+    margin: 10px 0;
+}
 </style>
 </head>
 <body>
@@ -82,18 +117,38 @@
             <li>Allow to cool before serving.</li>
         </ol>
     </section>
-    <div id="nutrition-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="toggleInfo()">&times;</span>
-            <h2>Nutrition & Serving Info</h2>
+<div id="nutrition-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="toggleInfo()">&times;</span>
+        <h2>Nutrition Facts</h2>
+        <div class="nutrition-facts">
             <p><strong>Serving Size:</strong> 1 slice</p>
             <p><strong>Servings:</strong> 8</p>
-            <p><strong>Calories per Serving:</strong> 250</p>
-            <p><strong>Protein:</strong> 5g</p>
-            <p><strong>Carbs:</strong> 35g</p>
-            <p><strong>Fat:</strong> 10g</p>
+            <table>
+                <tr>
+                    <td><strong>Calories</strong></td>
+                    <td>250</td>
+                </tr>
+                <tr>
+                    <td><strong>Protein</strong></td>
+                    <td>5g</td>
+                </tr>
+                <tr>
+                    <td><strong>Carbs</strong></td>
+                    <td>35g</td>
+                </tr>
+                <tr>
+                    <td><strong>Fat</strong></td>
+                    <td>10g</td>
+                </tr>
+                <tr>
+                    <td><strong>Sodium</strong></td>
+                    <td>150mg</td>
+                </tr>
+            </table>
         </div>
     </div>
+</div>
     <footer>
         <p>&copy; 2024 Bear Book. All rights reserved.</p>
     </footer>
