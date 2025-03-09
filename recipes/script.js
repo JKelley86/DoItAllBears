@@ -14,3 +14,11 @@
                 alert("Sharing is not supported on this device.");
             }
         }
+         function toggleInfo() {
+          const infoSection = document.getElementById('nutrition-info');
+          if (infoSection.style.display === 'none') {
+             infoSection.style.display = 'block';
+         } else {
+             infoSection.style.display = 'none';
+           }
+        }
