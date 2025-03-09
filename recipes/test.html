@@ -15,6 +15,7 @@
         <div class="button-container">
             <button class="print-button" onclick="window.print()"><i class="fas fa-print"></i></button>
             <button class="share-button" onclick="shareRecipe()"><i class="fas fa-share-alt"></i></button>
+            <button class="info-button" onclick="toggleInfo()"><i class="fas fa-info-circle"></i></button>
         </div>
     </header>
 
@@ -48,9 +49,33 @@
         </ol>
     </section>
 
+    <section id="nutrition-info" style="display:none;">
+        <h2>Serving Information</h2>
+        <p><strong>Serving Size:</strong> 1 slice</p>
+        <p><strong>Servings:</strong> 8</p>
+        <h3>Nutrition Facts (Per Serving)</h3>
+        <ul>
+            <li>Calories: 200</li>
+            <li>Fat: 8g</li>
+            <li>Carbohydrates: 28g</li>
+            <li>Protein: 5g</li>
+        </ul>
+    </section>
+
     <footer>
         <p>&copy; 2024 Bear Book. All rights reserved.</p>
     </footer>
+
+<script>
+function toggleInfo() {
+    const infoSection = document.getElementById('nutrition-info');
+    if (infoSection.style.display === 'none') {
+        infoSection.style.display = 'block';
+    } else {
+        infoSection.style.display = 'none';
+    }
+}
+</script>
 
 <script src="script.js"></script>
 
