@@ -14,11 +14,11 @@
                 alert("Sharing is not supported on this device.");
             }
         }
-         function toggleInfo() {
-          const infoSection = document.getElementById('nutrition-info');
-          if (infoSection.style.display === 'none') {
-             infoSection.style.display = 'block';
-         } else {
-             infoSection.style.display = 'none';
-           }
+    function toggleInfo() {
+        const modal = document.getElementById('nutrition-modal');
+        if (modal.style.display === 'none' || modal.style.display === '') {
+            modal.style.display = 'flex';
+        } else {
+            modal.style.display = 'none';
         }
+    }
