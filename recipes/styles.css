@@ -118,6 +118,14 @@
         page-break-before: auto;
         page-break-inside: avoid;
     }
+               
+    #nutrition-info {
+        display: none;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-top: 10px;
+    }
 
     footer {
         position: fixed;
