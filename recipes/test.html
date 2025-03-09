@@ -7,15 +7,6 @@
     <!-- Add Font Awesome CDN -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <styles>
-        #nutrition-info {
-    display: none;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin-top: 10px;
-}
-    </styles>
 </head>
 <body>
 
@@ -58,34 +49,11 @@
         </ol>
     </section>
 
-    <section id="nutrition-info" style="display: none;">
-        <h2>Nutrition & Serving Info</h2>
-        <p><strong>Serving Size:</strong> 1 slice</p>
-        <p><strong>Servings:</strong> 8</p>
-        <p><strong>Calories per Serving:</strong> 250</p>
-        <p><strong>Protein:</strong> 5g</p>
-        <p><strong>Carbs:</strong> 35g</p>
-        <p><strong>Fat:</strong> 10g</p>
-    </section>
-
     <footer>
         <p>&copy; 2024 Bear Book. All rights reserved.</p>
     </footer>
 
-<script>
-    function toggleInfo() {
-        const infoSection = document.getElementById('nutrition-info');
-        if (infoSection.style.display === 'none') {
-            infoSection.style.display = 'block';
-        } else {
-            infoSection.style.display = 'none';
-        }
-    }
-
-    function shareRecipe() {
-        alert('Sharing feature coming soon!');
-    }
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
