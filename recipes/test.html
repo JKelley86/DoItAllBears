@@ -101,6 +101,15 @@
     </footer>
 
 <script src="script.js"></script>
-
+<script>
+        function toggleInfo() {
+        const modal = document.getElementById('nutrition-modal');
+        if (modal.style.display === 'none' || modal.style.display === '') {
+            modal.style.display = 'flex';
+        } else {
+            modal.style.display = 'none';
+        }
+    }
+</script>
 </body>
 </html>
