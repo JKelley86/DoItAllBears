@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Pumpkin Bars</title>
+    <!-- Add Font Awesome CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+                .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        width: 80%;
+        max-width: 400px;
+        text-align: center;
+        position: relative;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin: auto;
+    }
+
+    .close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+        cursor: pointer;
+    }
+    .nutrition-facts {
+    margin-top: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.nutrition-facts h2 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.nutrition-facts table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.nutrition-facts table td {
+    padding: 5px;
+    font-size: 16px;
+}
+
+.nutrition-facts table td:first-child {
+    width: 60%;
+    font-weight: bold;
+}
+
+.nutrition-facts table td:last-child {
+    text-align: right;
+}
+
+.nutrition-facts p {
+    font-size: 16px;
+    margin: 10px 0;
+}
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Pumpkin Bars</h1>
+        <div class="button-container">
+            <button class="print-button" onclick="window.print()"><i class="fas fa-print"></i></button>
+            <button class="share-button" onclick="shareRecipe()"><i class="fas fa-share-alt"></i></button>
+            <button class="info-button" onclick="toggleInfo()"><i class="fas fa-info-circle"></i></button>
+        </div>
+    </header>
+    <section id="recipe-details">
+        <h2>Recipe Details</h2>
+        <p><strong>Prep Time:</strong> 20 minutes</p>
+        <p><strong>Cook Time:</strong> 25 minutes</p>
+        <p><strong>Total Time:</strong> 45 minutes</p>
+    </section>
+
+    <section id="ingredients">
+        <h2>Ingredients (Cake)</h2>
+        <ul>
+            <li>1 (15 Ounce) Can pumpkin puree</li>
+            <li>1 2/3 Cups white sugar</li>
+            <li>1 Cup vegetable oil</li>
+            <li>4 Large eggs</li>
+            <li>2 Cups all-purpose flour</li>
+            <li>2 Teaspoons ground cinnamon</li>
+            <li>2 Teaspoons baking powder</li>
+            <li>1 Teaspoon baking soda</li>
+            <li>1 Teaspoon salt</li>
+        </ul>
+        <h2>Ingredients (Frosting)</h2>
+        <ul>
+            <li>1/2 Cup butter softened</li>
+            <li>1 (3 Ounce) Pack cream cheese</li>
+            <li>1 Teaspoon vanilla extract</li>
+            <li>2 Cups sifted confectioners' sugar</li>
+        </ul>
+    </section>
+
+    <section id="instructions">
+        <h2>Instructions</h2>
+        <ol>
+            <li>Preheat the oven to 350°F (175°C).</li>
+            <li>In a bowl, mix the flour, sugar, and eggs together.</li>
+            <li>Add the milk and vanilla extract, and stir until smooth.</li>
+            <li>Pour the mixture into a greased baking pan.</li>
+            <li>Bake for 30 minutes or until golden brown.</li>
+            <li>Allow to cool before serving.</li>
+        </ol>
+    </section>
+<div id="nutrition-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="toggleInfo()">&times;</span>
+        <h2>Nutrition Facts</h2>
+        <div class="nutrition-facts">
+            <p><strong>Serving Size:</strong> 1 bar</p>
+            <p><strong>Servings:</strong> 24 bars</p>
+            <table>
+                <tr>
+                    <td><strong>Calories</strong></td>
+                    <td>279</td>
+                </tr>
+                <tr>
+                    <td><strong>Protein</strong></td>
+                    <td>3g</td>
+                </tr>
+                <tr>
+                    <td><strong>Carbs</strong></td>
+                    <td>34g</td>
+                </tr>
+                <tr>
+                    <td><strong>Fat</strong></td>
+                    <td>15g</td>
+                </tr>
+                <tr>
+                    <td><strong>Sodium</strong></td>
+                    <td>238mg</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+    <footer>
+        <p>&copy; 2024 Bear Book. All rights reserved.</p>
+    </footer>
+
+<script src="script.js"></script>
+<script>
+    window.onload = function() {
+    const modal = document.getElementById('nutrition-modal');
+    modal.style.display = 'none'; // Ensure modal is hidden on page load
+}
+
+function toggleInfo() {
+    const modal = document.getElementById('nutrition-modal');
+    if (modal.style.display === 'none' || modal.style.display === '') {
+        modal.style.display = 'flex';
+    } else {
+        modal.style.display = 'none';
+    }
+}
+</script>
+</body>
+</html>
