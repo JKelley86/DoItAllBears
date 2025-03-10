@@ -15,6 +15,9 @@ html, body {
 body {
     text-align: center;
     margin: 0;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    overflow-y: auto; /* Only allow vertical scrolling if needed */
+    height: 100vh; /* Ensure the body takes up the full height of the viewport */
 }
 
 .calculator.single-column {
