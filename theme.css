@@ -171,3 +171,30 @@ footer {
     from { opacity: 0; }
     to { opacity: 1; }
 }
+        /* Styling for the information sections */
+        .information-section {
+            background-color: #e0e0e0; /* Slightly darker gray than the background */
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-sizing: border-box; /* Ensure padding is included in the height */
+        }
+
+        .information-section h2 {
+            font-size: 1.5em;
+            color: #333; /* Dark text */
+        }
+
+        .information-section p {
+            font-size: 1em;
+            color: #555; /* Darker gray for the paragraph text */
+        }
+
+        /* Ensure all sections are the same height */
+        .information-section {
+            min-height: 150px; /* Minimum height to make sections the same size */
+            max-width: 1200px;
+            min-width: 50%;
+            margin: 50 auto;
+            padding: 20px;
+        }
