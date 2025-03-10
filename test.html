@@ -97,11 +97,14 @@
             document.body.classList.remove('light-mode');
         }
     }
-    fetch('navbar.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('main-container').innerHTML += data;
-            });
+fetch('navbar.html')
+    .then(response => response.text())
+    .then(data => {
+        const container = document.getElementById('main-container');
+        container.innerHTML += data;
+        const cards = container.querySelectorAll('.nav-card');
+        cards.forEach(card => card.classList.add('nav-card')); // Ensure class is added
+    });
     setInterval(updateClock, 1000);
     updateClock();
 </script>
