@@ -35,6 +35,26 @@
             flex: 1;
             padding: 50px 20px;
         }
+        .card-container {
+             display: grid;
+             grid-template-columns: repeat(3, 1fr); /* Maximum of 3 columns */
+             gap: 20px; /* Space between the grid items */
+             justify-items: center; /* Centers the cards horizontally */
+             align-items: center; /* Centers the cards vertically */
+             justify-content: center; /* Centers the grid within the container */
+        }
+
+        @media (max-width: 768px) {
+            .card-container {
+                grid-template-columns: repeat(2, 1fr); /* 2 columns on smaller screens */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card-container {
+                grid-template-columns: 1fr; /* 1 column on very small screens */
+             }
+        }
         h1 {
             font-size: 4rem;
             margin-bottom: 10px;
@@ -148,6 +168,8 @@
         <h1>Welcome To The Home Page Of Useful Items</h1>
         <p>This is a one-stop shop for anything you may need!</p>
         <input type="text" class="search-bar" placeholder="Search...">
+    </div>
+    <div class="card-container">
         <div class="nav-card" onclick="navigateTo('recipes/index.html')">🍽 Recipes</div>
         <div class="nav-card" onclick="navigateTo('home/index.html')">🏡 Home</div>
         <div class="nav-card" onclick="navigateTo('useful/index.html')">🔧 Useful</div>
@@ -156,7 +178,6 @@
         <div class="nav-card" onclick="navigateTo('animals/index.html')">🐔 Animals</div>
         <div class="nav-card" onclick="navigateTo('games/index.html')">🎮 Games</div>
     </div>
-
     <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
     <div class="sidebar" id="sidebar">
         <div class="clock" id="clock"></div>
