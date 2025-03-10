@@ -159,10 +159,11 @@ p {
 
 /* Footer */
 footer {
-    text-align: center;
-    margin-top: 50px;
-    padding: 10px;
     background: var(--card-bg);
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+    position: relative; /* Ensures it flows at the bottom */
 }
 
 /* Animation */
