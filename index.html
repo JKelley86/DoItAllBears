@@ -63,6 +63,13 @@
             cursor: pointer;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
             transition: background 0.3s ease, transform 0.2s ease;
+            visibility: visible; /* Default state */
+            opacity: 1; /* Default state */
+        }
+
+        .nav-card.hidden {
+            visibility: hidden; /* When hidden, the card stays in layout */
+            opacity: 0; /* Make the card invisible */
         }
         .nav-card:hover {
             background: var(--accent-color);
@@ -147,7 +154,7 @@
     <div class="container">
         <h1>Welcome To The Home Page Of Useful Items</h1>
         <p>This is a one-stop shop for anything you may need!</p>
-        <input type="text" class="search-bar" placeholder="Search...">
+        <input type="text" class="search-bar" id="search-bar" placeholder="Search..." oninput="filterCards()">
         <div class="nav-card" onclick="navigateTo('recipes/index.html')">🍽 Recipes</div>
         <div class="nav-card" onclick="navigateTo('home/index.html')">🏡 Home</div>
         <div class="nav-card" onclick="navigateTo('useful/index.html')">🔧 Useful</div>
@@ -160,7 +167,7 @@
     <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
     <div class="sidebar" id="sidebar">
         <div class="clock" id="clock"></div>
-        <a href="recipes/index.html">📖 Recipes</a>
+        <a href="recipes.index.html">📖 Recipes</a>
         <a href="useful/showtracker.html">🎥 Movies</a>
 	<a href="useful/camping.html">⛺ Camping</a>
         <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
@@ -189,6 +196,35 @@
         const timeString = now.toLocaleTimeString();
         document.getElementById('clock').textContent = timeString;
     }
+    function filterCards() {
+    const searchTerm = document.getElementById('search-bar').value.toLowerCase(); // Get the search term and make it lowercase
+    const cards = Array.from(document.querySelectorAll('.nav-card')); // Get all the card elements and convert them to an array
+
+    // Filter the cards based on the search term
+    const filteredCards = cards.filter(card => card.textContent.toLowerCase().includes(searchTerm));
+
+    // Sort the cards in order (matching cards go to the top)
+    const sortedCards = filteredCards.concat(cards.filter(card => !card.textContent.toLowerCase().includes(searchTerm)));
+
+    // Now, reorder the cards in the DOM
+    const container = document.querySelector('.container'); // Get the container where cards are located
+    sortedCards.forEach(card => {
+        container.appendChild(card); // Append the card in the correct order
+    });
+
+    // Adjust visibility and opacity for a smooth transition
+    cards.forEach(card => {
+        const cardText = card.textContent.toLowerCase(); // Get the text of each card and make it lowercase
+
+        if (cardText.includes(searchTerm)) {
+            card.style.visibility = 'visible'; // Make card visible
+            card.style.opacity = '1'; // Make card fully visible
+        } else {
+            card.style.visibility = 'hidden'; // Hide card but keep it in layout
+            card.style.opacity = '0'; // Make card invisible
+        }
+    });
+}
     setInterval(updateClock, 1000);
     updateClock();
 </script>
