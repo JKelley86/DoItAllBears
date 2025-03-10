@@ -42,7 +42,14 @@
         const sidebar = document.getElementById('sidebar');
         sidebar.classList.toggle('open');
     }
-
+        // Close sidebar if clicked outside of it
+    document.addEventListener('click', function(event) {
+	const sidebar = document.getElementById('sidebar');
+        const menuButton = document.querySelector('.menu-btn');
+        if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+            sidebar.classList.remove('open');
+        }
+    });
 
     function updateClock() {
         const now = new Date();
