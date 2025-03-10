@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en"> 
 <head>
@@ -7,54 +5,97 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Home</title>
     <link rel="stylesheet" href="../styles.css">
-<style>
-    .nav-button {
-        display: inline-block;
-        width: 90px;
-        height: 90px;
-        margin: 10px;
-        border-radius: 50%;
-        background-color: #000;
-        color: #fff;
-        text-align: center;
-        line-height: 80px;
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-</style>
-.nav-button:hover {
-    background-color: #333;
-}
-
+    <link rel="stylesheet" href="../theme.css">
 </head>
-<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
- <div class="container">
-        <nav>
-            <div id="navbar"></div>
-        </nav>
+<body>
+    <div class="container">
+        <h1>Welcome To The Useful Items Page</h1>
+        <p>Here you will find general items that are useful!</p>
+        <input type="text" class="search-bar" id="search-bar" placeholder="Search..." oninput="filterCards()">
+        <div class="nav-card" onclick="navigateTo('showtracker.html')">Show Tracker</div>
+        <div class="nav-card" onclick="navigateTo('camping.html')">Camping</div>
+        <div class="nav-card" onclick="navigateTo('song.html')">Song Search</div>
+        <div class="nav-card" onclick="navigateTo('qrcode.html')">QR Code Generator</div>
+        <div class="nav-card" onclick="navigateTo('file.html')">File Converter</div>
+        <div class="nav-card" onclick="navigateTo('loan.html')">Loan Calculator</div>
+        <div class="nav-card" onclick="navigateTo('hunting-fishing.html')">Hunting & Fishing Info</div>
+    </div>
 
-       <main>
-        <h1>Welcome To The Home Page Of Useful items</h1>
-        <p>This page will contain any tools or tip on useful items.</p>
-        
-        <section>
-            <h2>Description</h2>
-            <p>On the top navigation bar theres buttons to each type of page. To navigate to each page simply click or tap on the text. Each page will have a variety of pages to choose from.</p>
-        </section>
-    </main>
+    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+    <div class="sidebar" id="sidebar">
+        <div class="clock" id="clock"></div>
+        <a href="../index.html">Home Page</a>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+    </div>
 
     <footer> 
         <span>&copy; 2024 Justin's Website. All rights reserved.</span>
     </footer> 
- </div>
 <script>
-    fetch('navbar.html')
-    .then(response => response.text())
-    .then(data => {
-        document.getElementById('navbar').innerHTML = data;
+    function navigateTo(page) {
+        window.location.href = page;
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('open');
+    }
+
+
+    function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        document.getElementById('clock').textContent = timeString;
+    }
+    function filterCards() {
+    const searchTerm = document.getElementById('search-bar').value.toLowerCase(); // Get the search term and make it lowercase
+    const cards = Array.from(document.querySelectorAll('.nav-card')); // Get all the card elements and convert them to an array
+
+    // Filter the cards based on the search term
+    const filteredCards = cards.filter(card => card.textContent.toLowerCase().includes(searchTerm));
+
+    // Sort the cards in order (matching cards go to the top)
+    const sortedCards = filteredCards.concat(cards.filter(card => !card.textContent.toLowerCase().includes(searchTerm)));
+
+    // Now, reorder the cards in the DOM
+    const container = document.querySelector('.container'); // Get the container where cards are located
+    sortedCards.forEach(card => {
+        container.appendChild(card); // Append the card in the correct order
     });
+
+    // Adjust visibility and opacity for a smooth transition
+    cards.forEach(card => {
+        const cardText = card.textContent.toLowerCase(); // Get the text of each card and make it lowercase
+
+        if (cardText.includes(searchTerm)) {
+            card.style.visibility = 'visible'; // Make card visible
+            card.style.opacity = '1'; // Make card fully visible
+        } else {
+            card.style.visibility = 'hidden'; // Hide card but keep it in layout
+            card.style.opacity = '0'; // Make card invisible
+        }
+    });
+}
+        // Function to toggle the theme
+    function toggleTheme() {
+        // Toggle the 'light-mode' class on the body
+        document.body.classList.toggle('light-mode');
+
+        // Save the theme to localStorage
+        localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    }
+
+    // Check localStorage for the theme preference on page load
+    window.onload = function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+        } else if (savedTheme === 'dark') {
+            document.body.classList.remove('light-mode');
+        }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
 </script>
 </body>
 </html>
