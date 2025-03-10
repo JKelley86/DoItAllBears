@@ -1,73 +1,100 @@
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Sprinklers</title>
-    <link rel="stylesheet" href="../styles.css">
-<style>
-    .nav-button {
-        display: inline-block;
-        width: 90px;
-        height: 90px;
-        margin: 10px;
-        border-radius: 50%;
-        background-color: #000;
-        color: #fff;
-        text-align: center;
-        line-height: 80px;
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-</style>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../theme.css">
 </head>
-<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
- <div class="container">
-        <nav>
-            <div id="navbar"></div>
-        </nav>
-
-       <main>
-        <h1>Welcome To The Sprinkler page</h1>
-        <p>This page will tell you everything you need to know to winterize your sprinklers.</p>
+<body>
+    <div class="container">
+        <h1>Sprinklers</h1>
+        <p>Here you will find any information on your sprinklers!</p>
         
-        <section>
+        <!-- Section 1 -->
+        <section class="information-section">
             <h2>Zones</h2>
             <p>You have 8 zones. They are labled on the controller inside the garage. Each zone consist of 5 sprinklers. The shut off valve is in back by the AC and the solenoid valves are inbetween the shut off valve and the wood burried in the ground.</p>
-            <div>Zone 1: Front Sidewalk</div>
-            <div>Zone 2: Front Driveway</div>
-            <div>Zone 3: North Front/Back</div>
-            <div>Zone 4: North East Side</div>
-            <div>Zone 5: South Side</div>
-            <div>Zone 6: South East Corner</div>
-            <div>Zone 7: Drip Zone</div>
-            <div>Zone 8: Blank</div>
-            <div>Zone 9: Garden</div>
+            <p>Zone 1: Front Sidewalk</p>
+            <p>Zone 2: Front Driveway</p>
+            <P>Zone 3: North Front/Back</P>
+            <p>Zone 4: North East Side</p>
+            <p>Zone 5: South Side</p>
+            <p>Zone 6: South East Corner</p>
+            <p>Zone 7: Drip Zone</p>
+            <p>Zone 8: Not Used</p>
+            <p>Zone 9: Garden</p>
         </section>
-        <section>
-        <h2>How to Winterize</h2>
-        <div>1. Locate the shut off valve behind the house.</div>
-        <div>2. Bring air compressor next to shut off valve and start. Make sure to start it early to accumulate air</div>
-        <div>3. Shut off the lower valve running into the house. This will shut off the water.</div>
-        <div>4. Start the first zone on the sprinkler controller by switching it to manual and selecting zone 1 then switch it to run</div>
-        <div>5. Connect the air compressor to the air fitting inbetween the 2 valves. You will see zone 1 start to shoot out water.</div>
-        <div>6. Let the air compressor run until no more water shoots out. Ensure there is enough pressure.</div>
-        <div>7. Turn the top valve on and off as needed to accumulate enough air pressure in the air compressor.</div>
-        <div>8. Turn on the air to each zone at least twice to push out any remaning water that might have settled.</div>
-        <div>9. Repeat steps 5-8 for each zone ensure no water shoots out before moving on. This should take less than an hour.</div>
+
+        <!-- Section 2 -->
+        <section class="information-section">
+            <h2>Winterization</h2>
+            <p>1. Locate the shut off valve behind the house.</p>
+            <p>2. Bring air compressor next to shut off valve and start. Make sure to start it early to accumulate air.</p>
+            <p>3. Shut off the lower valve running into the house. This will shut off the water.</p>
+            <p>4. Start the first zone on the sprinkler controller by switching it to manual and selecting zone 1 then switch it to run.</p>
+            <p>5. Connect the air compressor to the air fitting inbetween the 2 valves. You will see zone 1 start to shoot out water.</p>
+            <p>6. Let the air compressor run until no more water shoots out. Ensure there is enough pressure.</p>
+            <p>7. Turn the top valve on and off as needed to accumulate enough air pressure in the air compressor.</p>
+            <p>8. Turn on the air to each zone at least twice to push out any remaning water that might have settled.</p>
+            <p>9. Repeat steps 5-8 for each zone ensure no water shoots out before moving on. This should take less than an hour.</p>
         </section>
-    </main>
+
+
+    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+    <div class="sidebar" id="sidebar">
+        <div class="clock" id="clock"></div>
+        <a href="../index.html">Main Page</a>
+        <a href="index.html">Home Page</a>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+    </div>
 
     <footer> 
         <span>&copy; 2024 Justin's Website. All rights reserved.</span>
-    </footer> 
- </div>
-<script>
-    fetch('navbar.html')
-    .then(response => response.text())
-    .then(data => {
-        document.getElementById('navbar').innerHTML = data;
-    });
-</script>
+    </footer>
+
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+                // Close sidebar if clicked outside of it
+                document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuButton = document.querySelector('.menu-btn');
+            if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('clock').textContent = timeString;
+        }
+
+        // Function to toggle the theme
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+        }
+
+        window.onload = function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+            } else if (savedTheme === 'dark') {
+                document.body.classList.remove('light-mode');
+            }
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+</body>
+</html>
