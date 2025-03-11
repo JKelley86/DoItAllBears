@@ -123,17 +123,17 @@ p {
     padding-left: 10px;
 }
 .sidebar-card {
-    background-color: #f0f0f0;
-    padding: 12px;
-    margin: 8px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1.2rem;
+    color: var(--text-color);
+    padding: 20px 0;
+    text-decoration: none;
+    font-size: 20px;
+    transition: background 0.3s ease, padding-left 0.3s ease;
 }
 
 /* Hover effect for sidebar cards */
 .sidebar-card:hover {
-    background-color: #ddd;
+    background: var(--accent-color);
+    padding-left: 10px;
 }
 
 /* Menu Button */
