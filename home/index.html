@@ -20,7 +20,7 @@
     <div class="sidebar" id="sidebar">
         <div class="clock" id="clock"></div>
         <a href="../index.html">Home</a>
-	<div id="sidebar-nav"></div>
+	<div id="sidebar"></div>
         <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
     </div>
 
@@ -101,7 +101,7 @@
             .then(response => response.text())
             .then(data => {
                 document.getElementById('main-container').innerHTML += data;
-		document.getElementById('sidebar-nav').innerHTML = data; // Sidebar one
+		document.getElementById('sidebar').innerHTML = data; // Sidebar one
             });
     setInterval(updateClock, 1000);
     updateClock();
