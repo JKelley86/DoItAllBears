@@ -4,29 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Home</title>
-    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="theme.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome To The Home Page Of Useful Items</h1>
-        <p>This is a one-stop shop for anything you may need!</p>
-        <input type="text" class="search-bar" id="search-bar" placeholder="Search..." oninput="filterCards()">
-        <div class="nav-card" onclick="navigateTo('recipes/index.html')">🍽 Recipes</div>
-        <div class="nav-card" onclick="navigateTo('home/index.html')">🏡 Home</div>
-        <div class="nav-card" onclick="navigateTo('useful/index.html')">🔧 Useful</div>
-        <div class="nav-card" onclick="navigateTo('Calculators/index.html')">📱 Calculators</div>
-        <div class="nav-card" onclick="navigateTo('plants/index.html')">🌱 Plants</div>
-        <div class="nav-card" onclick="navigateTo('animals/index.html')">🐔 Animals</div>
-        <div class="nav-card" onclick="navigateTo('games/index.html')">🎮 Games</div>
-    </div>
+<div class="container">
+    <h1>Welcome To The Home Page Of Useful Items</h1>
+    <p>This is a one-stop shop for anything you may need!</p>
+</div>
+<div class="search-bar-container">
+    <input type="text" class="search-bar" id="search-bar" placeholder="Search..." oninput="filterCards()">
+</div>
+<div class="container" id="main-container"></div>
 
     <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
     <div class="sidebar" id="sidebar">
         <div class="clock" id="clock"></div>
         <a href="recipes/index.html">📖 Recipes</a>
         <a href="useful/showtracker.html">🎥 Movies</a>
-	<a href="useful/camping.html">⛺ Camping</a>
+	    <a href="useful/camping.html">⛺ Camping</a>
         <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
     </div>
 
@@ -103,6 +98,11 @@
             document.body.classList.remove('light-mode');
         }
     }
+    fetch('navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('main-container').innerHTML += data;
+            });
     setInterval(updateClock, 1000);
     updateClock();
 </script>
