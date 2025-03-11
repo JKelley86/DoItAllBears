@@ -97,12 +97,18 @@
             document.body.classList.remove('light-mode');
         }
     }
+	
     fetch('navbar.html')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('main-container').innerHTML += data;
-		document.getElementById('sidebar-nav').innerHTML = data; // Sidebar one
             });
+    fetch('sidebar.html')
+	    .then(response => response.text())
+	    .then(data => {
+		document.getElementById('sidebar-nav').innerHTML = data;
+    	    });
+	
     setInterval(updateClock, 1000);
     updateClock();
 </script>
