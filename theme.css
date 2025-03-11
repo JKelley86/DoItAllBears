@@ -37,7 +37,7 @@ body {
     flex-direction: column; /* Stack cards in a single column */
     align-items: center; /* Center them horizontally */
     gap: 15px;
-    width: 100%;
+    width: 80%;
 }
 
 /* Headings and Text */
@@ -56,7 +56,7 @@ p {
     justify-content: center;
     align-items: center;
     width: 50%;
-    height: 200px;
+    height: 100px;
     margin: 15px;
     border-radius: 25px;
     background: var(--card-bg);
@@ -143,7 +143,7 @@ p {
 
 /* Search Bar */
 .header {
-    width: 100%;
+    width: 80%;
     text-align: center;
     margin-top: 20px;
 }
@@ -151,8 +151,8 @@ p {
 .search-bar-container {
     display: flex;
     justify-content: center;
-    width: 100%;
-    margin-bottom: 20px;
+    width: 80%;
+    margin-bottom: 40px;
 }
 .search-bar {
     width: 100%; /* Take up full width of its container */
