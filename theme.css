@@ -27,31 +27,27 @@ body {
 /* Container */
 .container {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-direction: column; /* Stack everything vertically */
+    align-items: center; /* Center everything horizontally */
     padding: 20px;
+    width: 100%; /* Take up full width */
 }
 #main-container {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column; /* Stack cards in a single column */
+    align-items: center; /* Center them horizontally */
     gap: 15px;
     width: 100%;
 }
 
 /* Headings and Text */
 h1 {
-    font-size: 4rem;
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
-    animation: fadeIn 2s ease-in;
+    text-align: center;
 }
 
 p {
-    font-size: 1.5rem;
-    margin-bottom: 50px;
-    max-width: 800px;
     text-align: center;
+    width: 80%; /* Optional: keep the text nicely contained */
 }
 
 /* Nav Cards */
@@ -59,7 +55,7 @@ p {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 250px;
+    width: 50%;
     height: 200px;
     margin: 15px;
     border-radius: 25px;
@@ -157,6 +153,12 @@ p {
     justify-content: center;
     width: 100%;
     margin-bottom: 20px;
+}
+.search-bar {
+    width: 100%; /* Take up full width of its container */
+    max-width: 600px; /* Optional: limit how wide it gets */
+    padding: 15px; /* Make it more prominent */
+    font-size: 18px;
 }
 
 /* Clock */
