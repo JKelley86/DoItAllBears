@@ -6,25 +6,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>QRCode</title>
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../theme.css">
 <style>
-  /* General Page Styles */
-  body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f0f4f8;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-
   .qr-menu-form {
     max-width: 450px;
     margin: 20px;
     padding: 30px;
-    background-color: #fff;
+    background-color: var(--card-bg);
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   }
@@ -36,13 +24,13 @@
 
   label {
     font-size: 15px;
-    color: #333;
+    color: var(--text-color);
     display: block;
     margin-bottom: 8px;
   }
 
   .form-control {
-    width: 100%;
+    width: 85%;
     padding: 12px;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -74,7 +62,7 @@
     width: 100%;
     padding: 12px;
     background-color: #007bff;
-    color: #fff;
+    color: var(--text-color);
     border: none;
     border-radius: 8px;
     font-size: 16px;
@@ -83,7 +71,7 @@
   }
 
   .btn:hover {
-    background-color: #0056b3;
+    background-color: var(--accent-color);
   }
 
   /* QR Code Display */
@@ -97,8 +85,8 @@
     display: block;
     margin: 20px auto 0;
     padding: 10px;
-    background-color: #28a745;
-    color: #fff;
+    background-color: var(--card-bg);
+    color: var(--text-color);
     border: none;
     border-radius: 8px;
     font-size: 16px;
@@ -107,29 +95,7 @@
   }
 
   #saveBtn:hover {
-    background-color: #218838;
-  }
-
-  /* Navigation Buttons (in case you have them on your page) */
-  .nav-button {
-    display: inline-block;
-    width: 90px;
-    height: 90px;
-    margin: 10px;
-    border-radius: 50%;
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    line-height: 80px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.2s ease-in-out;
-  }
-
-  .nav-button:hover {
-    background-color: #333;
+    background-color: var(--accent-color);
   }
 
   /* Responsive Adjustments */
@@ -152,12 +118,7 @@
 </style>
 
 </head>
-<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
- <div class="container">
-        <nav>
-            <div id="navbar"></div>
-        </nav>
-
+<body>
     <main>
         <form id="qrMenuForm" class="qr-menu-form">
   <div class="form-group">
@@ -206,6 +167,15 @@
 <button id="saveBtn" class="btn" style="display: none;">Save QR Code</button>
     </main>
 
+<div class="container" id="main-container"></div>
+
+    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+    <div class="sidebar" id="sidebar">
+        <div class="clock" id="clock"></div>
+	<div id="sidebar-nav"></div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+    </div>    
+    
     <footer> 
         <span>&copy; 2024 Justin's Website. All rights reserved.</span>
     </footer> 
@@ -292,6 +262,57 @@
     passwordField.setAttribute('type', type);
     this.textContent = type === 'password' ? 'Show' : 'Hide';
   });
+
+    function navigateTo(page) {
+        window.location.href = page;
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('open');
+    }
+        // Close sidebar if clicked outside of it
+    document.addEventListener('click', function(event) {
+	const sidebar = document.getElementById('sidebar');
+        const menuButton = document.querySelector('.menu-btn');
+        if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+            sidebar.classList.remove('open');
+        }
+    });
+
+    function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        document.getElementById('clock').textContent = timeString;
+    }
+	    // Function to toggle the theme
+    function toggleTheme() {
+        // Toggle the 'light-mode' class on the body
+        document.body.classList.toggle('light-mode');
+
+        // Save the theme to localStorage
+        localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    }
+
+    // Check localStorage for the theme preference on page load
+    window.onload = function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+        } else if (savedTheme === 'dark') {
+            document.body.classList.remove('light-mode');
+        }
+    }
+
+    fetch('sidebar.html')
+	    .then(response => response.text())
+	    .then(data => {
+		document.getElementById('sidebar-nav').innerHTML = data;
+    	    });
+	
+    setInterval(updateClock, 1000);
+    updateClock();
+    
 </script>
 
 </body>
