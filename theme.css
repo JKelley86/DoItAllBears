@@ -30,9 +30,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     flex: 1;
-    padding: 50px 20px;
+    padding: 20px;
 }
 #main-container {
     display: flex;
@@ -153,11 +152,7 @@ p {
 .header {
     width: 100%;
     text-align: center;
-    padding: 20px 0;
-    position: sticky;
-    top: 0;
-    background: var(--bg-color);
-    z-index: 100;
+    margin-top: 20px;
 }
 
 .search-bar-container {
