@@ -4,24 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Home</title>
-    <link rel="stylesheet" href="../styles.css">
-    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href="theme.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome To The House Page</h1>
-        <p>Here you will find useful information for your house and appliances!</p>
-        <input type="text" class="search-bar" id="search-bar" placeholder="Search..." oninput="filterCards()">
-        <div class="nav-card" onclick="navigateTo('sprinklers.html')">Sprinklers</div>
-        <div class="nav-card" onclick="navigateTo('filters.html')">Filters</div>
-        <div class="nav-card" onclick="navigateTo('watersoftner.html')">Water Softner</div>
-        <div class="nav-card" onclick="navigateTo('cars.html')">Vehicles</div>
-    </div>
+<div class="container">
+    <h1>Welcome To The Home Page Of Useful Items</h1>
+    <p>This is a one-stop shop for anything you may need!</p>
+</div>
+<div class="search-bar-container">
+    <input type="text" class="search-bar" id="search-bar" placeholder="Search..." oninput="filterCards()">
+</div>
+<div class="container" id="main-container"></div>
 
     <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
     <div class="sidebar" id="sidebar">
         <div class="clock" id="clock"></div>
-        <a href="../index.html">Home Page</a>
+        <a href="../index.html">Home</a>
+	<div id="sidebar-nav"></div>
         <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
     </div>
 
@@ -45,7 +44,6 @@
             sidebar.classList.remove('open');
         }
     });
-
 
     function updateClock() {
         const now = new Date();
@@ -81,7 +79,7 @@
         }
     });
 }
-        // Function to toggle the theme
+	    // Function to toggle the theme
     function toggleTheme() {
         // Toggle the 'light-mode' class on the body
         document.body.classList.toggle('light-mode');
@@ -99,8 +97,15 @@
             document.body.classList.remove('light-mode');
         }
     }
+    fetch('navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('main-container').innerHTML += data;
+		document.getElementById('sidebar-nav').innerHTML = data; // Sidebar one
+            });
     setInterval(updateClock, 1000);
     updateClock();
 </script>
+
 </body>
 </html>
