@@ -8,12 +8,14 @@
     <link rel="stylesheet" href="theme.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome To The Home Page Of Useful Items</h1>
-        <p>This is a one-stop shop for anything you may need!</p>
-        <input type="text" class="search-bar" id="search-bar" placeholder="Search..." oninput="filterCards()">
-        <div id="main-container"></div>
-    </div>
+<div class="header">
+    <h1>Welcome To The Home Page Of Useful Items</h1>
+    <p>This is a one-stop shop for anything you may need!</p>
+</div>
+<div class="search-bar-container">
+    <input type="text" class="search-bar" id="search-bar" placeholder="Search..." oninput="filterCards()">
+</div>
+<div class="container" id="main-container"></div>
 
     <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
     <div class="sidebar" id="sidebar">
