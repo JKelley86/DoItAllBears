@@ -34,6 +34,14 @@ body {
     flex: 1;
     padding: 50px 20px;
 }
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: 50px 20px;
+}
 
 /* Headings and Text */
 h1 {
