@@ -34,13 +34,14 @@ body {
     flex: 1;
     padding: 50px 20px;
 }
-.main-container {
+#main-container {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-wrap: wrap;
     justify-content: center;
-    flex: 1;
-    padding: 50px 20px;
+    gap: 20px; /* Space between cards */
+    padding: 20px;
+    position: relative; /* Make sure it’s on the right layer */
+    z-index: 1;
 }
 
 /* Headings and Text */
