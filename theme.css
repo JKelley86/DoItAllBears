@@ -38,6 +38,7 @@ body {
     align-items: center; /* Center them horizontally */
     gap: 15px;
     width: 80%;
+    border-radius: 25px;
 }
 
 /* Headings and Text */
@@ -145,7 +146,7 @@ p {
 .header {
     width: 80%;
     text-align: center;
-    margin-top: 20px;
+    margin-top: 60px;
 }
 
 .search-bar-container {
