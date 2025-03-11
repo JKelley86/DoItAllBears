@@ -19,8 +19,7 @@ body {
     font-family: 'Poppins', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
-    display: flex;
-    flex-direction: column;
+    display: block; /* Change from flex to block so the whole page scrolls */
     min-height: 100vh;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -30,16 +29,14 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    flex: 1;
     padding: 20px;
 }
 #main-container {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
-    padding: 20px; /* Reduce padding */
-    margin-top: 80px; /* Add some margin so it’s not hidden under the header */
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
 }
 
 /* Headings and Text */
