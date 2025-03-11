@@ -44,6 +44,7 @@ body {
 /* Headings and Text */
 h1 {
     text-align: center;
+    font-size: 3rem;
 }
 
 p {
