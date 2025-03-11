@@ -179,6 +179,7 @@ footer {
     width: 100%;
     margin-top: auto; /* Push footer to the bottom of the container */
     position: relative; /* Ensure footer is relative to the container */
+    text-align: center;
 }
 
 /* Animation */
