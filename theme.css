@@ -38,10 +38,9 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px; /* Space between cards */
-    padding: 20px;
-    position: relative; /* Make sure it’s on the right layer */
-    z-index: 1;
+    justify-content: center;
+    flex: 1;
+    padding: 50px 20px;
 }
 
 /* Headings and Text */
