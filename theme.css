@@ -122,6 +122,16 @@ p {
     background: var(--accent-color);
     padding-left: 10px;
 }
+#sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#sidebar-nav .nav-card {
+    width: 100%; /* Full width for sidebar */
+    text-align: left;
+}
 
 /* Menu Button */
 .menu-btn {
