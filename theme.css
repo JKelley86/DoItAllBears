@@ -138,8 +138,16 @@ p {
 }
 
 #sidebar-nav .nav-card {
-    width: 100%; /* Full width for sidebar */
-    text-align: left;
+    color: var(--text-color);
+    padding: 20px 0;
+    text-decoration: none;
+    font-size: 20px;
+    transition: background 0.3s ease, padding-left 0.3s ease;
+}
+
+#sidebar-nav .nav-card:hover {
+    background: var(--accent-color);
+    padding-left: 10px;
 }
 
 /* Menu Button */
