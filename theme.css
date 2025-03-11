@@ -38,9 +38,9 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     flex: 1;
-    padding: 50px 20px;
+    padding: 20px; /* Reduce padding */
+    margin-top: 80px; /* Add some margin so it’s not hidden under the header */
 }
 
 /* Headings and Text */
@@ -150,14 +150,21 @@ p {
 }
 
 /* Search Bar */
-.search-bar {
-    width: 80%;
-    max-width: 400px;
-    padding: 10px;
-    border-radius: 25px;
-    border: none;
-    font-size: 18px;
+.header {
+    width: 100%;
     text-align: center;
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    background: var(--bg-color);
+    z-index: 100;
+}
+
+.search-bar-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 20px;
 }
 
 /* Clock */
