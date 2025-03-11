@@ -50,6 +50,7 @@ h1 {
 p {
     text-align: center;
     width: 80%; /* Optional: keep the text nicely contained */
+    font-size: 1.5rem;
 }
 
 /* Nav Cards */
