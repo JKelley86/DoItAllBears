@@ -19,7 +19,9 @@ body {
     font-family: 'Poppins', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
-    display: block; /* Change from flex to block so the whole page scrolls */
+    display: flex; /* Ensure full-page vertical alignment */
+    flex-direction: column;
+    align-items: center;
     min-height: 100vh;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -27,17 +29,19 @@ body {
 /* Container */
 .container {
     display: flex;
-    flex-direction: column; /* Stack everything vertically */
-    align-items: center; /* Center everything horizontally */
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
     padding: 20px;
-    width: 100%; /* Take up full width */
 }
+
 #main-container {
     display: flex;
-    flex-direction: column; /* Stack cards in a single column */
-    align-items: center; /* Center them horizontally */
+    flex-direction: column;
+    align-items: center;
     gap: 15px;
     width: 80%;
+    max-width: 600px;
     border-radius: 25px;
 }
 
@@ -49,18 +53,18 @@ h1 {
 
 p {
     text-align: center;
-    width: 80%; /* Optional: keep the text nicely contained */
+    width: 80%;
     font-size: 1.5rem;
 }
 
 /* Nav Cards */
 .nav-card {
-    display: inline-flex;
+    display: flex;
     justify-content: center;
     align-items: center;
-    width: 50%;
+    width: 100%; /* Full width of container */
+    max-width: 400px;
     height: 100px;
-    margin: 15px;
     border-radius: 25px;
     background: var(--card-bg);
     color: var(--text-color);
@@ -70,8 +74,6 @@ p {
     cursor: pointer;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     transition: background 0.3s ease, transform 0.2s ease;
-    visibility: visible;
-    opacity: 1;
 }
 
 .nav-card.hidden {
@@ -98,7 +100,6 @@ p {
     box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
     transition: left 0.3s ease;
     z-index: 1000;
-    opacity: 100%;
 }
 
 .sidebar.open {
@@ -146,23 +147,24 @@ p {
 
 /* Search Bar */
 .header {
-    width: 80%;
+    width: 100%;
     text-align: center;
-    margin-top: 80px;
-    margin-bottom: 80px:
+    margin: 50px 0;
 }
 
 .search-bar-container {
     display: flex;
     justify-content: center;
-    width: 80%;
-    margin-bottom: 40px;
+    width: 100%;
 }
+
 .search-bar {
-    width: 100%; /* Take up full width of its container */
-    max-width: 600px; /* Optional: limit how wide it gets */
-    padding: 15px; /* Make it more prominent */
+    width: 100%;
+    max-width: 600px;
+    padding: 15px;
     font-size: 18px;
+    border-radius: 25px;
+    border: none;
 }
 
 /* Clock */
@@ -174,43 +176,32 @@ p {
 /* Footer */
 footer {
     background: var(--card-bg);
-    padding: 10px; /* Adjusted padding */
-    font-size: 16px; /* Adjusted font size */
+    padding: 10px;
+    font-size: 16px;
     width: 100%;
-    margin-top: auto; /* Push footer to the bottom of the container */
-    position: relative; /* Ensure footer is relative to the container */
     text-align: center;
 }
 
-/* Animation */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+/* Information Sections */
+.information-section {
+    background-color: #e0e0e0;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px auto;
+    box-sizing: border-box;
+    min-height: 150px;
+    max-width: 1200px;
+    width: 80%;
 }
-        /* Styling for the information sections */
-        .information-section {
-            background-color: #e0e0e0; /* Slightly darker gray than the background */
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            box-sizing: border-box; /* Ensure padding is included in the height */
-        }
 
-        .information-section h2 {
-            font-size: 1.5em;
-            color: #333; /* Dark text */
-        }
+.information-section h2 {
+    text-align: center;
+    font-size: 1.5em;
+    color: #333;
+}
 
-        .information-section p {
-            font-size: 1em;
-            color: #555; /* Darker gray for the paragraph text */
-        }
-
-        /* Ensure all sections are the same height */
-        .information-section {
-            min-height: 150px; /* Minimum height to make sections the same size */
-            max-width: 1200px;
-            min-width: 50%;
-            margin: 50 auto;
-            padding: 20px;
-        }
+.information-section p {
+    text-align: center;
+    font-size: 1em;
+    color: #555;
+}
