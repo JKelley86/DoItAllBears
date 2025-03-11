@@ -19,9 +19,8 @@
     <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
     <div class="sidebar" id="sidebar">
         <div class="clock" id="clock"></div>
-        <a href="recipes/index.html">📖 Recipes</a>
-        <a href="useful/showtracker.html">🎥 Movies</a>
-	    <a href="useful/camping.html">⛺ Camping</a>
+        <a href="../index.html">Home</a>
+	<div id="sidebar-nav"></div>
         <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
     </div>
 
@@ -102,6 +101,7 @@
             .then(response => response.text())
             .then(data => {
                 document.getElementById('main-container').innerHTML += data;
+		document.getElementById('sidebar-nav').innerHTML = data; // Sidebar one
             });
     setInterval(updateClock, 1000);
     updateClock();
