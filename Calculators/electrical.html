@@ -204,6 +204,39 @@
         </div>
     </div>
 </div>
+    <div class="calculator single-column">
+        <div class="calc-column">
+        <h3>Ohm's Law Calculator</h3>
+        <label for="voltage">Voltage (V):</label>
+        <input type="number" id="voltage" oninput="calculateOhmsLaw()">
+        <label for="current">Current (I):</label>
+        <input type="number" id="current" oninput="calculateOhmsLaw()">
+        <label for="resistance">Resistance (R):</label>
+        <input type="number" id="resistance" oninput="calculateOhmsLaw()">
+        <div class="result" id="ohmsLawResult"></div>
+    </div>
+ </div>
+    <div class="calculator single-column">
+        <div class="calc-column">
+        <h3>Power Calculator</h3>
+        <label for="power-voltage">Voltage (V):</label>
+        <input type="number" id="power-voltage" oninput="calculatePower()">
+        <label for="power-current">Current (I):</label>
+        <input type="number" id="power-current" oninput="calculatePower()">
+        <label for="power-resistance">Resistance (R):</label>
+        <input type="number" id="power-resistance" oninput="calculatePower()">
+        <div class="result" id="powerResult"></div>
+    </div>
+</div>
+    <div class="sidebar" id="sidebar">
+        <div class="clock" id="clock"></div>
+	<div id="sidebar-nav"></div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+    </div>
+
+    <footer> 
+        <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+    </footer> 
 <script>
     function calculateResistor4Band() {
         const band1 = parseInt(document.getElementById('band1').value);
@@ -241,42 +274,6 @@
         document.getElementById('resistor-multiplier-5').style.backgroundColor = colorCodes[[1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 0.1, 0.01].indexOf(multiplier)];
         document.getElementById('resistor-tolerance-5').style.backgroundColor = colorCodes[[1, 2, 5, 10].indexOf(tolerance) + 1];
     }
-</script>
-
-    <div class="calculator single-column">
-        <div class="calc-column">
-        <h3>Ohm's Law Calculator</h3>
-        <label for="voltage">Voltage (V):</label>
-        <input type="number" id="voltage" oninput="calculateOhmsLaw()">
-        <label for="current">Current (I):</label>
-        <input type="number" id="current" oninput="calculateOhmsLaw()">
-        <label for="resistance">Resistance (R):</label>
-        <input type="number" id="resistance" oninput="calculateOhmsLaw()">
-        <div class="result" id="ohmsLawResult"></div>
-    </div>
- </div>
-    <div class="calculator single-column">
-        <div class="calc-column">
-        <h3>Power Calculator</h3>
-        <label for="power-voltage">Voltage (V):</label>
-        <input type="number" id="power-voltage" oninput="calculatePower()">
-        <label for="power-current">Current (I):</label>
-        <input type="number" id="power-current" oninput="calculatePower()">
-        <label for="power-resistance">Resistance (R):</label>
-        <input type="number" id="power-resistance" oninput="calculatePower()">
-        <div class="result" id="powerResult"></div>
-    </div>
-</div>
-    <div class="sidebar" id="sidebar">
-        <div class="clock" id="clock"></div>
-	<div id="sidebar-nav"></div>
-        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
-    </div>
-
-    <footer> 
-        <span>&copy; 2024 Justin's Website. All rights reserved.</span>
-    </footer> 
-    <script>
         function calculateOhmsLaw() {
             const voltage = parseFloat(document.getElementById('voltage').value);
             const current = parseFloat(document.getElementById('current').value);
