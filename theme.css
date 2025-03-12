@@ -238,4 +238,5 @@ footer {
 
 .information-section li {
     text-align: left; /* Aligns the list items to the left to prevent the bullet points from being centered */
+    color: #555;
 }
