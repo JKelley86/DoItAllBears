@@ -49,32 +49,18 @@
         const timeString = now.toLocaleTimeString();
         document.getElementById('clock').textContent = timeString;
     }
-    function filterCards() {
-    const searchTerm = document.getElementById('search-bar').value.toLowerCase(); // Get the search term and make it lowercase
-    const cards = Array.from(document.querySelectorAll('.nav-card')); // Get all the card elements and convert them to an array
+function filterCards() {
+    const searchTerm = document.getElementById('search-bar').value.toLowerCase();
+    const cards = Array.from(document.querySelectorAll('.nav-card'));
 
-    // Filter the cards based on the search term
-    const filteredCards = cards.filter(card => card.textContent.toLowerCase().includes(searchTerm));
-
-    // Sort the cards in order (matching cards go to the top)
-    const sortedCards = filteredCards.concat(cards.filter(card => !card.textContent.toLowerCase().includes(searchTerm)));
-
-    // Now, reorder the cards in the DOM
-    const container = document.querySelector('.container'); // Get the container where cards are located
-    sortedCards.forEach(card => {
-        container.appendChild(card); // Append the card in the correct order
-    });
-
-    // Adjust visibility and opacity for a smooth transition
     cards.forEach(card => {
-        const cardText = card.textContent.toLowerCase(); // Get the text of each card and make it lowercase
+        const cardText = card.textContent.toLowerCase();
 
         if (cardText.includes(searchTerm)) {
-            card.style.visibility = 'visible'; // Make card visible
-            card.style.opacity = '1'; // Make card fully visible
+            card.style.display = 'block'; // Show matching cards
+            card.style.opacity = '1';    // Ensure visible cards stay fully visible
         } else {
-            card.style.visibility = 'hidden'; // Hide card but keep it in layout
-            card.style.opacity = '0'; // Make card invisible
+            card.style.display = 'none'; // Hide non-matching cards and remove their space
         }
     });
 }
