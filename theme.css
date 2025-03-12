@@ -214,6 +214,7 @@ footer {
     min-height: 150px;
     max-width: 1200px;
     width: 80%;
+    text-align: center; /* This centers the text inside the entire section */
 }
 
 .information-section h2 {
