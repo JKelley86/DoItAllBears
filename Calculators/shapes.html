@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Shape Calculators</title>
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../theme.css">
     <style>
         .calculator {
-            background-color: #fff;
+            background-color: var(--card-bg);
             padding: 20px;
             margin-bottom: 20px;
             border-radius: 8px;
@@ -15,16 +15,17 @@
             display: flex;
             justify-content: space-between;
             width: 80%;
-            margin: 20px auto; /* Center table horizontally */
+            margin: 20px auto;
         }
         .calc-column {
-            width: 40%;
+            width: 45%;
+            margin-bottom: 20px;
         }
         .calculator label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
-            color: #333;
+            color: var(--text-color);
         }
         .calculator input {
             width: 100%;
@@ -32,49 +33,29 @@
             margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            color: #333;
+            color: black;
             touch-action: manipulation;
         }
         .calculator button {
             padding: 10px 20px;
-            background-color: #007BFF;
-            color: #fff;
+            background-color: var(--accent-color);
+            color: var(--text-color);
             border: none;
             border-radius: 4px;
             cursor: pointer;
         }
         .calculator button:hover {
-            background-color: #0056b3;
+            background-color: var(--accent-color);
         }
         .result {
             margin-top: 10px;
             font-weight: bold;
-            color: #333;
+            color: var(--text-color);
         }
     </style>
 </head>
-<body style="background-image: url('picture1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+<body>
 <div class="container">
-    <nav>
-        <ul class="navbar-left">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="tip.html">Tips</a></li>
-            <li><a href="shapes.html">Shapes</a></li>
-            <li><a href="speed.html">Speed</a></li>
-            <li><a href="conversions.html">Conversions</a></li>
-            <li><a href="electrical.html">Electrical</a></li>
-            <li><a href="algebra.html">Algebra</a></li>
-            <li><a href="conveyor.html">Conveyor</a></li>
-            <li><a href="binary.html">Binary</a></li>
-            <li><a href="cooking.html">Cooking</a></li>
-            <li><a href="weight.html">Weight</a></li>
-            <li><a href="physics.html">Physics</a></li>
-            <li><a href="calculus.html">Calculus</a></li>
-            <li><a href="chemistry.html">Chemistry</a></li>
-            <li><a href="trigonometry.html">Trigonometry</a></li>
-            <li><a href="hmi.html">HMI</a></li>
-        </ul>
-    </nav>
 <main>
     <h1>Shape Calculators</h1>
 
@@ -272,8 +253,15 @@
         </div>
     </div>
 </main>    
+    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+    <div class="sidebar" id="sidebar">
+        <div class="clock" id="clock"></div>
+	<div id="sidebar-nav"></div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+    </div>
+
     <footer> 
-        <span>&copy; 2024 Justin's Calculations. All rights reserved.</span>
+        <span>&copy; 2024 Justin's Website. All rights reserved.</span>
     </footer> 
 
     <script>
@@ -424,6 +412,54 @@
             const mass = density * volume;
             document.getElementById('densityResult2').innerHTML = `Mass: ${mass.toFixed(2)}`;
         }
+                    function navigateTo(page) {
+        window.location.href = page;
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('open');
+    }
+        // Close sidebar if clicked outside of it
+    document.addEventListener('click', function(event) {
+	const sidebar = document.getElementById('sidebar');
+        const menuButton = document.querySelector('.menu-btn');
+        if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+            sidebar.classList.remove('open');
+        }
+    });
+
+    function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        document.getElementById('clock').textContent = timeString;
+    }
+        	    // Function to toggle the theme
+    function toggleTheme() {
+        // Toggle the 'light-mode' class on the body
+        document.body.classList.toggle('light-mode');
+
+        // Save the theme to localStorage
+        localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    }
+
+    // Check localStorage for the theme preference on page load
+    window.onload = function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+        } else if (savedTheme === 'dark') {
+            document.body.classList.remove('light-mode');
+        }
+    }
+            fetch('sidebar.html')
+	    .then(response => response.text())
+	    .then(data => {
+		document.getElementById('sidebar-nav').innerHTML = data;
+    	    });
+	
+    setInterval(updateClock, 1000);
+    updateClock();
     </script>
 </body>
 </html>
