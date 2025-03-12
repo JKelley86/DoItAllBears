@@ -51,9 +51,6 @@
         const timeString = now.toLocaleTimeString();
         document.getElementById('clock').textContent = timeString;
     }
-    function filterCards() {
-    const searchTerm = document.getElementById('search-bar').value.toLowerCase(); // Get the search term and make it lowercase
-    const cards = Array.from(document.querySelectorAll('.nav-card')); // Get all the card elements and convert them to an array
 
 function filterCards() {
     const searchTerm = document.getElementById('search-bar').value.toLowerCase();
