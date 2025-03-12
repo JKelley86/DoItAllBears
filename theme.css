@@ -223,8 +223,19 @@ footer {
     color: #333;
 }
 
-.information-section p {
-    text-align: center;
+.information-section p,
+.information-section ul {
     font-size: 1em;
     color: #555;
+    margin: 10px 0; /* Adds spacing between the paragraphs and list */
+    text-align: center; /* Centers text inside the list */
+}
+
+.information-section ul {
+    list-style-type: disc; /* Makes sure the list has bullet points */
+    padding-left: 20px; /* Ensures the bullet points appear correctly */
+}
+
+.information-section li {
+    text-align: left; /* Aligns the list items to the left to prevent the bullet points from being centered */
 }
