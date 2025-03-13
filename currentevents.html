@@ -96,23 +96,25 @@
 
         loadNews();
 
-        // Real-time data for the charts on a monthly basis from the beginning of the year
+        // Real-time data for the charts on a daily basis from the beginning of the year
         const inflationData = Array(3).fill(null).map(() => (Math.random() * 3 + 2).toFixed(2));
         const sp500Data = Array(3).fill(null).map(() => (Math.random() * 100 + 4000).toFixed(0));
-        const labels = ['January', 'February', 'March'];
+        const labels = ['01-01', '01-02', '01-03'];
 
         function updateCharts() {
-            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            const nextMonth = months[labels.length % 12];
+            const today = new Date();
+            const nextDay = new Date(today);
+            nextDay.setDate(nextDay.getDate() + labels.length);
+            const dayLabel = `${String(nextDay.getMonth() + 1).padStart(2, '0')}-${String(nextDay.getDate()).padStart(2, '0')}`;
 
             const newInflation = (Math.random() * 3 + 2).toFixed(2);
             const newSp500 = (Math.random() * 100 + 4000).toFixed(0);
 
-            labels.push(nextMonth);
+            labels.push(dayLabel);
             inflationData.push(newInflation);
             sp500Data.push(newSp500);
 
-            if (labels.length > 12) {
+            if (labels.length > 365) {
                 labels.shift();
                 inflationData.shift();
                 sp500Data.shift();
@@ -148,7 +150,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             inflationChart = createChart('inflationChart', inflationData, 'Inflation Rate (%)', 'red');
             sp500Chart = createChart('sp500Chart', sp500Data, 'S&P 500 Index', 'blue');
-            setInterval(updateCharts, 5000);
+            setInterval(updateCharts, 86400000); // Update daily
         });
         function navigateTo(page) {
             window.location.href = page;
