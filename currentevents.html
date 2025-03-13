@@ -14,12 +14,23 @@
         .article h3 { margin: 0; }
         .article a { text-decoration: none; color: #007BFF; }
         .article a:hover { text-decoration: underline; }
+        .chart-container { text-align: center; margin: 50px 0; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Latest News</h1>
         <div id="news"></div>
+
+        <div class="chart-container">
+            <h2>Inflation Rate</h2>
+            <canvas id="inflationChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h2>S&P 500 Performance</h2>
+            <canvas id="sp500Chart"></canvas>
+        </div>
     </div>
 
     <script>
@@ -66,6 +77,42 @@
         }
 
         loadNews();
+
+        // Placeholder data for the charts
+        const inflationData = [2.1, 2.5, 3.0, 4.2, 5.1, 6.0];
+        const sp500Data = [3800, 3900, 4000, 4100, 4200, 4300];
+
+        const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+
+        function createChart(id, data, label, color) {
+            const ctx = document.getElementById(id).getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        borderColor: color,
+                        backgroundColor: 'transparent',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: false }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createChart('inflationChart', inflationData, 'Inflation Rate (%)', 'red');
+            createChart('sp500Chart', sp500Data, 'S&P 500 Index', 'blue');
+        });
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>
