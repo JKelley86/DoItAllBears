@@ -53,6 +53,12 @@
             </ol>
         </section>
 
+        <section class="information-section">
+            <h2>Blueprints</h2>
+            <p>Download the detailed blueprints for the regulation cornhole boards:</p>
+            <a href="blueprints/cornhole_blueprints.pdf" target="_blank" class="button">Download Blueprints (PDF)</a>
+        </section>
+
         <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
         <div class="sidebar" id="sidebar">
             <div class="clock" id="clock"></div>
@@ -65,6 +71,9 @@
         </footer>
 
         <script>
+                function navigateTo(page) {
+        window.location.href = page;
+    }
             function toggleSidebar() {
                 const sidebar = document.getElementById('sidebar');
                 sidebar.classList.toggle('open');
