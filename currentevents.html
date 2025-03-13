@@ -40,6 +40,7 @@
     <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
     <div class="sidebar" id="sidebar">
         <div class="clock" id="clock"></div>
+	<a href="index.html">Home</a>
         <a href="recipes/index.html">📖 Recipes</a>
         <a href="useful/showtracker.html">🎥 Movies</a>
 	<a href="useful/camping.html">⛺ Camping</a>
@@ -96,35 +97,22 @@
 
         loadNews();
 
-        // Real-time data for the charts on a daily basis from the beginning of the year
-        const inflationData = Array(3).fill(null).map(() => (Math.random() * 3 + 2).toFixed(2));
-        const sp500Data = Array(3).fill(null).map(() => (Math.random() * 100 + 4000).toFixed(0));
-        const labels = ['01-01', '01-02', '01-03'];
-
-        function updateCharts() {
-            const today = new Date();
-            const nextDay = new Date(today);
-            nextDay.setDate(nextDay.getDate() + labels.length);
-            const dayLabel = `${String(nextDay.getMonth() + 1).padStart(2, '0')}-${String(nextDay.getDate()).padStart(2, '0')}`;
-
-            const newInflation = (Math.random() * 3 + 2).toFixed(2);
-            const newSp500 = (Math.random() * 100 + 4000).toFixed(0);
-
-            labels.push(dayLabel);
-            inflationData.push(newInflation);
-            sp500Data.push(newSp500);
-
-            if (labels.length > 365) {
-                labels.shift();
-                inflationData.shift();
-                sp500Data.shift();
-            }
-
-            inflationChart.update();
-            sp500Chart.update();
+        async function fetchChartData(seriesId) {
+            const response = await fetch(`https://api.bls.gov/publicAPI/v1/timeseries/data/${seriesId}?registrationkey=YOUR_API_KEY`);
+            const data = await response.json();
+            return data;
         }
 
-        function createChart(id, data, label, color) {
+        async function loadChartData() {
+            const inflationData = await fetchChartData('CUUR0000SA0');
+
+            const labels = inflationData.Results.series[0].data.map(item => item.periodName).reverse();
+            const inflationRates = inflationData.Results.series[0].data.map(item => parseFloat(item.value)).reverse();
+
+            inflationChart = createChart('inflationChart', inflationRates, 'Inflation Rate (%)', 'red', labels);
+        }
+
+        function createChart(id, data, label, color, labels) {
             const ctx = document.getElementById(id).getContext('2d');
             return new Chart(ctx, {
                 type: 'line',
@@ -148,9 +136,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            inflationChart = createChart('inflationChart', inflationData, 'Inflation Rate (%)', 'red');
-            sp500Chart = createChart('sp500Chart', sp500Data, 'S&P 500 Index', 'blue');
-            setInterval(updateCharts, 86400000); // Update daily
+            loadChartData();
+            setInterval(loadChartData, 86400000); // Update daily
         });
         function navigateTo(page) {
             window.location.href = page;
