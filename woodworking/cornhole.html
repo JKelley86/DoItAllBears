@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Regulation Cornhole Boards</title>
+    <link rel="stylesheet" href="../theme.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Regulation Cornhole Boards Build</h1>
+        <p>Build your own regulation cornhole boards for the perfect backyard game setup.</p>
+
+        <!-- Project Description -->
+        <section class="information-section">
+            <h2>Project Overview</h2>
+            <p>These regulation cornhole boards are built to official specifications, providing a stable, smooth surface for the perfect game experience. Crafted with high-quality materials and detailed instructions, these boards will last for many years of enjoyment.</p>
+        </section>
+
+        <!-- Bill of Materials -->
+        <section class="information-section">
+            <h2>Bill of Materials (BOM)</h2>
+            <ul>
+                <li>2x4 Lumber - 6 pieces (Frame)</li>
+                <li>1/2" Plywood Sheet - 2 pieces (Top Surface)</li>
+                <li>Wood Screws (2") - 40 pieces</li>
+                <li>Wood Glue - 1 bottle</li>
+                <li>Wood Stain or Finish - 1 can</li>
+                <li>Handles (optional) - 2 pieces</li>
+            </ul>
+        </section>
+
+        <!-- Cut List -->
+        <section class="information-section">
+            <h2>Cut List</h2>
+            <ul>
+                <li>2x4 Lumber - 4 pieces @ 48" (Long Frame Sides)</li>
+                <li>2x4 Lumber - 4 pieces @ 24" (Short Frame Sides)</li>
+                <li>1/2" Plywood Sheet - 2 pieces @ 48" x 24" (Top Surface)</li>
+            </ul>
+        </section>
+
+        <!-- Assembly Instructions -->
+        <section class="information-section">
+            <h2>Assembly Steps</h2>
+            <ol>
+                <li>Cut all pieces according to the cut list.</li>
+                <li>Assemble the frame using 2x4s and wood screws, forming a rectangle.</li>
+                <li>Attach the 1/2" plywood top onto the frame using wood glue and screws.</li>
+                <li>If desired, attach handles to the side of the board for easy portability.</li>
+                <li>Sand the entire cornhole board and apply wood stain or finish for durability.</li>
+            </ol>
+        </section>
+
+        <!-- Attach PDF for Blueprints -->
+        <section class="information-section">
+            <h2>Blueprints</h2>
+            <p>Download the detailed blueprints for the regulation cornhole boards:</p>
+            <a href="blueprints/cornhole_blueprints.pdf" target="_blank" class="button">Download Blueprints (PDF)</a>
+        </section>
+
+        <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+        <div class="sidebar" id="sidebar">
+            <div class="clock" id="clock"></div>
+            <div id="sidebar-nav"></div>
+            <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+        </div>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+
+        <script>
+            function toggleSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                sidebar.classList.toggle('open');
+            }
+
+            document.addEventListener('click', function(event) {
+                const sidebar = document.getElementById('sidebar');
+                const menuButton = document.querySelector('.menu-btn');
+                if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+                    sidebar.classList.remove('open');
+                }
+            });
+
+            function updateClock() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString();
+                document.getElementById('clock').textContent = timeString;
+            }
+
+            function toggleTheme() {
+                document.body.classList.toggle('light-mode');
+                localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+            }
+
+            window.onload = function() {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'light') {
+                    document.body.classList.add('light-mode');
+                } else {
+                    document.body.classList.remove('light-mode');
+                }
+            }
+
+            fetch('sidebar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('sidebar-nav').innerHTML = data;
+                });
+
+            setInterval(updateClock, 1000);
+            updateClock();
+        </script>
+    </div>
+</body>
+</html>
