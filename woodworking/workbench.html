@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Woodworking Project: Workbench</title>
+    <link rel="stylesheet" href="../theme.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Workbench Build</h1>
+        <p>A sturdy and reliable workbench perfect for any woodworking shop.</p>
+
+        <!-- Project Description -->
+        <section class="information-section">
+            <h2>Project Overview</h2>
+            <p>This workbench is designed to provide a stable and spacious surface for all your woodworking needs. Built with heavy-duty lumber and reinforced joints, it can handle large projects and heavy tools with ease.</p>
+        </section>
+
+        <!-- Bill of Materials -->
+        <section class="information-section">
+            <h2>Bill of Materials (BOM)</h2>
+            <ul>
+                <li>4x4 Pressure-Treated Posts - 4 pieces (Legs)</li>
+                <li>2x4 Lumber - 8 pieces (Frame)</li>
+                <li>3/4" Plywood Sheet - 1 piece (Top)</li>
+                <li>Wood Screws (3") - 50 pieces</li>
+                <li>Wood Glue - 1 bottle</li>
+                <li>Wood Stain or Finish - 1 can</li>
+            </ul>
+        </section>
+
+        <!-- Cut List -->
+        <section class="information-section">
+            <h2>Cut List</h2>
+            <ul>
+                <li>4x4 Posts - 4 pieces @ 32" (Legs)</li>
+                <li>2x4 Lumber - 4 pieces @ 48" (Long Frame Sides)</li>
+                <li>2x4 Lumber - 4 pieces @ 20" (Short Frame Sides)</li>
+                <li>3/4" Plywood Sheet - 1 piece @ 48" x 24" (Top Surface)</li>
+            </ul>
+        </section>
+
+        <!-- Assembly Instructions -->
+        <section class="information-section">
+            <h2>Assembly Steps</h2>
+            <ol>
+                <li>Cut all pieces according to the cut list.</li>
+                <li>Assemble the frame using 2x4s and wood screws, forming a rectangle.</li>
+                <li>Attach the 4x4 posts as legs at each corner of the frame.</li>
+                <li>Secure the plywood top onto the frame using wood glue and screws.</li>
+                <li>Sand the entire workbench and apply wood stain or finish for durability.</li>
+            </ol>
+        </section>
+
+        <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+        <div class="sidebar" id="sidebar">
+            <div class="clock" id="clock"></div>
+            <div id="sidebar-nav"></div>
+            <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+        </div>
+
+        <footer>
+            <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+        </footer>
+
+        <script>
+            function toggleSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                sidebar.classList.toggle('open');
+            }
+
+            document.addEventListener('click', function(event) {
+                const sidebar = document.getElementById('sidebar');
+                const menuButton = document.querySelector('.menu-btn');
+                if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+                    sidebar.classList.remove('open');
+                }
+            });
+
+            function updateClock() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString();
+                document.getElementById('clock').textContent = timeString;
+            }
+
+            function toggleTheme() {
+                document.body.classList.toggle('light-mode');
+                localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+            }
+
+            window.onload = function() {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'light') {
+                    document.body.classList.add('light-mode');
+                } else {
+                    document.body.classList.remove('light-mode');
+                }
+            }
+
+            fetch('sidebar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('sidebar-nav').innerHTML = data;
+                });
+
+            setInterval(updateClock, 1000);
+            updateClock();
+        </script>
+    </div>
+</body>
+</html>
