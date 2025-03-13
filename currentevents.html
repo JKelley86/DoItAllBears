@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>News Dashboard</title>
+    <link rel="stylesheet" href="theme.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
-        .container { max-width: 1200px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 8px; }
-        h1 { text-align: center; }
         .category { margin-bottom: 30px; }
         .article { padding: 10px; border-bottom: 1px solid #ddd; }
         .article:last-child { border-bottom: none; }
@@ -32,7 +30,22 @@
             <canvas id="sp500Chart"></canvas>
         </div>
     </div>
+<div class="container" id="main-container"></div>
 
+    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+    <div class="sidebar" id="sidebar">
+        <div class="clock" id="clock"></div>
+        <a href="recipes/index.html">📖 Recipes</a>
+        <a href="useful/showtracker.html">🎥 Movies</a>
+	<a href="useful/camping.html">⛺ Camping</a>
+	<a href="woodworking/index.html">🔨 Wood Working</a>
+	<a href="currentevents.html">📰 Current Events</a>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+    </div>
+
+    <footer> 
+        <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+    </footer> 
     <script>
         const categories = [
             { name: 'Minnesota', url: 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml' },
@@ -111,6 +124,53 @@
             createChart('inflationChart', inflationData, 'Inflation Rate (%)', 'red');
             createChart('sp500Chart', sp500Data, 'S&P 500 Index', 'blue');
         });
+            function navigateTo(page) {
+        window.location.href = page;
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('open');
+    }
+        // Close sidebar if clicked outside of it
+    document.addEventListener('click', function(event) {
+	const sidebar = document.getElementById('sidebar');
+        const menuButton = document.querySelector('.menu-btn');
+        if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+            sidebar.classList.remove('open');
+        }
+    });
+
+    function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        document.getElementById('clock').textContent = timeString;
+    }
+        	    // Function to toggle the theme
+    function toggleTheme() {
+        // Toggle the 'light-mode' class on the body
+        document.body.classList.toggle('light-mode');
+
+        // Save the theme to localStorage
+        localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    }
+
+    // Check localStorage for the theme preference on page load
+    window.onload = function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+        } else if (savedTheme === 'dark') {
+            document.body.classList.remove('light-mode');
+        }
+    }
+    fetch('navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('main-container').innerHTML += data;
+            });
+    setInterval(updateClock, 1000);
+    updateClock();
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
