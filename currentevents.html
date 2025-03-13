@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+        .container { max-width: 1200px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 8px; }
+        h1 { text-align: center; }
+        .category { margin-bottom: 30px; }
+        .article { padding: 10px; border-bottom: 1px solid #ddd; }
+        .article:last-child { border-bottom: none; }
+        .article h3 { margin: 0; }
+        .article a { text-decoration: none; color: #007BFF; }
+        .article a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Latest News</h1>
+        <div id="news"></div>
+    </div>
+
+    <script>
+        const API_KEY = 'fdd957e4fba84425ad4ed70111e69779';
+        const categories = [
+            { name: 'Minnesota', query: 'Minnesota' },
+            { name: 'Tech', query: 'technology' },
+            { name: 'Politics', query: 'politics' }
+        ];
+
+        async function fetchNews(category) {
+            const response = await fetch(`https://newsapi.org/v2/everything?q=${category.query}&apiKey=${API_KEY}`);
+            const data = await response.json();
+            return data.articles.slice(0, 5);
+        }
+
+        async function loadNews() {
+            const newsContainer = document.getElementById('news');
+
+            for (const category of categories) {
+                const articles = await fetchNews(category);
+
+                const categoryDiv = document.createElement('div');
+                categoryDiv.classList.add('category');
+                categoryDiv.innerHTML = `<h2>${category.name}</h2>`;
+
+                articles.forEach(article => {
+                    const articleDiv = document.createElement('div');
+                    articleDiv.classList.add('article');
+                    articleDiv.innerHTML = `
+                        <h3>${article.title}</h3>
+                        <p>${article.description || 'No description available.'}</p>
+                        <a href="${article.url}" target="_blank">Read more</a>
+                    `;
+                    categoryDiv.appendChild(articleDiv);
+                });
+
+                newsContainer.appendChild(categoryDiv);
+            }
+        }
+
+        loadNews();
+    </script>
+</body>
+</html>
