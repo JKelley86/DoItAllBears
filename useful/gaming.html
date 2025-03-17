@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming Hub</title>
+    <link rel="stylesheet" href="../theme.css">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            loadGames("board"); // Default tab
+        });
+        
+        const games = {
+            board: [
+                { name: "Catan", players: "3-4" },
+                { name: "Risk", players: "2-6" },
+                { name: "Ticket to Ride", players: "2-5" }
+            ],
+            xbox: [
+                { name: "Halo Infinite", players: "1-4" },
+                { name: "Forza Horizon 5", players: "1-12" }
+            ],
+            pc: [
+                { name: "Minecraft", players: "1-10" },
+                { name: "League of Legends", players: "5v5" }
+            ],
+            switch: [
+                { name: "Mario Kart 8", players: "1-4" },
+                { name: "Super Smash Bros", players: "1-8" }
+            ],
+            oculus: [
+                { name: "Beat Saber", players: "1" },
+                { name: "Echo VR", players: "1-4" }
+            ]
+        };
+        
+        function loadGames(category) {
+            const list = document.getElementById("game-list");
+            list.innerHTML = "";
+            games[category].forEach(game => {
+                const item = document.createElement("li");
+                item.textContent = `${game.name} (Players: ${game.players})`;
+                list.appendChild(item);
+            });
+            document.getElementById("random-game").textContent = "";
+            document.getElementById("random-btn").setAttribute("data-category", category);
+        }
+        
+        function pickRandomGame() {
+            const category = document.getElementById("random-btn").getAttribute("data-category");
+            const gameList = games[category];
+            if (gameList.length > 0) {
+                const randomGame = gameList[Math.floor(Math.random() * gameList.length)];
+                document.getElementById("random-game").textContent = `Random Pick: ${randomGame.name} (Players: ${randomGame.players})`;
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Gaming Hub</h1>
+        <div class="tabs">
+            <button onclick="loadGames('board')">Board Games</button>
+            <button onclick="loadGames('xbox')">Xbox Games</button>
+            <button onclick="loadGames('pc')">PC Games</button>
+            <button onclick="loadGames('switch')">Nintendo Switch Games</button>
+            <button onclick="loadGames('oculus')">Oculus Games</button>
+        </div>
+        <ul id="game-list"></ul>
+        <button id="random-btn" onclick="pickRandomGame()" data-category="board">Random Game</button>
+        <p id="random-game"></p>
+    </div>
+</body>
+</html>
