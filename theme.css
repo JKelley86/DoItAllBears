@@ -62,7 +62,6 @@ p {
     max-width: 600px; /* Optional: limit how wide it gets */
     margin: 0; /* Center horizontally */
     font-size: 1.5rem;
-    align-items: center;
 }
 
 /* Nav Cards */
@@ -230,6 +229,7 @@ footer {
     color: #555;
     margin: 10px 0; /* Adds spacing between the paragraphs and list */
     text-align: center; /* Centers text inside the list */
+    align-items: center;
 }
 
 .information-section ul {
