@@ -62,6 +62,7 @@ p {
     max-width: 600px; /* Optional: limit how wide it gets */
     margin: 0; /* Center horizontally */
     font-size: 1.5rem;
+    align-items: center;
 }
 
 /* Nav Cards */
