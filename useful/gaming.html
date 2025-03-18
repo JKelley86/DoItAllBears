@@ -11,10 +11,30 @@
         });
         
         const games = {
+            drinking: [
+                { name: "Tipsy Land", players: "3-4" },
+                { name: "Last Call", players: "3+" },
+                { name: "You Laugh You Drink", players: "3+" },
+		{ name: "Slide In the DM's", players: "3+" },
+	    	{ name: "Stir The Pot", players: "3+" },
+	    	{ name: "Buzzed Tower", players: "3+" },
+	    	{ name: "First & Last", players: "3+" },
+	    	{ name: "Buzzed", players: "3+" },
+	    	{ name: "Cards Against Humanity", players: "4+" },
+	    	{ name: "The Ultimate Pre-Game", players: "2-6" }
+            ],
             board: [
-                { name: "Catan", players: "3-4" },
-                { name: "Risk", players: "2-6" },
-                { name: "Ticket to Ride", players: "2-5" }
+                { name: "Play Nine", players: "2-6" },
+                { name: "Mancala", players: "2" },
+                { name: "Storage Wars", players: "2-6" },
+		{ name: "Walking Dead", players: "2-10" },
+		{ name: "Uno", players: "2-10" },
+		{ name: "Dice Miner", players: "1-4" },
+		{ name: "Race To The Treasure", players: "2-4" },
+		{ name: "Fast Track", players: "2" },
+		{ name: "Uno Flip", players: "2-10" },
+		{ name: "Monopoly", players: "2-8" },
+		{ name: "Pay Day", players: "2-4" }
             ],
             xbox: [
                 { name: "Halo Infinite", players: "1-4" },
@@ -109,6 +129,7 @@
         <h1>Gaming Hub</h1>
         <div class="tabs">
             <button onclick="loadGames('board')">Board Games</button>
+	    <button onclick="loadGames('drinking')">Drinking Games</button>
             <button onclick="loadGames('xbox')">Xbox Games</button>
             <button onclick="loadGames('pc')">PC Games</button>
             <button onclick="loadGames('switch')">Nintendo Switch Games</button>
