@@ -46,10 +46,20 @@
 		{ name: "Arena Breakout", players: "1-4" },
 		{ name: "Delta Force", players: "1-4" }
             ],
+            yard: [
+                { name: "Corn Hole", players: "2-4" },
+                { name: "Bottle Bash", players: "2-4" },
+		{ name: "Pickle Ball", players: "2-4" },
+		{ name: "Tennis", players: "2-4" },
+		{ name: "Baseball", players: "2-18" },
+		{ name: "Football", players: "2-24" },
+            ],
+
             switch: [
                 { name: "Mario Kart 8", players: "1-4" },
                 { name: "Super Smash Bros", players: "1-8" }
-            ],
+            ],		
+		
             oculus: [
                 { name: "Beat Saber", players: "1" },
                 { name: "Into The Radius", players: "1" },
@@ -148,6 +158,7 @@
             <button onclick="loadGames('pc')">PC Games</button>
             <button onclick="loadGames('switch')">Nintendo Switch Games</button>
             <button onclick="loadGames('oculus')">Oculus Games</button>
+	    <button onclick="loadGames('yard')">Yard Games</button>
         </div>
         <ul id="game-list"></ul>
         <button id="random-btn" onclick="pickRandomGame()" data-category="board">Random Game</button>
