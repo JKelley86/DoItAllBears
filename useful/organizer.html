@@ -67,28 +67,30 @@
         <button onclick="addFurniture('Chair')">Add Chair</button>
     </div>
     <script>
-        function generateGrid() {
-            let grid = document.getElementById("grid");
-            grid.innerHTML = "";
-            let size = document.getElementById("room-size").value;
-            let width, height;
-            
-            if (size === "custom") {
-                width = parseInt(document.getElementById("custom-width").value) || 5;
-                height = parseInt(document.getElementById("custom-height").value) || 5;
-            } else {
-                [width, height] = size.split("x").map(Number);
-            }
-            
-            grid.style.gridTemplateColumns = `repeat(${width}, 50px)`;
-            grid.style.gridTemplateRows = `repeat(${height}, 50px)`;
-            
-            for (let i = 0; i < width * height; i++) {
-                let cell = document.createElement("div");
-                cell.classList.add("grid-cell");
-                grid.appendChild(cell);
-            }
-        }
+function generateGrid() {
+    let grid = document.getElementById("grid");
+    grid.innerHTML = "";
+    let size = document.getElementById("room-size").value;
+    let width, height;
+
+    if (size === "custom") {
+        width = parseInt(document.getElementById("custom-width").value) || 5;
+        height = parseInt(document.getElementById("custom-height").value) || 5;
+    } else {
+        [width, height] = size.split("x").map(Number);
+    }
+
+    grid.style.gridTemplateColumns = `repeat(${width}, 50px)`;
+    grid.style.gridTemplateRows = `repeat(${height}, 50px)`;
+    grid.style.width = `${width * 50}px`; // Ensure grid has proper dimensions
+    grid.style.height = `${height * 50}px`;
+
+    for (let i = 0; i < width * height; i++) {
+        let cell = document.createElement("div");
+        cell.classList.add("grid-cell");
+        grid.appendChild(cell);
+    }
+}
 
         function clearRoom() {
             document.getElementById("grid").innerHTML = "";
@@ -109,43 +111,51 @@ function addFurniture(type) {
     furniture.textContent = type;
     furniture.draggable = true;
 
+    let offsetX = 0, offsetY = 0;
+
     furniture.addEventListener("dragstart", (e) => {
         furniture.classList.add("dragging");
+        let rect = furniture.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
     });
 
     furniture.addEventListener("dragend", (e) => {
         furniture.classList.remove("dragging");
     });
 
-    document.getElementById("grid").addEventListener("dragover", (e) => {
-        e.preventDefault();
-    });
+    document.getElementById("grid").appendChild(furniture);
+}
 
-    document.getElementById("grid").addEventListener("drop", (e) => {
-        e.preventDefault();
-        let draggingItem = document.querySelector(".dragging");
-        let grid = document.getElementById("grid");
+document.getElementById("grid").addEventListener("dragover", (e) => {
+    e.preventDefault();
+});
 
-        if (draggingItem) {
-            let rect = grid.getBoundingClientRect();
-            let cellSize = 50; // Match grid cell size
-            let x = e.clientX - rect.left;
-            let y = e.clientY - rect.top;
+document.getElementById("grid").addEventListener("drop", (e) => {
+    e.preventDefault();
+    let draggingItem = document.querySelector(".dragging");
+    let grid = document.getElementById("grid");
 
-            let gridX = Math.floor(x / cellSize) * cellSize;
-            let gridY = Math.floor(y / cellSize) * cellSize;
+    if (draggingItem) {
+        let rect = grid.getBoundingClientRect();
+        let cellSize = 50; // Match grid cell size
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
 
-            // Keep furniture within grid boundaries
-            let maxX = grid.offsetWidth - cellSize;
-            let maxY = grid.offsetHeight - cellSize;
-            gridX = Math.max(0, Math.min(gridX, maxX));
-            gridY = Math.max(0, Math.min(gridY, maxY));
+        let gridX = Math.floor(x / cellSize) * cellSize;
+        let gridY = Math.floor(y / cellSize) * cellSize;
 
-            draggingItem.style.position = "absolute";
-            draggingItem.style.left = `${gridX}px`;
-            draggingItem.style.top = `${gridY}px`;
-        }
-    });
+        // Keep furniture within grid boundaries
+        let maxX = grid.offsetWidth - cellSize;
+        let maxY = grid.offsetHeight - cellSize;
+        gridX = Math.max(0, Math.min(gridX, maxX));
+        gridY = Math.max(0, Math.min(gridY, maxY));
+
+        draggingItem.style.position = "absolute";
+        draggingItem.style.left = `${gridX}px`;
+        draggingItem.style.top = `${gridY}px`;
+    }
+});
 
     document.getElementById("grid").appendChild(furniture);
 }
