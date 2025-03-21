@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Planner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+        }
+        .controls {
+            margin-bottom: 10px;
+        }
+        .grid-container {
+            display: grid;
+            gap: 1px;
+            background: #ddd;
+            border: 2px solid black;
+        }
+        .grid-cell {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border: 1px solid #ccc;
+            position: relative;
+        }
+        .furniture {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: lightblue;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Room Planner</h1>
+    <div class="controls">
+        <label for="room-size">Select Room Size:</label>
+        <select id="room-size">
+            <option value="5x5">Small (5x5)</option>
+            <option value="10x10">Medium (10x10)</option>
+            <option value="15x15">Large (15x15)</option>
+            <option value="custom">Custom</option>
+        </select>
+        <input type="number" id="custom-width" placeholder="Width" style="display: none;" min="1">
+        <input type="number" id="custom-height" placeholder="Height" style="display: none;" min="1">
+        <button onclick="generateGrid()">Create Room</button>
+        <button onclick="clearRoom()">Clear Room</button>
+    </div>
+    <div id="grid" class="grid-container"></div>
+
+    <script>
+        function generateGrid() {
+            let grid = document.getElementById("grid");
+            grid.innerHTML = "";
+            let size = document.getElementById("room-size").value;
+            let width, height;
+            
+            if (size === "custom") {
+                width = parseInt(document.getElementById("custom-width").value) || 5;
+                height = parseInt(document.getElementById("custom-height").value) || 5;
+            } else {
+                [width, height] = size.split("x").map(Number);
+            }
+            
+            grid.style.gridTemplateColumns = `repeat(${width}, 50px)`;
+            grid.style.gridTemplateRows = `repeat(${height}, 50px)`;
+            
+            for (let i = 0; i < width * height; i++) {
+                let cell = document.createElement("div");
+                cell.classList.add("grid-cell");
+                grid.appendChild(cell);
+            }
+        }
+
+        function clearRoom() {
+            document.getElementById("grid").innerHTML = "";
+        }
+
+        document.getElementById("room-size").addEventListener("change", function() {
+            let customInputs = [document.getElementById("custom-width"), document.getElementById("custom-height")];
+            if (this.value === "custom") {
+                customInputs.forEach(input => input.style.display = "inline-block");
+            } else {
+                customInputs.forEach(input => input.style.display = "none");
+            }
+        });
+    </script>
+</body>
+</html>
