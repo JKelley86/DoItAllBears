@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Finder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #ccc;
+        }
+        .recipe {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px auto;
+            max-width: 400px;
+        }
+        .recipe img {
+            width: 100%;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Recipe Finder</h1>
+    <input type="text" id="ingredients" placeholder="Enter ingredients (comma-separated)">
+    <button onclick="fetchRecipes()">Find Recipes</button>
+    <div id="recipes"></div>
+
+    <script>
+        const API_KEY = '02297cea99a84d478619b09c49fb4041';
+
+        async function fetchRecipes() {
+            const ingredients = document.getElementById('ingredients').value;
+            if (!ingredients) return;
+            
+            const url = `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredients}&number=5&apiKey=${API_KEY}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            const recipesDiv = document.getElementById('recipes');
+            recipesDiv.innerHTML = '';
+            
+            data.forEach(recipe => {
+                const recipeElement = document.createElement('div');
+                recipeElement.classList.add('recipe');
+                recipeElement.innerHTML = `
+                    <img src="${recipe.image}" alt="${recipe.title}">
+                    <h2>${recipe.title}</h2>
+                `;
+                recipesDiv.appendChild(recipeElement);
+            });
+        }
+    </script>
+</body>
+</html>
