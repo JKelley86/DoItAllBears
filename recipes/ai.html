@@ -30,6 +30,7 @@
             padding: 10px;
             margin: 10px auto;
             max-width: 400px;
+            cursor: pointer;
         }
         .recipe img {
             width: 100%;
@@ -64,6 +65,7 @@
                     <img src="${recipe.image}" alt="${recipe.title}">
                     <h2>${recipe.title}</h2>
                 `;
+                recipeElement.onclick = () => window.open(`https://spoonacular.com/recipes/${recipe.title.replace(/ /g, '-')}-${recipe.id}`, '_blank');
                 recipesDiv.appendChild(recipeElement);
             });
         }
