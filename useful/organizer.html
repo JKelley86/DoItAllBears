@@ -120,19 +120,29 @@
             document.getElementById("grid").appendChild(furniture);
         }
 
-        document.getElementById("grid").addEventListener("dragover", (e) => {
-            e.preventDefault();
-            let draggingItem = document.querySelector(".dragging");
-            if (draggingItem) {
-                let rect = e.currentTarget.getBoundingClientRect();
-                let x = e.clientX - rect.left;
-                let y = e.clientY - rect.top;
-                let snappedX = Math.floor(x / 50) * 50;
-                let snappedY = Math.floor(y / 50) * 50;
-                draggingItem.style.left = `${snappedX}px`;
-                draggingItem.style.top = `${snappedY}px`;
-            }
-        });
+document.getElementById("grid").addEventListener("dragover", (e) => {
+    e.preventDefault();
+    let draggingItem = document.querySelector(".dragging");
+    let grid = document.getElementById("grid");
+
+    if (draggingItem) {
+        let rect = grid.getBoundingClientRect();
+        let cellSize = 50; // Ensure this matches your grid cell size
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+        let gridX = Math.round(x / cellSize) * cellSize;
+        let gridY = Math.round(y / cellSize) * cellSize;
+
+        // Ensure items stay within bounds
+        let maxX = grid.clientWidth - cellSize;
+        let maxY = grid.clientHeight - cellSize;
+        gridX = Math.max(0, Math.min(gridX, maxX));
+        gridY = Math.max(0, Math.min(gridY, maxY));
+
+        draggingItem.style.left = `${gridX}px`;
+        draggingItem.style.top = `${gridY}px`;
+    }
+});
     </script>
 </body>
 </html>
