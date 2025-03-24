@@ -288,6 +288,7 @@ footer {
         }
         .chat-text {
             background-color: white;
+	    var(--text-color)
             padding: 5px 10px;
             border-radius: 10px;
             font-size: 14px;
