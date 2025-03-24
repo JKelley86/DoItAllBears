@@ -142,7 +142,22 @@
     cursor: pointer;
     z-index: 1100;
 }
-
+	    
+        .chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            text-align: center;
+        }
+        .chat-text {
+            background-color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 5px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+        }
+	    
 .chat-bubble {
     position: fixed;
     bottom: 20px;
@@ -183,8 +198,11 @@
         <div class="tab" data-diet="Carnivore" onclick="filterDiet('Carnivore')">Carnivore</div>
         <div class="tab" data-diet="General" onclick="filterDiet('General')">General</div>
     </div>
-	
-    <div class="chat-bubble" onclick="window.location.href='ai.html'">💬</div>
+
+    <div class="chat-container">
+        <div class="chat-text">Need recipe ideas?</div>
+    	<div class="chat-bubble" onclick="window.location.href='ai.html'">💬</div>
+    </div>
 	
     <input type="text" class="search" placeholder="Search recipes..." oninput="searchRecipes()">
     <ul class="recipe-list" id="recipe-list"></ul> 
