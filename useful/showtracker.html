@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Movie & Show Tracker</title>
+  <link rel="stylesheet" href="../theme.css">
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -92,90 +93,6 @@
     .random-show {
       margin-top: 30px;
     }
-  .sidebar {
-    position: fixed;
-    left: -400px;
-    top: 0;
-    width: 300px;
-    height: 100%;
-    background: var(--card-bg);
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
-    transition: left 0.3s ease;
-    z-index: 1000;
-}
-
-.sidebar.open {
-    left: 0;
-}
-
-.sidebar a {
-    color: var(--text-color);
-    padding: 20px 0;
-    text-decoration: none;
-    font-size: 20px;
-    transition: background 0.3s ease, padding-left 0.3s ease;
-}
-
-.sidebar a:hover {
-    background: var(--accent-color);
-    padding-left: 10px;
-}
-.sidebar-card {
-    color: var(--text-color);
-    padding: 20px 0;
-    text-decoration: none;
-    font-size: 20px;
-    transition: background 0.3s ease, padding-left 0.3s ease;
-}
-
-/* Hover effect for sidebar cards */
-.sidebar-card:hover {
-    background: var(--accent-color);
-    padding-left: 10px;
-}
-
-/* Menu Button */
-.menu-btn {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background: var(--text-color);
-    color: var(--bg-color);
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    z-index: 1100;
-}
-
-/* Theme Toggle Button */
-.theme-toggle {
-    margin-top: auto;
-    background: var(--text-color);
-    color: var(--bg-color);
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 60px;
-}
-    .clock {
-    margin-top: 60px;
-    font-size: 1.5rem;
-}
-
-/* Footer */
-footer {
-    background: var(--card-bg);
-    padding: 10px;
-    font-size: 16px;
-    width: 100%;
-    text-align: center;
-    margin-top: auto;
-}
   </style>
 </head>
 <body>
