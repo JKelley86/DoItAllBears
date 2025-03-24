@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Cookbook</title>
+    <link rel="stylesheet" href="../theme.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -95,53 +96,6 @@
         .recipe-list a:hover { 
             text-decoration: underline; 
         }
-	/* Sidebar */
-.sidebar {
-    position: fixed;
-    left: -400px;
-    top: 0;
-    width: 300px;
-    height: 100%;
-    background: var(--card-bg);
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
-    transition: left 0.3s ease;
-    z-index: 1000;
-    opacity: 100%;
-}
-
-.sidebar.open {
-    left: 0;
-}
-
-.sidebar a {
-    color: var(--text-color);
-    padding: 20px 0;
-    text-decoration: none;
-    font-size: 20px;
-    transition: background 0.3s ease, padding-left 0.3s ease;
-}
-
-.sidebar a:hover {
-    background: var(--accent-color);
-    padding-left: 10px;
-}
-
-/* Menu Button */
-.menu-btn {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background: var(--text-color);
-    color: var(--bg-color);
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    z-index: 1100;
-}
 	    
         .chat-container {
             position: fixed;
@@ -200,7 +154,7 @@
     </div>
 
     <div class="chat-container">
-        <div class="chat-text">Need recipe ideas?</div>
+        <div class="chat-text">Find Recipes With Ingredients You Have On Hand</div>
     	<div class="chat-bubble" onclick="window.location.href='ai.html'">💬</div>
     </div>
 	
