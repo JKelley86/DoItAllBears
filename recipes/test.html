@@ -3,171 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Recipe Title</title>
-    <!-- Add Font Awesome CDN -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <title>Cookbook</title>
+    <link rel="stylesheet" href="../theme.css">
     <style>
-                .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .modal-content {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        width: 80%;
-        max-width: 400px;
-        text-align: center;
-        position: relative;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        margin: auto;
-    }
-
-    .close-button {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 24px;
-        cursor: pointer;
-    }
-    .nutrition-facts {
-    margin-top: 20px;
-    font-family: Arial, sans-serif;
-}
-
-.nutrition-facts h2 {
-    text-align: center;
-    font-size: 24px;
-    margin-bottom: 10px;
-}
-
-.nutrition-facts table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-}
-
-.nutrition-facts table td {
-    padding: 5px;
-    font-size: 16px;
-}
-
-.nutrition-facts table td:first-child {
-    width: 60%;
-    font-weight: bold;
-}
-
-.nutrition-facts table td:last-child {
-    text-align: right;
-}
-
-.nutrition-facts p {
-    font-size: 16px;
-    margin: 10px 0;
-}
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 10px;
+            color: white;
+            font-weight: bold;
+        }
+        .tab {
+            padding: 10px 15px;
+            background: #ddd;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s, transform 0.2s;
+            white-space: nowrap;
+        }
+        .tab:hover { 
+            background: #bbb; 
+            transform: scale(1.05);
+        }
+        .tab.active { 
+            background: #6c757d; 
+            color: white; 
+        }
     </style>
 </head>
 <body>
-
-    <header>
-        <h1>Super Long Recipe Name That Might Get Cut Off</h1>
-        <div class="button-container">
-            <button class="print-button" onclick="window.print()"><i class="fas fa-print"></i></button>
-            <button class="share-button" onclick="shareRecipe()"><i class="fas fa-share-alt"></i></button>
-            <button class="info-button" onclick="toggleInfo()"><i class="fas fa-info-circle"></i></button>
-        </div>
-    </header>
-    <section id="recipe-details">
-        <h2>Recipe Details</h2>
-        <p><strong>Prep Time:</strong> 15 minutes</p>
-        <p><strong>Cook Time:</strong> 30 minutes</p>
-        <p><strong>Total Time:</strong> 45 minutes</p>
-    </section>
-
-    <section id="ingredients">
-        <h2>Ingredients</h2>
-        <ul>
-            <li>1 cup of flour</li>
-            <li>2 eggs</li>
-            <li>1/2 cup of sugar</li>
-            <li>1/4 cup of milk</li>
-            <li>1 tsp of vanilla extract</li>
-        </ul>
-    </section>
-
-    <section id="instructions">
-        <h2>Instructions</h2>
-        <ol>
-            <li>Preheat the oven to 350°F (175°C).</li>
-            <li>In a bowl, mix the flour, sugar, and eggs together.</li>
-            <li>Add the milk and vanilla extract, and stir until smooth.</li>
-            <li>Pour the mixture into a greased baking pan.</li>
-            <li>Bake for 30 minutes or until golden brown.</li>
-            <li>Allow to cool before serving.</li>
-        </ol>
-    </section>
-<div id="nutrition-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-button" onclick="toggleInfo()">&times;</span>
-        <h2>Nutrition Facts</h2>
-        <div class="nutrition-facts">
-            <p><strong>Serving Size:</strong> 1 slice</p>
-            <p><strong>Servings:</strong> 8</p>
-            <table>
-                <tr>
-                    <td><strong>Calories</strong></td>
-                    <td>250</td>
-                </tr>
-                <tr>
-                    <td><strong>Protein</strong></td>
-                    <td>5g</td>
-                </tr>
-                <tr>
-                    <td><strong>Carbs</strong></td>
-                    <td>35g</td>
-                </tr>
-                <tr>
-                    <td><strong>Fat</strong></td>
-                    <td>10g</td>
-                </tr>
-                <tr>
-                    <td><strong>Sodium</strong></td>
-                    <td>150mg</td>
-                </tr>
-            </table>
-        </div>
+    <header>Bear Book - Cookbook</header>
+    
+    <div class="tabs" id="category-tabs">
+        <div class="tab active" data-category="All" onclick="filterCategory('All')">All</div>
+        <div class="tab" data-category="Breakfast" onclick="filterCategory('Breakfast')">Breakfast</div>
+        <div class="tab" data-category="Lunch" onclick="filterCategory('Lunch')">Lunch</div>
+        <div class="tab" data-category="Dinner" onclick="filterCategory('Dinner')">Dinner</div>
+        <div class="tab" data-category="Dessert" onclick="filterCategory('Dessert')">Dessert</div>
+        <div class="tab" data-category="Snacks" onclick="filterCategory('Snacks')">Snacks/Appetizers</div>
     </div>
-</div>
-    <footer>
-        <p>&copy; 2024 Bear Book. All rights reserved.</p>
-    </footer>
+    
+    <div class="tabs" id="diet-tabs">
+        <div class="tab active" data-diet="All" onclick="filterDiet('All')">All</div>
+        <div class="tab" data-diet="Vegan" onclick="filterDiet('Vegan')">Vegan</div>
+        <div class="tab" data-diet="Vegetarian" onclick="filterDiet('Vegetarian')">Vegetarian</div>
+        <div class="tab" data-diet="Carnivore" onclick="filterDiet('Carnivore')">Carnivore</div>
+        <div class="tab" data-diet="General" onclick="filterDiet('General')">General</div>
+    </div>
 
-<script src="script.js"></script>
-<script>
-    window.onload = function() {
-    const modal = document.getElementById('nutrition-modal');
-    modal.style.display = 'none'; // Ensure modal is hidden on page load
-}
+    <div class="chat-container">
+        <div class="chat-text">Find Recipes With Ingredients You Have On Hand</div>
+    	<div class="chat-bubble" onclick="window.location.href='ai.html'">💬</div>
+    </div>
+	
+    <input type="text" class="search" placeholder="Search recipes..." oninput="searchRecipes()">
+    <ul class="recipe-list" id="recipe-list"></ul> 
+        <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+    <div class="sidebar" id="sidebar">
+        <div class="clock" id="clock"></div>
+        <a href="../index.html">Main Page</a>
+        <a href="useful/showtracker.html">🎥 Movies</a>
+	<a href="useful/camping.html">⛺ Camping</a>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+    </div>
+    <script>
+        const recipes = [
+            { name: "Biscuits And Gravy", category: "Breakfast", diet: "General", link: "biscuitsgravy.html",  approved: true },
+            
+            { name: "Chicken Mozzarella Sticks", category: "Lunch", diet: "Carnivore", link: "chickenmozzsticks.html",  approved: true },
+            { name: "Mozzarella Sticks", category: "Lunch", diet: "General", link: "mozzarellasticks.html",  approved: false },
+	    { name: "Philadelphia Sushi Roll", category: "Lunch", diet: "General", link: "philadelphiaroll.html",  approved: true },
+            
+            { name: "Chicken And Rice Bake", category: "Dinner", diet: "General", link: "chickenricebake.html",  approved: false },
+            { name: "Lemon Garlic Salmon", category: "Dinner", diet: "Carnivore", link: "lemongarlicsalmon.html",  approved: false },
+	    { name: "Steak And Butter", category: "Dinner", diet: "Carnivore", link: "steakandbutter.html",  approved: true },
+	    { name: "Mac and Cheese", category: "Dinner", diet: "General", link: "macandcheese.html",  approved: true },
+	
+            { name: "Banana Cream Cool Whip Bars", category: "Dessert", diet: "General", link: "bananabars.html",  approved: false },
+            { name: "Chocolate Chip Cookies", category: "Dessert", diet: "Vegetarian", link: "chocolatechipcookie.html",  approved: false },
+            { name: "Fudge Topped Brownies", category: "Dessert", diet: "General", link: "fudgetoppedbrownies.html",  approved: false },
+	    { name: "Wedding Cake", category: "Dessert", diet: "General", link: "weddingcake.html",  approved: true },
+	    { name: "Pumpkin Bars", category: "Dessert", diet: "General", link: "pumpkinbars.html",  approved: false },
+            
+            { name: "Apple Salad", category: "Snacks", diet: "Vegan", link: "applesalad.html",  approved: true },
+            { name: "Avocado Fries", category: "Snacks", diet: "Vegan", link: "avocadofries.html",  approved: false },
+            { name: "Blooming Onion", category: "Snacks", diet: "Vegetarian", link: "bloomingonion.html",  approved: false },
+            { name: "Buffalo Chicken Dip", category: "Snacks", diet: "Carnivore", link: "buffalochickendip.html",  approved: true },
+            { name: "French Fries", category: "Snacks", diet: "Vegan", link: "frenchfries.html",  approved: true },
+            { name: "Green Beans", category: "Snacks", diet: "Vegan", link: "greenbeans.html",  approved: true },
+	    { name: "Sweet Potato Fries", category: "Snacks", diet: "Vegan", link: "sweetpotatofries.html",  approved: true },
+	    { name: "Pico De Gallo", category: "Snacks", diet: "Vegan", link: "picodegallo.html",  approved: false }
+        ];
 
-function toggleInfo() {
-    const modal = document.getElementById('nutrition-modal');
-    if (modal.style.display === 'none' || modal.style.display === '') {
-        modal.style.display = 'flex';
-    } else {
-        modal.style.display = 'none';
-    }
-}
-</script>
+        let currentCategory = "All";
+        let currentDiet = "All";
+
+        function filterCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('#category-tabs .tab').forEach(tab =>
+                tab.classList.toggle('active', tab.dataset.category === category));
+            displayRecipes();
+        }
+
+        function filterDiet(diet) {
+            currentDiet = diet;
+            document.querySelectorAll('#diet-tabs .tab').forEach(tab =>
+                tab.classList.toggle('active', tab.dataset.diet === diet));
+            displayRecipes();
+        }
+
+        function searchRecipes() {
+            displayRecipes();
+        }
+
+        function displayRecipes() {
+            const searchTerm = document.querySelector('.search').value.toLowerCase();
+            const list = document.getElementById('recipe-list');
+            list.innerHTML = "";
+
+            recipes.filter(recipe => 
+                recipe.name.toLowerCase().includes(searchTerm) && 
+                (currentCategory === 'All' || recipe.category === currentCategory) &&
+                (currentDiet === 'All' || recipe.diet === currentDiet)
+            ).forEach(recipe => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = recipe.link;
+                a.textContent = recipe.name;
+
+                if (recipe.approved) {
+                const paw = document.createElement('span');
+                paw.classList.add('paw-icon');
+                paw.textContent = " 🐾";
+                li.appendChild(paw);
+                }
+                
+                li.appendChild(a);
+                list.appendChild(li);
+            });
+        }
+
+        displayRecipes();
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+                // Close sidebar if clicked outside of it
+                document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuButton = document.querySelector('.menu-btn');
+            if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('clock').textContent = timeString;
+        }
+
+        // Function to toggle the theme
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+        }
+
+        window.onload = function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+            } else if (savedTheme === 'dark') {
+                document.body.classList.remove('light-mode');
+            }
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script> 
 </body>
 </html>
