@@ -10,6 +10,7 @@
 <div class="container">
     <h1>Welcome To The Home Page Of Useful Items</h1>
     <p>This is a one-stop shop for anything you may need!</p>
+    <p>Please note this website is a work in progress. Some things may not work as expected.</p>
 </div>
 <div class="search-bar-container">
     <input type="text" class="search-bar" id="search-bar" placeholder="Search..." oninput="filterCards()">
@@ -19,11 +20,14 @@
     <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
     <div class="sidebar" id="sidebar">
         <div class="clock" id="clock"></div>
-        <a href="../index.html">Home</a>
-	<div id="sidebar-nav"></div>
+        <a href="recipes/index.html">📖 Recipes</a>
+        <a href="useful/showtracker.html">🎥 Movies</a>
+        <a href="useful/gaming.html">🎮 Game Library</a>
+	<a href="useful/camping.html">⛺ Camping</a>
+	<a href="woodworking/index.html">🔨 Wood Working</a>
+	<a href="currentevents.html">📰 Current Events</a>
         <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
     </div>
-
     <footer> 
         <span>&copy; 2024 Justin's Website. All rights reserved.</span>
     </footer> 
@@ -50,6 +54,7 @@
         const timeString = now.toLocaleTimeString();
         document.getElementById('clock').textContent = timeString;
     }
+
 function filterCards() {
     const searchTerm = document.getElementById('search-bar').value.toLowerCase();
     const cards = Array.from(document.querySelectorAll('.nav-card'));
@@ -64,33 +69,15 @@ function filterCards() {
             card.style.display = 'none'; // Hide non-matching cards and remove their space
         }
     });
-}	    // Function to toggle the theme
-    function toggleTheme() {
-        // Toggle the 'light-mode' class on the body
-        document.body.classList.toggle('light-mode');
-
-        // Save the theme to localStorage
-        localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-    }
-
-    // Check localStorage for the theme preference on page load
-    window.onload = function() {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'light') {
-            document.body.classList.add('light-mode');
-        } else if (savedTheme === 'dark') {
-            document.body.classList.remove('light-mode');
-        }
-    }
+}
     fetch('navbar.html')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('main-container').innerHTML += data;
-		document.getElementById('sidebar-nav').innerHTML = data; // Sidebar one
             });
     setInterval(updateClock, 1000);
     updateClock();
 </script>
-
+<script src="theme-toggle.js"></script>
 </body>
 </html>
