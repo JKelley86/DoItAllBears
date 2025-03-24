@@ -58,6 +58,8 @@ h1 {
 h6 {
     text-align: center;
     font-size: .75rem;
+    margin: 0; /* Center horizontally */
+    width: 100%; /* Take up full width */
 }
 
 p {
