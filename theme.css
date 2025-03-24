@@ -55,6 +55,10 @@ h1 {
     text-align: center;
     font-size: 3rem;
 }
+h6 {
+    text-align: center;
+    font-size: .25rem;
+}
 
 p {
     text-align: center;
