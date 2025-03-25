@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newest Movies</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Newest Movies</h1>
+    
+    <!-- Search bar -->
+    <div id="search-container">
+        <input type="text" id="search-input" placeholder="Search for movies...">
+    </div>
+    
+    <div id="movie-container"></div>
+    
+    <!-- Load More button -->
+    <button id="load-more-button">Load More</button>
+
+    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+    <div class="sidebar" id="sidebar">
+        <div class="clock" id="clock"></div>
+	<div id="sidebar-nav"></div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
