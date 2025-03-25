@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Details</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="movie-details" class="clearfix">
+        <img id="movie-poster" src="" alt="Movie Poster">
+        <div>
+            <h1 id="movie-title"></h1>
+            <p><strong>Plot:</strong> <span id="movie-overview"></span></p>
+            <p><strong>Genres:</strong> <span id="movie-genres"></span></p>
+            <p><strong>IMDB Rating:</strong> <span id="movie-rating"></span></p>
+            <div class="rating-bar-container">
+                <div class="rating-bar">
+                    <div class="rating-bar-fill" id="rating-bar-fill"></div>
+                </div>
+            </div>
+            <p><strong>Director:</strong> <span id="movie-director"></span></p>
+            <p><strong>Runtime:</strong> <span id="movie-runtime"></span> minutes</p>
+            <p><strong>Budget:</strong> $<span id="movie-budget"></span></p>
+            <p><strong>Revenue:</strong> $<span id="movie-revenue"></span></p>
+        </div>
+        <div style="width: 100%;">
+            <h2>Cast:</h2>
+            <div id="movie-cast"></div>
+        </div>
+        <a href="index.html">Back to Home</a>
+    </div>
+
+    <script src="movie.js"></script>
+</body>
+</html>
