@@ -51,6 +51,35 @@ body {
     line-height: 1.6; /* Improve readability */
 }
 
+/* TV show details container */
+#tv-details {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #2c2c2c;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    text-align: left; /* Align text to the left for better readability */
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* TV show poster */
+#tv-poster {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    margin-right: 20px; /* Add some space between the poster and the text */
+}
+
+/* TV show details text */
+#tv-details p {
+    font-size: 18px;
+    margin: 10px 0;
+    line-height: 1.6; /* Improve readability */
+}
+
 /* Clearfix for floating elements */
 .clearfix::after {
     content: "";
