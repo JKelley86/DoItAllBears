@@ -1,0 +1,292 @@
+/* Default (Dark Theme) */
+:root {
+    --bg-color: #121212;
+    --text-color: #fff;
+    --card-bg: #000;
+    --accent-color: #ff6347;
+}
+
+/* Light Mode */
+body.light-mode {
+    --bg-color: #f4f4f4;
+    --text-color: #121212;
+    --card-bg: #fff;
+}
+
+/* General styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #222;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Movie details container */
+#movie-details {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #2c2c2c;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    text-align: left; /* Align text to the left for better readability */
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* Movie poster */
+#movie-poster {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    margin-right: 20px; /* Add some space between the poster and the text */
+}
+
+/* Movie details text */
+#movie-details p {
+    font-size: 18px;
+    margin: 10px 0;
+    line-height: 1.6; /* Improve readability */
+}
+
+/* Clearfix for floating elements */
+.clearfix::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* Bigger headers */
+h1 {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #FFD700;
+}
+
+h2 {
+    font-size: 26px;
+    margin-top: 20px;
+    color: #FFA500;
+}
+
+/* Rating bar */
+.rating-bar-container {
+    margin: 10px 0;
+}
+
+.rating-bar {
+    width: 100%;
+    max-width: 300px;
+    height: 20px;
+    background-color: #444;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+.rating-bar-fill {
+    height: 100%;
+    background-color: #FFD700;
+    width: 0; /* Initial width set to 0 */
+    transition: width 0.5s ease;
+}
+
+/* Actors section */
+#movie-cast {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Actor card */
+.actor {
+    width: 150px;
+    background-color: #3a3a3a;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Actor images */
+.actor img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid white;
+}
+
+/* Actor name */
+.actor p {
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+/* Character name */
+.actor span {
+    font-size: 14px;
+    color: #bbb;
+    display: block;
+    margin-top: 2px;
+}
+
+/* Back button */
+a {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 15px;
+    background-color: #FFD700;
+    color: #222;
+    font-size: 18px;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+a:hover {
+    background-color: #FFA500;
+}
+
+/* Search container */
+#search-container {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Search input */
+#search-input {
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #FFD700;
+    border-radius: 6px;
+    width: 300px;
+    background-color: #333;
+    color: white;
+}
+
+/* Search button */
+#load-more-button {
+    padding: 10px 15px;
+    font-size: 16px;
+    background-color: #FFD700;
+    color: #222;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+/* Movie container (Grid Layout) */
+#movie-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* Individual movie box */
+.movie {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.movie:hover {
+    transform: scale(1.05);
+}
+
+/* Movie poster images */
+.movie img {
+    width: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.sidebar {
+    position: fixed;
+    left: -400px;
+    top: 0;
+    width: 300px;
+    height: 100%;
+    background: var(--card-bg);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+    transition: left 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto; /* Adds vertical scrolling if content overflows */
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar a {
+    color: var(--text-color);
+    padding: 20px 0;
+    text-decoration: none;
+    font-size: 20px;
+    transition: background 0.3s ease, padding-left 0.3s ease;
+}
+
+.sidebar a:hover {
+    background: var(--accent-color);
+    padding-left: 10px;
+}
+.sidebar-card {
+    color: var(--text-color);
+    padding: 20px 0;
+    text-decoration: none;
+    font-size: 20px;
+    transition: background 0.3s ease, padding-left 0.3s ease;
+}
+
+/* Hover effect for sidebar cards */
+.sidebar-card:hover {
+    background: var(--accent-color);
+    padding-left: 10px;
+}
+
+/* Menu Button */
+.menu-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: var(--text-color);
+    color: var(--bg-color);
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1100;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    margin-top: auto;
+    background: var(--text-color);
+    color: var(--bg-color);
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 60px;
+}
+
+/* Clock */
+.clock {
+    margin-top: 60px;
+    font-size: 1.5rem;
+}
