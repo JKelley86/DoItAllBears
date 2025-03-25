@@ -132,6 +132,15 @@ h2 {
     margin-top: 20px;
 }
 
+/* Actors section */
+#tv-cast {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
 /* Actor card */
 .actor {
     width: 150px;
