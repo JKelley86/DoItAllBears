@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie & Show Tracker</title>
+  <link rel="stylesheet" href="../theme.css">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #2c3e50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: white;
+      background-image: linear-gradient(to bottom, #34495e, #2c3e50);
+    }
+
+    h1 {
+      color: #e74c3c;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+      font-size: 3rem;
+      margin-top: 20px;
+    }
+
+    .show-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      width: 80%;
+      margin-top: 30px;
+      padding: 0 10px;
+    }
+
+    .card {
+      background: #ecf0f1;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      margin: 5px 0;
+      font-size: 1rem;
+      color: #7f8c8d;
+    }
+
+    .card img {
+      width: 50px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    .logo-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .random-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 10px 20px;
+      font-size: 1rem;
+      margin-top: 20px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .random-btn:hover {
+      background-color: #c0392b;
+      transform: scale(1.05);
+    }
+
+    .random-show {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Movie & Show Tracker</h1>
+
+  <div class="show-cards" id="showCards"></div>
+
+  <button class="random-btn" onclick="pickRandomShow()">Pick a Random Show</button>
+
+  <div id="randomShow" class="random-show"></div>
+  
+    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+    <div class="sidebar" id="sidebar">
+        <div class="clock" id="clock"></div>
+	<div id="sidebar-nav"></div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+    </div>
+
+    <footer> 
+        <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+    </footer> 
+  <script>
+    const showCards = document.getElementById('showCards');
+    const randomShowDiv = document.getElementById('randomShow');
+
+    const logoMap = {
+      'Netflix': 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg',
+      'Disney+': 'https://upload.wikimedia.org/wikipedia/commons/archive/7/77/20230514165915%21Disney_Plus_logo.svg',
+      'Amazon Prime': 'https://upload.wikimedia.org/wikipedia/commons/e/e3/Amazon_Prime_Logo.svg',
+      'Hulu': 'https://upload.wikimedia.org/wikipedia/commons/f/f9/Hulu_logo_%282018%29.svg',
+      'Paramount Plus': 'https://upload.wikimedia.org/wikipedia/commons/9/93/Paramount_Plus_logo.png',
+      'MAX' : 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Max_logo.svg',
+      'AMC+' : 'https://upload.wikimedia.org/wikipedia/commons/4/4a/AMC%2B_logo.png',
+      'Peacock' : 'https://upload.wikimedia.org/wikipedia/commons/d/d3/NBCUniversal_Peacock_Logo.svg',
+      'Tubi' : 'https://upload.wikimedia.org/wikipedia/commons/c/c5/Tubi_logo_2024_purple.svg',
+      'Apple TV' : 'https://upload.wikimedia.org/wikipedia/commons/1/16/AppleTVLogo.png'
+    };
+
+    const shows = [
+      { name: 'Stranger Things', service: 'Netflix' },
+      { name: 'The Mandalorian', service: 'Disney+' },
+      { name: 'The Boys', service: 'Amazon Prime' },
+      { name: 'Reacher', service: 'Amazon Prime' },
+      { name: 'The Night Agent', service: 'Netflix' },
+      { name: 'The Recruit', service: 'Netflix' },
+      { name: 'Outer Banks', service: 'Netflix' },
+      { name: 'Rookie', service: 'Hulu' },
+      { name: 'Lioness', service: 'Paramount Plus' },
+      { name: 'Landman', service: 'Paramount Plus' },
+      { name: 'Fire Country', service: 'Paramount Plus' },
+      { name: 'Chicago Med', service: 'Peacock' },
+      { name: 'See', service: 'Apple TV'},
+      { name: 'Monarch', service: 'Apple TV'}
+    ];
+
+    shows.forEach(show => {
+      const card = document.createElement('div');
+      card.classList.add('card');
+      const logoUrl = logoMap[show.service];
+      card.innerHTML = `
+        <div class="logo-container">
+          <img src="${logoUrl}" alt="${show.service} Logo">
+        </div>
+        <h3>${show.name}</h3>
+        <p>Streaming on: ${show.service}</p>
+      `;
+      showCards.appendChild(card);
+    });
+
+    function pickRandomShow() {
+      const randomIndex = Math.floor(Math.random() * shows.length);
+      const show = shows[randomIndex];
+      const logoUrl = logoMap[show.service];
+      randomShowDiv.innerHTML = `
+        <div class="card">
+          <div class="logo-container">
+            <img src="${logoUrl}" alt="${show.service} Logo">
+          </div>
+          <h3>${show.name}</h3>
+          <p>Streaming on: ${show.service}</p>
+        </div>
+      `;
+    }
+      function navigateTo(page) {
+        window.location.href = page;
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('open');
+    }
+        // Close sidebar if clicked outside of it
+    document.addEventListener('click', function(event) {
+	const sidebar = document.getElementById('sidebar');
+        const menuButton = document.querySelector('.menu-btn');
+        if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+            sidebar.classList.remove('open');
+        }
+    });
+
+    function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        document.getElementById('clock').textContent = timeString;
+    }
+  	    // Function to toggle the theme
+    function toggleTheme() {
+        // Toggle the 'light-mode' class on the body
+        document.body.classList.toggle('light-mode');
+
+        // Save the theme to localStorage
+        localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    }
+
+    // Check localStorage for the theme preference on page load
+    window.onload = function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+        } else if (savedTheme === 'dark') {
+            document.body.classList.remove('light-mode');
+        }
+    }
+    fetch('sidebar.html')
+	    .then(response => response.text())
+	    .then(data => {
+		document.getElementById('sidebar-nav').innerHTML = data;
+    	    });
+	
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+</body>
+</html>
