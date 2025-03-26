@@ -1,6 +1,6 @@
 async function signup(username, password) {
     try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbxtr9HojPf8eKF6TTPQU0vqEhvV-262Su8BWbDj_38q6-faVZ-iRoheW6v00euOEwNB/exec", {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbxn5PpI1xuOjDHbZy3z_JUJtSs384KhplxAqKkpoVKkicEo5CHY5a5E-83WYUuPsCFU/exec", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
