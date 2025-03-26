@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbxtr9HojPf8eKF6TTPQU0vqEhvV-262Su8BWbDj_38q6-faVZ-iRoheW6v00euOEwNB/exec";  // Replace with your actual Google Apps Script URL
+const API_URL = "https://script.google.com/macros/library/d/1M52NfXPWlEFMAILoCX1FCGnylKNEUcIt1qwZiJ12kOOXnzH9BFCQxqYJ/1";  // Replace with your actual Google Apps Script URL
 
 async function signup() {
     let username = document.getElementById("signup-username").value;
