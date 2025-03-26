@@ -328,3 +328,15 @@ a:hover {
     margin-top: 60px;
     font-size: 1.5rem;
 }
+
+.tmdb-attribution {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #aaa;
+}
+
+.tmdb-attribution img {
+    width: 100px;
+    margin: 10px;
+}
