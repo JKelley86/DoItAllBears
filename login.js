@@ -1,24 +1,26 @@
 async function login() {
-    let username = document.getElementById("username").value;
-    let password = document.getElementById("password").value;
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
 
-    let response = await fetch("https://script.google.com/macros/s/AKfycbz5lrdm90lpXCRpx68jcwZJdUiYL8xx5JoN4lOGwf00eVn1TW1Ayc3SouO6zgjr84pe/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            action: "login",
-            username: username,
-            password: password
-        })
-    });
+    // Hash the input password (using MD5)
+    const hashedPassword = md5(password);
 
-    let result = await response.json();
+    try {
+        // Fetch users.json from GitHub
+        const response = await fetch("https://raw.githubusercontent.com/jkelley86/DoItAllBears/main/data/users.json");
+        const data = await response.json();
 
-    if (result.success) {
-        alert("Login successful!");
-        // Redirect to a new page or store session data
-        window.location.href = "dashboard.html";  
-    } else {
-        alert("Invalid username or password.");
+        // Check if the username & hashed password match
+        const user = data.users.find(user => user.username === username && user.password === hashedPassword);
+
+        if (user) {
+            alert("Login successful!");
+            // Redirect or perform actions after login
+        } else {
+            alert("Invalid credentials!");
+        }
+    } catch (error) {
+        console.error("Error fetching user data:", error);
+        alert("Error logging in. Please try again.");
     }
 }
