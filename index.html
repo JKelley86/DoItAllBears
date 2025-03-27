@@ -32,15 +32,18 @@
 	<button class="login-btn" onclick="openLoginPopup()">🔑 Login</button>
         <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
     </div>
+	
 <div id="loginPopup" class="popup">
     <div class="popup-content">
         <span class="close" onclick="closeLoginPopup()">&times;</span>
         <h2>Login</h2>
+        <p id="login-message"></p>  <!-- 🔹 This will show login messages -->
         <input type="text" id="username" placeholder="Username" required><br>
         <input type="password" id="password" placeholder="Password" required><br>
         <button onclick="login()">Login</button>
     </div>
 </div>
+	
     <footer> 
         <span>&copy; 2024 Justin's Website. All rights reserved.</span>
     </footer> 
