@@ -11,7 +11,7 @@ async function login() {
 
     try {
         // 🔹 Fetch the users.json file
-        const response = await fetch("https://jkelley86.github.io/DoItAllBears/users.json");
+        const response = await fetch("https://raw.githubusercontent.com/JKelley86/DoItAllBears/main/docs/users.json");
         if (!response.ok) throw new Error("Failed to fetch user data.");
 
         const data = await response.json();
