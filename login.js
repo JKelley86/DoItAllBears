@@ -9,28 +9,29 @@ async function login() {
         return;
     }
 
-    // Hash the password using MD5
-    const hashedPassword = md5(password);
-
     try {
-        // Fetch users.json from GitHub
-        const response = await fetch("https://raw.githubusercontent.com/jkelley86/DoItAllBears/main/data/users.json");
-        if (!response.ok) throw new Error("Failed to fetch user data.");
+        // 🔹 Fetch users.json from GitHub
+        const response = await fetch("https://raw.githubusercontent.com/jkelley86/DoItAllBears/main/data/users.json", {
+            headers: { "Cache-Control": "no-cache" } // Prevents fetching outdated versions
+        });
 
+        if (!response.ok) throw new Error("Failed to fetch user data.");
         const data = await response.json();
-        const user = data.users.find(user => user.username === username && user.password === hashedPassword);
+
+        // 🔹 Find user and check if password matches
+        const user = data.users.find(user => user.username === username && user.password === password);
 
         if (user) {
             messageBox.textContent = "Login successful!";
             messageBox.style.color = "green";
 
-            // Store the logged-in user in localStorage
+            // 🔹 Store the logged-in user in localStorage
             localStorage.setItem("loggedInUser", username);
 
-            // Close login popup after 1 second
+            // 🔹 Close popup & sidebar after 1 second
             setTimeout(() => {
                 closeLoginPopup();
-                closeSidebar();
+                closeSidebar(); // Ensures sidebar closes
             }, 1000);
         } else {
             messageBox.textContent = "Invalid username or password.";
@@ -52,11 +53,11 @@ function closeLoginPopup() {
 }
 
 function closeSidebar() {
-    document.getElementById("sidebar").classList.remove("open");
+    document.getElementById("sidebar").classList.remove("open"); // 🔹 Close sidebar
 }
 
 // Auto-close login popup if user is already logged in
-window.onload = function() {
+window.onload = function () {
     const loggedInUser = localStorage.getItem("loggedInUser");
     if (loggedInUser) {
         document.getElementById("loginPopup").style.display = "none";
