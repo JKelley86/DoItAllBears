@@ -380,7 +380,7 @@ footer {
     padding: 8px;
 }
 
-.popup button {
+.popup-button {
     margin-top: auto;
     background: var(--text-color);
     color: var(--bg-color);
