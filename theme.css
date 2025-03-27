@@ -357,8 +357,8 @@ footer {
 .popup {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
     width: 60%;
     height: 60%;
     background: var(--bg-color);
