@@ -375,11 +375,15 @@ footer {
 }
 
 .popup button {
-    background: blue;
-    color: white;
+    margin-top: auto;
+    background: var(--text-color);
+    color: var(--bg-color);
+    padding: 10px 15px;
     border: none;
-    padding: 10px;
+    border-radius: 5px;
     cursor: pointer;
+    margin-bottom: 60px;
+}
 }
 
 .close {
