@@ -11,7 +11,7 @@ async function login() {
 
     try {
         // 🔹 Fetch users.json from GitHub
-        const response = await fetch("https://raw.githubusercontent.com/JKelley86/DoItAllBears/refs/heads/main/users.json", {
+        const response = await fetch("https://raw.githubusercontent.com/JKelley86/DoItAllBears/main/users.json", {
             headers: { "Cache-Control": "no-cache" } // Prevents fetching outdated versions
         });
 
