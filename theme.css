@@ -361,13 +361,13 @@ footer {
     left: 20%;
     width: 60%;
     height: 60%;
-    background: var(--card-color);
+    background: var(--card-bg);
     justify-content: center;
     align-items: center;
 }
 
 .popup-content {
-    background: var(--card-color);
+    background: var(--card-bg);
     padding: 20px;
     border-radius: 10px;
     text-align: center;
