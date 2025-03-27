@@ -1,24 +1,24 @@
-async function signup(username, password) {
-    try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbxn5PpI1xuOjDHbZy3z_JUJtSs384KhplxAqKkpoVKkicEo5CHY5a5E-83WYUuPsCFU/exec", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                action: "signup",
-                username: username,
-                password: password
-            })
-        });
+async function login() {
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+    let response = await fetch("https://script.google.com/macros/s/AKfycbz5lrdm90lpXCRpx68jcwZJdUiYL8xx5JoN4lOGwf00eVn1TW1Ayc3SouO6zgjr84pe/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            action: "login",
+            username: username,
+            password: password
+        })
+    });
 
-        const data = await response.json();
-        console.log(data);
-    } catch (error) {
-        console.error("Error:", error);
+    let result = await response.json();
+
+    if (result.success) {
+        alert("Login successful!");
+        // Redirect to a new page or store session data
+        window.location.href = "dashboard.html";  
+    } else {
+        alert("Invalid username or password.");
     }
 }
