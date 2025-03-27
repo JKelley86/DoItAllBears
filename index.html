@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Home</title>
     <link rel="stylesheet" href="theme.css">
+    <script src="login.js" defer></script>
 </head>
 <body>
 <div class="container">
@@ -26,8 +27,19 @@
 	<a href="useful/camping.html">⛺ Camping</a>
 	<a href="woodworking/index.html">🔨 Wood Working</a>
 	<a href="currentevents.html">📰 Current Events</a>
+
+	<button class="login-btn" onclick="openLoginPopup()">🔑 Login</button>
         <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
     </div>
+<div id="loginPopup" class="popup">
+    <div class="popup-content">
+        <span class="close" onclick="closeLoginPopup()">&times;</span>
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username" required><br>
+        <input type="password" id="password" placeholder="Password" required><br>
+        <button onclick="login()">Login</button>
+    </div>
+</div>
     <footer> 
         <span>&copy; 2024 Justin's Website. All rights reserved.</span>
     </footer> 
@@ -95,6 +107,15 @@ function filterCards() {
             });
     setInterval(updateClock, 1000);
     updateClock();
+
+    function openLoginPopup() {
+        document.getElementById("loginPopup").style.display = "flex";
+    }
+
+    function closeLoginPopup() {
+        document.getElementById("loginPopup").style.display = "none";
+    }	
+	
 </script>
 </body>
 </html>
