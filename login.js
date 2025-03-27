@@ -10,15 +10,13 @@ async function login() {
     }
 
     try {
-        // 🔹 Fetch users.json from GitHub
-        const response = await fetch("https://jkelley86.github.io/DoItAllBears/users.json", {
-            headers: { "Cache-Control": "no-cache" } // Prevents fetching outdated versions
-        });
-
+        // 🔹 Fetch the users.json file
+        const response = await fetch("https://jkelley86.github.io/DoItAllBears/users.json");
         if (!response.ok) throw new Error("Failed to fetch user data.");
+
         const data = await response.json();
 
-        // 🔹 Find user and check if password matches
+        // 🔹 Find user in JSON
         const user = data.users.find(user => user.username === username && user.password === password);
 
         if (user) {
