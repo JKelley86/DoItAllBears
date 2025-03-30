@@ -94,15 +94,19 @@ function filterCards() {
         localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
     }
 
-    // Check localStorage for the theme preference on page load
-    window.onload = function() {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'light') {
-            document.body.classList.add('light-mode');
-        } else if (savedTheme === 'dark') {
-            document.body.classList.remove('light-mode');
-        }
+window.onload = function() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+    } else if (savedTheme === 'dark') {
+        document.body.classList.remove('light-mode');
     }
+
+    const loggedInUser = localStorage.getItem("loggedInUser");
+    if (loggedInUser) {
+        document.getElementById("loginPopup").style.display = "none";
+    }
+};
 	
     fetch('navbar.html')
             .then(response => response.text())
@@ -174,14 +178,6 @@ function closeLoginPopup() {
 function closeSidebar() {
     document.getElementById("sidebar").classList.remove("open"); // 🔹 Close sidebar
 }
-
-// Auto-close login popup if user is already logged in
-window.onload = function () {
-    const loggedInUser = localStorage.getItem("loggedInUser");
-    if (loggedInUser) {
-        document.getElementById("loginPopup").style.display = "none";
-    }
-};	
 </script>
 </body>
 </html>
