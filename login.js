@@ -1,63 +1,37 @@
-async function login() {
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const messageBox = document.getElementById("login-message");
+document.addEventListener('DOMContentLoaded', function() {
+    const hamburgerMenu = document.getElementById('hamburger-menu');
+    const menu = document.getElementById('menu');
 
-    if (!username || !password) {
-        messageBox.textContent = "Please fill in both fields.";
-        messageBox.style.color = "red";
-        return;
+    // Check login status on page load
+    checkLoginStatus();
+
+    // Function to show additional menu items when logged in
+    function showLoggedInMenuItems() {
+        const hiddenDetails = document.createElement('a');
+        hiddenDetails.href = 'home/index.html';
+        hiddenDetails.textContent = 'House';
+
+
+        const logout = document.createElement('a');
+        logout.href = '#';
+        logout.textContent = 'Logout';
+        logout.addEventListener('click', function() {
+            localStorage.removeItem('loggedIn');
+            localStorage.removeItem('username');
+            location.reload();  // Reload the page to reset the menu
+        });
+
+        menu.appendChild(hiddenDetails);
+        menu.appendChild(spotify);
+        menu.appendChild(logout);
     }
 
-    try {
-        // 🔹 Fetch the users.json file
-        const response = await fetch("https://raw.githubusercontent.com/JKelley86/DoItAllBears/main/docs/users.json");
-        if (!response.ok) throw new Error("Failed to fetch user data.");
+    // Function to check if the user is logged in
+    function checkLoginStatus() {
+        const loggedIn = localStorage.getItem('loggedIn');
 
-        const data = await response.json();
-
-        // 🔹 Find user in JSON
-        const user = data.users.find(user => user.username === username && user.password === password);
-
-        if (user) {
-            messageBox.textContent = "Login successful!";
-            messageBox.style.color = "green";
-
-            // 🔹 Store the logged-in user in localStorage
-            localStorage.setItem("loggedInUser", username);
-
-            // 🔹 Close popup & sidebar after 1 second
-            setTimeout(() => {
-                closeLoginPopup();
-                closeSidebar(); // Ensures sidebar closes
-            }, 1000);
-        } else {
-            messageBox.textContent = "Invalid username or password.";
-            messageBox.style.color = "red";
+        if (loggedIn === 'true') {
+            showLoggedInMenuItems();
         }
-    } catch (error) {
-        console.error("Error fetching user data:", error);
-        messageBox.textContent = "Error logging in. Try again.";
-        messageBox.style.color = "red";
     }
-}
-
-function openLoginPopup() {
-    document.getElementById("loginPopup").style.display = "flex";
-}
-
-function closeLoginPopup() {
-    document.getElementById("loginPopup").style.display = "none";
-}
-
-function closeSidebar() {
-    document.getElementById("sidebar").classList.remove("open"); // 🔹 Close sidebar
-}
-
-// Auto-close login popup if user is already logged in
-window.onload = function () {
-    const loggedInUser = localStorage.getItem("loggedInUser");
-    if (loggedInUser) {
-        document.getElementById("loginPopup").style.display = "none";
-    }
-};
+});
