@@ -434,8 +434,8 @@ footer {
             border-radius: 4px;
         }
         #login-popup button {
-            background-color: #709B67;
-            color: white;
+            background-color: var(--card-bg);
+            color: var(--text-color);
             padding: 10px;
             width: 100%;
             border: none;
@@ -444,7 +444,7 @@ footer {
             font-size: 16px;
         }
         #login-popup button:hover {
-            background-color: #557a50;
+            background-color: var(--card-bg);
         }
         #welcome-message {
             text-align: center;
