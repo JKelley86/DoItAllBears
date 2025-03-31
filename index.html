@@ -32,21 +32,40 @@
         <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
     </div>
 	
-<div id="loginPopup" class="popup">
-    <div class="popup-content">
-        <span class="close" onclick="closeLoginPopup()">&times;</span>
-        <h2>Login</h2>
-        <p id="login-message"></p>  <!-- 🔹 This will show login messages -->
-        <input type="text" id="username" placeholder="Username" required><br>
-        <input type="password" id="password" placeholder="Password" required><br>
-        <button onclick="login()">Login</button>
+        <!-- Login Popup -->
+        <div id="login-popup">
+            <h3>Login</h3>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button id="login-button">Login</button>
+            <button id="cancel-button">Cancel</button>
+            <div id="welcome-message"></div>
+        </div>
     </div>
-</div>
 	
     <footer> 
         <span>&copy; 2024 Justin's Website. All rights reserved.</span>
     </footer> 
 <script>
+
+            const loginPopup = document.getElementById('login-popup');
+            const loginButton = document.getElementById('login-button');
+            const cancelButton = document.getElementById('cancel-button');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const welcomeMessage = document.getElementById('welcome-message');
+	    let users = {};
+
+	            // Fetch the users.json file
+            fetch('users.json')
+                .then(response => response.json())
+                .then(data => {
+                    users = data;
+                })
+                .catch(error => {
+                    console.error('Error loading users:', error);
+                });
+	
     function navigateTo(page) {
         window.location.href = page;
     }
@@ -178,6 +197,65 @@ function closeLoginPopup() {
 function closeSidebar() {
     document.getElementById("sidebar").classList.remove("open"); // 🔹 Close sidebar
 }
+
+            // Handle gear icon click
+            gearIcon.addEventListener('click', function() {
+                loginPopup.style.display = 'block';
+                usernameInput.value = '';
+                passwordInput.value = '';
+                welcomeMessage.textContent = '';
+            });
+
+            // Handle login button click
+            loginButton.addEventListener('click', function() {
+                const username = usernameInput.value;
+                const password = passwordInput.value;
+
+                if (users[username] && users[username] === password) {
+                    welcomeMessage.textContent = `Welcome, ${username}!`;
+                    setTimeout(function() {
+                        loginPopup.style.display = 'none';
+                        localStorage.setItem('loggedIn', 'true');
+                        showLoggedInMenuItems();
+                    }, 1000);
+                } else {
+                    welcomeMessage.textContent = 'Incorrect username or password.';
+                }
+            });
+
+            // Handle cancel button click
+            cancelButton.addEventListener('click', function() {
+                loginPopup.style.display = 'none';
+            });
+
+            // Show additional menu items when logged in
+            function showLoggedInMenuItems() {
+                const hiddenDetails = document.createElement('a');
+                hiddenDetails.href = 'home/index.html';
+                hiddenDetails.textContent = 'Home';
+                menu.appendChild(hiddenDetails);
+
+                const logout = document.createElement('a');
+                logout.href = '#';
+                logout.textContent = 'Logout';
+                logout.addEventListener('click', function() {
+                    menu.removeChild(hiddenDetails);
+                    menu.removeChild(spotify);
+                    menu.removeChild(logout);
+                });
+                menu.appendChild(logout);
+            }
+        });
+
+            // Function to check if the user is logged in
+    function checkLoginStatus() {
+        const loggedIn = localStorage.getItem('loggedIn');
+
+        if (loggedIn === 'true') {
+            showLoggedInMenuItems();
+        }
+	checkLoginStatus();
 </script>
+<script src="login.js"></script>
 </body>
 </html>
