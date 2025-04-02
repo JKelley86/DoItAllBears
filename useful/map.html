@@ -3,26 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find Nearby Stores</title>
+    <title>Find Nearby Places</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
-        #map { height: 400px; width: 100%; border-radius: 10px; margin-bottom: 20px; }
-        .card { background: #fff; padding: 10px; margin: 10px auto; width: 90%; max-width: 400px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .card h3 { margin: 5px 0; }
-    </style>
 </head>
-<body>
-    <h1>Find Nearby Stores</h1>
-    <button onclick="getUserLocation()">Find Gas Stations ⛽</button>
-    <button onclick="getUserLocation('grocery store')">Find Grocery Stores 🛒</button>
-    <div id="map"></div>
-    <div id="results"></div>
+<body class="bg-gray-900 text-white flex flex-col items-center p-4">
+
+    <h1 class="text-3xl font-bold mb-4">Find Nearby Places</h1>
+
+    <div class="flex gap-4">
+        <select id="searchType" class="p-2 bg-gray-800 text-white rounded-md">
+            <option value="gas station">⛽ Gas Stations</option>
+            <option value="grocery store">🛒 Grocery Stores</option>
+            <option value="restaurant">🍽 Restaurants</option>
+            <option value="coffee shop">☕ Coffee Shops</option>
+        </select>
+        <button onclick="getUserLocation()" class="px-4 py-2 bg-blue-500 text-white rounded-md">Find</button>
+    </div>
+
+    <div id="map" class="w-full max-w-3xl h-96 mt-4 rounded-lg shadow-lg"></div>
+
+    <div id="results" class="w-full max-w-3xl mt-4"></div>
 
     <script>
         let map;
-        
+
         function initMap(lat, lon) {
             if (!map) {
                 map = L.map('map').setView([lat, lon], 13);
@@ -35,13 +41,17 @@
             L.marker([lat, lon]).addTo(map).bindPopup("You are here").openPopup();
         }
 
-        function getUserLocation(searchType = "gas station") {
+        function getUserLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
                     let lat = position.coords.latitude;
                     let lon = position.coords.longitude;
                     initMap(lat, lon);
+                    let searchType = document.getElementById("searchType").value;
                     findNearbyPlaces(lat, lon, searchType);
+                    if (searchType === "gas station") {
+                        findCheapestGas(lat, lon);
+                    }
                 }, error => {
                     alert("Location access denied. Please enable location services.");
                 });
@@ -52,16 +62,15 @@
 
         function findNearbyPlaces(lat, lon, query) {
             const url = `https://nominatim.openstreetmap.org/search?format=json&q=${query}+near+${lat},${lon}`;
-
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    let output = "<h2>Nearby Locations</h2>";
+                    let output = "<h2 class='text-xl font-semibold mt-4'>Nearby Locations</h2>";
                     data.slice(0, 5).forEach(place => {
                         output += `
-                            <div class="card">
-                                <h3>${place.display_name.split(",")[0]}</h3>
-                                <p>${place.display_name}</p>
+                            <div class="bg-gray-800 p-4 mt-2 rounded-md shadow-md">
+                                <h3 class="text-lg font-bold">${place.display_name.split(",")[0]}</h3>
+                                <p class="text-gray-400">${place.display_name}</p>
                             </div>`;
                         L.marker([place.lat, place.lon]).addTo(map)
                             .bindPopup(place.display_name)
@@ -71,6 +80,8 @@
                 })
                 .catch(error => console.error("Error fetching data:", error));
         }
+
     </script>
+
 </body>
 </html>
