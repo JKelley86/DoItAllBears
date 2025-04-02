@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Nearby Stores</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        #map { height: 400px; width: 100%; border-radius: 10px; margin-bottom: 20px; }
+        .card { background: #fff; padding: 10px; margin: 10px auto; width: 90%; max-width: 400px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .card h3 { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>Find Nearby Stores</h1>
+    <button onclick="getUserLocation()">Find Gas Stations ⛽</button>
+    <button onclick="getUserLocation('grocery store')">Find Grocery Stores 🛒</button>
+    <div id="map"></div>
+    <div id="results"></div>
+
+    <script>
+        let map;
+        
+        function initMap(lat, lon) {
+            if (!map) {
+                map = L.map('map').setView([lat, lon], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+            } else {
+                map.setView([lat, lon], 13);
+            }
+            L.marker([lat, lon]).addTo(map).bindPopup("You are here").openPopup();
+        }
+
+        function getUserLocation(searchType = "gas station") {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    let lat = position.coords.latitude;
+                    let lon = position.coords.longitude;
+                    initMap(lat, lon);
+                    findNearbyPlaces(lat, lon, searchType);
+                }, error => {
+                    alert("Location access denied. Please enable location services.");
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function findNearbyPlaces(lat, lon, query) {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${query}+near+${lat},${lon}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    let output = "<h2>Nearby Locations</h2>";
+                    data.slice(0, 5).forEach(place => {
+                        output += `
+                            <div class="card">
+                                <h3>${place.display_name.split(",")[0]}</h3>
+                                <p>${place.display_name}</p>
+                            </div>`;
+                        L.marker([place.lat, place.lon]).addTo(map)
+                            .bindPopup(place.display_name)
+                            .openPopup();
+                    });
+                    document.getElementById("results").innerHTML = output;
+                })
+                .catch(error => console.error("Error fetching data:", error));
+        }
+    </script>
+</body>
+</html>
