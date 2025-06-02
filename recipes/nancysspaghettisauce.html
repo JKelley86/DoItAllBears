@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Nancy's Spaghetti Sauce</title>
+    <!-- Add Font Awesome CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+                .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        width: 80%;
+        max-width: 400px;
+        text-align: center;
+        position: relative;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin: auto;
+    }
+
+    .close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+        cursor: pointer;
+    }
+    .nutrition-facts {
+    margin-top: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.nutrition-facts h2 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.nutrition-facts table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.nutrition-facts table td {
+    padding: 5px;
+    font-size: 16px;
+}
+
+.nutrition-facts table td:first-child {
+    width: 60%;
+    font-weight: bold;
+}
+
+.nutrition-facts table td:last-child {
+    text-align: right;
+}
+
+.nutrition-facts p {
+    font-size: 16px;
+    margin: 10px 0;
+}
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Nancy's Spaghetti Sauce</h1>
+        <div class="button-container">
+            <button class="print-button" onclick="window.print()"><i class="fas fa-print"></i></button>
+            <button class="share-button" onclick="shareRecipe()"><i class="fas fa-share-alt"></i></button>
+            <!--<button class="info-button" onclick="toggleInfo()"><i class="fas fa-info-circle"></i></button>-->
+        </div>
+    </header>
+    <section id="recipe-details">
+        <h2>Recipe Details</h2>
+        <p><strong>Prep Time:</strong> 30 minutes</p>
+        <p><strong>Cook Time:</strong> 5-8 Hours</p>
+        <p><strong>Total Time:</strong> 5.5-8.5 Hours</p>
+    </section>
+
+    <section id="ingredients">
+        <h2>Ingredients</h2>
+        <ul>
+            <li>1 Pound hamburger</li>
+            <li>2 Pound Italian sausage</li>
+            <li>2 Jars traditional prego sauce</li>
+            <li>1 Jar ragu chunky sause with onion, tomatoe, and garlic</li>
+            <li>1 Small onion</li>
+            <li>1 Clove garlic</li>
+            <li>4 Heeping tablespoons brown sugar</li>
+            <li>Red pepper</li>
+            <li>Parsley</li>
+            <li>Orgeno</li>
+            <li>Garlic powder</li>
+            <li>Onion powder</li>
+        </ul>
+    </section>
+
+    <section id="instructions">
+        <h2>Instructions</h2>
+        <ol>
+            <li>Cook hamburger with onion and garlic clove.</li>
+            <li>Cook italian sausage.</li>
+            <li>Mix everything in crockpot.</li>
+            <li>Top with red pepper, parsley, oregeno, garlic powder, onion powder, and brown sugar.</li>
+            <li>Cook 5 to 8 hours.</li>
+        </ol>
+    </section>
+<div id="nutrition-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="toggleInfo()">&times;</span>
+        <h2>Nutrition Facts</h2>
+        <div class="nutrition-facts">
+            <p><strong>Serving Size:</strong> N/A</p>
+            <p><strong>Servings:</strong>  N/A</p>
+            <table>
+                <tr>
+                    <td><strong>Calories</strong></td>
+                    <td>N/A</td>
+                </tr>
+                <tr>
+                    <td><strong>Protein</strong></td>
+                    <td>N/A</td>
+                </tr>
+                <tr>
+                    <td><strong>Carbs</strong></td>
+                    <td>N/A</td>
+                </tr>
+                <tr>
+                    <td><strong>Fat</strong></td>
+                    <td>N/A</td>
+                </tr>
+                <tr>
+                    <td><strong>Sodium</strong></td>
+                    <td>N/A</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+    <footer>
+        <p>&copy; 2024 Bear Book. All rights reserved.</p>
+    </footer>
+
+<script src="script.js"></script>
+<script>
+    window.onload = function() {
+    const modal = document.getElementById('nutrition-modal');
+    modal.style.display = 'none'; // Ensure modal is hidden on page load
+}
+
+function toggleInfo() {
+    const modal = document.getElementById('nutrition-modal');
+    if (modal.style.display === 'none' || modal.style.display === '') {
+        modal.style.display = 'flex';
+    } else {
+        modal.style.display = 'none';
+    }
+}
+</script>
+</body>
+</html>
