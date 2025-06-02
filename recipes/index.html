@@ -300,38 +300,39 @@ footer {
              alt="Mickey Mouse" 
              style="width: 16px; height: 16px; vertical-align: middle;">
         = Aubrie's Grandma's Recipe!
-    </span>
+    </span><br>
+    <span>🏕️ = Grandma's Recipe!</span>
 </footer> 
     <script>
         const recipes = [
-            { name: "Biscuits And Gravy", category: "Breakfast", diet: "General", link: "biscuitsgravy.html",  approved: false, aubrie: false },
+            { name: "Biscuits And Gravy", category: "Breakfast", diet: "General", link: "biscuitsgravy.html",  approved: false, aubrie: false, grandma: false },
             
-            { name: "Chicken Mozzarella Sticks", category: "Lunch", diet: "Carnivore", link: "chickenmozzsticks.html",  approved: false, aubrie: false },
-            { name: "Mozzarella Sticks", category: "Lunch", diet: "General", link: "mozzarellasticks.html",  approved: false, aubrie: false },
-	    { name: "Philadelphia Sushi Roll", category: "Lunch", diet: "General", link: "philadelphiaroll.html",  approved: false, aubrie: false },
+            { name: "Chicken Mozzarella Sticks", category: "Lunch", diet: "Carnivore", link: "chickenmozzsticks.html",  approved: false, aubrie: false, grandma: false },
+            { name: "Mozzarella Sticks", category: "Lunch", diet: "General", link: "mozzarellasticks.html",  approved: false, aubrie: false, grandma: false },
+	    { name: "Philadelphia Sushi Roll", category: "Lunch", diet: "General", link: "philadelphiaroll.html",  approved: false, aubrie: false, grandma: false },
             
-            { name: "Chicken And Rice Bake", category: "Dinner", diet: "General", link: "chickenricebake.html",  approved: false, aubrie: false },
-            { name: "Lemon Garlic Salmon", category: "Dinner", diet: "Carnivore", link: "lemongarlicsalmon.html",  approved: true, aubrie: false },
-	    { name: "Steak And Butter", category: "Dinner", diet: "Carnivore", link: "steakandbutter.html",  approved: true, aubrie: false },
-	    { name: "Mac and Cheese", category: "Dinner", diet: "General", link: "macandcheese.html",  approved: false, aubrie: false },
-	    { name: "Creamy Chicken Pasta", category: "Dinner", diet: "General", link: "creamychickenpasta.html",  approved: false, aubrie: false },
+            { name: "Chicken And Rice Bake", category: "Dinner", diet: "General", link: "chickenricebake.html",  approved: false, aubrie: false, grandma: false },
+            { name: "Lemon Garlic Salmon", category: "Dinner", diet: "Carnivore", link: "lemongarlicsalmon.html",  approved: true, aubrie: false, grandma: false },
+	    { name: "Steak And Butter", category: "Dinner", diet: "Carnivore", link: "steakandbutter.html",  approved: true, aubrie: false, grandma: false },
+	    { name: "Mac and Cheese", category: "Dinner", diet: "General", link: "macandcheese.html",  approved: false, aubrie: false, grandma: false },
+	    { name: "Creamy Chicken Pasta", category: "Dinner", diet: "General", link: "creamychickenpasta.html",  approved: false, aubrie: false, grandma: false },
 	
-            { name: "Banana Cream Cool Whip Bars", category: "Dessert", diet: "General", link: "bananabars.html",  approved: false, aubrie: false },
-            { name: "Chocolate Chip Cookies", category: "Dessert", diet: "Vegetarian", link: "chocolatechipcookie.html",  approved: false, aubrie: false },
-            { name: "Fudge Topped Brownies", category: "Dessert", diet: "General", link: "fudgetoppedbrownies.html",  approved: false, aubrie: false },
-	    { name: "Wedding Cake", category: "Dessert", diet: "General", link: "weddingcake.html",  approved: false, aubrie: false },
-	    { name: "Pumpkin Bars", category: "Dessert", diet: "General", link: "pumpkinbars.html",  approved: false, aubrie: false },
-	    { name: "Banana Split Muffins", category: "Dessert", diet: "General", link: "bananasplitmuffins.html",  approved: false, aubrie: true },
+            { name: "Banana Cream Cool Whip Bars", category: "Dessert", diet: "General", link: "bananabars.html",  approved: false, aubrie: false, grandma: false },
+            { name: "Chocolate Chip Cookies", category: "Dessert", diet: "Vegetarian", link: "chocolatechipcookie.html",  approved: false, aubrie: false, grandma: false },
+            { name: "Fudge Topped Brownies", category: "Dessert", diet: "General", link: "fudgetoppedbrownies.html",  approved: false, aubrie: false, grandma: false },
+	    { name: "Wedding Cake", category: "Dessert", diet: "General", link: "weddingcake.html",  approved: false, aubrie: false, grandma: false },
+	    { name: "Pumpkin Bars", category: "Dessert", diet: "General", link: "pumpkinbars.html",  approved: false, aubrie: false, grandma: false },
+	    { name: "Banana Split Muffins", category: "Dessert", diet: "General", link: "bananasplitmuffins.html",  approved: false, aubrie: true, grandma: false },
             
-            { name: "Apple Salad", category: "Snacks", diet: "Vegan", link: "applesalad.html",  approved: true, aubrie: false },
-            { name: "Avocado Fries", category: "Snacks", diet: "Vegan", link: "avocadofries.html",  approved: false, aubrie: false },
-            { name: "Blooming Onion", category: "Snacks", diet: "Vegetarian", link: "bloomingonion.html",  approved: false, aubrie: false },
-            { name: "Buffalo Chicken Dip", category: "Snacks", diet: "Carnivore", link: "buffalochickendip.html",  approved: true, aubrie: false },
-            { name: "French Fries", category: "Snacks", diet: "Vegan", link: "frenchfries.html",  approved: true, aubrie: false },
-            { name: "Green Beans", category: "Snacks", diet: "Vegan", link: "greenbeans.html",  approved: true, aubrie: false },
-	    { name: "Sweet Potato Fries", category: "Snacks", diet: "Vegan", link: "sweetpotatofries.html",  approved: false, aubrie: false },
-	    { name: "Pico De Gallo", category: "Snacks", diet: "Vegan", link: "picodegallo.html",  approved: false, aubrie: false },
-	    { name: "White Bread", category: "Snacks", diet: "General", link: "whitebread.html",  approved: false, aubrie: true }
+            { name: "Apple Salad", category: "Snacks", diet: "Vegan", link: "applesalad.html",  approved: true, aubrie: false, grandma: false },
+            { name: "Avocado Fries", category: "Snacks", diet: "Vegan", link: "avocadofries.html",  approved: false, aubrie: false, grandma: false },
+            { name: "Blooming Onion", category: "Snacks", diet: "Vegetarian", link: "bloomingonion.html",  approved: false, aubrie: false, grandma: false },
+            { name: "Buffalo Chicken Dip", category: "Snacks", diet: "Carnivore", link: "buffalochickendip.html",  approved: true, aubrie: false, grandma: false },
+            { name: "French Fries", category: "Snacks", diet: "Vegan", link: "frenchfries.html",  approved: true, aubrie: false, grandma: false },
+            { name: "Green Beans", category: "Snacks", diet: "Vegan", link: "greenbeans.html",  approved: true, aubrie: false, grandma: false },
+	    { name: "Sweet Potato Fries", category: "Snacks", diet: "Vegan", link: "sweetpotatofries.html",  approved: false, aubrie: false, grandma: false },
+	    { name: "Pico De Gallo", category: "Snacks", diet: "Vegan", link: "picodegallo.html",  approved: false, aubrie: false, grandma: false },
+	    { name: "White Bread", category: "Snacks", diet: "General", link: "whitebread.html",  approved: false, aubrie: true, grandma: false }
         ];
 
         let currentCategory = "All";
@@ -377,6 +378,13 @@ footer {
                 li.appendChild(paw);
                 }
 
+                if (recipe.grandma) {
+                const camp = document.createElement('span');
+                cabin.classList.add('cabin-icon');
+                cabin.textContent = " 🏕️";
+                li.appendChild(cabin);
+                }
+		    
 		if (recipe.aubrie) {
     		    const mickey = document.createElement('img');
     		    mickey.src = "https://static.wikia.nocookie.net/disneyemojiblitz/images/5/57/EmojiBlitzMickey1.png"; // or use an external URL
