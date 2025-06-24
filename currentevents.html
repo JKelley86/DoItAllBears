@@ -1,3 +1,14 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>News</title>
+    <link rel="stylesheet" href="theme.css">
+</head>
+
+
+
 <section id="latest-reads">
   <h2>📰 Latest & Interesting Reads</h2>
 
@@ -12,6 +23,7 @@
       <option value="outdoors">Outdoors</option>
       <option value="politics">Politics</option>
       <option value="law">Law Enforcement</option>
+      <option value="robotics">Robotics</option>
       <option value="self">Self Improvement</option>
       <option value="learn">Learn Something New</option>
     </select>
@@ -25,6 +37,23 @@
       ▶ Load More Articles
     </button>
   </div>
+
+ <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+<div class="sidebar" id="sidebar">
+    <div class="clock" id="clock"></div>
+    <a href="index.html">Home</a>
+    <a href="recipes/index.html">📖 Recipes</a>
+    <a href="movies/showtracker.html">🎥 Movies</a>
+    <a href="useful/gaming.html">🎮 Game Library</a>
+    <a href="useful/camping.html">⛺ Camping</a>
+    <a href="woodworking/index.html">🔨 Wood Working</a>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+</div>
+
+    <footer> 
+        <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+    </footer> 
+
 </section>
 
 <style>
@@ -123,7 +152,9 @@
 <script>
 const feedsByCategory = {
   tech: [
+    'https://automatedhome.com/feed/',
     'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',
+    'https://www.home-assistant.io/atom.xml?format=xml',
     'https://www.engadget.com/rss.xml',
     'https://www.wired.com/feed/rss',
     'https://feeds.arstechnica.com/arstechnica/index'
@@ -156,6 +187,12 @@ const feedsByCategory = {
     'https://www.justice.gov/opa/press-release/feed',
     'https://www.lawofficer.com/feed/',
     'https://apbweb.com/feed/'
+  ],
+    robotics: [
+    'https://blog.robotiq.com/rss.xml',
+    'https://newatlas.com/robotics/index.rss',
+    'https://www.roboticmagazine.com/feed',
+    'https://techxplore.com/rss-feed/robotics-news/'
   ],
   self: [
     'https://zenhabits.net/feed/',
@@ -264,4 +301,62 @@ document.getElementById('load-more').addEventListener('click', renderArticles);
 
 // Auto-refresh every 10 minutes
 setInterval(() => loadArticles(true), 10 * 60 * 1000);
+</script>
+<script>
+    function navigateTo(page) {
+        window.location.href = page;
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('open');
+    }
+        // Close sidebar if clicked outside of it
+    document.addEventListener('click', function(event) {
+	const sidebar = document.getElementById('sidebar');
+        const menuButton = document.querySelector('.menu-btn');
+        if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+            sidebar.classList.remove('open');
+        }
+    });
+
+    function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        document.getElementById('clock').textContent = timeString;
+    }
+	    // Function to toggle the theme
+    function toggleTheme() {
+        // Toggle the 'light-mode' class on the body
+        document.body.classList.toggle('light-mode');
+
+        // Save the theme to localStorage
+        localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    }
+
+    // Check localStorage for the theme preference on page load
+    window.onload = function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+        } else if (savedTheme === 'dark') {
+            document.body.classList.remove('light-mode');
+        }
+    }
+	
+    fetch('navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('main-container').innerHTML += data;
+            });
+    fetch('sidebar.html')
+	    .then(response => response.text())
+	    .then(data => {
+		document.getElementById('sidebar-nav').innerHTML = data;
+    	    });
+	
+    setInterval(updateClock, 1000);
+    updateClock();
+
+
 </script>
