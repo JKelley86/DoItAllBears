@@ -1,37 +1,58 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const hamburgerMenu = document.getElementById('hamburger-menu');
-    const menu = document.getElementById('menu');
+document.addEventListener('DOMContentLoaded', function () {
+    const sidebar = document.getElementById('sidebar');
+    const mainContainer = document.getElementById('main-container');
 
-    // Check login status on page load
-    checkLoginStatus();
+    function updateSidebarForLoggedInUser(username) {
+        // Hide the login button
+        const loginBtn = document.querySelector('.popup-button');
+        if (loginBtn) loginBtn.style.display = 'none';
 
-    // Function to show additional menu items when logged in
-    function showLoggedInMenuItems() {
-        const hiddenDetails = document.createElement('a');
-        hiddenDetails.href = 'home/index.html';
-        hiddenDetails.textContent = 'House';
+        // Find reference node to insert before — either loginBtn or themeToggle
+        const themeToggle = document.querySelector('.theme-toggle');
+        const insertBeforeNode = loginBtn || themeToggle;
 
+        // Add House link if not present
+        if (!sidebar.querySelector('a[href="home/index.html"]')) {
+            const houseLink = document.createElement('a');
+            houseLink.href = 'home/index.html';
+            houseLink.textContent = '🏠 House';
+            sidebar.insertBefore(houseLink, insertBeforeNode);
+        }
 
-        const logout = document.createElement('a');
-        logout.href = '#';
-        logout.textContent = 'Logout';
-        logout.addEventListener('click', function() {
-            localStorage.removeItem('loggedIn');
-            localStorage.removeItem('username');
-            location.reload();  // Reload the page to reset the menu
-        });
+    // Add Logout button styled like login button
+    if (!sidebar.querySelector('button.logout-btn')) {
+        const logoutBtn = document.createElement('button');
+        logoutBtn.textContent = '🚪 Logout';
+        logoutBtn.className = 'popup-button login-btn';  // match login button styles + custom class
+        logoutBtn.onclick = logout;
+        sidebar.insertBefore(logoutBtn, insertBeforeNode);
+    }
+}
 
-        menu.appendChild(hiddenDetails);
-        menu.appendChild(spotify);
-        menu.appendChild(logout);
+    function addHouseCardToMain() {
+        if (!mainContainer || mainContainer.querySelector('[data-dynamic="house"]')) return;
+
+        const card = document.createElement('div');
+        card.className = 'nav-card';
+        card.textContent = '🏡 Home';
+        card.setAttribute('data-dynamic', 'house');
+        card.onclick = () => navigateTo('home/index.html');
+        mainContainer.insertBefore(card, mainContainer.firstChild);
     }
 
-    // Function to check if the user is logged in
-    function checkLoginStatus() {
-        const loggedIn = localStorage.getItem('loggedIn');
+    function logout() {
+        localStorage.removeItem('loggedInUser');
+        location.reload();
+    }
 
-        if (loggedIn === 'true') {
-            showLoggedInMenuItems();
+    function updateUIIfLoggedIn() {
+        const user = localStorage.getItem('loggedInUser');
+        if (user) {
+            updateSidebarForLoggedInUser(user);
+            addHouseCardToMain();
         }
     }
+
+    document.addEventListener('navbarLoaded', updateUIIfLoggedIn);
+    updateUIIfLoggedIn();
 });
