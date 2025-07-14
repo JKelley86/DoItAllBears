@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', function () {
         card.textContent = '🏡 Home';
         card.setAttribute('data-dynamic', 'house');
 
-        // Use addEventListener instead of onclick assignment
         card.addEventListener('click', () => navigateTo('home/index.html'));
 
         mainContainer.insertBefore(card, mainContainer.firstChild);
