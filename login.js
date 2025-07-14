@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Use addEventListener instead of onclick assignment
         card.addEventListener('click', () => navigateTo('home/index.html'));
-        });
 
         mainContainer.insertBefore(card, mainContainer.firstChild);
     }
