@@ -52,7 +52,10 @@ document.addEventListener('DOMContentLoaded', function () {
             addHouseCardToMain();
         }
     }
-
+function navigateTo(url) {
+    window.location.href = url;
+}
+    
     document.addEventListener('navbarLoaded', updateUIIfLoggedIn);
     updateUIIfLoggedIn();
 });
