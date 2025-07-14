@@ -36,9 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
         card.setAttribute('data-dynamic', 'house');
 
         // Use addEventListener instead of onclick assignment
-        card.addEventListener('click', () => {
-            console.log('Home card clicked, navigating...');
-            navigateTo('home/index.html');
+        card.addEventListener('click', () => navigateTo('home/index.html'));
         });
 
         mainContainer.insertBefore(card, mainContainer.firstChild);
