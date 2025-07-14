@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en"> 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>Home</title>
-    <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="theme.css" />
 </head>
 <body>
 <div class="container">
@@ -14,7 +14,7 @@
 </div>
 
 <div class="search-bar-container">
-    <input type="text" class="search-bar" id="search-bar" placeholder="Search..." oninput="filterCards()">
+    <input type="text" class="search-bar" id="search-bar" placeholder="Search..." oninput="filterCards()" />
 </div>
 <div class="container" id="main-container"></div>
 
@@ -34,8 +34,8 @@
 <!-- Login Popup -->
 <div id="login-popup" class="popup" style="display:none;">
     <h3>Login</h3>
-    <input type="text" id="username" placeholder="Username">
-    <input type="password" id="password" placeholder="Password">
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
     <button onclick="login()">Login</button>
     <button onclick="closeLoginPopup()">Cancel</button>
     <div id="login-message" style="margin-top: 10px;"></div>
@@ -46,6 +46,12 @@
 </footer> 
 
 <script>
+// Your global utility functions and page-specific functions first
+
+function navigateTo(url) {
+    window.location.href = url;
+}
+
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     sidebar.classList.toggle('open');
@@ -65,11 +71,11 @@ function updateClock() {
     document.getElementById('clock').textContent = timeString;
 }
 
-    fetch('navbar.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('main-container').innerHTML += data;
-            });
+fetch('navbar.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('main-container').innerHTML += data;
+    });
 
 setInterval(updateClock, 1000);
 updateClock();
@@ -141,12 +147,9 @@ async function login() {
         messageBox.style.color = "red";
     }
 }
-
-function navigateTo(url) {
-    window.location.href = url;
-}
 </script>
 
+<!-- Load login.js AFTER navigateTo is defined -->
 <script src="login.js"></script>
 </body>
 </html>
