@@ -1,7 +1,4 @@
-// ✅ Make navigateTo globally available
-function navigateTo(url) {
-    window.location.href = url;
-}
+// NOTE: Since navigateTo is global in index.html, no need to redeclare here.
 
 document.addEventListener('DOMContentLoaded', function () {
     const sidebar = document.getElementById('sidebar');
@@ -37,7 +34,13 @@ document.addEventListener('DOMContentLoaded', function () {
         card.className = 'nav-card';
         card.textContent = '🏡 Home';
         card.setAttribute('data-dynamic', 'house');
-        card.onclick = () => navigateTo('home/index.html');
+
+        // Use addEventListener instead of onclick assignment
+        card.addEventListener('click', () => {
+            console.log('Home card clicked, navigating...');
+            navigateTo('home/index.html');
+        });
+
         mainContainer.insertBefore(card, mainContainer.firstChild);
     }
 
