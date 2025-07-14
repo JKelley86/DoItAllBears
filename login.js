@@ -1,17 +1,19 @@
+// ✅ Make navigateTo globally available
+function navigateTo(url) {
+    window.location.href = url;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const sidebar = document.getElementById('sidebar');
     const mainContainer = document.getElementById('main-container');
 
     function updateSidebarForLoggedInUser(username) {
-        // Hide the login button
         const loginBtn = document.querySelector('.popup-button');
         if (loginBtn) loginBtn.style.display = 'none';
 
-        // Find reference node to insert before — either loginBtn or themeToggle
         const themeToggle = document.querySelector('.theme-toggle');
         const insertBeforeNode = loginBtn || themeToggle;
 
-        // Add House link if not present
         if (!sidebar.querySelector('a[href="home/index.html"]')) {
             const houseLink = document.createElement('a');
             houseLink.href = 'home/index.html';
@@ -19,15 +21,14 @@ document.addEventListener('DOMContentLoaded', function () {
             sidebar.insertBefore(houseLink, insertBeforeNode);
         }
 
-    // Add Logout button styled like login button
-    if (!sidebar.querySelector('button.logout-btn')) {
-        const logoutBtn = document.createElement('button');
-        logoutBtn.textContent = '🚪 Logout';
-        logoutBtn.className = 'popup-button login-btn';  // match login button styles + custom class
-        logoutBtn.onclick = logout;
-        sidebar.insertBefore(logoutBtn, insertBeforeNode);
+        if (!sidebar.querySelector('button.logout-btn')) {
+            const logoutBtn = document.createElement('button');
+            logoutBtn.textContent = '🚪 Logout';
+            logoutBtn.className = 'popup-button login-btn';
+            logoutBtn.onclick = logout;
+            sidebar.insertBefore(logoutBtn, insertBeforeNode);
+        }
     }
-}
 
     function addHouseCardToMain() {
         if (!mainContainer || mainContainer.querySelector('[data-dynamic="house"]')) return;
@@ -52,10 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
             addHouseCardToMain();
         }
     }
-function navigateTo(url) {
-    window.location.href = url;
-}
-    
+
     document.addEventListener('navbarLoaded', updateUIIfLoggedIn);
     updateUIIfLoggedIn();
 });
