@@ -31,13 +31,17 @@
       border-radius: 5px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       color: #666;
-      visibility: hidden;
+      font-style: italic;
     }
     .answer.revealed {
-      visibility: visible;
       background-color: #d4edda;
       color: #155724;
       font-weight: bold;
+      font-style: normal;
+    }
+    .placeholder {
+      color: #bbb;
+      font-style: italic;
     }
     .scores {
       text-align: center;
@@ -60,15 +64,15 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyBY8wm-BiRozfkQw9GontLmX-6uIMpavjc",
-        authDomain: "family-feud-game-ea08a.firebaseapp.com",
-        databaseURL: "https://family-feud-game-ea08a-default-rtdb.firebaseio.com",
-        projectId: "family-feud-game-ea08a",
-        storageBucket: "family-feud-game-ea08a.firebasestorage.app",
-        messagingSenderId: "901336964187",
-        appId: "1:901336964187:web:53534171e5ebf2a751337e"
-      };
+    const firebaseConfig = {
+      apiKey: "AIzaSyBY8wm-BiRozfkQw9GontLmX-6uIMpavjc",
+      authDomain: "family-feud-game-ea08a.firebaseapp.com",
+      projectId: "family-feud-game-ea08a",
+      storageBucket: "family-feud-game-ea08a.firebasestorage.app",
+      messagingSenderId: "901336964187",
+      appId: "1:901336964187:web:53534171e5ebf2a751337e",
+      databaseURL: "https://family-feud-game-ea08a-default-rtdb.firebaseio.com/"
+    };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
@@ -92,10 +96,15 @@
 
       answersDiv.innerHTML = "";
       if (data.answers && Array.isArray(data.answers)) {
-        data.answers.forEach((ans, i) => {
+        data.answers.forEach((ans) => {
           const div = document.createElement('div');
-          div.className = "answer" + (ans.revealed ? " revealed" : "");
-          div.textContent = ans.revealed ? `${ans.text} (${ans.points} pts)` : "???";
+          if (ans.revealed) {
+            div.className = "answer revealed";
+            div.textContent = `${ans.text} (${ans.points} pts)`;
+          } else {
+            div.className = "answer placeholder";
+            div.textContent = "???";
+          }
           answersDiv.appendChild(div);
         });
       }
