@@ -10,9 +10,13 @@
     button { padding: 10px 20px; font-size: 1em; margin: 5px; }
     .answer-btns { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 20px; }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js"></script>
 </head>
 <body>
   <h1>Family Feud Host Control</h1>
+
+  <button onclick="loadQuestionsFromSheet()">📥 Load Questions from Google Sheets</button>
+  <div id="question-loader"></div>
 
   <label>Question:</label><br>
   <textarea id="question" rows="2"></textarea><br>
@@ -88,6 +92,48 @@
       const team1 = parseInt(document.getElementById('team1').value);
       const team2 = parseInt(document.getElementById('team2').value);
       update(ref(db, 'game/current'), { team1, team2 });
+    };
+
+    window.loadQuestionsFromSheet = () => {
+      Tabletop.init({
+        key: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pubhtml',
+        simpleSheet: true,
+        callback: function(data) {
+          const grouped = {};
+          data.forEach(row => {
+            if (!grouped[row.question]) grouped[row.question] = [];
+            grouped[row.question].push({
+              text: row.answer,
+              points: parseInt(row.points),
+              revealed: false
+            });
+          });
+
+          const select = document.createElement('select');
+          select.id = 'question-picker';
+          Object.keys(grouped).forEach(q => {
+            const option = document.createElement('option');
+            option.value = q;
+            option.textContent = q;
+            select.appendChild(option);
+          });
+
+          const btn = document.createElement('button');
+          btn.textContent = '✔️ Load Selected Question';
+          btn.onclick = () => {
+            const selected = select.value;
+            document.getElementById('question').value = selected;
+            document.getElementById('answers').value = grouped[selected]
+              .map(a => `${a.text} - ${a.points}`)
+              .join('\n');
+          };
+
+          const container = document.getElementById('question-loader');
+          container.innerHTML = '';
+          container.appendChild(select);
+          container.appendChild(btn);
+        }
+      });
     };
   </script>
 </body>
