@@ -1,28 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Family Feud - Host View</title>
-  <link rel="stylesheet" href="styles.css" />
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <title>Family Feud - Host</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #222;
+      color: white;
+      text-align: center;
+    }
+    .answer {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 10px 0;
+    }
+    button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 1em;
+    }
+  </style>
 </head>
 <body>
-  <h1>👨‍🏫 Family Feud - Host View</h1>
+  <h1>Host View - Family Feud</h1>
 
-  <button id="loadQuestions">Load Questions from Google Sheets</button>
-  <button id="nextRound" disabled>Next Round</button>
+  <button onclick="loadQuestions()">Load Questions from Google Sheets</button>
+  <button onclick="nextRound()">Next Round</button>
 
-  <h2 id="question">Waiting for questions...</h2>
+  <h2 id="question">Click "Next Round" to begin</h2>
+
   <div id="answers"></div>
 
-  <h3>Team Scores</h3>
-  <p>Team A: <span id="scoreA">0</span> <button onclick="updateScore('A', 10)">+10</button></p>
-  <p>Team B: <span id="scoreB">0</span> <button onclick="updateScore('B', 10)">+10</button></p>
-
   <script>
-    // Firebase setup
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyBY8wm-BiRozfkQw9GontLmX-6uIMpavjc",
       authDomain: "family-feud-game-ea08a.firebaseapp.com",
@@ -31,125 +44,72 @@
       messagingSenderId: "901336964187",
       appId: "1:901336964187:web:53534171e5ebf2a751337e"
     };
-    firebase.initializeApp(firebaseConfig);
+    const app = firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let allQuestions = [];
     let currentRound = -1;
+    let sheetData = [];
 
-    async function loadQuestionsFromGoogleSheets() {
-      const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pub?output=csv';
-      const res = await fetch(sheetURL);
-      const data = await res.text();
-      const rows = data.trim().split('\n').map(row => row.split(','));
+    async function loadQuestions() {
+      const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pub?output=csv";
+      const response = await fetch(url);
+      const text = await response.text();
+      const rows = text.trim().split('\n').map(row => row.split(','));
+      
+      sheetData = rows.map(cells => ({
+        question: cells[0],
+        answers: cells.slice(1).map(cell => {
+          const [text, points] = cell.split('|');
+          return { text: text?.trim(), points: Number(points) || 0, revealed: false };
+        }).filter(ans => ans.text)
+      }));
 
-      allQuestions = rows.slice(1).map(row => {
-        return {
-          question: row[0],
-          answers: [
-            { text: row[1], points: parseInt(row[2]) || 0 },
-            { text: row[3], points: parseInt(row[4]) || 0 },
-            { text: row[5], points: parseInt(row[6]) || 0 },
-            { text: row[7], points: parseInt(row[8]) || 0 },
-            { text: row[9], points: parseInt(row[10]) || 0 },
-            { text: row[11], points: parseInt(row[12]) || 0 }
-          ].filter(a => a.text)
-        };
-      });
-
-      // Shuffle the questions
-      for (let i = allQuestions.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [allQuestions[i], allQuestions[j]] = [allQuestions[j], allQuestions[i]];
-      }
-
-      document.getElementById('nextRound').disabled = false;
-      alert('Questions loaded! Click "Next Round" to begin.');
+      alert("Questions loaded successfully!");
     }
 
-    function showNextRound() {
-      currentRound++;
-      if (currentRound >= allQuestions.length) {
-        alert('No more questions!');
+    function nextRound() {
+      if (sheetData.length === 0) {
+        alert("Please load questions first.");
         return;
       }
-
-      const q = allQuestions[currentRound];
-      db.ref('game').set({
-        question: q.question,
-        answers: q.answers.map((a, i) => ({
-          text: a.text,
-          points: a.points,
-          revealed: false
-        }))
-      });
-
-      document.getElementById('question').textContent = q.question;
-      renderAnswers(q.answers.map((a, i) => ({ ...a, revealed: false })));
+      currentRound = (currentRound + 1) % sheetData.length;
+      const qData = sheetData[currentRound];
+      displayQuestion(qData);
+      syncToFirebase(qData);
     }
 
-    function renderAnswers(answers) {
-      const container = document.getElementById('answers');
-      container.innerHTML = '';
-      answers.forEach((a, i) => {
+    function displayQuestion(qData) {
+      document.getElementById("question").innerText = qData.question;
+      const answersDiv = document.getElementById("answers");
+      answersDiv.innerHTML = '';
+
+      qData.answers.forEach((ans, i) => {
         const div = document.createElement('div');
-        div.className = 'answer unrevealed';
-        div.textContent = 'Click to Reveal';
-        div.style.cursor = 'pointer';
-        div.onclick = () => revealAnswer(i, a);
-        container.appendChild(div);
+        div.className = "answer";
+        div.id = `ans-${i}`;
+        div.innerHTML = `
+          <button onclick="revealAnswer(${i})">Reveal Answer ${i+1}</button>
+          <span id="text-${i}" style="display:none;">${ans.text} - ${ans.points}</span>
+        `;
+        answersDiv.appendChild(div);
       });
     }
 
-    function revealAnswer(index, answer) {
-      const divs = document.querySelectorAll('.answer');
-      divs[index].className = 'answer revealed';
-      divs[index].textContent = `${answer.text} - ${answer.points} pts`;
+    function revealAnswer(index) {
+      const span = document.getElementById(`text-${index}`);
+      if (span) span.style.display = "inline";
 
-      db.ref(`game/answers/${index}/revealed`).set(true);
+      const qData = sheetData[currentRound];
+      qData.answers[index].revealed = true;
+      syncToFirebase(qData);
     }
 
-    function updateScore(team, points) {
-      const span = document.getElementById(`score${team}`);
-      const current = parseInt(span.textContent) || 0;
-      const newScore = current + points;
-      span.textContent = newScore;
-
-      db.ref(`scores/team${team}`).set(newScore);
+    function syncToFirebase(qData) {
+      db.ref("game").set({
+        question: qData.question,
+        answers: qData.answers
+      });
     }
-
-    document.getElementById('loadQuestions').addEventListener('click', loadQuestionsFromGoogleSheets);
-    document.getElementById('nextRound').addEventListener('click', showNextRound);
   </script>
-
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      background: #f4f4f4;
-    }
-    button {
-      margin: 5px;
-      padding: 10px;
-      font-size: 16px;
-    }
-    #answers {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .answer {
-      padding: 20px;
-      background: #ddd;
-      border-radius: 5px;
-      text-align: center;
-      font-size: 18px;
-    }
-    .answer.revealed {
-      background: #4caf50;
-      color: white;
-    }
-  </style>
 </body>
 </html>
