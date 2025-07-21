@@ -1,130 +1,126 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Family Feud - Host</title>
+  <title>Family Feud Host</title>
   <style>
-    body { font-family: sans-serif; background: #111; color: #fff; text-align: center; }
-    .answer { display: none; font-size: 24px; margin: 10px; }
-    .revealed { display: block; }
-    button { margin: 5px; padding: 10px 20px; font-size: 16px; }
+    body { font-family: Arial; background: #222; color: #fff; text-align: center; }
+    #question { font-size: 2em; margin-top: 20px; }
+    .answer-list { margin-top: 20px; display: flex; flex-direction: column; align-items: center; }
+    .answer-item { background: #333; padding: 10px 20px; margin: 5px; border-radius: 8px; width: 300px; display: flex; justify-content: space-between; align-items: center; }
+    .btn-group { display: flex; gap: 10px; }
+    .btn { background: #555; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; }
+    .btn:hover { background: #777; }
+    #team-scores { margin: 20px; }
   </style>
 </head>
 <body>
-  <h1>Family Feud - Host View</h1>
-  <h2 id="question"></h2>
-  <div id="answers"></div>
-  <button onclick="nextRound()">Next Round</button>
-  <p>Team 1 Score: <span id="team1Score">0</span></p>
-  <p>Team 2 Score: <span id="team2Score">0</span></p>
-  <button onclick="loadQuestions()">Load Questions from Google Sheets</button>
+  <h1>Family Feud Host Panel</h1>
+  <div id="question">Press Load Questions to Start</div>
+  <div class="answer-list" id="answers"></div>
+  <div>
+    <button onclick="nextRound()" class="btn">Next Round</button>
+    <button onclick="loadQuestions()" class="btn">Load Questions</button>
+  </div>
+  <div id="team-scores">
+    <h2>Scores</h2>
+    <p>Team A: <span id="scoreA">0</span></p>
+    <p>Team B: <span id="scoreB">0</span></p>
+  </div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script>
-    // ✅ Your Firebase Config (from earlier)
+    // Firebase config
     const firebaseConfig = {
-      apiKey: "AIzaSyCp14HR7X_O5dGrEK4QyrPq3q5mf-nRXJQ",
-      authDomain: "familyfeud-1df4a.firebaseapp.com",
-      databaseURL: "https://familyfeud-1df4a-default-rtdb.firebaseio.com",
-      projectId: "familyfeud-1df4a",
-      storageBucket: "familyfeud-1df4a.appspot.com",
-      messagingSenderId: "182167116439",
-      appId: "1:182167116439:web:45a3d9d6f97f7fa1248e8c"
+      apiKey: "AIzaSyC...",
+      authDomain: "your-project.firebaseapp.com",
+      projectId: "your-project-id",
+      databaseURL: "https://your-project-id.firebaseio.com",
+      storageBucket: "your-project.appspot.com",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID"
     };
 
-    const app = firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
     let questions = [];
-    let currentIndex = 0;
-    let scores = { team1: 0, team2: 0 };
+    let currentQuestionIndex = 0;
+    let teamScores = { A: 0, B: 0 };
 
     function loadQuestions() {
       fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pub?output=csv")
         .then(res => res.text())
         .then(csv => {
-          const rows = csv.split("\n").map(row => row.split(","));
-          questions = rows.slice(1).map(row => {
-            const question = row[0];
+          const lines = csv.trim().split("\n");
+          const headers = lines[0].split(",");
+          questions = [];
+
+          for (let i = 1; i < lines.length; i++) {
+            const cols = lines[i].split(",");
+            const question = cols[0];
             const answers = [];
-            for (let i = 1; i < row.length; i += 2) {
-              if (row[i] && row[i+1]) {
-                answers.push({ text: row[i], points: parseInt(row[i+1]) });
+
+            for (let j = 1; j < cols.length; j += 2) {
+              if (cols[j]) {
+                answers.push({ text: cols[j], points: parseInt(cols[j + 1]) || 0, revealed: false });
               }
             }
-            return { question, answers };
-          });
-          currentIndex = 0;
+
+            questions.push({ question, answers });
+          }
+
+          currentQuestionIndex = 0;
           showQuestion();
         });
     }
 
     function showQuestion() {
-      const q = questions[currentIndex];
-      if (!q) return;
+      const q = questions[currentQuestionIndex];
       document.getElementById("question").innerText = q.question;
-      const answerDiv = document.getElementById("answers");
-      answerDiv.innerHTML = "";
+
+      const answerContainer = document.getElementById("answers");
+      answerContainer.innerHTML = "";
+
       q.answers.forEach((ans, idx) => {
-        const container = document.createElement("div");
-        container.className = "answer";
-        container.id = "answer" + idx;
-        container.innerText = `${ans.text} - ${ans.points} pts`;
-        
-        const btn1 = document.createElement("button");
-        btn1.textContent = "Reveal - Team 1";
-        btn1.onclick = () => revealAnswer(idx, 'team1');
-
-        const btn2 = document.createElement("button");
-        btn2.textContent = "Reveal - Team 2";
-        btn2.onclick = () => revealAnswer(idx, 'team2');
-
-        answerDiv.appendChild(container);
-        answerDiv.appendChild(btn1);
-        answerDiv.appendChild(btn2);
+        const div = document.createElement("div");
+        div.className = "answer-item";
+        div.innerHTML = `
+          <span>${ans.revealed ? `${ans.text} (${ans.points})` : "-----"}</span>
+          <div class="btn-group">
+            <button class="btn" onclick="revealAnswer(${idx}, 'A')">Team A</button>
+            <button class="btn" onclick="revealAnswer(${idx}, 'B')">Team B</button>
+          </div>
+        `;
+        answerContainer.appendChild(div);
       });
 
-      db.ref("game/currentQuestion").set(q);
-      db.ref("game/revealedAnswers").set([]);
+      // Sync to players
+      db.ref("game/currentQuestion").set(q.question);
+      db.ref("game/answers").set(q.answers.map(a => a.revealed ? `${a.text} (${a.points})` : "-----"));
     }
 
     function revealAnswer(index, team) {
-      const el = document.getElementById("answer" + index);
-      if (el && !el.classList.contains("revealed")) {
-        el.classList.add("revealed");
-
-        const points = questions[currentIndex].answers[index].points;
-        scores[team] += points;
-        document.getElementById(team + "Score").innerText = scores[team];
-
-        db.ref("game/revealedAnswers").once('value').then(snapshot => {
-          const revealed = snapshot.val() || [];
-          revealed.push({ index, team });
-          db.ref("game/revealedAnswers").set(revealed);
-        });
-
-        db.ref("game/scores").set(scores);
+      const q = questions[currentQuestionIndex];
+      if (!q.answers[index].revealed) {
+        q.answers[index].revealed = true;
+        teamScores[team] += q.answers[index].points;
+        document.getElementById(`score${team}`).innerText = teamScores[team];
+        db.ref("game/scores").set(teamScores);
+        showQuestion(); // re-render with updated answer
       }
     }
 
     function nextRound() {
-      if (currentIndex < questions.length - 1) {
-        currentIndex++;
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
         showQuestion();
       } else {
-        alert("No more questions!");
+        alert("Game over!");
+        db.ref("game/currentQuestion").set("Game Over");
+        db.ref("game/answers").set([]);
       }
     }
-
-    // Load last state from Firebase on load
-    db.ref("game/scores").on("value", snap => {
-      if (snap.exists()) {
-        scores = snap.val();
-        document.getElementById("team1Score").innerText = scores.team1;
-        document.getElementById("team2Score").innerText = scores.team2;
-      }
-    });
   </script>
 </body>
 </html>
