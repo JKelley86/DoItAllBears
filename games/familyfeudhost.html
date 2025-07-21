@@ -75,6 +75,9 @@
             };
           });
           currentIndex = 0;
+          teamAScore = 0;
+          teamBScore = 0;
+          updateScoreUI();
           showQuestion();
         });
     }
@@ -101,10 +104,12 @@
         answersDiv.appendChild(div);
       });
 
+      // Save initial state to Firebase with answers unrevealed and current scores
       db.ref("game/current").set({
         question: q.question,
-        answers: q.answers.map(a => ({ text: "", points: 0 })),
-        revealed: []
+        answers: q.answers.map(a => ({ text: a.text, points: a.points, revealed: false })),
+        team1: teamAScore,
+        team2: teamBScore
       });
     }
 
@@ -117,21 +122,31 @@
       if (team === "A") teamAScore += answer.points;
       else if (team === "B") teamBScore += answer.points;
 
+      updateScoreUI();
+
+      // Update the whole answers array with revealed flags in Firebase
+      db.ref("game/current").once("value").then(snap => {
+        const data = snap.val() || {};
+        const answers = data.answers || [];
+
+        answers[index] = {
+          text: answer.text,
+          points: answer.points,
+          revealed: true
+        };
+
+        db.ref("game/current").set({
+          question: q.question,
+          answers: answers,
+          team1: teamAScore,
+          team2: teamBScore
+        });
+      });
+    }
+
+    function updateScoreUI() {
       document.getElementById("teamAScore").innerText = teamAScore;
       document.getElementById("teamBScore").innerText = teamBScore;
-
-      db.ref("game/current/answers/" + index).set({
-        text: answer.text,
-        points: answer.points
-      });
-
-      db.ref("game/current/revealed").once("value", snap => {
-        const revealed = snap.val() || [];
-        if (!revealed.includes(index)) {
-          revealed.push(index);
-          db.ref("game/current/revealed").set(revealed);
-        }
-      });
     }
 
     function nextRound() {
