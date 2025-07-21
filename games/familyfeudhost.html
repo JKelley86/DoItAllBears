@@ -1,56 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Family Feud - Host</title>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #222;
-      color: #fff;
-      padding: 2rem;
-    }
-    button {
-      margin: 5px;
-      padding: 10px 20px;
-      font-size: 16px;
-    }
-    .answer {
-      background: #444;
-      margin: 10px 0;
-      padding: 10px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .answer.revealed {
-      background: green;
-    }
-  </style>
+  <title>Family Feud Host</title>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
 </head>
 <body>
   <h1>Family Feud - Host</h1>
-  <h2 id="question">Click "Next Round" to begin</h2>
-  <div id="answers"></div>
-
-  <button onclick="nextRound()">Next Round</button>
-  <button onclick="resetBoard()">Reset Board</button>
-
-  <h3>Team Scores</h3>
-  <div>
-    Team 1: <span id="team1Score">0</span>
-    <button onclick="updateScore('team1', 10)">+10</button>
-    <button onclick="updateScore('team1', -10)">-10</button>
-  </div>
-  <div>
-    Team 2: <span id="team2Score">0</span>
-    <button onclick="updateScore('team2', 10)">+10</button>
-    <button onclick="updateScore('team2', -10)">-10</button>
-  </div>
+  <button onclick="loadQuestions()">Load Questions</button>
+  <button onclick="nextQuestion()">Next Round</button>
+  <div id="question"></div>
+  <ul id="answers"></ul>
+  <h2>Scores</h2>
+  <p>Team A: <span id="scoreA">0</span></p>
+  <p>Team B: <span id="scoreB">0</span></p>
 
   <script>
-    // ✅ Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyBY8wm-BiRozfkQw9GontLmX-6uIMpavjc",
       authDomain: "family-feud-game-ea08a.firebaseapp.com",
@@ -60,93 +25,80 @@
       appId: "1:901336964187:web:53534171e5ebf2a751337e"
     };
 
-    // ✅ Init Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
     let questions = [];
-    let currentQuestionIndex = -1;
+    let currentIndex = -1;
+    let scores = { A: 0, B: 0 };
 
-    // ✅ Load Google Sheets
-    fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pub?output=csv")
-      .then(res => res.text())
-      .then(csv => {
-        const rows = csv.trim().split("\n").map(r => r.split(","));
-        rows.shift(); // remove headers
-        questions = rows.map(row => ({
-          question: row[0],
-          answers: [
-            { text: row[1], points: parseInt(row[2]) || 0 },
-            { text: row[3], points: parseInt(row[4]) || 0 },
-            { text: row[5], points: parseInt(row[6]) || 0 },
-            { text: row[7], points: parseInt(row[8]) || 0 },
-            { text: row[9], points: parseInt(row[10]) || 0 },
-            { text: row[11], points: parseInt(row[12]) || 0 }
-          ].filter(a => a.text)
-        }));
-      });
+    function loadQuestions() {
+      fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pub?output=csv")
+        .then(res => res.text())
+        .then(csv => {
+          const lines = csv.trim().split("\n");
+          const headers = lines[0].split(",");
+          for (let i = 1; i < lines.length; i++) {
+            const cols = lines[i].split(",");
+            const q = {
+              question: cols[0],
+              answers: []
+            };
+            for (let j = 1; j < cols.length; j += 2) {
+              if (cols[j]) {
+                q.answers.push({ text: cols[j], points: parseInt(cols[j+1]) || 0, revealed: false });
+              }
+            }
+            questions.push(q);
+          }
+          alert("Questions loaded!");
+        });
+    }
 
-    // ✅ Push to Firebase
-    function updateFirebase(question, answers) {
+    function nextQuestion() {
+      currentIndex++;
+      if (currentIndex >= questions.length) {
+        alert("No more questions!");
+        return;
+      }
+      const current = questions[currentIndex];
+      current.answers.forEach(a => a.revealed = false);
+      updateGameState(current);
+    }
+
+    function updateGameState(q) {
       db.ref("game").set({
-        question,
-        answers,
+        question: q.question,
+        answers: q.answers,
+        scores
       });
     }
 
-    function nextRound() {
-      if (questions.length === 0) return;
-      currentQuestionIndex = Math.floor(Math.random() * questions.length);
-      const q = questions[currentQuestionIndex];
-      document.getElementById("question").innerText = q.question;
-      showAnswers(q.answers);
-      updateFirebase(q.question, q.answers.map(a => ({ ...a, revealed: false })));
+    function awardPoints(team, index) {
+      const current = questions[currentIndex];
+      if (!current.answers[index].revealed) {
+        current.answers[index].revealed = true;
+        scores[team] += current.answers[index].points;
+        updateGameState(current);
+      }
     }
 
-    function resetBoard() {
-      const q = questions[currentQuestionIndex];
-      if (!q) return;
-      showAnswers(q.answers);
-      updateFirebase(q.question, q.answers.map(a => ({ ...a, revealed: false })));
-    }
+    db.ref("game").on("value", snapshot => {
+      const game = snapshot.val();
+      if (!game) return;
+      document.getElementById("question").textContent = game.question;
+      document.getElementById("scoreA").textContent = game.scores?.A || 0;
+      document.getElementById("scoreB").textContent = game.scores?.B || 0;
 
-    function showAnswers(answers) {
-      const container = document.getElementById("answers");
-      container.innerHTML = "";
-      answers.forEach((ans, index) => {
-        const div = document.createElement("div");
-        div.className = "answer";
-        div.innerHTML = `
-          <span>${ans.text}</span>
-          <span>${ans.points}</span>
-          <button onclick="revealAnswer(${index})">Reveal</button>
-        `;
-        container.appendChild(div);
+      const ul = document.getElementById("answers");
+      ul.innerHTML = "";
+      game.answers?.forEach((a, i) => {
+        const li = document.createElement("li");
+        li.innerHTML = a.revealed ? `${a.text} (${a.points})` :
+          `<button onclick="awardPoints('A', ${i})">Reveal for Team A</button>
+           <button onclick="awardPoints('B', ${i})">Reveal for Team B</button>`;
+        ul.appendChild(li);
       });
-    }
-
-    function revealAnswer(index) {
-      const answerDivs = document.querySelectorAll(".answer");
-      answerDivs[index].classList.add("revealed");
-
-      const ref = db.ref("game/answers/" + index + "/revealed");
-      ref.set(true);
-    }
-
-    function updateScore(team, change) {
-      const ref = db.ref("scores/" + team);
-      ref.get().then(snapshot => {
-        const current = snapshot.val() || 0;
-        ref.set(current + change);
-        document.getElementById(team + "Score").innerText = current + change;
-      });
-    }
-
-    // ✅ Sync scores to UI on load
-    db.ref("scores").on("value", (snapshot) => {
-      const scores = snapshot.val() || {};
-      document.getElementById("team1Score").innerText = scores.team1 || 0;
-      document.getElementById("team2Score").innerText = scores.team2 || 0;
     });
   </script>
 </body>
