@@ -1,0 +1,58 @@
+<!-- This is the player view (player.html) -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Family Feud - Player</title>
+  <style>
+    body { background: #111; color: white; font-family: sans-serif; text-align: center; }
+    h1 { font-size: 3em; }
+    #question { font-size: 2em; margin: 20px; }
+    #answers { list-style: none; padding: 0; }
+    #answers li { font-size: 1.5em; margin: 10px; background: #333; padding: 10px; border-radius: 10px; }
+    #scoreboard { display: flex; justify-content: center; gap: 50px; font-size: 1.5em; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Family Feud</h1>
+  <div id="question">Waiting for host...</div>
+  <ul id="answers"></ul>
+  <div id="scoreboard">
+    <div>Team 1: <span id="team1">0</span></div>
+    <div>Team 2: <span id="team2">0</span></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      databaseURL: "YOUR_DATABASE_URL",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    onValue(ref(db, 'game/current'), (snapshot) => {
+      const data = snapshot.val();
+      if (!data) return;
+
+      document.getElementById('question').textContent = data.question;
+      const answerList = document.getElementById('answers');
+      answerList.innerHTML = '';
+      data.answers.forEach((a, i) => {
+        const li = document.createElement('li');
+        li.textContent = a.revealed ? `${a.text} - ${a.points}` : '__________';
+        answerList.appendChild(li);
+      });
+      document.getElementById('team1').textContent = data.team1;
+      document.getElementById('team2').textContent = data.team2;
+    });
+  </script>
+</body>
+</html>
