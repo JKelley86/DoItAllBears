@@ -1,0 +1,94 @@
+<!-- This is the host view (host.html) -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Family Feud - Host</title>
+  <style>
+    body { background: #111; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+    h1 { font-size: 2.5em; }
+    textarea, input { margin: 10px; width: 80%; padding: 10px; font-size: 1em; }
+    button { padding: 10px 20px; font-size: 1em; margin: 5px; }
+    .answer-btns { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Family Feud Host Control</h1>
+
+  <label>Question:</label><br>
+  <textarea id="question" rows="2"></textarea><br>
+
+  <label>Answers (format: Answer - Points):</label><br>
+  <textarea id="answers" rows="6"></textarea><br>
+
+  <button onclick="startRound()">Start Round</button>
+
+  <div class="answer-btns" id="reveal-controls"></div>
+
+  <h2>Scores</h2>
+  <div>
+    Team 1: <input type="number" id="team1" value="0"> &nbsp;
+    Team 2: <input type="number" id="team2" value="0">
+    <button onclick="updateScores()">Update Scores</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, set, update, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBY8wm-BiRozfkQw9GontLmX-6uIMpavjc",
+      authDomain: "family-feud-game-ea08a.firebaseapp.com",
+      projectId: "family-feud-game-ea08a",
+      storageBucket: "family-feud-game-ea08a.firebasestorage.app",
+      messagingSenderId: "901336964187",
+      appId: "1:901336964187:web:53534171e5ebf2a751337e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    window.startRound = () => {
+      const question = document.getElementById('question').value;
+      const answersRaw = document.getElementById('answers').value.trim().split('\n');
+      const answers = answersRaw.map(a => {
+        const [text, pts] = a.split('-');
+        return { text: text.trim(), points: parseInt(pts), revealed: false };
+      });
+
+      const data = {
+        question,
+        answers,
+        team1: 0,
+        team2: 0
+      };
+      set(ref(db, 'game/current'), data);
+      renderRevealButtons(answers);
+    };
+
+    function renderRevealButtons(answers) {
+      const container = document.getElementById('reveal-controls');
+      container.innerHTML = '';
+      answers.forEach((a, i) => {
+        const btn = document.createElement('button');
+        btn.textContent = `Reveal: ${a.text}`;
+        btn.onclick = () => revealAnswer(i);
+        container.appendChild(btn);
+      });
+    }
+
+    async function revealAnswer(index) {
+      const snapshot = await get(ref(db, 'game/current'));
+      const data = snapshot.val();
+      if (!data) return;
+      data.answers[index].revealed = true;
+      update(ref(db, 'game/current'), { answers: data.answers });
+    }
+
+    window.updateScores = () => {
+      const team1 = parseInt(document.getElementById('team1').value);
+      const team2 = parseInt(document.getElementById('team2').value);
+      update(ref(db, 'game/current'), { team1, team2 });
+    };
+  </script>
+</body>
+</html>
