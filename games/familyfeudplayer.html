@@ -1,103 +1,107 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Family Feud - Player</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Family Feud Player</title>
   <style>
     body {
-      background: #111;
-      color: white;
-      font-family: sans-serif;
-      text-align: center;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
       padding: 20px;
+      color: #222;
+      max-width: 600px;
+      margin: auto;
     }
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 20px;
+    h1, h2 {
+      text-align: center;
+      color: #111;
     }
     #question {
-      font-size: 1.8em;
+      font-size: 1.5em;
       margin-bottom: 20px;
+      text-align: center;
     }
     .answer {
-      background: #222;
-      padding: 10px 20px;
-      margin: 10px auto;
-      width: 80%;
-      border-radius: 8px;
-      font-size: 1.3em;
+      display: flex;
+      justify-content: space-between;
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      color: #666;
       visibility: hidden;
-      transition: visibility 0.3s;
     }
     .answer.revealed {
       visibility: visible;
-      background: #28a745;
-      color: white;
+      background-color: #d4edda;
+      color: #155724;
+      font-weight: bold;
     }
     .scores {
-      margin-top: 30px;
-      font-size: 1.5em;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #111;
     }
   </style>
 </head>
 <body>
-
   <h1>Family Feud</h1>
-  <div id="question">Waiting for host...</div>
-
-  <div id="answersContainer"></div>
+  <h2 id="question">Waiting for host...</h2>
+  <div id="answers"></div>
 
   <div class="scores">
-    Team 1 Score: <span id="team1Score">0</span> &nbsp;&nbsp;&nbsp;
-    Team 2 Score: <span id="team2Score">0</span>
+    <p>Team A Score: <span id="teamAScore">0</span></p>
+    <p>Team B Score: <span id="teamBScore">0</span></p>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyBY8wm-BiRozfkQw9GontLmX-6uIMpavjc",
-      authDomain: "family-feud-game-ea08a.firebaseapp.com",
-      projectId: "family-feud-game-ea08a",
-      storageBucket: "family-feud-game-ea08a.firebasestorage.app",
-      messagingSenderId: "901336964187",
-      appId: "1:901336964187:web:53534171e5ebf2a751337e",
-      databaseURL: "https://family-feud-game-ea08a-default-rtdb.firebaseio.com"
+      apiKey: "AIzaSyBX0VRJb78-uWfD3i4EwU1df1vPabG6m7k",
+      authDomain: "family-feud-8b52e.firebaseapp.com",
+      projectId: "family-feud-8b52e",
+      storageBucket: "family-feud-8b52e.appspot.com",
+      messagingSenderId: "604323429661",
+      appId: "1:604323429661:web:f684108fa62dcf6979822d",
+      databaseURL: "https://family-feud-8b52e-default-rtdb.firebaseio.com/"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
     const questionEl = document.getElementById('question');
-    const answersContainer = document.getElementById('answersContainer');
-    const team1ScoreEl = document.getElementById('team1Score');
-    const team2ScoreEl = document.getElementById('team2Score');
+    const answersDiv = document.getElementById('answers');
+    const teamAScoreEl = document.getElementById('teamAScore');
+    const teamBScoreEl = document.getElementById('teamBScore');
 
-    onValue(ref(db, 'game/current'), (snapshot) => {
+    db.ref("game/current").on("value", (snapshot) => {
       const data = snapshot.val();
       if (!data) {
-        questionEl.textContent = 'Waiting for host...';
-        answersContainer.innerHTML = '';
-        team1ScoreEl.textContent = '0';
-        team2ScoreEl.textContent = '0';
+        questionEl.textContent = "Waiting for host...";
+        answersDiv.innerHTML = "";
+        teamAScoreEl.textContent = "0";
+        teamBScoreEl.textContent = "0";
         return;
       }
 
-      questionEl.textContent = data.question || 'Waiting for question...';
+      questionEl.textContent = data.question || "Waiting for question...";
 
-      answersContainer.innerHTML = '';
-
+      answersDiv.innerHTML = "";
       if (data.answers && Array.isArray(data.answers)) {
-        data.answers.forEach((answer, idx) => {
+        data.answers.forEach((ans, i) => {
           const div = document.createElement('div');
-          div.className = 'answer' + (answer.revealed ? ' revealed' : '');
-          div.textContent = answer.revealed ? `${answer.text} (${answer.points})` : '---';
-          answersContainer.appendChild(div);
+          div.className = "answer" + (ans.revealed ? " revealed" : "");
+          div.textContent = ans.revealed ? `${ans.text} (${ans.points} pts)` : "???";
+          answersDiv.appendChild(div);
         });
       }
 
-      team1ScoreEl.textContent = data.team1 ?? 0;
-      team2ScoreEl.textContent = data.team2 ?? 0;
+      teamAScoreEl.textContent = data.team1 ?? 0;
+      teamBScoreEl.textContent = data.team2 ?? 0;
     });
   </script>
 </body>
