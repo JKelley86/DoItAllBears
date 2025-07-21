@@ -2,187 +2,125 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Family Feud Host</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-    }
-    .question {
-      font-size: 2em;
-      margin: 20px 0;
-    }
-    .answer {
-      background: #222;
-      margin: 10px auto;
-      padding: 10px;
-      width: 80%;
-      border-radius: 10px;
-    }
-    .answer.revealed {
-      background: green;
-    }
-    .buttons {
-      margin-top: 10px;
-    }
-    button {
-      margin: 5px;
-      padding: 10px 15px;
-      font-size: 1em;
-      cursor: pointer;
-    }
-    .team-scores {
-      margin: 20px 0;
-      font-size: 1.5em;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Family Feud Host</h1>
-
-  <div class="team-scores">
-    Team A: <span id="teamAScore">0</span> |
-    Team B: <span id="teamBScore">0</span>
-  </div>
+  <h1>Family Feud Host Panel</h1>
 
   <div>
-    <button onclick="loadQuestions()">Load Questions</button>
-    <button onclick="nextQuestion()">Next Round</button>
-    <button onclick="shuffleQuestions()">Randomize</button>
+    <button id="loadQuestionsBtn">Load Questions from Google Sheets</button>
+    <button id="nextRoundBtn">Next Round</button>
   </div>
 
-  <div class="question" id="questionText">Click "Load Questions"</div>
-  <div id="answers"></div>
+  <h2 id="currentQuestion">Click "Next Round" to begin!</h2>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  <div id="answersContainer"></div>
 
-  <script>
+  <h3>Team Scores</h3>
+  <p>Team 1: <span id="team1Score">0</span></p>
+  <p>Team 2: <span id="team2Score">0</span></p>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyBY8wm-BiRozfkQw9GontLmX-6uIMpavjc",
       authDomain: "family-feud-game-ea08a.firebaseapp.com",
       projectId: "family-feud-game-ea08a",
       storageBucket: "family-feud-game-ea08a.appspot.com",
       messagingSenderId: "901336964187",
-      appId: "1:901336964187:web:53534171e5ebf2a751337e",
-      databaseURL: "https://family-feud-game-ea08a-default-rtdb.firebaseio.com/"
+      appId: "1:901336964187:web:53534171e5ebf2a751337e"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
     let questions = [];
-    let currentQuestionIndex = 0;
-    let teamAScore = 0;
-    let teamBScore = 0;
+    let currentRound = 0;
+    let teamScores = [0, 0];
 
-    function loadQuestions() {
-      fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pub?output=csv")
-        .then(response => response.text())
-        .then(csv => {
-          const rows = csv.trim().split("\n").slice(1);
-          questions = [];
+    function updateScores() {
+      document.getElementById('team1Score').textContent = teamScores[0];
+      document.getElementById('team2Score').textContent = teamScores[1];
 
-          let current = null;
-          for (let row of rows) {
-            const [question, answer, points] = row.split(",");
-            if (!current || current.question !== question) {
-              current = { question, answers: [] };
-              questions.push(current);
-            }
-            current.answers.push({ answer, points: parseInt(points), revealed: false });
-          }
-
-          currentQuestionIndex = 0;
-          displayQuestion();
-        });
+      set(ref(db, 'scores'), {
+        team1: teamScores[0],
+        team2: teamScores[1]
+      });
     }
 
     function displayQuestion() {
-      if (!questions[currentQuestionIndex]) return;
-      const q = questions[currentQuestionIndex];
+      const questionObj = questions[currentRound];
+      if (!questionObj) return;
 
-      document.getElementById("questionText").textContent = q.question;
+      document.getElementById("currentQuestion").textContent = questionObj.question;
 
-      const answersDiv = document.getElementById("answers");
-      answersDiv.innerHTML = "";
+      const container = document.getElementById("answersContainer");
+      container.innerHTML = "";
 
-      q.answers.forEach((a, i) => {
+      questionObj.answers.forEach((ans, i) => {
         const div = document.createElement("div");
-        div.className = "answer";
-        div.id = `answer-${i}`;
-        div.innerHTML = a.revealed
-          ? `${a.answer} - ${a.points} pts`
-          : "___________";
-
-        const btnA = document.createElement("button");
-        btnA.textContent = "Reveal (Team A)";
-        btnA.onclick = () => revealAnswer(i, "A");
-
-        const btnB = document.createElement("button");
-        btnB.textContent = "Reveal (Team B)";
-        btnB.onclick = () => revealAnswer(i, "B");
-
-        const btnDiv = document.createElement("div");
-        btnDiv.className = "buttons";
-        btnDiv.appendChild(btnA);
-        btnDiv.appendChild(btnB);
-
-        div.appendChild(btnDiv);
-        answersDiv.appendChild(div);
+        div.innerHTML = `
+          <strong>${i + 1}.</strong> ${ans.revealed ? ans.answer + ' - ' + ans.points : "____"}
+          <button data-index="${i}" data-team="1">Team 1</button>
+          <button data-index="${i}" data-team="2">Team 2</button>
+        `;
+        container.appendChild(div);
       });
 
-      syncWithFirebase();
+      set(ref(db, 'currentRound'), {
+        question: questionObj.question,
+        answers: questionObj.answers.map(a => a.revealed ? `${a.answer} - ${a.points}` : "____")
+      });
     }
 
-    function revealAnswer(index, team) {
-      const q = questions[currentQuestionIndex];
-      if (q.answers[index].revealed) return;
+    document.getElementById("loadQuestionsBtn").addEventListener("click", async () => {
+      const res = await fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pub?output=csv");
+      const text = await res.text();
+      const rows = text.trim().split("\n").map(r => r.split(","));
 
-      q.answers[index].revealed = true;
+      questions = rows.map(row => {
+        const question = row[0];
+        const answers = [];
+        for (let i = 1; i < row.length; i += 2) {
+          if (row[i] && row[i + 1]) {
+            answers.push({ answer: row[i], points: parseInt(row[i + 1]), revealed: false });
+          }
+        }
+        return { question, answers };
+      });
 
-      const points = q.answers[index].points;
-      if (team === "A") {
-        teamAScore += points;
-        document.getElementById("teamAScore").textContent = teamAScore;
+      alert("Questions Loaded! Click 'Next Round' to start.");
+    });
+
+    document.getElementById("nextRoundBtn").addEventListener("click", () => {
+      if (currentRound < questions.length) {
+        displayQuestion();
+        currentRound++;
       } else {
-        teamBScore += points;
-        document.getElementById("teamBScore").textContent = teamBScore;
+        alert("No more questions.");
       }
+    });
 
-      displayQuestion();
-    }
+    document.getElementById("answersContainer").addEventListener("click", e => {
+      if (e.target.tagName === "BUTTON") {
+        const index = parseInt(e.target.getAttribute("data-index"));
+        const team = parseInt(e.target.getAttribute("data-team"));
 
-    function nextQuestion() {
-      currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
-      displayQuestion();
-    }
-
-    function shuffleQuestions() {
-      for (let i = questions.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [questions[i], questions[j]] = [questions[j], questions[i]];
+        const currentQ = questions[currentRound - 1];
+        if (!currentQ.answers[index].revealed) {
+          currentQ.answers[index].revealed = true;
+          teamScores[team - 1] += currentQ.answers[index].points;
+          updateScores();
+          displayQuestion();
+        }
       }
-      currentQuestionIndex = 0;
-      displayQuestion();
-    }
+    });
 
-    function syncWithFirebase() {
-      const q = questions[currentQuestionIndex];
-      db.ref("game/currentQuestion").set({
-        question: q.question,
-        answers: q.answers.map(a => ({
-          answer: a.revealed ? a.answer : "",
-          points: a.revealed ? a.points : 0
-        })),
-        teamAScore,
-        teamBScore
-      });
-    }
+    updateScores();
   </script>
 </body>
 </html>
