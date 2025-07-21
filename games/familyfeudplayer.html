@@ -1,73 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Family Feud - Player</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="container">
-    <h1>Family Feud</h1>
-    <h2 id="question">Waiting for Host...</h2>
-    
-    <ul id="answers-list"></ul>
-
-    <div class="scoreboard">
-      <div>Team A: <span id="teamAScore">0</span></div>
-      <div>Team B: <span id="teamBScore">0</span></div>
-    </div>
-  </div>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCNttKcvk-xcTV3tw7LbpkPjZcdKpMB9ik",
-      authDomain: "familyfeud-9761e.firebaseapp.com",
-      projectId: "familyfeud-9761e",
-      storageBucket: "familyfeud-9761e.appspot.com",
-      messagingSenderId: "131663690095",
-      appId: "1:131663690095:web:12b201c2e4c93090cc4f3f",
-      measurementId: "G-B2H3EJFTMP",
-      databaseURL: "https://familyfeud-9761e-default-rtdb.firebaseio.com"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    const questionEl = document.getElementById('question');
-    const answersList = document.getElementById('answers-list');
-    const teamAScoreEl = document.getElementById('teamAScore');
-    const teamBScoreEl = document.getElementById('teamBScore');
-
-    function updateQuestionView(questionData) {
-      if (!questionData) return;
-      questionEl.textContent = questionData.question || 'Waiting for Host...';
-
-      answersList.innerHTML = '';
-      if (questionData.answers) {
-        questionData.answers.forEach((ans, index) => {
-          const li = document.createElement('li');
-          li.textContent = ans.revealed ? `${ans.text} - ${ans.points}` : '---';
-          li.classList.toggle('revealed', ans.revealed);
-          answersList.appendChild(li);
-        });
-      }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #222;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
     }
 
-    db.ref('currentQuestion').on('value', snapshot => {
-      const questionData = snapshot.val();
-      updateQuestionView(questionData);
+    h1 {
+      font-size: 3em;
+      margin-bottom: 0.5em;
+    }
+
+    #question {
+      font-size: 2em;
+      margin-bottom: 1em;
+    }
+
+    .answers {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 2em;
+    }
+
+    .answer {
+      width: 60%;
+      background: #444;
+      border: 2px solid #fff;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 1.5em;
+      transition: 0.3s;
+      visibility: hidden;
+    }
+
+    .answer.revealed {
+      visibility: visible;
+      background: #28a745;
+    }
+
+    .scores {
+      display: flex;
+      justify-content: space-around;
+      font-size: 1.5em;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Family Feud</h1>
+  <div id="question">Waiting for host...</div>
+
+  <div class="answers" id="answersContainer"></div>
+
+  <div class="scores">
+    <div>Team 1: <span id="team1Score">0</span></div>
+    <div>Team 2: <span id="team2Score">0</span></div>
+  </div>
+
+  <script type="module">
+    // Firebase SDK v9+ Modular import
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBOZ3SSNU0aO2uJ2VrYqRAhHT7RCeOeThA",
+      authDomain: "family-feud-45c4c.firebaseapp.com",
+      databaseURL: "https://family-feud-45c4c-default-rtdb.firebaseio.com",
+      projectId: "family-feud-45c4c",
+      storageBucket: "family-feud-45c4c.appspot.com",
+      messagingSenderId: "458809502134",
+      appId: "1:458809502134:web:3dc041429b6325298a1d6c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const questionEl = document.getElementById('question');
+    const answersContainer = document.getElementById('answersContainer');
+    const team1ScoreEl = document.getElementById('team1Score');
+    const team2ScoreEl = document.getElementById('team2Score');
+
+    onValue(ref(db, 'game/currentRound'), snapshot => {
+      const round = snapshot.val();
+      if (!round) return;
+
+      questionEl.textContent = round.question || 'Waiting for question...';
+      answersContainer.innerHTML = '';
+
+      if (round.answers) {
+        round.answers.forEach(answer => {
+          const div = document.createElement('div');
+          div.className = 'answer';
+          div.textContent = `${answer.text} - ${answer.points}`;
+          if (answer.revealed) {
+            div.classList.add('revealed');
+          }
+          answersContainer.appendChild(div);
+        });
+      }
     });
 
-    db.ref('scores').on('value', snapshot => {
+    onValue(ref(db, 'game/scores'), snapshot => {
       const scores = snapshot.val();
-      teamAScoreEl.textContent = scores?.teamA || 0;
-      teamBScoreEl.textContent = scores?.teamB || 0;
+      if (scores) {
+        team1ScoreEl.textContent = scores.team1 || 0;
+        team2ScoreEl.textContent = scores.team2 || 0;
+      }
     });
   </script>
+
 </body>
 </html>
