@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Family Feud</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #002366, #ffd700);
+      font-family: 'Bangers', cursive;
+      color: white;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      font-size: 4em;
+      margin-bottom: 30px;
+      text-shadow: 3px 3px #000;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: #ff4500;
+      border: none;
+      color: white;
+      padding: 20px 40px;
+      font-size: 2em;
+      border-radius: 15px;
+      cursor: pointer;
+      box-shadow: 0 6px #b22222;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #ff6347;
+    }
+
+    button:active {
+      box-shadow: 0 3px #b22222;
+      transform: translateY(3px);
+    }
+  </style>
+</head>
+<body>
+  <h1>🔥 Family Feud 🔥</h1>
+  <div class="button-container">
+    <button onclick="location.href='familyfeudhost.html'">Host Game</button>
+    <button onclick="location.href='familyfeudplayer.html'">Join Game</button>
+  </div>
+</body>
+</html>
