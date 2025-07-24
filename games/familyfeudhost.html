@@ -5,16 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Family Feud Host</title>
   <style>
-    body { font-family: Arial; background: #f0f0f0; padding: 20px; }
+    body { font-family: Arial, sans-serif; background: #f0f0f0; padding: 20px; }
     h1, h2 { text-align: center; }
-    .answer { display: flex; justify-content: space-between; background: #fff; margin: 10px 0; padding: 10px; border-radius: 5px; }
+    .answer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    button, select {
+      padding: 8px 12px;
+      margin: 5px;
+      font-size: 1em;
+      cursor: pointer;
+    }
     .controls { text-align: center; margin: 20px 0; }
-    button, select { margin: 5px; padding: 8px 12px; }
-    .revealed { background: #d4edda; }
+    .revealed { background-color: #d4edda; }
   </style>
 </head>
 <body>
   <h1>Family Feud - Host View</h1>
+
   <div class="controls">
     <select id="feudType">
       <option value="family">Family Feud</option>
@@ -23,13 +38,16 @@
     <button onclick="loadQuestions()">Load Selected Game</button>
     <button onclick="nextRound()">Next Round</button>
   </div>
+
   <h2 id="question">Waiting for questions...</h2>
   <div id="answers"></div>
+
   <div class="controls">
-    Team A Score: <span id="teamAScore">0</span><br>
-    Team B Score: <span id="teamBScore">0</span>
+    <p>Team A Score: <span id="teamAScore">0</span></p>
+    <p>Team B Score: <span id="teamBScore">0</span></p>
   </div>
 
+  <!-- Firebase + PapaParse -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
@@ -44,73 +62,74 @@
       messagingSenderId: "901336964187",
       appId: "1:901336964187:web:53534171e5ebf2a751337e"
     };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let questions = [], currentIndex = 0, teamAScore = 0, teamBScore = 0;
+    let questions = [];
+    let currentIndex = 0;
+    let teamAScore = 0;
+    let teamBScore = 0;
 
     function loadQuestions() {
-      const feudType = document.getElementById('feudType').value;
-
+      const feudType = document.getElementById("feudType").value;
       const gidMap = {
-        family: "0", // First sheet
-        wedding: "1009729111" // Second sheet
+        "family": "0",             // Sheet 1
+        "wedding": "1009729111"    // Sheet 2
       };
-
       const gid = gidMap[feudType];
-      const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pub?output=csv&gid=${gid}`;
 
-      console.log("Fetching CSV from URL:", url);
+      const sheetUrl = `https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pub?output=csv&gid=${gid}`;
 
-      Papa.parse(url, {
+      Papa.parse(sheetUrl, {
         download: true,
         header: true,
         complete: (res) => {
-          console.log("Parsed CSV rows:", res.data);
-
           const grouped = {};
           res.data.forEach(r => {
-            console.log("Row check:", r.question, r.answer, r.points);
             if (r.question && r.answer && r.points) {
-              grouped[r.question] = grouped[r.question] || [];
-              grouped[r.question].push({
-                text: r.answer,
+              const q = r.question.trim();
+              if (!grouped[q]) grouped[q] = [];
+              grouped[q].push({
+                text: r.answer.trim(),
                 points: parseInt(r.points),
                 revealed: false
               });
             }
           });
 
-          console.log("Grouped questions:", grouped);
-          questions = Object.entries(grouped).map(([q, a]) => ({ question: q, answers: a }));
-          console.log("Final question array:", questions);
+          questions = Object.entries(grouped).map(([q, answers]) => ({
+            question: q,
+            answers: answers
+          }));
 
           currentIndex = 0;
-          teamAScore = teamBScore = 0;
+          teamAScore = 0;
+          teamBScore = 0;
           updateScore();
           showQuestion();
-        },
-        error: (err) => {
-          console.error("Papa Parse Error:", err);
-          alert("Error loading questions. See console for details.");
         }
       });
     }
 
     function showQuestion() {
-      if (!questions[currentIndex]) return;
-
       const q = questions[currentIndex];
-      document.getElementById('question').textContent = q.question;
+      if (!q || !q.question || !q.answers) {
+        console.warn("Invalid question data:", q);
+        return;
+      }
 
-      const ad = document.getElementById('answers');
-      ad.innerHTML = '';
+      document.getElementById("question").textContent = q.question;
+
+      const ad = document.getElementById("answers");
+      ad.innerHTML = "";
+
       q.answers.forEach((ans, i) => {
-        const div = document.createElement('div');
-        div.className = 'answer';
-        div.id = 'ans-' + i;
+        const div = document.createElement("div");
+        div.className = "answer";
+        div.id = "ans-" + i;
         div.innerHTML = `
-          <span>${ans.text} (${ans.points} pts)</span>
+          <span>${ans.text || "???"} (${ans.points || 0} pts)</span>
           <div>
             <button onclick="reveal(${i}, 'A')">Team A</button>
             <button onclick="reveal(${i}, 'B')">Team B</button>
@@ -118,45 +137,52 @@
         ad.appendChild(div);
       });
 
-      db.ref('game/current').set({
+      db.ref("game/current").set({
         question: q.question,
-        answers: q.answers.map(a => ({ text: a.text, points: a.points, revealed: false })),
+        answers: q.answers.map(a => ({
+          text: a.text || "",
+          points: a.points || 0,
+          revealed: false
+        })),
         team1: teamAScore,
         team2: teamBScore
       });
     }
 
     function reveal(i, team) {
-      const ans = questions[currentIndex].answers[i];
+      const q = questions[currentIndex];
+      const ans = q.answers[i];
       if (!ans.revealed) {
         ans.revealed = true;
-        if (team === 'A') teamAScore += ans.points;
-        else teamBScore += ans.points;
+
+        if (team === "A") teamAScore += ans.points;
+        else if (team === "B") teamBScore += ans.points;
+
         updateScore();
 
-        db.ref('game/current').set({
-          question: questions[currentIndex].question,
-          answers: questions[currentIndex].answers,
+        document.getElementById("ans-" + i).classList.add("revealed");
+
+        db.ref("game/current").set({
+          question: q.question,
+          answers: q.answers,
           team1: teamAScore,
           team2: teamBScore
         });
-
-        document.getElementById('ans-' + i).classList.add('revealed');
       }
     }
 
-    function updateScore() {
-      document.getElementById('teamAScore').textContent = teamAScore;
-      document.getElementById('teamBScore').textContent = teamBScore;
-    }
-
     function nextRound() {
-      if (currentIndex < questions.length - 1) {
+      if (currentIndex + 1 < questions.length) {
         currentIndex++;
         showQuestion();
       } else {
         alert("No more questions.");
       }
+    }
+
+    function updateScore() {
+      document.getElementById("teamAScore").textContent = teamAScore;
+      document.getElementById("teamBScore").textContent = teamBScore;
     }
   </script>
 </body>
