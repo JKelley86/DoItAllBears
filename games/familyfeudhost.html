@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Family Feud Host</title>
   <style>
-    /* Your existing styles */
     body { font-family: Arial; background: #f0f0f0; padding: 20px; }
     h1, h2 { text-align: center; }
     .answer { display: flex; justify-content: space-between; background: #fff; margin: 10px 0; padding: 10px; border-radius: 5px; }
@@ -48,48 +47,34 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const sheetBase = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pub?";
-
     let questions = [], currentIndex = 0, teamAScore = 0, teamBScore = 0;
 
-function loadQuestions() {
-  const feudType = document.getElementById('feudType').value;
+    function loadQuestions() {
+      const feudType = document.getElementById('feudType').value;
+      const gidMap = {
+        "family": "0",
+        "wedding": "1009729111"
+      };
 
-  // These are the actual gid values from your sheets
-  const gidMap = {
-    "family": "0",              // First tab — usually gid=0
-    "wedding": "1009729111"     // Second tab — confirmed from your URL
-  };
-
-  const gid = gidMap[feudType];
-  const sheetBase = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pub?output=csv&gid=";
-
-  const url = sheetBase + gid;
-  
-  Papa.parse(url, {
-    download: true,
-    header: true,
-    complete: (res) => {
-      const grouped = {};
-      res.data.forEach(r => {
-        if (r.question && r.answer && r.points) {
-          grouped[r.question] = grouped[r.question] || [];
-          grouped[r.question].push({
-            text: r.answer,
-            points: parseInt(r.points),
-            revealed: false
+      const gid = gidMap[feudType];
+      const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pub?output=csv&gid=${gid}`;
+      
+      Papa.parse(url, {
+        download: true,
+        header: true,
+        complete: (res) => {
+          const grouped = {};
+          res.data.forEach(r => {
+            if (r.question && r.answer && r.points) {
+              grouped[r.question] = grouped[r.question] || [];
+              grouped[r.question].push({
+                text: r.answer,
+                points: parseInt(r.points),
+                revealed: false
+              });
+            }
           });
-        }
-      });
 
-      questions = Object.entries(grouped).map(([q, a]) => ({ question: q, answers: a }));
-      currentIndex = 0;
-      teamAScore = teamBScore = 0;
-      updateScore();
-      showQuestion();
-    }
-  });
-}
           questions = Object.entries(grouped).map(([q, a]) => ({ question: q, answers: a }));
           currentIndex = 0;
           teamAScore = teamBScore = 0;
@@ -109,7 +94,7 @@ function loadQuestions() {
       q.answers.forEach((ans, i) => {
         const div = document.createElement('div');
         div.className = 'answer';
-        div.id = 'ans-'+i;
+        div.id = 'ans-' + i;
         div.innerHTML = `<span>${ans.text} (${ans.points} pts)</span>
                          <button onclick="reveal(${i}, 'A')">Team A</button>
                          <button onclick="reveal(${i}, 'B')">Team B</button>`;
@@ -137,7 +122,7 @@ function loadQuestions() {
           team1: teamAScore,
           team2: teamBScore
         });
-        document.getElementById('ans-'+i).classList.add('revealed');
+        document.getElementById('ans-' + i).classList.add('revealed');
       }
     }
 
