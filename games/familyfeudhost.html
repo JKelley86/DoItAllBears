@@ -41,7 +41,7 @@
 
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Tabletop.js/1.5.1/tabletop.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js"></script>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBY8wm-BiRozfkQw9GontLmX-6uIMpavjc",
@@ -63,14 +63,20 @@
 
     function loadQuestions() {
       const selectedSheet = document.getElementById("feudType").value;
+
       Tabletop.init({
         key: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pubhtml',
         wanted: [selectedSheet],
+        simpleSheet: false,
         callback: function(data) {
-          const rawData = data[selectedSheet].elements;
-          const grouped = {};
+          const sheet = data[selectedSheet];
+          if (!sheet || !sheet.elements) {
+            alert("Could not load data from the selected sheet.");
+            return;
+          }
 
-          rawData.forEach(row => {
+          const grouped = {};
+          sheet.elements.forEach(row => {
             if (!grouped[row.question]) grouped[row.question] = [];
             grouped[row.question].push({
               text: row.answer,
