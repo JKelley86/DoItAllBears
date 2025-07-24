@@ -78,30 +78,26 @@
         "wedding": "1009729111"    // Sheet 2
       };
       const gid = gidMap[feudType];
-
       const sheetUrl = `https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pub?output=csv&gid=${gid}`;
 
       Papa.parse(sheetUrl, {
         download: true,
-        header: true,
-        complete: (res) => {
-          const grouped = {};
-          res.data.forEach(r => {
-            if (r.question && r.answer && r.points) {
-              const q = r.question.trim();
-              if (!grouped[q]) grouped[q] = [];
-              grouped[q].push({
-                text: r.answer.trim(),
-                points: parseInt(r.points),
-                revealed: false
-              });
-            }
-          });
+        complete: (results) => {
+          questions = results.data.map(row => {
+            const question = row[0];
+            const answers = [];
 
-          questions = Object.entries(grouped).map(([q, answers]) => ({
-            question: q,
-            answers: answers
-          }));
+            // Start parsing from index 1
+            for (let i = 1; i < row.length; i += 2) {
+              const answer = row[i];
+              const points = parseInt(row[i + 1]);
+              if (answer && !isNaN(points)) {
+                answers.push({ text: answer, points, revealed: false });
+              }
+            }
+
+            return { question, answers };
+          }).filter(q => q.question && q.answers.length > 0);
 
           currentIndex = 0;
           teamAScore = 0;
@@ -114,34 +110,31 @@
 
     function showQuestion() {
       const q = questions[currentIndex];
-      if (!q || !q.question || !q.answers) {
-        console.warn("Invalid question data:", q);
-        return;
-      }
+      if (!q) return;
 
       document.getElementById("question").textContent = q.question;
-
-      const ad = document.getElementById("answers");
-      ad.innerHTML = "";
+      const answersDiv = document.getElementById("answers");
+      answersDiv.innerHTML = "";
 
       q.answers.forEach((ans, i) => {
         const div = document.createElement("div");
         div.className = "answer";
-        div.id = "ans-" + i;
+        div.id = `ans-${i}`;
         div.innerHTML = `
-          <span>${ans.text || "???"} (${ans.points || 0} pts)</span>
+          <span>${ans.text} (${ans.points} pts)</span>
           <div>
             <button onclick="reveal(${i}, 'A')">Team A</button>
             <button onclick="reveal(${i}, 'B')">Team B</button>
-          </div>`;
-        ad.appendChild(div);
+          </div>
+        `;
+        answersDiv.appendChild(div);
       });
 
       db.ref("game/current").set({
         question: q.question,
         answers: q.answers.map(a => ({
-          text: a.text || "",
-          points: a.points || 0,
+          text: a.text,
+          points: a.points,
           revealed: false
         })),
         team1: teamAScore,
@@ -160,7 +153,7 @@
 
         updateScore();
 
-        document.getElementById("ans-" + i).classList.add("revealed");
+        document.getElementById(`ans-${i}`).classList.add("revealed");
 
         db.ref("game/current").set({
           question: q.question,
