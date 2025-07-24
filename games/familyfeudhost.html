@@ -51,20 +51,26 @@
 
     function loadQuestions() {
       const feudType = document.getElementById('feudType').value;
+
       const gidMap = {
-        "family": "0",
-        "wedding": "1009729111"
+        family: "0", // First sheet
+        wedding: "1009729111" // Second sheet
       };
 
       const gid = gidMap[feudType];
       const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pub?output=csv&gid=${gid}`;
-      
+
+      console.log("Fetching CSV from URL:", url);
+
       Papa.parse(url, {
         download: true,
         header: true,
         complete: (res) => {
+          console.log("Parsed CSV rows:", res.data);
+
           const grouped = {};
           res.data.forEach(r => {
+            console.log("Row check:", r.question, r.answer, r.points);
             if (r.question && r.answer && r.points) {
               grouped[r.question] = grouped[r.question] || [];
               grouped[r.question].push({
@@ -75,17 +81,25 @@
             }
           });
 
+          console.log("Grouped questions:", grouped);
           questions = Object.entries(grouped).map(([q, a]) => ({ question: q, answers: a }));
+          console.log("Final question array:", questions);
+
           currentIndex = 0;
           teamAScore = teamBScore = 0;
           updateScore();
           showQuestion();
+        },
+        error: (err) => {
+          console.error("Papa Parse Error:", err);
+          alert("Error loading questions. See console for details.");
         }
       });
     }
 
     function showQuestion() {
       if (!questions[currentIndex]) return;
+
       const q = questions[currentIndex];
       document.getElementById('question').textContent = q.question;
 
@@ -95,9 +109,12 @@
         const div = document.createElement('div');
         div.className = 'answer';
         div.id = 'ans-' + i;
-        div.innerHTML = `<span>${ans.text} (${ans.points} pts)</span>
-                         <button onclick="reveal(${i}, 'A')">Team A</button>
-                         <button onclick="reveal(${i}, 'B')">Team B</button>`;
+        div.innerHTML = `
+          <span>${ans.text} (${ans.points} pts)</span>
+          <div>
+            <button onclick="reveal(${i}, 'A')">Team A</button>
+            <button onclick="reveal(${i}, 'B')">Team B</button>
+          </div>`;
         ad.appendChild(div);
       });
 
@@ -109,19 +126,21 @@
       });
     }
 
-    function reveal(i, t) {
+    function reveal(i, team) {
       const ans = questions[currentIndex].answers[i];
       if (!ans.revealed) {
         ans.revealed = true;
-        if (t === 'A') teamAScore += ans.points;
+        if (team === 'A') teamAScore += ans.points;
         else teamBScore += ans.points;
         updateScore();
+
         db.ref('game/current').set({
           question: questions[currentIndex].question,
           answers: questions[currentIndex].answers,
           team1: teamAScore,
           team2: teamBScore
         });
+
         document.getElementById('ans-' + i).classList.add('revealed');
       }
     }
@@ -136,7 +155,7 @@
         currentIndex++;
         showQuestion();
       } else {
-        alert('No more questions.');
+        alert("No more questions.");
       }
     }
   </script>
