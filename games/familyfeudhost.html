@@ -16,13 +16,18 @@
     button { padding: 8px 12px; margin: 5px; cursor: pointer; }
     .controls { text-align: center; margin: 20px 0; }
     .revealed { background-color: #d4edda; }
+    select { font-size: 1em; padding: 6px; }
   </style>
 </head>
 <body>
   <h1>Family Feud - Host View</h1>
 
   <div class="controls">
-    <button onclick="loadQuestions()">Load Questions from Google Sheets</button>
+    <select id="feudType">
+      <option value="Sheet1">Family Feud</option>
+      <option value="Sheet2">Wedding Feud</option>
+    </select>
+    <button onclick="loadQuestions()">Load Selected Game</button>
     <button onclick="nextRound()">Next Round</button>
   </div>
 
@@ -36,16 +41,17 @@
 
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Tabletop.js/1.5.1/tabletop.min.js"></script>
   <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyBY8wm-BiRozfkQw9GontLmX-6uIMpavjc",
-        authDomain: "family-feud-game-ea08a.firebaseapp.com",
-        databaseURL: "https://family-feud-game-ea08a-default-rtdb.firebaseio.com",
-        projectId: "family-feud-game-ea08a",
-        storageBucket: "family-feud-game-ea08a.firebasestorage.app",
-        messagingSenderId: "901336964187",
-        appId: "1:901336964187:web:53534171e5ebf2a751337e"
-      };
+    const firebaseConfig = {
+      apiKey: "AIzaSyBY8wm-BiRozfkQw9GontLmX-6uIMpavjc",
+      authDomain: "family-feud-game-ea08a.firebaseapp.com",
+      databaseURL: "https://family-feud-game-ea08a-default-rtdb.firebaseio.com",
+      projectId: "family-feud-game-ea08a",
+      storageBucket: "family-feud-game-ea08a.appspot.com",
+      messagingSenderId: "901336964187",
+      appId: "1:901336964187:web:53534171e5ebf2a751337e"
+    };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
@@ -56,30 +62,35 @@
     let teamBScore = 0;
 
     function loadQuestions() {
-      fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pub?output=tsv")
-        .then(res => res.text())
-        .then(text => {
-          const rows = text.trim().split("\n").slice(1);
-          questions = rows.map(row => {
-            const cols = row.split("\t");
-            return {
-              question: cols[0],
-              answers: [
-                { text: cols[1], points: parseInt(cols[2]) },
-                { text: cols[3], points: parseInt(cols[4]) },
-                { text: cols[5], points: parseInt(cols[6]) },
-                { text: cols[7], points: parseInt(cols[8]) },
-                { text: cols[9], points: parseInt(cols[10]) },
-                { text: cols[11], points: parseInt(cols[12]) }
-              ].filter(ans => ans.text)
-            };
+      const selectedSheet = document.getElementById("feudType").value;
+      Tabletop.init({
+        key: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pubhtml',
+        wanted: [selectedSheet],
+        callback: function(data) {
+          const rawData = data[selectedSheet].elements;
+          const grouped = {};
+
+          rawData.forEach(row => {
+            if (!grouped[row.question]) grouped[row.question] = [];
+            grouped[row.question].push({
+              text: row.answer,
+              points: parseInt(row.points),
+              revealed: false
+            });
           });
+
+          questions = Object.entries(grouped).map(([question, answers]) => ({
+            question,
+            answers
+          }));
+
           currentIndex = 0;
           teamAScore = 0;
           teamBScore = 0;
           updateScoreUI();
           showQuestion();
-        });
+        }
+      });
     }
 
     function showQuestion() {
@@ -104,7 +115,6 @@
         answersDiv.appendChild(div);
       });
 
-      // Save initial state to Firebase with answers unrevealed and current scores
       db.ref("game/current").set({
         question: q.question,
         answers: q.answers.map(a => ({ text: a.text, points: a.points, revealed: false })),
@@ -124,7 +134,6 @@
 
       updateScoreUI();
 
-      // Update the whole answers array with revealed flags in Firebase
       db.ref("game/current").once("value").then(snap => {
         const data = snap.val() || {};
         const answers = data.answers || [];
