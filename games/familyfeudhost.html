@@ -133,11 +133,12 @@
         question: q.question,
         answers: q.answers.map(a => ({
           text: a.text,
-          points: a.points,
+          points: (currentMode === "wedding" ? 0 : a.points),
           revealed: false
         })),
         team1: teamAScore,
-        team2: teamBScore
+        team2: teamBScore,
+        mode: currentMode
       });
     }
 
@@ -147,20 +148,15 @@
 
       if (ans.revealed) return;
 
-      // Mark as revealed
       ans.revealed = true;
       document.getElementById(`ans-${i}`).classList.add("revealed");
 
-      // Scoring logic
       if (currentMode === "family") {
         if (team === "A") teamAScore += ans.points;
         else teamBScore += ans.points;
       } else {
-        // Wedding mode - fixed 100 points
         if (team === "A") teamAScore += 100;
         else teamBScore += 100;
-
-        // Hide other buttons to prevent multi-selection
         const allBtns = document.querySelectorAll(".answer button");
         allBtns.forEach(btn => btn.disabled = true);
       }
@@ -171,7 +167,8 @@
         question: q.question,
         answers: q.answers,
         team1: teamAScore,
-        team2: teamBScore
+        team2: teamBScore,
+        mode: currentMode
       });
     }
 
