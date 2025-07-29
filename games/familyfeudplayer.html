@@ -2,25 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Family Feud - Player</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Family Feud - Player View</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f0f0f0; padding: 20px; }
+    body { font-family: Arial, sans-serif; background: #f8f8f8; padding: 20px; }
     h1, h2 { text-align: center; }
+    #question { font-size: 1.5em; margin: 20px 0; text-align: center; }
     .answer {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #fff;
       padding: 10px;
-      margin-bottom: 10px;
+      background: #ddd;
+      margin: 10px auto;
+      max-width: 600px;
       border-radius: 5px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      min-height: 40px;
+      text-align: center;
+      font-size: 1.2em;
     }
-    .revealed {
-      background-color: #d4edda;
-    }
+    .revealed.correct { background-color: #d4edda; }
+    .revealed.incorrect { background-color: #f8d7da; }
+    .revealed.family { background-color: #d4edda; }
   </style>
 </head>
 <body>
@@ -30,7 +29,6 @@
 
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBY8wm-BiRozfkQw9GontLmX-6uIMpavjc",
@@ -45,26 +43,36 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    db.ref("game/current").on("value", snap => {
-      const data = snap.val();
+    db.ref("game/current").on("value", (snapshot) => {
+      const data = snapshot.val();
       if (!data) return;
 
-      document.getElementById("question").textContent = data.question || "Waiting...";
+      document.getElementById("question").textContent = data.question || "";
 
-      const mode = data.mode || "family";
-      const answers = data.answers || [];
       const answersDiv = document.getElementById("answers");
       answersDiv.innerHTML = "";
 
-      answers.forEach((ans, i) => {
+      (data.answers || []).forEach((ans, i) => {
         const div = document.createElement("div");
         div.className = "answer";
-        if (ans.revealed) div.classList.add("revealed");
 
-        if (mode === "wedding") {
-          div.textContent = ans.text;
+        let display = "";
+        if (data.mode === "wedding") {
+          display = ans.text;
         } else {
-          div.textContent = ans.revealed ? `${ans.text} (${ans.points} pts)` : "";
+          display = ans.revealed ? `${ans.text} (${ans.points} pts)` : "";
+        }
+
+        div.innerText = display || "________";
+
+        if (ans.revealed) {
+          if (data.mode === "wedding") {
+            div.classList.add("revealed");
+            if (ans.points > 0) div.classList.add("correct");
+            else div.classList.add("incorrect");
+          } else {
+            div.classList.add("revealed", "family");
+          }
         }
 
         answersDiv.appendChild(div);
