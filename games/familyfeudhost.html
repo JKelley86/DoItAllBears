@@ -47,7 +47,6 @@
     <p>Team B Score: <span id="teamBScore">0</span></p>
   </div>
 
-  <!-- Firebase + PapaParse -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
@@ -70,14 +69,15 @@
     let currentIndex = 0;
     let teamAScore = 0;
     let teamBScore = 0;
+    let currentMode = "family";
 
     function loadQuestions() {
-      const feudType = document.getElementById("feudType").value;
+      currentMode = document.getElementById("feudType").value;
       const gidMap = {
-        "family": "0",             // Sheet 1
-        "wedding": "1009729111"    // Sheet 2
+        "family": "0",
+        "wedding": "1009729111"
       };
-      const gid = gidMap[feudType];
+      const gid = gidMap[currentMode];
       const sheetUrl = `https://docs.google.com/spreadsheets/d/e/2PACX-1vT8hWnxpAnGUMSl7VqP4rRFALVpaQ4LCd46XU_lyio6qSv847jmUUTX8EsQ3gRZ2db0hwTMVYfYlIPj/pub?output=csv&gid=${gid}`;
 
       Papa.parse(sheetUrl, {
@@ -86,16 +86,13 @@
           questions = results.data.map(row => {
             const question = row[0];
             const answers = [];
-
-            // Start parsing from index 1
             for (let i = 1; i < row.length; i += 2) {
-              const answer = row[i];
+              const text = row[i];
               const points = parseInt(row[i + 1]);
-              if (answer && !isNaN(points)) {
-                answers.push({ text: answer, points, revealed: false });
+              if (text && !isNaN(points)) {
+                answers.push({ text, points, revealed: false });
               }
             }
-
             return { question, answers };
           }).filter(q => q.question && q.answers.length > 0);
 
@@ -120,8 +117,10 @@
         const div = document.createElement("div");
         div.className = "answer";
         div.id = `ans-${i}`;
+        let displayText = (currentMode === "wedding") ? ans.text : `${ans.text} (${ans.points} pts)`;
+
         div.innerHTML = `
-          <span>${ans.text} (${ans.points} pts)</span>
+          <span>${displayText}</span>
           <div>
             <button onclick="reveal(${i}, 'A')">Team A</button>
             <button onclick="reveal(${i}, 'B')">Team B</button>
@@ -145,23 +144,35 @@
     function reveal(i, team) {
       const q = questions[currentIndex];
       const ans = q.answers[i];
-      if (!ans.revealed) {
-        ans.revealed = true;
 
+      if (ans.revealed) return;
+
+      // Mark as revealed
+      ans.revealed = true;
+      document.getElementById(`ans-${i}`).classList.add("revealed");
+
+      // Scoring logic
+      if (currentMode === "family") {
         if (team === "A") teamAScore += ans.points;
-        else if (team === "B") teamBScore += ans.points;
+        else teamBScore += ans.points;
+      } else {
+        // Wedding mode - fixed 100 points
+        if (team === "A") teamAScore += 100;
+        else teamBScore += 100;
 
-        updateScore();
-
-        document.getElementById(`ans-${i}`).classList.add("revealed");
-
-        db.ref("game/current").set({
-          question: q.question,
-          answers: q.answers,
-          team1: teamAScore,
-          team2: teamBScore
-        });
+        // Hide other buttons to prevent multi-selection
+        const allBtns = document.querySelectorAll(".answer button");
+        allBtns.forEach(btn => btn.disabled = true);
       }
+
+      updateScore();
+
+      db.ref("game/current").set({
+        question: q.question,
+        answers: q.answers,
+        team1: teamAScore,
+        team2: teamBScore
+      });
     }
 
     function nextRound() {
