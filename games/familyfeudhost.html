@@ -151,9 +151,12 @@
 
       ans.revealed = true;
       const div = document.getElementById(`ans-${i}`);
+
       if (currentMode === "wedding") {
         if (ans.points > 0) {
           div.classList.add("revealed", "correct");
+          if (team === "A") teamAScore += 100;
+          else teamBScore += 100;
         } else {
           div.classList.add("revealed", "incorrect");
         }
@@ -161,11 +164,6 @@
         div.classList.add("revealed", "family");
         if (team === "A") teamAScore += ans.points;
         else teamBScore += ans.points;
-      }
-
-      if (currentMode === "wedding") {
-        if (team === "A") teamAScore += 100;
-        else teamBScore += 100;
       }
 
       updateScore();
