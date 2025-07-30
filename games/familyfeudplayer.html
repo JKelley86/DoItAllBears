@@ -23,10 +23,15 @@
   </style>
 </head>
 <body>
-  <h1>Family Feud - Player View</h1>
+  <h1>Family Feud</h1>
   <h2 id="question">Waiting for host...</h2>
   <div id="answers"></div>
 
+  <div class="controls">
+    <p>Team A Score: <span id="teamAScore">0</span></p>
+    <p>Team B Score: <span id="teamBScore">0</span></p>
+  </div>
+  
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script>
