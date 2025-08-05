@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Modular Interactive Wallpapers</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #111; color: white; font-family: sans-serif; }
+    .wallpaper-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      padding: 20px;
+    }
+    .wallpaper-thumb {
+      height: 150px;
+      background: #222;
+      border: 2px solid #333;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .wallpaper-thumb canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .wallpaper-thumb::after {
+      content: attr(data-wallpaper);
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      color: white;
+      font-size: 14px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 2px 6px;
+      border-radius: 4px;
+      z-index: 1;
+    }
+    #fullscreen-viewer {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: black;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #wallpaper-canvas {
+      width: 100%; height: 100%;
+      position: relative;
+    }
+    #closeBtn {
+      position: absolute;
+      top: 20px; right: 20px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: white;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 1001;
+    }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="wallpaper-gallery">
+    <div class="wallpaper-thumb" data-wallpaper="Stars"></div>
+    <div class="wallpaper-thumb" data-wallpaper="Waves"></div>
+    <div class="wallpaper-thumb" data-wallpaper="Fireflies"></div>
+    <div class="wallpaper-thumb" data-wallpaper="CursorTrail"></div>
+    <div class="wallpaper-thumb" data-wallpaper="BlackHole"></div>
+    <div class="wallpaper-thumb" data-wallpaper="MeteorShower"></div>
+    <div class="wallpaper-thumb" data-wallpaper="StarfieldWarp"></div>
+    <div class="wallpaper-thumb" data-wallpaper="GalaxySwirl"></div>
+    <div class="wallpaper-thumb" data-wallpaper="AuroraBorealis"></div>
+    <div class="wallpaper-thumb" data-wallpaper="DeepOcean"></div>
+  </div>
+
+  <div id="fullscreen-viewer">
+    <button id="closeBtn">&times;</button>
+    <div id="wallpaper-canvas"></div>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
