@@ -185,34 +185,56 @@
     }
 
     // --- Show Plant Details ---
-    function showPlantDetails(plantName) {
-      const docRef = db.doc(`garden/plants/${plantName}`);
-      docRef.onSnapshot(doc => {
-        const data = doc.exists ? doc.data() : {};
-        plantDetails.innerHTML = `
-          <div class="plant-details">
-            <h2>${plantName}</h2>
-            <label>When to Plant</label>
-            <input type="text" value="${data.whenToPlant || ""}" 
-              onchange="updateField('${plantName}','whenToPlant',this.value)">
-            <label>Sun</label>
-            <input type="text" value="${data.sun || ""}" 
-              onchange="updateField('${plantName}','sun',this.value)">
-            <label>Spacing</label>
-            <input type="text" value="${data.spacing || ""}" 
-              onchange="updateField('${plantName}','spacing',this.value)">
-            <label>Harvest Time</label>
-            <input type="text" value="${data.harvestTime || ""}" 
-              onchange="updateField('${plantName}','harvestTime',this.value)">
-            <label>Winterize</label>
-            <input type="text" value="${data.winterize || ""}" 
-              onchange="updateField('${plantName}','winterize',this.value)">
-            <label>Notes</label>
-            <textarea onchange="updateField('${plantName}','notes',this.value)">${data.notes || ""}</textarea>
-          </div>
-        `;
+function showPlantDetails(plantName) {
+  const docRef = db.doc(`garden/plants/${plantName}`);
+
+  // Listen for live updates
+  docRef.onSnapshot(doc => {
+    const data = doc.exists ? doc.data() : {};
+
+    // Clear details area
+    plantDetails.innerHTML = "";
+
+    const container = document.createElement("div");
+    container.className = "plant-details";
+
+    const title = document.createElement("h2");
+    title.textContent = plantName;
+    container.appendChild(title);
+
+    const fields = [
+      { key: "whenToPlant", label: "When to Plant" },
+      { key: "sun", label: "Sun" },
+      { key: "spacing", label: "Spacing" },
+      { key: "harvestTime", label: "Harvest Time" },
+      { key: "winterize", label: "Winterize" },
+      { key: "notes", label: "Notes", type: "textarea" }
+    ];
+
+    fields.forEach(f => {
+      const label = document.createElement("label");
+      label.textContent = f.label;
+      container.appendChild(label);
+
+      let input;
+      if (f.type === "textarea") {
+        input = document.createElement("textarea");
+      } else {
+        input = document.createElement("input");
+        input.type = "text";
+      }
+
+      input.value = data[f.key] || "";
+      input.addEventListener("change", (e) => {
+        updateField(plantName, f.key, e.target.value);
       });
-    }
+
+      container.appendChild(input);
+    });
+
+    plantDetails.appendChild(container);
+  });
+}
 
     // --- Update Field ---
     async function updateField(plantName, field, value) {
