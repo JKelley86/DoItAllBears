@@ -1,1 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Garden</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      display: flex;
+      justify-content: flex-end;
+      background: #4CAF50;
+      color: white;
+      padding: 10px;
+    }
+    button {
+      background: #2e7d32;
+      border: none;
+      padding: 8px 14px;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover { background: #1b5e20; }
+
+.plant-list {
+  display: flex;
+  flex-direction: column; /* vertical list */
+  gap: 8px;
+  padding: 20px;
+}
+
+.plant-card {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.plant-card:hover {
+  background: #f1f1f1;
+}
+
+    /* Popup Config */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+    }
+    .popup-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      min-width: 300px;
+    }
+    .popup-content h3 {
+      margin-top: 0;
+    }
+    .close-btn {
+      float: right;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    /* Plant details */
+    .plant-details {
+      margin: 20px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .plant-details input, .plant-details textarea {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button id="configBtn">⚙️ Config</button>
+  </header>
+
+  <div class="plant-list" id="plantList"></div>
+  <div id="plantDetails"></div>
+
+  <!-- Config Popup -->
+  <div id="configPopup" class="popup">
+    <div class="popup-content">
+      <span class="close-btn" id="closeConfig">&times;</span>
+      <h3>Select Plants in Garden</h3>
+      <div id="plantOptions"></div>
+      <button id="saveConfig">Save</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Firebase Config ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyD3RT8GwOdg3G3bGm4SKLm1XMKdifW63WU",
+      authDomain: "mygarden-3440d.firebaseapp.com",
+      projectId: "mygarden-3440d",
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // --- Elements ---
+    const configBtn = document.getElementById("configBtn");
+    const configPopup = document.getElementById("configPopup");
+    const closeConfig = document.getElementById("closeConfig");
+    const plantOptions = document.getElementById("plantOptions");
+    const saveConfig = document.getElementById("saveConfig");
+    const plantList = document.getElementById("plantList");
+    const plantDetails = document.getElementById("plantDetails");
+
+    const allPlants = ["Tomato", "Carrot", "Lettuce", "Cucumber", "Pepper", "Onion"];
+    let selectedPlants = [];
+
+    // --- Open/Close Popup ---
+    configBtn.onclick = () => configPopup.style.display = "flex";
+    closeConfig.onclick = () => configPopup.style.display = "none";
+
+    // --- Load Config ---
+    function loadConfig() {
+      db.doc("garden/config").onSnapshot(doc => {
+        if (doc.exists) {
+          selectedPlants = doc.data().plants || [];
+          renderPlants();
+          renderConfigOptions();
+        }
+      });
+    }
+
+    // --- Render Config Checkboxes ---
+    function renderConfigOptions() {
+      plantOptions.innerHTML = "";
+      allPlants.forEach(plant => {
+        const isChecked = selectedPlants.includes(plant);
+        plantOptions.innerHTML += `
+          <label>
+            <input type="checkbox" value="${plant}" ${isChecked ? "checked" : ""}>
+            ${plant}
+          </label><br>
+        `;
+      });
+    }
+
+    // --- Save Config ---
+    saveConfig.onclick = () => {
+      const checkboxes = plantOptions.querySelectorAll("input[type=checkbox]");
+      const newPlants = [];
+      checkboxes.forEach(cb => {
+        if (cb.checked) newPlants.push(cb.value);
+      });
+      db.doc("garden/config").set({ plants: newPlants });
+      configPopup.style.display = "none";
+    };
+
+    // --- Render Plant List ---
+    function renderPlants() {
+      plantList.innerHTML = "";
+      selectedPlants.forEach(plant => {
+        const card = document.createElement("div");
+        card.className = "plant-card";
+        card.textContent = plant;
+        card.onclick = () => showPlantDetails(plant);
+        plantList.appendChild(card);
+      });
+    }
+
+    // --- Show Plant Details ---
+    function showPlantDetails(plantName) {
+      const docRef = db.doc(`garden/plants/${plantName}`);
+      docRef.onSnapshot(doc => {
+        const data = doc.exists ? doc.data() : {};
+        plantDetails.innerHTML = `
+          <div class="plant-details">
+            <h2>${plantName}</h2>
+            <label>When to Plant</label>
+            <input type="text" value="${data.whenToPlant || ""}" 
+              onchange="updateField('${plantName}','whenToPlant',this.value)">
+            <label>Sun</label>
+            <input type="text" value="${data.sun || ""}" 
+              onchange="updateField('${plantName}','sun',this.value)">
+            <label>Spacing</label>
+            <input type="text" value="${data.spacing || ""}" 
+              onchange="updateField('${plantName}','spacing',this.value)">
+            <label>Harvest Time</label>
+            <input type="text" value="${data.harvestTime || ""}" 
+              onchange="updateField('${plantName}','harvestTime',this.value)">
+            <label>Winterize</label>
+            <input type="text" value="${data.winterize || ""}" 
+              onchange="updateField('${plantName}','winterize',this.value)">
+            <label>Notes</label>
+            <textarea onchange="updateField('${plantName}','notes',this.value)">${data.notes || ""}</textarea>
+          </div>
+        `;
+      });
+    }
+
+    // --- Update Field ---
+    async function updateField(plantName, field, value) {
+      const ref = db.doc(`garden/plants/${plantName}`);
+      const docSnap = await ref.get();
+      const currentData = docSnap.exists ? docSnap.data() : {};
+      await ref.set({ ...currentData, [field]: value });
+    }
+
+    // --- Init ---
+    loadConfig();
+  </script>
+</body>
+</html>
 
