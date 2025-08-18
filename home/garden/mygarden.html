@@ -29,25 +29,25 @@
     }
     button:hover { background: #1b5e20; }
 
-.plant-list {
-  display: flex;
-  flex-direction: column; /* vertical list */
-  gap: 8px;
-  padding: 20px;
-}
+    .plant-list {
+      display: flex;
+      flex-direction: column; /* vertical list */
+      gap: 8px;
+      padding: 20px;
+    }
 
-.plant-card {
-  background: white;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-  padding: 10px 14px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
+    .plant-card {
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
 
-.plant-card:hover {
-  background: #f1f1f1;
-}
+    .plant-card:hover {
+      background: #f1f1f1;
+    }
 
     /* Popup Config */
     .popup {
@@ -138,7 +138,7 @@
 
     // --- Load Config ---
     function loadConfig() {
-      db.doc("garden/config").onSnapshot(doc => {
+      db.collection("garden").doc("shared").onSnapshot(doc => {
         if (doc.exists) {
           selectedPlants = doc.data().plants || [];
           renderPlants();
@@ -168,7 +168,7 @@
       checkboxes.forEach(cb => {
         if (cb.checked) newPlants.push(cb.value);
       });
-      db.doc("garden/config").set({ plants: newPlants });
+      db.collection("garden").doc("shared").set({ plants: newPlants }, { merge: true });
       configPopup.style.display = "none";
     };
 
@@ -185,63 +185,60 @@
     }
 
     // --- Show Plant Details ---
-function showPlantDetails(plantName) {
-  const docRef = db.doc(`garden/plants/${plantName}`);
+    function showPlantDetails(plantName) {
+      const docRef = db.collection("garden").doc("shared").collection("plants").doc(plantName);
 
-  // Fetch the current data once
-  docRef.get().then(docSnap => {
-    const data = docSnap.exists ? docSnap.data() : {};
+      docRef.get().then(docSnap => {
+        const data = docSnap.exists ? docSnap.data() : {};
 
-    // Clear previous details
-    plantDetails.innerHTML = "";
+        // Clear previous details
+        plantDetails.innerHTML = "";
 
-    const container = document.createElement("div");
-    container.className = "plant-details";
+        const container = document.createElement("div");
+        container.className = "plant-details";
 
-    const title = document.createElement("h2");
-    title.textContent = plantName;
-    container.appendChild(title);
+        const title = document.createElement("h2");
+        title.textContent = plantName;
+        container.appendChild(title);
 
-    const fields = [
-      { key: "whenToPlant", label: "When to Plant" },
-      { key: "sun", label: "Sun" },
-      { key: "spacing", label: "Spacing" },
-      { key: "harvestTime", label: "Harvest Time" },
-      { key: "winterize", label: "Winterize" },
-      { key: "notes", label: "Notes", type: "textarea" }
-    ];
+        const fields = [
+          { key: "whenToPlant", label: "When to Plant" },
+          { key: "sun", label: "Sun" },
+          { key: "spacing", label: "Spacing" },
+          { key: "harvestTime", label: "Harvest Time" },
+          { key: "winterize", label: "Winterize" },
+          { key: "notes", label: "Notes", type: "textarea" }
+        ];
 
-    fields.forEach(f => {
-      const label = document.createElement("label");
-      label.textContent = f.label;
-      container.appendChild(label);
+        fields.forEach(f => {
+          const label = document.createElement("label");
+          label.textContent = f.label;
+          container.appendChild(label);
 
-      let input;
-      if (f.type === "textarea") {
-        input = document.createElement("textarea");
-      } else {
-        input = document.createElement("input");
-        input.type = "text";
-      }
+          let input;
+          if (f.type === "textarea") {
+            input = document.createElement("textarea");
+          } else {
+            input = document.createElement("input");
+            input.type = "text";
+          }
 
-      input.value = data[f.key] || "";
-      input.addEventListener("change", (e) => {
-        updateField(plantName, f.key, e.target.value);
+          input.value = data[f.key] || "";
+          input.addEventListener("change", (e) => {
+            updateField(plantName, f.key, e.target.value);
+          });
+
+          container.appendChild(input);
+        });
+
+        plantDetails.appendChild(container);
       });
-
-      container.appendChild(input);
-    });
-
-    plantDetails.appendChild(container);
-  });
-}
+    }
 
     // --- Update Field ---
     async function updateField(plantName, field, value) {
-      const ref = db.doc(`garden/plants/${plantName}`);
-      const docSnap = await ref.get();
-      const currentData = docSnap.exists ? docSnap.data() : {};
-      await ref.set({ ...currentData, [field]: value });
+      const ref = db.collection("garden").doc("shared").collection("plants").doc(plantName);
+      await ref.set({ [field]: value }, { merge: true });
     }
 
     // --- Init ---
@@ -249,4 +246,3 @@ function showPlantDetails(plantName) {
   </script>
 </body>
 </html>
-
