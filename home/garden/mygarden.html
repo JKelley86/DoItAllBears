@@ -2,247 +2,355 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Garden</title>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f9f9f9;
       margin: 0;
       padding: 0;
+      background: #f4f4f4;
     }
+
     header {
-      display: flex;
-      justify-content: flex-end;
       background: #4CAF50;
       color: white;
-      padding: 10px;
+      padding: 15px;
+      text-align: center;
+      position: relative;
     }
-    button {
-      background: #2e7d32;
+
+    #config-btn {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      background: white;
+      color: #4CAF50;
       border: none;
-      padding: 8px 14px;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    button:hover { background: #1b5e20; }
-
-    .plant-list {
-      display: flex;
-      flex-direction: column; /* vertical list */
-      gap: 8px;
-      padding: 20px;
-    }
-
-    .plant-card {
-      background: white;
-      border-radius: 6px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-      padding: 10px 14px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .plant-card:hover {
-      background: #f1f1f1;
-    }
-
-    /* Popup Config */
-    .popup {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6);
-      justify-content: center;
-      align-items: center;
-    }
-    .popup-content {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      min-width: 300px;
-    }
-    .popup-content h3 {
-      margin-top: 0;
-    }
-    .close-btn {
-      float: right;
+      padding: 8px 12px;
+      border-radius: 5px;
       cursor: pointer;
       font-weight: bold;
-      font-size: 18px;
     }
 
-    /* Plant details */
-    .plant-details {
-      margin: 20px;
-      background: #fff;
+    #plant-list {
+      padding: 20px;
+    }
+
+    .plant-item {
+      background: white;
+      margin: 10px 0;
       padding: 15px;
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      font-size: 1.1rem;
     }
-    .plant-details input, .plant-details textarea {
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
       width: 100%;
-      margin-bottom: 10px;
-      padding: 6px;
+      height: 100%;
+      overflow-y: auto;
+      background-color: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .modal-content h2 {
+      margin-top: 0;
+    }
+
+    .modal-content label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .modal-content input,
+    .modal-content textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
       border: 1px solid #ccc;
-      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 15px;
+      gap: 10px;
+    }
+
+    .modal-actions button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    #saveBtn {
+      background: #4CAF50;
+      color: white;
+    }
+
+    #cancelBtn {
+      background: #ccc;
+    }
+
+    /* Config Modal */
+    #config-modal {
+      display: none;
+      position: fixed;
+      z-index: 1100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      background-color: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    #config-content {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    #config-content h3 {
+      margin-top: 0;
+    }
+
+    #config-content label {
+      display: block;
+      margin: 8px 0;
+    }
+
+    #config-save {
+      margin-top: 15px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      width: 100%;
+    }
+
+    /* Mobile friendly tweaks */
+    @media (max-width: 600px) {
+      header {
+        font-size: 1.2rem;
+      }
+
+      #config-btn {
+        padding: 6px 10px;
+        font-size: 0.9rem;
+      }
+
+      .plant-item {
+        font-size: 1rem;
+        padding: 12px;
+      }
+
+      .modal-content {
+        padding: 15px;
+      }
+
+      .modal-content input,
+      .modal-content textarea {
+        font-size: 1rem;
+      }
+
+      .modal-actions button {
+        font-size: 1rem;
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <button id="configBtn">⚙️ Config</button>
+    My Garden
+    <button id="config-btn">⚙️ Config</button>
   </header>
 
-  <div class="plant-list" id="plantList"></div>
-  <div id="plantDetails"></div>
+  <div id="plant-list"></div>
 
-  <!-- Config Popup -->
-  <div id="configPopup" class="popup">
-    <div class="popup-content">
-      <span class="close-btn" id="closeConfig">&times;</span>
-      <h3>Select Plants in Garden</h3>
-      <div id="plantOptions"></div>
-      <button id="saveConfig">Save</button>
+  <!-- Plant Details Modal -->
+  <div id="plant-modal" class="modal">
+    <div class="modal-content">
+      <h2 id="plant-title"></h2>
+      <label>When to Plant</label>
+      <input type="text" id="whenToPlant">
+
+      <label>Sun</label>
+      <input type="text" id="sun">
+
+      <label>Spacing</label>
+      <input type="text" id="spacing">
+
+      <label>Time to First Harvest</label>
+      <input type="text" id="harvestTime">
+
+      <label>How to Winterize</label>
+      <input type="text" id="winterize">
+
+      <label>Notes</label>
+      <textarea id="notes" rows="4"></textarea>
+
+      <div class="modal-actions">
+        <button id="cancelBtn">Cancel</button>
+        <button id="saveBtn">Save</button>
+      </div>
     </div>
   </div>
 
+  <!-- Config Modal -->
+  <div id="config-modal" class="modal">
+    <div id="config-content">
+      <h3>Select Plants</h3>
+      <div id="plant-options"></div>
+      <button id="config-save">Save Selection</button>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
   <script>
-    // --- Firebase Config ---
+    // Firebase setup
     const firebaseConfig = {
       apiKey: "AIzaSyD3RT8GwOdg3G3bGm4SKLm1XMKdifW63WU",
       authDomain: "mygarden-3440d.firebaseapp.com",
       projectId: "mygarden-3440d",
+      storageBucket: "mygarden-3440d.firebasestorage.app",
+      messagingSenderId: "793732208634",
+      appId: "1:793732208634:web:6c1797b22502309c48b643"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // --- Elements ---
-    const configBtn = document.getElementById("configBtn");
-    const configPopup = document.getElementById("configPopup");
-    const closeConfig = document.getElementById("closeConfig");
-    const plantOptions = document.getElementById("plantOptions");
-    const saveConfig = document.getElementById("saveConfig");
-    const plantList = document.getElementById("plantList");
-    const plantDetails = document.getElementById("plantDetails");
+    const plantListEl = document.getElementById("plant-list");
+    const plantModal = document.getElementById("plant-modal");
+    const configModal = document.getElementById("config-modal");
 
-    const allPlants = ["Tomato", "Carrot", "Lettuce", "Cucumber", "Pepper", "Onion"];
-    let selectedPlants = [];
+    let currentPlant = null;
 
-    // --- Open/Close Popup ---
-    configBtn.onclick = () => configPopup.style.display = "flex";
-    closeConfig.onclick = () => configPopup.style.display = "none";
+    // Plant modal open
+    function openPlantDetails(plantName) {
+      currentPlant = plantName;
+      document.getElementById("plant-title").textContent = plantName;
 
-    // --- Load Config ---
-    function loadConfig() {
-      db.collection("garden").doc("shared").onSnapshot(doc => {
+      const docRef = db.collection("garden").doc("shared").collection("plants").doc(plantName);
+      docRef.get().then(doc => {
         if (doc.exists) {
-          selectedPlants = doc.data().plants || [];
-          renderPlants();
-          renderConfigOptions();
+          const data = doc.data();
+          document.getElementById("whenToPlant").value = data.whenToPlant || "";
+          document.getElementById("sun").value = data.sun || "";
+          document.getElementById("spacing").value = data.spacing || "";
+          document.getElementById("harvestTime").value = data.harvestTime || "";
+          document.getElementById("winterize").value = data.winterize || "";
+          document.getElementById("notes").value = data.notes || "";
+        } else {
+          document.querySelectorAll("#plant-modal input, #plant-modal textarea").forEach(el => el.value = "");
         }
       });
+
+      plantModal.style.display = "flex";
     }
 
-    // --- Render Config Checkboxes ---
-    function renderConfigOptions() {
-      plantOptions.innerHTML = "";
-      allPlants.forEach(plant => {
-        const isChecked = selectedPlants.includes(plant);
-        plantOptions.innerHTML += `
-          <label>
-            <input type="checkbox" value="${plant}" ${isChecked ? "checked" : ""}>
-            ${plant}
-          </label><br>
-        `;
+    // Save plant details
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      if (!currentPlant) return;
+      const docRef = db.collection("garden").doc("shared").collection("plants").doc(currentPlant);
+      docRef.set({
+        whenToPlant: document.getElementById("whenToPlant").value,
+        sun: document.getElementById("sun").value,
+        spacing: document.getElementById("spacing").value,
+        harvestTime: document.getElementById("harvestTime").value,
+        winterize: document.getElementById("winterize").value,
+        notes: document.getElementById("notes").value
+      }, { merge: true }).then(() => {
+        plantModal.style.display = "none";
       });
-    }
+    });
 
-    // --- Save Config ---
-    saveConfig.onclick = () => {
-      const checkboxes = plantOptions.querySelectorAll("input[type=checkbox]");
-      const newPlants = [];
+    // Cancel
+    document.getElementById("cancelBtn").addEventListener("click", () => {
+      plantModal.style.display = "none";
+    });
+
+    // Config modal
+    document.getElementById("config-btn").addEventListener("click", () => {
+      configModal.style.display = "flex";
+    });
+
+    document.getElementById("config-save").addEventListener("click", () => {
+      const checkboxes = document.querySelectorAll("#plant-options input[type=checkbox]");
+      const selected = [];
       checkboxes.forEach(cb => {
-        if (cb.checked) newPlants.push(cb.value);
+        if (cb.checked) selected.push(cb.value);
       });
-      db.collection("garden").doc("shared").set({ plants: newPlants }, { merge: true });
-      configPopup.style.display = "none";
-    };
+      db.collection("garden").doc("shared").set({ selectedPlants: selected }, { merge: true });
+      configModal.style.display = "none";
+    });
 
-    // --- Render Plant List ---
-    function renderPlants() {
-      plantList.innerHTML = "";
-      selectedPlants.forEach(plant => {
-        const card = document.createElement("div");
-        card.className = "plant-card";
-        card.textContent = plant;
-        card.onclick = () => showPlantDetails(plant);
-        plantList.appendChild(card);
+    // Load selected plants
+    db.collection("garden").doc("shared").onSnapshot(doc => {
+      const data = doc.data();
+      if (!data) return;
+
+      // Load plant list
+      plantListEl.innerHTML = "";
+      (data.selectedPlants || []).forEach(plant => {
+        const div = document.createElement("div");
+        div.className = "plant-item";
+        div.textContent = plant;
+        div.addEventListener("click", () => openPlantDetails(plant));
+        plantListEl.appendChild(div);
       });
-    }
 
-    // --- Show Plant Details ---
-    function showPlantDetails(plantName) {
-      const docRef = db.collection("garden").doc("shared").collection("plants").doc(plantName);
-
-      docRef.get().then(docSnap => {
-        const data = docSnap.exists ? docSnap.data() : {};
-
-        // Clear previous details
-        plantDetails.innerHTML = "";
-
-        const container = document.createElement("div");
-        container.className = "plant-details";
-
-        const title = document.createElement("h2");
-        title.textContent = plantName;
-        container.appendChild(title);
-
-        const fields = [
-          { key: "whenToPlant", label: "When to Plant" },
-          { key: "sun", label: "Sun" },
-          { key: "spacing", label: "Spacing" },
-          { key: "harvestTime", label: "Harvest Time" },
-          { key: "winterize", label: "Winterize" },
-          { key: "notes", label: "Notes", type: "textarea" }
-        ];
-
-        fields.forEach(f => {
-          const label = document.createElement("label");
-          label.textContent = f.label;
-          container.appendChild(label);
-
-          let input;
-          if (f.type === "textarea") {
-            input = document.createElement("textarea");
-          } else {
-            input = document.createElement("input");
-            input.type = "text";
-          }
-
-          input.value = data[f.key] || "";
-          input.addEventListener("change", (e) => {
-            updateField(plantName, f.key, e.target.value);
-          });
-
-          container.appendChild(input);
-        });
-
-        plantDetails.appendChild(container);
+      // Load config checkboxes
+      const availablePlants = ["Tomato", "Pepper", "Carrot", "Lettuce", "Cucumber"]; // You can expand this
+      const optionsEl = document.getElementById("plant-options");
+      optionsEl.innerHTML = "";
+      availablePlants.forEach(p => {
+        const label = document.createElement("label");
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.value = p;
+        if (data.selectedPlants && data.selectedPlants.includes(p)) cb.checked = true;
+        label.appendChild(cb);
+        label.append(" " + p);
+        optionsEl.appendChild(label);
       });
-    }
-
-    // --- Update Field ---
-    async function updateField(plantName, field, value) {
-      const ref = db.collection("garden").doc("shared").collection("plants").doc(plantName);
-      await ref.set({ [field]: value }, { merge: true });
-    }
-
-    // --- Init ---
-    loadConfig();
+    });
   </script>
 </body>
 </html>
