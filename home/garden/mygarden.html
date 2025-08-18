@@ -188,11 +188,11 @@
 function showPlantDetails(plantName) {
   const docRef = db.doc(`garden/plants/${plantName}`);
 
-  // Listen for live updates
-  docRef.onSnapshot(doc => {
-    const data = doc.exists ? doc.data() : {};
+  // Fetch the current data once
+  docRef.get().then(docSnap => {
+    const data = docSnap.exists ? docSnap.data() : {};
 
-    // Clear details area
+    // Clear previous details
     plantDetails.innerHTML = "";
 
     const container = document.createElement("div");
