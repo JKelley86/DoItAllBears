@@ -62,15 +62,35 @@
       border-radius: 8px;
       width: 90%;
       max-width: 400px;
+      max-height: 90%;
+      overflow-y: auto;
     }
 
     .config-menu h2 {
       margin-top: 0;
     }
 
-    .config-menu label {
-      display: block;
-      margin: 8px 0;
+    .config-plant {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 6px 0;
+    }
+
+    .config-plant input[type=text] {
+      flex-grow: 1;
+      margin-left: 6px;
+      padding: 4px;
+    }
+
+    .delete-btn {
+      background: red;
+      color: white;
+      border: none;
+      margin-left: 6px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
     }
 
     .config-menu button {
@@ -223,9 +243,11 @@
         const name = doc.id;
         const checked = data.selectedPlants.includes(name) ? "checked" : "";
         plantCheckboxes.innerHTML += `
-          <label>
-            <input type="checkbox" value="${name}" ${checked}> ${name}
-          </label>`;
+          <div class="config-plant">
+            <input type="checkbox" value="${name}" ${checked}>
+            <input type="text" value="${name}" onchange="renamePlant('${name}', this.value)">
+            <button class="delete-btn" onclick="deletePlant('${name}')">X</button>
+          </div>`;
       });
     }
 
@@ -296,6 +318,46 @@
 
       await db.collection("garden").doc("shared").collection("plants").doc(name).set({});
       loadConfig();
+    }
+
+    async function deletePlant(oldName) {
+      if (!confirm(`Delete ${oldName}? This cannot be undone.`)) return;
+
+      await db.collection("garden").doc("shared").collection("plants").doc(oldName).delete();
+
+      // Remove from selectedPlants if present
+      const doc = await db.collection("garden").doc("shared").get();
+      const data = doc.data() || {};
+      const updated = (data.selectedPlants || []).filter(p => p !== oldName);
+      await db.collection("garden").doc("shared").set({ selectedPlants: updated }, { merge: true });
+
+      loadConfig();
+      loadPlants();
+    }
+
+    async function renamePlant(oldName, newName) {
+      if (!newName || oldName === newName) return;
+
+      const oldDocRef = db.collection("garden").doc("shared").collection("plants").doc(oldName);
+      const oldDoc = await oldDocRef.get();
+      if (!oldDoc.exists) return;
+
+      const data = oldDoc.data();
+
+      // Create new doc
+      await db.collection("garden").doc("shared").collection("plants").doc(newName).set(data);
+
+      // Delete old doc
+      await oldDocRef.delete();
+
+      // Update selectedPlants
+      const sharedDoc = await db.collection("garden").doc("shared").get();
+      const sharedData = sharedDoc.data() || {};
+      const updated = (sharedData.selectedPlants || []).map(p => p === oldName ? newName : p);
+      await db.collection("garden").doc("shared").set({ selectedPlants: updated }, { merge: true });
+
+      loadConfig();
+      loadPlants();
     }
 
     loadPlants();
