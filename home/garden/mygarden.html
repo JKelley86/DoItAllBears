@@ -120,10 +120,17 @@
       border-radius: 10px;
       width: 90%;
       max-width: 500px;
+      max-height: 90%;
+      overflow-y: auto;
     }
 
     .modal-content h2 {
       margin-top: 0;
+    }
+
+    .modal-content h3 {
+      margin-top: 15px;
+      color: #4CAF50;
     }
 
     .modal-content label {
@@ -186,18 +193,38 @@
   <div class="modal" id="plant-modal">
     <div class="modal-content">
       <h2 id="plant-title">Plant Details</h2>
+
+      <h3>General</h3>
       <label>When to plant:</label>
       <input type="text" id="whenToPlant">
       <label>Sun:</label>
       <input type="text" id="sun">
       <label>Spacing:</label>
       <input type="text" id="spacing">
-      <label>Time to first harvest:</label>
+      <label>Ideal Amount To Plant:</label>
+      <input type="text" id="amount">
+
+      <h3>Care</h3>
+      <label>Watering:</label>
+      <input type="text" id="watering">
+      <label>Fertilizer:</label>
+      <input type="text" id="fertilizer">
+
+      <h3>Problems</h3>
+      <label>Pests:</label>
+      <input type="text" id="pests">
+      <label>Diseases:</label>
+      <input type="text" id="diseases">
+
+      <h3>Harvest</h3>
+      <label>Harvest Time:</label>
       <input type="text" id="harvestTime">
-      <label>How to winterize:</label>
-      <input type="text" id="winterize">
-      <label>Notes:</label>
+      <label>How to tell when ready:</label>
+      <input type="text" id="howToTell">
+
+      <h3>Notes</h3>
       <textarea id="notes"></textarea>
+
       <div class="modal-actions">
         <button class="cancel-btn" onclick="closePlantModal()">Cancel</button>
         <button class="save-btn" onclick="savePlantDetails()">Save</button>
@@ -282,11 +309,21 @@
       const data = doc.data() || {};
 
       document.getElementById("plant-title").textContent = name;
-      document.getElementById("whenToPlant").value = data.whenToPlant || "";
-      document.getElementById("sun").value = data.sun || "";
-      document.getElementById("spacing").value = data.spacing || "";
-      document.getElementById("harvestTime").value = data.harvestTime || "";
-      document.getElementById("winterize").value = data.winterize || "";
+
+      document.getElementById("whenToPlant").value = data.general?.whenToPlant || "";
+      document.getElementById("sun").value = data.general?.sun || "";
+      document.getElementById("spacing").value = data.general?.spacing || "";
+      document.getElementById("amount").value = data.general?.amount || "";
+
+      document.getElementById("watering").value = data.care?.watering || "";
+      document.getElementById("fertilizer").value = data.care?.fertilizer || "";
+
+      document.getElementById("pests").value = data.problems?.pests || "";
+      document.getElementById("diseases").value = data.problems?.diseases || "";
+
+      document.getElementById("harvestTime").value = data.harvest?.time || "";
+      document.getElementById("howToTell").value = data.harvest?.howToTell || "";
+
       document.getElementById("notes").value = data.notes || "";
 
       document.getElementById("plant-modal").style.display = "flex";
@@ -300,11 +337,24 @@
       if (!currentPlant) return;
 
       const details = {
-        whenToPlant: document.getElementById("whenToPlant").value,
-        sun: document.getElementById("sun").value,
-        spacing: document.getElementById("spacing").value,
-        harvestTime: document.getElementById("harvestTime").value,
-        winterize: document.getElementById("winterize").value,
+        general: {
+          whenToPlant: document.getElementById("whenToPlant").value,
+          sun: document.getElementById("sun").value,
+          spacing: document.getElementById("spacing").value,
+          amount: document.getElementById("amount").value,
+        },
+        care: {
+          watering: document.getElementById("watering").value,
+          fertilizer: document.getElementById("fertilizer").value,
+        },
+        problems: {
+          pests: document.getElementById("pests").value,
+          diseases: document.getElementById("diseases").value,
+        },
+        harvest: {
+          time: document.getElementById("harvestTime").value,
+          howToTell: document.getElementById("howToTell").value,
+        },
         notes: document.getElementById("notes").value,
       };
 
