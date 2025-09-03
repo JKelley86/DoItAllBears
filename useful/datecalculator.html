@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Date Countdown Tool</title>
+  <style>
+    /* Reset & Base */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, #1d2b64, #f8cdda);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #fff;
+    }
+
+    /* Glass Card */
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 1.8rem;
+      margin-bottom: 25px;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    label {
+      display: block;
+      margin: 18px 0 6px;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    input[type="date"],
+    input[type="checkbox"] {
+      margin-top: 6px;
+    }
+
+    input[type="date"] {
+      padding: 10px;
+      width: 100%;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 0.95rem;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      transition: all 0.3s ease;
+    }
+    input[type="date"]:focus {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      margin-top: 12px;
+    }
+    .checkbox-group label {
+      margin: 0 0 0 8px;
+      font-weight: normal;
+      font-size: 0.9rem;
+    }
+
+    button {
+      width: 100%;
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 14px;
+      margin-top: 25px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    }
+
+    #result {
+      margin-top: 25px;
+      padding: 20px;
+      border-radius: 12px;
+      font-size: 1rem;
+      line-height: 1.5;
+      white-space: pre-line;
+      background: rgba(255,255,255,0.1);
+      border-left: 4px solid #4facfe;
+      animation: slideUp 0.6s ease-out;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Mobile */
+    @media (max-width: 480px) {
+      .card {
+        padding: 25px 20px;
+      }
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Future Date Countdown</h2>
+
+    <label>Select a date:</label>
+    <input type="date" id="targetDate">
+
+    <div class="checkbox-group">
+      <input type="checkbox" id="excludeWeekends">
+      <label for="excludeWeekends">Exclude weekends</label>
+    </div>
+
+    <div class="checkbox-group">
+      <input type="checkbox" id="excludeHolidays">
+      <label for="excludeHolidays">Exclude US federal holidays</label>
+    </div>
+
+    <button onclick="calculateDays()">Calculate</button>
+
+    <h3 id="result"></h3>
+  </div>
+
+  <script>
+    async function getFederalHolidays(year) {
+      try {
+        const response = await fetch("https://date.nager.at/api/v3/PublicHolidays/" + year + "/US");
+        if (!response.ok) throw new Error("Failed to fetch holidays");
+        const data = await response.json();
+        return data.map(holiday => holiday.date);
+      } catch (error) {
+        console.error("Holiday fetch error:", error);
+        return [];
+      }
+    }
+
+    async function calculateDays() {
+      const targetDate = new Date(document.getElementById("targetDate").value);
+      const excludeWeekends = document.getElementById("excludeWeekends").checked;
+      const excludeHolidays = document.getElementById("excludeHolidays").checked;
+      
+      if (isNaN(targetDate)) {
+        document.getElementById("result").innerText = "Please select a valid date.";
+        return;
+      }
+
+      const today = new Date();
+      today.setHours(0,0,0,0);
+
+      let totalDays = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
+      let count = 0;
+
+      let federalHolidays = [];
+      if (excludeHolidays) {
+        federalHolidays = await getFederalHolidays(targetDate.getFullYear());
+      }
+
+      let tempDate = new Date(today);
+      tempDate.setDate(tempDate.getDate() + 1);
+
+      for (let i = 1; i <= totalDays; i++) {
+        const isoDate = tempDate.toISOString().split("T")[0];
+        const dayOfWeek = tempDate.getDay();
+
+        let skip = false;
+        if (excludeWeekends && (dayOfWeek === 0 || dayOfWeek === 6)) skip = true;
+        if (excludeHolidays && federalHolidays.includes(isoDate)) skip = true;
+
+        if (!skip) count++;
+
+        tempDate.setDate(tempDate.getDate() + 1);
+      }
+
+      document.getElementById("result").innerText = 
+        "Total days until selected date: " + totalDays + "\n" +
+        "Days (with options applied): " + count;
+    }
+  </script>
+</body>
+</html>
