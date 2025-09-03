@@ -133,6 +133,12 @@
   </style>
 </head>
 <body>
+    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+    <div class="sidebar" id="sidebar">
+        <div class="clock" id="clock"></div>
+	<div id="sidebar-nav"></div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+    </div>
   <div class="card">
     <h2>Future Date Countdown</h2>
 
@@ -208,6 +214,15 @@
         "Total days until selected date: " + totalDays + "\n" +
         "Days (with options applied): " + count;
     }
+
+    fetch('sidebar.html')
+	    .then(response => response.text())
+	    .then(data => {
+		document.getElementById('sidebar-nav').innerHTML = data;
+    	    });
+	
+    setInterval(updateClock, 1000);
+    updateClock();
   </script>
 </body>
 </html>
