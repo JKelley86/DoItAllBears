@@ -111,6 +111,96 @@
       animation: slideUp 0.6s ease-out;
     }
 
+.nav-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Full width of container */
+    max-width: 400px;
+    height: 100px;
+    border-radius: 25px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s ease, transform 0.2s ease;
+    opacity: 100%;
+}
+
+.nav-card.hidden {
+    visibility: hidden;
+    opacity: 0;
+}
+
+.nav-card:hover {
+    background: var(--accent-color);
+    transform: scale(1.1);
+}
+
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    left: -400px;
+    top: 0;
+    width: 300px;
+    height: 100%;
+    background: var(--card-bg);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+    transition: left 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto; /* Adds vertical scrolling if content overflows */
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar a {
+    color: var(--text-color);
+    padding: 20px 0;
+    text-decoration: none;
+    font-size: 20px;
+    transition: background 0.3s ease, padding-left 0.3s ease;
+}
+
+.sidebar a:hover {
+    background: var(--accent-color);
+    padding-left: 10px;
+}
+.sidebar-card {
+    color: var(--text-color);
+    padding: 20px 0;
+    text-decoration: none;
+    font-size: 20px;
+    transition: background 0.3s ease, padding-left 0.3s ease;
+}
+
+/* Hover effect for sidebar cards */
+.sidebar-card:hover {
+    background: var(--accent-color);
+    padding-left: 10px;
+}
+
+/* Menu Button */
+.menu-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: var(--text-color);
+    color: var(--bg-color);
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1100;
+}
+
     /* Animations */
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
