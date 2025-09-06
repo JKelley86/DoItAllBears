@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Lawn Mower</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="../theme.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Lawn Mower</h1>
+    <p>Here you will find any information for your Lawn Mower!</p>
+
+    <!-- Vehicle: Dodge Challenger -->
+    <section class="vehicle-section">
+      <h2>John Deere S110</h2>
+      
+      <div class="item-group">
+        <h3>Information</h3>
+        <ul>
+          <li>42 Inch mower deck</li>
+          <li>Egine model: Briggs & Stratton 33</li>
+          <li>Oil Filter: Standard</li>
+          <li>Air Filter: Cartridge</li>
+        </ul>
+      </div>
+      
+      <div class="item-group">
+        <h3>Service Intervals  (Yearly or every 50 hours)</h3>
+        <ul>
+          <li>Replace engine oil and filter</li>
+          <li>Replace air filter</li>
+          <li>replace fuel filter</li>
+          <li>Replace spark plug</li>
+          <li>Sharpen/replace mower blades</li>
+        </ul>
+      </div>
+      
+      <div class="item-group">
+        <h3>Oil</h3>
+        <ul>
+          <li>SAE 10W-30 – 1.4L/1.5qt <a href="https://a.co/d/h2OeJVr">Oil</a></li>
+        </ul>
+      </div>
+      
+      <div class="item-group">
+        <h3>Oil Filters</h3>
+        <ul>
+          <li><a href="https://a.co/d/ginZGPq">Oil Filter/Spark plug/Air filter</a></li>
+          <!-- Add more filters as needed -->
+        </ul>
+      </div>
+      
+      <div class="item-group">
+        <h3>Air Filter</h3>
+        <ul>
+          <li><a href="https://a.co/d/ginZGPq">Oil Filter/Spark plug/Air filter</a></li></li>
+        </ul>
+      </div>
+      
+      <div class="item-group">
+        <h3>Fuel Filter</h3>
+        <ul>
+          <li><!-- Info here --></li>
+        </ul>
+      </div>
+      
+      <div class="item-group">
+        <h3>Spark Plug</h3>
+        <ul>
+          <li><a href="https://a.co/d/ginZGPq">Oil Filter/Spark plug/Air filter</a></li></li>
+        </ul>
+      </div>
+      
+      <div class="item-group">
+        <h3>Mower Blades</h3>
+        <ul>
+          <li><a href="https://a.co/d/19OwhLG">Mower Blades</a></li></li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <!-- Sidebar & Footer -->
+  <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+  <div class="sidebar" id="sidebar">
+    <div class="clock" id="clock"></div>
+    <div id="sidebar-nav"></div>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+  </div>
+
+  <footer>
+    <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+  </footer>
+
+  <script>
+    function navigateTo(page) {
+      window.location.href = page;
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('open');
+    }
+
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const menuButton = document.querySelector('.menu-btn');
+      if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+        sidebar.classList.remove('open');
+      }
+    });
+
+    function updateClock() {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString();
+      document.getElementById('clock').textContent = timeString;
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('light-mode');
+      localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    }
+
+    window.onload = function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+      }
+    }
+
+    fetch('sidebar.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('sidebar-nav').innerHTML = data;
+      });
+
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+</body>
+</html>
