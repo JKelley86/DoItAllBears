@@ -1,292 +1,148 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Task Tracker</title>
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-    }
+<div id="board-container"></div>
 
-    /* Sidebar */
-    #sidebar {
-      width: 220px;
-      background: #1e293b;
-      color: #fff;
-      padding: 20px;
-      height: 100vh;
-    }
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbxG7G0C5wvF_rx0HKiDI8nOcHNcrQz2n-4dtDfbiMYnE9jmMhzvMxNMgCYzuNtWGh-y/exec";
 
-    #sidebar h2 {
-      text-align: center;
-      margin-top: 0;
-    }
+const categories = ["Daily", "Weekly", "Long-Term"];
+const types = ["Personal", "Work"];
 
-    #sidebar iframe {
-      border: none;
-      width: 100%;
-      height: 80vh;
-    }
+async function loadTasks() {
+  const res = await fetch(API_URL + "?sheet=Task Tracker");
+  const data = await res.json();
+  renderBoard(data);
+}
 
-    /* Main Content */
-    #content {
-      flex: 1;
-      padding: 20px;
-      background: #f1f5f9;
-      overflow-x: auto;
-    }
+function renderBoard(tasks) {
+  const container = document.getElementById("board-container");
+  container.innerHTML = "";
 
-    h1 { margin-top: 0; }
+  types.forEach(type => {
+    const section = document.createElement("div");
+    section.className = "board-section";
+    section.innerHTML = `<h2>${type}</h2>`;
+    const board = document.createElement("div");
+    board.className = "board";
 
-    .board-section {
-      margin-bottom: 40px;
-    }
+    categories.forEach(cat => {
+      const col = document.createElement("div");
+      col.className = "column";
+      col.dataset.category = type;
+      col.dataset.timeframe = cat;
+      col.innerHTML = `<h3>${cat}</h3><div class="task-list" id="${type}-${cat}"></div>`;
 
-    .board {
-      display: flex;
-      gap: 20px;
-      flex-wrap: nowrap;
-    }
-
-    .column {
-      background: #fff;
-      flex: 1;
-      min-width: 250px;
-      border-radius: 10px;
-      padding: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      max-height: 75vh;
-    }
-
-    .column h3 {
-      text-align: center;
-      margin: 0 0 10px;
-    }
-
-    .task-list {
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    .task {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #f9fafb;
-      margin: 5px 0;
-      padding: 8px;
-      border-radius: 6px;
-      cursor: grab;
-    }
-
-    .task span {
-      flex: 1;
-      margin: 0 10px;
-      outline: none;
-    }
-
-    .task.overdue {
-      border: 2px solid #ef4444;
-    }
-
-    .task input[type="date"] {
-      font-size: 12px;
-      margin-left: 5px;
-    }
-
-    .task button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #ef4444;
-      margin-left: 5px;
-    }
-
-    .add-task {
-      display: flex;
-      margin-top: 10px;
-      gap: 5px;
-    }
-
-    .add-task input {
-      flex: 1;
-      padding: 5px;
-    }
-
-    .add-task button {
-      background: #3b82f6;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 6px 10px;
-      cursor: pointer;
-    }
-
-    .add-task button:hover {
-      background: #2563eb;
-    }
-  </style>
-</head>
-<body>
-  <!-- Sidebar -->
-  <div id="sidebar">
-    <h2>Menu</h2>
-    <iframe src="navbar.html"></iframe>
-  </div>
-
-  <!-- Main content -->
-  <div id="content">
-    <h1>Task Tracker</h1>
-    <div id="board-container"></div>
-  </div>
-
-  <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbx8BmiMQ7fKWQ6XB7n0Yv_J3brhdC8jh4D_7U5HNhrbd9teTyQQGtfSclPNp3aMaWw/exec";
-
-    const categories = ["Daily", "Weekly", "Long-Term"];
-    const types = ["Personal", "Work"];
-
-    async function loadTasks() {
-      const res = await fetch(API_URL + "?sheet=Task Tracker");
-      const data = await res.json();
-      renderBoard(data);
-    }
-
-    function renderBoard(tasks) {
-      const container = document.getElementById("board-container");
-      container.innerHTML = "";
-
-      types.forEach(type => {
-        const section = document.createElement("div");
-        section.className = "board-section";
-        section.innerHTML = `<h2>${type}</h2>`;
-        const board = document.createElement("div");
-        board.className = "board";
-
-        categories.forEach(cat => {
-          const col = document.createElement("div");
-          col.className = "column";
-          col.dataset.category = type;
-          col.dataset.timeframe = cat;
-          col.innerHTML = `<h3>${cat}</h3><div class="task-list" id="${type}-${cat}"></div>`;
-
-          const addDiv = document.createElement("div");
-          addDiv.className = "add-task";
-          addDiv.innerHTML = `
-            <input type="text" placeholder="New task...">
-            <button>Add</button>
-          `;
-          addDiv.querySelector("button").addEventListener("click", () => {
-            const val = addDiv.querySelector("input").value.trim();
-            if (val) {
-              addTask(type, cat, val);
-              addDiv.querySelector("input").value = "";
-            }
-          });
-
-          col.appendChild(addDiv);
-          board.appendChild(col);
-
-          new Sortable(col.querySelector(".task-list"), {
-            group: "shared",
-            animation: 150,
-            onEnd: saveAllTasks
-          });
-        });
-
-        section.appendChild(board);
-        container.appendChild(section);
+      // Add task row
+      const addDiv = document.createElement("div");
+      addDiv.className = "add-task";
+      addDiv.innerHTML = `
+        <input type="text" placeholder="New task...">
+        <input type="date">
+        <button>Add</button>
+      `;
+      addDiv.querySelector("button").addEventListener("click", () => {
+        const taskText = addDiv.querySelector("input[type=text]").value.trim();
+        const dueDate = addDiv.querySelector("input[type=date]").value;
+        if (taskText) {
+          addTask(type, cat, taskText, dueDate);
+          addDiv.querySelector("input[type=text]").value = "";
+          addDiv.querySelector("input[type=date]").value = "";
+        }
       });
 
-      // Populate tasks
-      tasks.forEach(t => {
-        const taskDiv = createTaskElement(t.category, t.timeframe, t.task, t.completed, t.dueDate);
-        const list = document.getElementById(`${t.category}-${t.timeframe}`);
-        if(list) list.appendChild(taskDiv);
+      col.appendChild(addDiv);
+      board.appendChild(col);
+
+      new Sortable(col.querySelector(".task-list"), {
+        group: "shared",
+        animation: 150,
+        onEnd: saveAllTasks
       });
-    }
+    });
 
-    function createTaskElement(category, timeframe, text, completed=false, dueDate="") {
-      const task = document.createElement("div");
-      task.className = "task";
+    section.appendChild(board);
+    container.appendChild(section);
+  });
 
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.checked = completed;
-      checkbox.onchange = saveAllTasks;
+  // populate tasks
+  tasks.forEach(t => {
+    const taskDiv = createTaskElement(t.category, t.timeframe, t.task, t.completed, t.dueDate);
+    const list = document.getElementById(`${t.category}-${t.timeframe}`);
+    if(list) list.appendChild(taskDiv);
+  });
+}
 
-      const span = document.createElement("span");
-      span.contentEditable = true;
-      span.innerText = text;
-      span.oninput = saveAllTasks;
+function createTaskElement(category, timeframe, text, completed=false, dueDate="") {
+  const task = document.createElement("div");
+  task.className = "task";
 
-      const dateInput = document.createElement("input");
-      dateInput.type = "date";
-      if (dueDate) dateInput.value = dueDate;
-      dateInput.onchange = saveAllTasks;
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = completed;
+  checkbox.onchange = saveAllTasks;
 
-      const delBtn = document.createElement("button");
-      delBtn.innerHTML = '<i class="fas fa-trash"></i>';
-      delBtn.onclick = () => { task.remove(); saveAllTasks(); };
+  const span = document.createElement("span");
+  span.contentEditable = true;
+  span.innerText = text;
+  span.oninput = saveAllTasks;
 
-      task.appendChild(checkbox);
-      task.appendChild(span);
-      task.appendChild(dateInput);
-      task.appendChild(delBtn);
+  const dateInput = document.createElement("input");
+  dateInput.type = "date";
+  if(dueDate) dateInput.value = dueDate;
+  dateInput.onchange = saveAllTasks;
 
-      // highlight overdue
-      if(dueDate && new Date(dueDate) < new Date() && !completed) task.classList.add("overdue");
+  const delBtn = document.createElement("button");
+  delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+  delBtn.onclick = () => { task.remove(); saveAllTasks(); };
 
-      return task;
-    }
+  task.appendChild(checkbox);
+  task.appendChild(span);
+  task.appendChild(dateInput);
+  task.appendChild(delBtn);
 
-    async function addTask(category, timeframe, taskText) {
-      await fetch(API_URL + "?sheet=Task Tracker", {
-        method: "POST",
-        body: JSON.stringify({
-          action: "addTask",
-          category: category,
-          timeframe: timeframe,
-          task: taskText,
-          completed: false,
-          dueDate: ""
-        })
+  // highlight overdue
+  if(dueDate && new Date(dueDate) < new Date() && !completed) task.classList.add("overdue");
+
+  return task;
+}
+
+async function addTask(category, timeframe, taskText, dueDate="") {
+  await fetch(API_URL + "?sheet=Task Tracker", {
+    method: "POST",
+    body: JSON.stringify({
+      action: "addTask",
+      category,
+      timeframe,
+      task: taskText,
+      completed: false,
+      dueDate
+    })
+  });
+  loadTasks();
+}
+
+async function saveAllTasks() {
+  const tasks = [];
+  document.querySelectorAll(".column").forEach(col => {
+    const category = col.dataset.category;
+    const timeframe = col.dataset.timeframe;
+    col.querySelectorAll(".task").forEach(t => {
+      tasks.push({
+        action: "addTask",
+        category,
+        timeframe,
+        task: t.querySelector("span").innerText,
+        completed: t.querySelector("input[type='checkbox']").checked,
+        dueDate: t.querySelector("input[type='date']").value
       });
-      loadTasks();
-    }
+    });
+  });
 
-    async function saveAllTasks() {
-      const tasks = [];
-      document.querySelectorAll(".column").forEach(col => {
-        const category = col.dataset.category;
-        const timeframe = col.dataset.timeframe;
-        col.querySelectorAll(".task").forEach(t => {
-          tasks.push({
-            action: "addTask",
-            category: category,
-            timeframe: timeframe,
-            task: t.querySelector("span").innerText,
-            completed: t.querySelector("input[type='checkbox']").checked,
-            dueDate: t.querySelector("input[type='date']").value
-          });
-        });
-      });
+  await fetch(API_URL + "?sheet=Task Tracker", {
+    method: "POST",
+    body: JSON.stringify(tasks)
+  });
 
-      await fetch(API_URL + "?sheet=Task Tracker", {
-        method: "POST",
-        body: JSON.stringify(tasks)
-      });
+  loadTasks();
+}
 
-      loadTasks(); // reload to reflect changes
-    }
-
-    loadTasks();
-  </script>
-</body>
-</html>
+loadTasks();
+</script>
