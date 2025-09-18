@@ -199,7 +199,7 @@
         }
         
         .page-list.open {
-            max-height: 400px;
+            max-height: 500px;
             border-top: 1px solid rgba(255, 99, 71, 0.2);
         }
         
@@ -370,6 +370,21 @@
         .ql-container {
             border: none;
             font-size: 16px;
+        }
+        
+        /* Fix Quill editor text color in dark mode */
+        .ql-editor {
+            color: #333 !important;
+            background: white !important;
+        }
+        
+        /* Ensure content viewer text is visible in both themes */
+        .content-viewer {
+            color: var(--text-color) !important;
+        }
+        
+        .content-viewer * {
+            color: inherit !important;
         }
         
         /* Custom Scrollbars */
@@ -724,8 +739,8 @@ function renderCategories(searchTerm = "") {
             icon.className = pageList.classList.contains('open') ? 'fas fa-folder-open' : 'fas fa-folder';
         });
         
-        // Auto-open if searching or category selected
-        if (searchTerm || selectedCategory === categoryName) {
+        // Auto-open folders by default unless we're searching for specific terms
+        if (!searchTerm || filteredPages.length > 0) {
             pageList.classList.add('open');
             header.querySelector('i').className = 'fas fa-folder-open';
         }
