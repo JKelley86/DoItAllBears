@@ -3,111 +3,119 @@
 <head>
   <meta charset="UTF-8">
   <title>Knowledge Base</title>
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
   <style>
-    body { margin:0; font-family: Arial; display:flex; }
-    #sidebar { width:220px; background:#1e293b; color:#fff; padding:20px; height:100vh; overflow-y:auto; }
-    #sidebar h2 { text-align:center; margin-top:0; }
-    #sidebar iframe { border:none; width:100%; height:80vh; }
-    #content { flex:1; padding:20px; background:#f1f5f9; }
-    h1 { margin-top:0; }
-    .page-list { margin:10px 0; }
-    .page-item { cursor:pointer; padding:5px; border-radius:5px; }
-    .page-item:hover { background:#334155; }
-    #editor { height:300px; display:none; }
-    #view { padding:10px; background:#fff; border-radius:10px; min-height:300px; }
-    button { margin:5px; padding:6px 10px; border:none; border-radius:5px; cursor:pointer; }
-    .btn-primary { background:#3b82f6; color:#fff; }
-    .btn-secondary { background:#64748b; color:#fff; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 20px;
+    }
+    .category {
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fff;
+      padding: 10px;
+    }
+    .category h2 {
+      cursor: pointer;
+      margin: 0;
+      font-size: 18px;
+      background: #eee;
+      padding: 6px;
+      border-radius: 6px;
+    }
+    .topics {
+      display: none;
+      margin-top: 10px;
+    }
+    .topic {
+      padding: 5px;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .topic:last-child {
+      border-bottom: none;
+    }
+    .delete-btn {
+      color: red;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .content {
+      margin-top: 20px;
+      padding: 10px;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
   </style>
 </head>
 <body>
-  <div id="sidebar">
-    <h2>Menu</h2>
-    <iframe src="navbar.html"></iframe>
-    <h3>Pages</h3>
-    <input type="text" id="search" placeholder="Search..." style="width:100%; margin-bottom:10px;">
-    <div id="page-list" class="page-list"></div>
-    <button class="btn-primary" onclick="newPage()">+ New Page</button>
-  </div>
-  <div id="content">
-    <h1 id="page-title">Select a Page</h1>
-    <div id="view"></div>
-    <div id="editor"></div>
-    <button id="edit-btn" class="btn-secondary" onclick="editPage()" style="display:none;">Edit</button>
-    <button id="save-btn" class="btn-primary" onclick="savePage()" style="display:none;">Save</button>
-  </div>
+  <h1>📂 Knowledge Base</h1>
+  <div id="categories"></div>
+  <div class="content" id="content"></div>
 
-<script>
-const API_URL = "https://script.google.com/macros/s/AKfycbz4zc9gT0uDYUOf5GGpUrB1w_jWgwRUzt4Cidk2McusHx4geKcfJDh73fiN6A6WFCnr/exec"; // replace with your web app link
-let quill, pages=[], currentPage=null;
+  <script>
+    const apiUrl = "https://script.google.com/macros/s/AKfycbyzDqSg5NmJ6mQyLpQYtvO4jHmKzBbhP9Q7QrpRcnetrmnM2rxBSqYPuZmYtmh1VYRB/exec"; // replace with deployed script URL
 
-async function loadPages() {
-  const res = await fetch(API_URL+"?sheet=Knowledge Base");
-  pages = await res.json();
-  renderPageList();
-}
+    async function loadData() {
+      const res = await fetch(apiUrl);
+      const data = await res.json();
+      const container = document.getElementById("categories");
+      container.innerHTML = "";
 
-function renderPageList(filter="") {
-  const list=document.getElementById("page-list");
-  list.innerHTML="";
-  pages.filter(p=>p.title.toLowerCase().includes(filter.toLowerCase())).forEach(p=>{
-    const div=document.createElement("div");
-    div.className="page-item";
-    div.innerText=`${p.category} → ${p.title}`;
-    div.onclick=()=>openPage(p);
-    list.appendChild(div);
-  });
-}
+      for (const category in data) {
+        const catDiv = document.createElement("div");
+        catDiv.className = "category";
+        
+        const header = document.createElement("h2");
+        header.textContent = "📁 " + category;
+        header.onclick = () => {
+          topicsDiv.style.display = topicsDiv.style.display === "none" ? "block" : "none";
+        };
+        catDiv.appendChild(header);
 
-function openPage(p) {
-  currentPage=p;
-  document.getElementById("page-title").innerText=p.title;
-  document.getElementById("view").innerHTML=p.content;
-  document.getElementById("view").style.display="block";
-  document.getElementById("editor").style.display="none";
-  document.getElementById("edit-btn").style.display="inline-block";
-  document.getElementById("save-btn").style.display="none";
-}
+        const topicsDiv = document.createElement("div");
+        topicsDiv.className = "topics";
 
-function editPage() {
-  document.getElementById("view").style.display="none";
-  document.getElementById("editor").style.display="block";
-  quill.root.innerHTML=currentPage ? currentPage.content : "";
-  document.getElementById("edit-btn").style.display="none";
-  document.getElementById("save-btn").style.display="inline-block";
-}
+        data[category].forEach(page => {
+          const topicDiv = document.createElement("div");
+          topicDiv.className = "topic";
 
-async function savePage() {
-  const content=quill.root.innerHTML;
-  const title=currentPage ? currentPage.title : prompt("Enter page title:");
-  const category=currentPage ? currentPage.category : prompt("Enter category:");
-  
-  await fetch(API_URL+"?sheet=Knowledge Base",{method:"POST",body:JSON.stringify({
-    action:"savePage", category, title, content
-  })});
-  
-  loadPages();
-  alert("Page saved!");
-}
+          const topicName = document.createElement("span");
+          topicName.textContent = page.topic;
+          topicName.style.cursor = "pointer";
+          topicName.onclick = () => {
+            document.getElementById("content").innerHTML = page.content;
+          };
 
-function newPage() {
-  currentPage=null;
-  document.getElementById("page-title").innerText="New Page";
-  document.getElementById("view").style.display="none";
-  document.getElementById("editor").style.display="block";
-  quill.root.innerHTML="";
-  document.getElementById("edit-btn").style.display="none";
-  document.getElementById("save-btn").style.display="inline-block";
-}
+          const deleteBtn = document.createElement("span");
+          deleteBtn.className = "delete-btn";
+          deleteBtn.textContent = "🗑";
+          deleteBtn.onclick = () => deletePage(category, page.topic);
 
-document.getElementById("search").addEventListener("input",e=>{
-  renderPageList(e.target.value);
-});
+          topicDiv.appendChild(topicName);
+          topicDiv.appendChild(deleteBtn);
+          topicsDiv.appendChild(topicDiv);
+        });
 
-quill=new Quill("#editor",{theme:"snow"});
-loadPages();
-</script>
+        catDiv.appendChild(topicsDiv);
+        container.appendChild(catDiv);
+      }
+    }
+
+    async function deletePage(category, topic) {
+      if (!confirm(`Delete "${topic}" from ${category}?`)) return;
+      await fetch(apiUrl, {
+        method: "POST",
+        body: JSON.stringify({ action: "deletePage", category, topic }),
+      });
+      loadData();
+    }
+
+    loadData();
+  </script>
 </body>
 </html>
