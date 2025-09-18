@@ -257,13 +257,14 @@ fetch('sidebar.html')
     });
 
 // Task Tracker Logic
-const API_URL = "https://script.google.com/macros/s/AKfycbyufFKmH8Hpgq9vFPersUnBa0TMdThuuiInw3CB_4Y63NSbBZOjnnCYo5f_AAlCZ3QR/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxKlpLG0vcDhLLTreC8NJ3DZ7m5XadofOCxHsBQn_jzCYUvTB5iSCwDnCB-_3rmAKst/exec";
+const SHEET_NAME = "Task Tracker"; // Change this to match your actual tab name
 const categories = ["Daily", "Weekly", "Long-Term"];
 const types = ["Personal", "Work"];
 
 async function loadTasks() {
     try {
-        const res = await fetch(API_URL + "?sheet=Task Tracker");
+        const res = await fetch(API_URL + "?sheet=" + SHEET_NAME);
         const data = await res.json();
         renderBoard(data);
     } catch (error) {
@@ -398,7 +399,7 @@ function createTaskElement(category, timeframe, text, completed = false, dueDate
 
 async function addTask(category, timeframe, taskText, dueDate = "") {
     try {
-        await fetch(API_URL + "?sheet=Task Tracker", {
+        await fetch(API_URL + "?sheet=" + SHEET_NAME, {
             method: "POST",
             body: JSON.stringify({
                 action: "addTask",
