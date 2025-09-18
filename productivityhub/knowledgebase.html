@@ -1,318 +1,904 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"> 
 <head>
-  <meta charset="utf-8" />
-  <title>Knowledge Base</title>
-
-  <!-- Quill -->
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-
-  <style>
-    :root { --bg:#f4f6f8; --card:#fff; --accent:#0f172a; --muted:#64748b; --primary:#2563eb; }
-    body { margin:0; font-family:Inter, Arial, sans-serif; background:var(--bg); color:var(--accent); }
-    .app { display:flex; height:100vh; }
-    .left { width:320px; border-right:1px solid #e6e9ee; padding:18px; box-sizing:border-box; background:#0b1320; color:white; overflow:auto; }
-    .left h1 { margin:0 0 14px; font-size:18px; }
-    .search { width:100%; padding:8px; border-radius:6px; border:none; margin-bottom:12px; }
-    .folder { background:transparent; margin-bottom:10px; border-radius:8px; }
-    .folder-header { display:flex; justify-content:space-between; align-items:center; padding:10px; cursor:pointer; border-radius:6px; }
-    .folder-header:hover { background:rgba(255,255,255,0.03); }
-    .folder-title { font-weight:600; }
-    .topic-list { padding-left:8px; display:none; margin-top:6px; }
-    .topic-item { display:flex; justify-content:space-between; align-items:center; padding:8px; border-radius:6px; cursor:pointer; color:#e6eef9; }
-    .topic-item:hover { background: rgba(255,255,255,0.02); }
-    .topic-name { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:8px; }
-    .topic-actions { margin-left:6px; display:flex; gap:6px; }
-    .btn { background:var(--primary); color:white; border:none; padding:8px 10px; border-radius:6px; cursor:pointer; }
-    .btn.ghost { background:transparent; border:1px solid rgba(255,255,255,0.08); color:#cfe3ff; }
-    .right { flex:1; padding:20px; box-sizing:border-box; overflow:auto; }
-    .page-header { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; }
-    .page-title { font-size:20px; margin:0; }
-    .meta { color:var(--muted); font-size:12px; }
-    .viewer { background:var(--card); padding:16px; border-radius:8px; min-height:360px; border:1px solid #e6e9ee; }
-    .editor-area { display:none; background:var(--card); padding:12px; border-radius:8px; border:1px solid #e6e9ee; }
-    .top-controls { display:flex; gap:8px; }
-    .small { padding:6px 8px; font-size:13px; }
-    .no-selection { color:var(--muted); }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Knowledge Base</title>
+    <link rel="stylesheet" href="../theme.css">
+    
+    <!-- Quill Rich Text Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+        /* Knowledge Base Specific Styling */
+        .kb-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+            margin: 20px 0;
+            height: calc(100vh - 200px);
+            max-width: 1400px;
+            width: 100%;
+        }
+        
+        /* Left Sidebar - Category/Page Browser */
+        .kb-sidebar {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+        
+        .kb-sidebar h2 {
+            color: var(--text-color);
+            margin: 0 0 20px 0;
+            font-size: 1.4rem;
+            text-align: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+        
+        .kb-controls {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .kb-search {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .kb-search:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(255, 99, 71, 0.1);
+        }
+        
+        .category-controls {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .kb-select {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 14px;
+        }
+        
+        .kb-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        .kb-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .kb-btn:hover {
+            background: #ff4500;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 99, 71, 0.3);
+        }
+        
+        .kb-btn.secondary {
+            background: transparent;
+            border: 2px solid var(--text-color);
+            color: var(--text-color);
+        }
+        
+        .kb-btn.secondary:hover {
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
+        
+        .kb-btn.danger {
+            background: #dc3545;
+        }
+        
+        .kb-btn.danger:hover {
+            background: #c82333;
+        }
+        
+        /* Category Folders */
+        .category-folder {
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 99, 71, 0.2);
+            overflow: hidden;
+        }
+        
+        .category-header {
+            background: linear-gradient(135deg, var(--accent-color), #ff4500);
+            color: white;
+            padding: 12px 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .category-header:hover {
+            background: linear-gradient(135deg, #ff4500, var(--accent-color));
+        }
+        
+        .category-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .page-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        .page-list {
+            background: var(--bg-color);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .page-list.open {
+            max-height: 400px;
+            border-top: 1px solid rgba(255, 99, 71, 0.2);
+        }
+        
+        .page-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-item:hover {
+            background: rgba(255, 99, 71, 0.1);
+            padding-left: 20px;
+        }
+        
+        .page-item:last-child {
+            border-bottom: none;
+        }
+        
+        .page-title {
+            color: var(--text-color);
+            font-weight: 500;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .page-actions {
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .page-item:hover .page-actions {
+            opacity: 1;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .action-btn:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+        
+        .action-btn.delete:hover {
+            background: #dc3545;
+        }
+        
+        /* Right Content Area */
+        .kb-content {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 15px;
+        }
+        
+        .content-title {
+            color: var(--text-color);
+            font-size: 1.8rem;
+            margin: 0;
+            font-weight: bold;
+        }
+        
+        .content-meta {
+            color: var(--text-color);
+            opacity: 0.7;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .content-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .content-viewer {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: var(--bg-color);
+            border-radius: 10px;
+            border: 2px solid transparent;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .content-viewer.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            opacity: 0.5;
+            font-size: 1.2rem;
+        }
+        
+        /* Editor Styles */
+        .editor-container {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            gap: 15px;
+        }
+        
+        .editor-title-input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-sizing: border-box;
+        }
+        
+        .editor-title-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(255, 99, 71, 0.1);
+        }
+        
+        .quill-container {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+        
+        .quill-container:focus-within {
+            border-color: var(--accent-color);
+        }
+        
+        /* Quill Editor Customizations */
+        .ql-toolbar {
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        .ql-container {
+            border: none;
+            font-size: 16px;
+        }
+        
+        /* Custom Scrollbars */
+        .kb-sidebar::-webkit-scrollbar,
+        .content-viewer::-webkit-scrollbar,
+        .page-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .kb-sidebar::-webkit-scrollbar-track,
+        .content-viewer::-webkit-scrollbar-track,
+        .page-list::-webkit-scrollbar-track {
+            background: var(--bg-color);
+            border-radius: 4px;
+        }
+        
+        .kb-sidebar::-webkit-scrollbar-thumb,
+        .content-viewer::-webkit-scrollbar-thumb,
+        .page-list::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 4px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .kb-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .kb-sidebar {
+                order: 2;
+                max-height: 400px;
+            }
+            
+            .kb-content {
+                order: 1;
+                min-height: 500px;
+            }
+        }
+        
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: var(--text-color);
+            padding: 40px;
+        }
+        
+        .loading::after {
+            content: "";
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Highlight searched terms */
+        .highlight {
+            background: rgba(255, 99, 71, 0.3);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
 </head>
 <body>
-  <div class="app">
-    <div class="left">
-      <h1>Knowledge Base</h1>
-      <input id="search" class="search" placeholder="Search titles / content..." />
-
-      <div style="display:flex; gap:8px; margin-bottom:12px;">
-        <select id="category-select" style="flex:1; padding:8px; border-radius:6px; border:none;">
-          <option value="">-- Select category --</option>
-        </select>
-        <button id="new-page-btn" class="btn small">+ New</button>
-      </div>
-
-      <div id="folders"></div>
+    <div class="container">
+        <h1>Knowledge Base</h1>
+        <p>Store, organize, and access all your important information</p>
     </div>
 
-    <div class="right">
-      <div class="page-header">
-        <div>
-          <h2 id="page-title" class="page-title">Select or create a page</h2>
-          <div id="page-meta" class="meta"></div>
+    <div class="container">
+        <div class="kb-container">
+            <!-- Left Sidebar -->
+            <div class="kb-sidebar">
+                <h2><i class="fas fa-book"></i> Categories</h2>
+                
+                <div class="kb-controls">
+                    <input type="text" id="search-input" class="kb-search" placeholder="Search pages and content...">
+                    
+                    <div class="category-controls">
+                        <select id="category-select" class="kb-select">
+                            <option value="">All Categories</option>
+                        </select>
+                        <button id="new-page-btn" class="kb-btn">
+                            <i class="fas fa-plus"></i> New
+                        </button>
+                    </div>
+                    
+                    <button id="new-category-btn" class="kb-btn secondary">
+                        <i class="fas fa-folder-plus"></i> New Category
+                    </button>
+                </div>
+                
+                <div id="categories-container" class="loading">
+                    Loading categories...
+                </div>
+            </div>
+            
+            <!-- Right Content Area -->
+            <div class="kb-content">
+                <div class="content-header">
+                    <div>
+                        <h2 id="page-title" class="content-title">Select a page to view</h2>
+                        <div id="page-meta" class="content-meta"></div>
+                    </div>
+                    <div class="content-actions">
+                        <button id="edit-btn" class="kb-btn secondary" style="display:none;">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button id="save-btn" class="kb-btn" style="display:none;">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                        <button id="cancel-btn" class="kb-btn secondary" style="display:none;">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button id="delete-btn" class="kb-btn danger" style="display:none;">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="content-viewer" class="content-viewer empty">
+                    <i class="fas fa-file-alt" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.3;"></i>
+                    <div>Select a page from the sidebar to view its content</div>
+                </div>
+                
+                <div id="editor-container" class="editor-container">
+                    <input type="text" id="page-title-input" class="editor-title-input" placeholder="Enter page title...">
+                    <div class="quill-container">
+                        <div id="quill-editor"></div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="top-controls">
-          <button id="edit-btn" class="btn ghost small" style="display:none;">Edit</button>
-          <button id="save-btn" class="btn small" style="display:none;">Save</button>
-          <button id="cancel-btn" class="btn ghost small" style="display:none;">Cancel</button>
-          <button id="delete-btn" class="btn ghost small" style="display:none;">Delete</button>
-        </div>
-      </div>
-
-      <div id="viewer" class="viewer no-selection">No page selected.</div>
-
-      <div id="editor-area" class="editor-area" style="margin-top:12px;">
-        <input id="edit-title" placeholder="Page title" style="width:100%; padding:8px; margin-bottom:8px; border-radius:6px; border:1px solid #e6e9ee;">
-        <div id="quill" style="height:320px; background:white;"></div>
-      </div>
     </div>
-  </div>
+
+    <!-- Your proper sidebar structure -->
+    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+    <div class="sidebar" id="sidebar">
+        <div class="clock" id="clock"></div>
+        <div id="sidebar-nav"></div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+    </div>
+
+    <footer> 
+        <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+    </footer> 
 
 <script>
-  // Replace this with your Apps Script web app URL (use the same one you deployed)
-  const API_URL = "https://script.google.com/macros/s/AKfycbwHtT4YHZnss_-8AzeQ6-6mAGuMgoUsxKU1opcsJ3le1e0tB52V085eeyQEbF72_GM6/exec";
+// Your standard template functions
+function navigateTo(page) {
+    window.location.href = page;
+}
 
-  let quill;
-  let categoriesData = {}; // { category: [ { title, content, lastUpdated }, ... ] }
-  let selectedCategory = "";
-  let selectedPage = null; // { category, title, content, lastUpdated }
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('open');
+}
 
-  // initialize quill
-  document.addEventListener("DOMContentLoaded", ()=> {
-    quill = new Quill('#quill', { theme: 'snow' });
-    loadData();
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    const menuButton = document.querySelector('.menu-btn');
+    if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+        sidebar.classList.remove('open');
+    }
+});
 
-    // UI handlers
-    document.getElementById("new-page-btn").addEventListener("click", onNewPage);
-    document.getElementById("save-btn").addEventListener("click", onSave);
-    document.getElementById("edit-btn").addEventListener("click", onEdit);
-    document.getElementById("cancel-btn").addEventListener("click", onCancel);
-    document.getElementById("delete-btn").addEventListener("click", onDelete);
-    document.getElementById("search").addEventListener("input", e => renderFolders(e.target.value));
-  });
+function updateClock() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString();
+    document.getElementById('clock').textContent = timeString;
+}
 
-  async function loadData() {
-    const res = await fetch(API_URL.replace(/\?.*$/,'' ) + "?sheet=Knowledge%20Base");
-    categoriesData = await res.json();
-    // populate category select
-    const select = document.getElementById("category-select");
-    select.innerHTML = "<option value=''>-- Select category --</option>";
-    Object.keys(categoriesData).forEach(cat => {
-      const opt = document.createElement("option");
-      opt.value = cat;
-      opt.innerText = cat;
-      select.appendChild(opt);
+function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+}
+
+// Load theme and sidebar
+window.onload = function() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+    }
+    initializeKnowledgeBase();
+}
+
+fetch('sidebar.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('sidebar-nav').innerHTML = data;
     });
-    select.addEventListener("change", () => {
-      selectedCategory = select.value;
-      renderFolders(document.getElementById("search").value);
-    });
-    renderFolders();
-  }
 
-  function renderFolders(filter="") {
-    const container = document.getElementById("folders");
+setInterval(updateClock, 1000);
+updateClock();
+
+// Knowledge Base Logic
+const API_URL = "https://script.google.com/macros/s/AKfycbwHtT4YHZnss_-8AzeQ6-6mAGuMgoUsxKU1opcsJ3le1e0tB52V085eeyQEbF72_GM6/exec";
+
+let quill;
+let categoriesData = {};
+let selectedCategory = "";
+let selectedPage = null;
+let isEditing = false;
+
+function initializeKnowledgeBase() {
+    // Initialize Quill editor
+    quill = new Quill('#quill-editor', {
+        theme: 'snow',
+        placeholder: 'Start writing your content...',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['link', 'image'],
+                ['clean']
+            ]
+        }
+    });
+
+    // Event listeners
+    document.getElementById('new-page-btn').addEventListener('click', createNewPage);
+    document.getElementById('new-category-btn').addEventListener('click', createNewCategory);
+    document.getElementById('edit-btn').addEventListener('click', editPage);
+    document.getElementById('save-btn').addEventListener('click', savePage);
+    document.getElementById('cancel-btn').addEventListener('click', cancelEdit);
+    document.getElementById('delete-btn').addEventListener('click', deletePage);
+    document.getElementById('search-input').addEventListener('input', handleSearch);
+    document.getElementById('category-select').addEventListener('change', handleCategoryFilter);
+
+    // Load initial data
+    loadKnowledgeBase();
+}
+
+async function loadKnowledgeBase() {
+    try {
+        const response = await fetch(API_URL + "?sheet=Knowledge%20Base");
+        categoriesData = await response.json();
+        
+        if (categoriesData.error) {
+            throw new Error(categoriesData.error);
+        }
+        
+        updateCategorySelect();
+        renderCategories();
+    } catch (error) {
+        console.error('Error loading knowledge base:', error);
+        document.getElementById('categories-container').innerHTML = 
+            '<div style="color: #dc3545; text-align: center;"><i class="fas fa-exclamation-triangle"></i><br>Error loading data</div>';
+    }
+}
+
+function updateCategorySelect() {
+    const select = document.getElementById('category-select');
+    select.innerHTML = '<option value="">All Categories</option>';
+    
+    Object.keys(categoriesData).sort().forEach(category => {
+        if (category.trim()) {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            select.appendChild(option);
+        }
+    });
+}
+
+function renderCategories(searchTerm = "") {
+    const container = document.getElementById('categories-container');
     container.innerHTML = "";
-    const search = filter.trim().toLowerCase();
-
-    const cats = Object.keys(categoriesData).sort((a,b)=>a.localeCompare(b));
-    cats.forEach(cat => {
-      const folder = document.createElement("div");
-      folder.className = "folder";
-
-      const header = document.createElement("div");
-      header.className = "folder-header";
-      const title = document.createElement("div");
-      title.className = "folder-title";
-      title.innerText = "📁 " + cat;
-      header.appendChild(title);
-
-      // count matching topics
-      const topics = (categoriesData[cat] || []).filter(t=>{
-        if(!search) return true;
-        const combined = (t.title + " " + (t.content || "")).toLowerCase();
-        return combined.includes(search);
-      });
-      const countBadge = document.createElement("div");
-      countBadge.style.opacity = 0.7;
-      countBadge.innerText = topics.length;
-      header.appendChild(countBadge);
-
-      folder.appendChild(header);
-
-      const topicList = document.createElement("div");
-      topicList.className = "topic-list";
-      topicList.style.display = (selectedCategory === "" || selectedCategory === cat) ? "block" : "none";
-
-      topics.forEach(topic => {
-        const item = document.createElement("div");
-        item.className = "topic-item";
-
-        const name = document.createElement("div");
-        name.className = "topic-name";
-        name.innerText = topic.title;
-        name.title = topic.title;
-        name.addEventListener("click", () => openPage(cat, topic));
-
-        const actions = document.createElement("div");
-        actions.className = "topic-actions";
-
-        const editBtn = document.createElement("button");
-        editBtn.className = "btn ghost small";
-        editBtn.innerText = "Open";
-        editBtn.addEventListener("click", () => openPage(cat, topic));
-
-        const del = document.createElement("button");
-        del.className = "btn ghost small";
-        del.style.color = "#ff6b6b";
-        del.innerText = "Delete";
-        del.addEventListener("click", (ev) => {
-          ev.stopPropagation();
-          confirmDelete(cat, topic.title);
+    
+    const categories = Object.keys(categoriesData).sort();
+    
+    if (categories.length === 0) {
+        container.innerHTML = '<div style="text-align: center; color: var(--text-color); opacity: 0.6;"><i class="fas fa-folder-open"></i><br>No categories yet</div>';
+        return;
+    }
+    
+    categories.forEach(categoryName => {
+        if (!categoryName.trim()) return;
+        
+        const pages = categoriesData[categoryName] || [];
+        const filteredPages = searchTerm ? 
+            pages.filter(page => 
+                page.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                page.content.toLowerCase().includes(searchTerm.toLowerCase())
+            ) : pages;
+        
+        if (selectedCategory && selectedCategory !== categoryName && searchTerm === "") return;
+        if (searchTerm && filteredPages.length === 0) return;
+        
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = 'category-folder';
+        
+        const header = document.createElement('div');
+        header.className = 'category-header';
+        header.innerHTML = `
+            <div class="category-title">
+                <i class="fas fa-folder"></i>
+                <span>${categoryName}</span>
+            </div>
+            <span class="page-count">${filteredPages.length}</span>
+        `;
+        
+        const pageList = document.createElement('div');
+        pageList.className = 'page-list';
+        
+        filteredPages.forEach(page => {
+            const pageDiv = document.createElement('div');
+            pageDiv.className = 'page-item';
+            
+            let title = page.title;
+            if (searchTerm) {
+                title = title.replace(new RegExp(`(${searchTerm})`, 'gi'), '<span class="highlight">$1</span>');
+            }
+            
+            pageDiv.innerHTML = `
+                <div class="page-title">${title}</div>
+                <div class="page-actions">
+                    <button class="action-btn" onclick="openPage('${categoryName}', '${page.title}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn delete" onclick="confirmDeletePage('${categoryName}', '${page.title}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            
+            pageDiv.addEventListener('click', (e) => {
+                if (!e.target.closest('.page-actions')) {
+                    openPage(categoryName, page.title);
+                }
+            });
+            
+            pageList.appendChild(pageDiv);
         });
-
-        actions.appendChild(editBtn);
-        actions.appendChild(del);
-
-        item.appendChild(name);
-        item.appendChild(actions);
-        topicList.appendChild(item);
-      });
-
-      // toggle on header click
-      header.addEventListener("click", () => {
-        topicList.style.display = (topicList.style.display === "none") ? "block" : "none";
-      });
-
-      folder.appendChild(topicList);
-      container.appendChild(folder);
+        
+        header.addEventListener('click', () => {
+            pageList.classList.toggle('open');
+            const icon = header.querySelector('i');
+            icon.className = pageList.classList.contains('open') ? 'fas fa-folder-open' : 'fas fa-folder';
+        });
+        
+        // Auto-open if searching or category selected
+        if (searchTerm || selectedCategory === categoryName) {
+            pageList.classList.add('open');
+            header.querySelector('i').className = 'fas fa-folder-open';
+        }
+        
+        categoryDiv.appendChild(header);
+        categoryDiv.appendChild(pageList);
+        container.appendChild(categoryDiv);
     });
-  }
+}
 
-  function openPage(category, topicObj) {
-    selectedCategory = category;
-    selectedPage = { category, title: topicObj.title, content: topicObj.content, lastUpdated: topicObj.lastUpdated };
-    document.getElementById("page-title").innerText = topicObj.title;
-    document.getElementById("page-meta").innerText = `Category: ${category}${topicObj.lastUpdated ? " • Last updated: " + new Date(topicObj.lastUpdated).toLocaleString() : ""}`;
-    document.getElementById("viewer").style.display = "block";
-    document.getElementById("viewer").innerHTML = topicObj.content || "<em>(empty)</em>";
-    document.getElementById("editor-area").style.display = "none";
-    document.getElementById("edit-btn").style.display = "inline-block";
-    document.getElementById("delete-btn").style.display = "inline-block";
-    document.getElementById("save-btn").style.display = "none";
-    document.getElementById("cancel-btn").style.display = "none";
-  }
+function openPage(category, title) {
+    const page = categoriesData[category]?.find(p => p.title === title);
+    if (!page) return;
+    
+    selectedPage = { category, ...page };
+    
+    document.getElementById('page-title').textContent = title;
+    document.getElementById('page-meta').textContent = 
+        `Category: ${category} • Last updated: ${new Date(page.lastUpdated).toLocaleString()}`;
+    
+    const viewer = document.getElementById('content-viewer');
+    viewer.innerHTML = page.content || '<em style="opacity: 0.6;">This page is empty</em>';
+    viewer.classList.remove('empty');
+    
+    showViewer();
+}
 
-  function onNewPage() {
-    // require category selected or prompt
-    if (!selectedCategory) {
-      const sel = document.getElementById("category-select").value;
-      if (!sel) {
-        const p = prompt("No category selected. Enter new category name (or cancel):");
-        if (!p) return;
-        selectedCategory = p;
-        // refresh categoriesData with the new empty category for immediate UI feedback
-        if (!categoriesData[selectedCategory]) categoriesData[selectedCategory] = [];
-        loadData(); // reload to update select
-      } else {
-        selectedCategory = sel;
-      }
+function createNewPage() {
+    const category = selectedCategory || document.getElementById('category-select').value;
+    if (!category) {
+        const newCategory = prompt('Enter category name for the new page:');
+        if (!newCategory) return;
+        selectedCategory = newCategory;
+        if (!categoriesData[newCategory]) categoriesData[newCategory] = [];
     }
-
+    
     selectedPage = null;
-    document.getElementById("page-title").innerText = "New Page";
-    document.getElementById("page-meta").innerText = `Category: ${selectedCategory}`;
-    document.getElementById("viewer").style.display = "none";
-    document.getElementById("editor-area").style.display = "block";
-    document.getElementById("edit-title").value = "";
-    quill.setContents([{ insert: "\n" }]);
-    document.getElementById("edit-btn").style.display = "none";
-    document.getElementById("save-btn").style.display = "inline-block";
-    document.getElementById("cancel-btn").style.display = "inline-block";
-    document.getElementById("delete-btn").style.display = "none";
-  }
+    document.getElementById('page-title').textContent = 'New Page';
+    document.getElementById('page-meta').textContent = `Category: ${selectedCategory}`;
+    document.getElementById('page-title-input').value = '';
+    quill.setContents([]);
+    
+    showEditor();
+}
 
-  function onEdit() {
+function createNewCategory() {
+    const categoryName = prompt('Enter new category name:');
+    if (!categoryName || !categoryName.trim()) return;
+    
+    if (categoriesData[categoryName]) {
+        alert('Category already exists!');
+        return;
+    }
+    
+    categoriesData[categoryName] = [];
+    selectedCategory = categoryName;
+    updateCategorySelect();
+    renderCategories();
+    document.getElementById('category-select').value = categoryName;
+}
+
+function editPage() {
     if (!selectedPage) return;
-    document.getElementById("viewer").style.display = "none";
-    document.getElementById("editor-area").style.display = "block";
-    document.getElementById("edit-title").value = selectedPage.title;
-    quill.root.innerHTML = selectedPage.content || "";
-    document.getElementById("edit-btn").style.display = "none";
-    document.getElementById("save-btn").style.display = "inline-block";
-    document.getElementById("cancel-btn").style.display = "inline-block";
-  }
+    
+    document.getElementById('page-title-input').value = selectedPage.title;
+    quill.root.innerHTML = selectedPage.content || '';
+    
+    showEditor();
+}
 
-  function onCancel() {
-    document.getElementById("editor-area").style.display = "none";
-    document.getElementById("viewer").style.display = selectedPage ? "block" : "none";
-    document.getElementById("edit-btn").style.display = selectedPage ? "inline-block" : "none";
-    document.getElementById("save-btn").style.display = "none";
-    document.getElementById("cancel-btn").style.display = "none";
-  }
-
-  async function onSave() {
-    const title = document.getElementById("edit-title").value.trim();
-    if (!title) { alert("Please add a page title."); return; }
+async function savePage() {
+    const title = document.getElementById('page-title-input').value.trim();
+    if (!title) {
+        alert('Please enter a page title');
+        return;
+    }
+    
     const content = quill.root.innerHTML;
-    const payload = {
-      action: "savePage",
-      category: selectedCategory || document.getElementById("category-select").value || "Uncategorized",
-      title,
-      content
-    };
-
-    await fetch(API_URL.replace(/\?.*$/,'' ), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    // refresh
-    await loadData();
-    // open newly saved page
-    const newTopic = (categoriesData[payload.category] || []).find(t => t.title === title);
-    if (newTopic) openPage(payload.category, newTopic);
-    else {
-      // fallback: show it using local content
-      selectedPage = { category: payload.category, title, content, lastUpdated: new Date().toISOString() };
-      document.getElementById("viewer").innerHTML = content;
-      document.getElementById("viewer").style.display = "block";
-      document.getElementById("editor-area").style.display = "none";
+    const category = selectedCategory || document.getElementById('category-select').value || 'Uncategorized';
+    
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'savePage',
+                category,
+                title,
+                content
+            })
+        });
+        
+        const result = await response.text();
+        console.log('Save result:', result);
+        
+        await loadKnowledgeBase();
+        
+        // Open the saved page
+        const savedPage = categoriesData[category]?.find(p => p.title === title);
+        if (savedPage) {
+            openPage(category, title);
+        }
+        
+    } catch (error) {
+        console.error('Error saving page:', error);
+        alert('Error saving page. Please try again.');
     }
-  }
+}
 
-  function confirmDelete(category, title) {
-    if (!confirm(`Delete "${title}" from ${category}? This cannot be undone.`)) return;
-    doDelete(category, title);
-  }
-
-  async function doDelete(category, title) {
-    const payload = { action: "deletePage", category, title };
-    await fetch(API_URL.replace(/\?.*$/,'' ), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    await loadData();
-    // clear viewer if the deleted page was open
-    if (selectedPage && selectedPage.title === title && selectedPage.category === category) {
-      selectedPage = null;
-      document.getElementById("page-title").innerText = "Select or create a page";
-      document.getElementById("viewer").innerHTML = "No page selected.";
-      document.getElementById("viewer").style.display = "block";
-      document.getElementById("edit-btn").style.display = "none";
-      document.getElementById("delete-btn").style.display = "none";
+function cancelEdit() {
+    if (selectedPage) {
+        openPage(selectedPage.category, selectedPage.title);
+    } else {
+        showViewer();
+        document.getElementById('content-viewer').classList.add('empty');
+        document.getElementById('content-viewer').innerHTML = `
+            <i class="fas fa-file-alt" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.3;"></i>
+            <div>Select a page from the sidebar to view its content</div>
+        `;
+        document.getElementById('page-title').textContent = 'Select a page to view';
+        document.getElementById('page-meta').textContent = '';
     }
-  }
+}
+
+function confirmDeletePage(category, title) {
+    if (confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) {
+        deletePageAction(category, title);
+    }
+}
+
+async function deletePageAction(category, title) {
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'deletePage',
+                category,
+                title
+            })
+        });
+        
+        const result = await response.text();
+        console.log('Delete result:', result);
+        
+        if (selectedPage && selectedPage.category === category && selectedPage.title === title) {
+            selectedPage = null;
+            cancelEdit();
+        }
+        
+        await loadKnowledgeBase();
+        
+    } catch (error) {
+        console.error('Error deleting page:', error);
+        alert('Error deleting page. Please try again.');
+    }
+}
+
+function deletePage() {
+    if (selectedPage) {
+        confirmDeletePage(selectedPage.category, selectedPage.title);
+    }
+}
+
+function handleSearch(e) {
+    const searchTerm = e.target.value.trim();
+    selectedCategory = ""; // Clear category filter when searching
+    document.getElementById('category-select').value = "";
+    renderCategories(searchTerm);
+}
+
+function handleCategoryFilter(e) {
+    selectedCategory = e.target.value;
+    document.getElementById('search-input').value = ""; // Clear search when filtering
+    renderCategories();
+}
+
+function showViewer() {
+    document.getElementById('content-viewer').style.display = 'block';
+    document.getElementById('editor-container').style.display = 'none';
+    document.getElementById('edit-btn').style.display = selectedPage ? 'inline-flex' : 'none';
+    document.getElementById('delete-btn').style.display = selectedPage ? 'inline-flex' : 'none';
+    document.getElementById('save-btn').style.display = 'none';
+    document.getElementById('cancel-btn').style.display = 'none';
+    isEditing = false;
+}
+
+function showEditor() {
+    document.getElementById('content-viewer').style.display = 'none';
+    document.getElementById('editor-container').style.display = 'flex';
+    document.getElementById('edit-btn').style.display = 'none';
+    document.getElementById('delete-btn').style.display = 'none';
+    document.getElementById('save-btn').style.display = 'inline-flex';
+    document.getElementById('cancel-btn').style.display = 'inline-flex';
+    isEditing = true;
+    
+    setTimeout(() => {
+        document.getElementById('page-title-input').focus();
+    }, 100);
+}
 </script>
 </body>
 </html>
