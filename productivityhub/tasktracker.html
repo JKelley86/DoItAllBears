@@ -113,4 +113,13 @@ async function saveAllTasks(){
     const timeframe=col.dataset.timeframe;
     col.querySelectorAll(".task").forEach(t=>{
       tasks.push({category,timeframe,task:t.querySelector("span").innerText,completed:t.querySelector("input[type='checkbox']").checked,dueDate:t.querySelector("input[type='date']").value});
-   
+    });
+  });
+  await fetch(API_URL+"?sheet=Task Tracker",{method:"POST",body:JSON.stringify(tasks)});
+  loadTasks();
+}
+
+loadTasks();
+</script>
+</body>
+</html>
