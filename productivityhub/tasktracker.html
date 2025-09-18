@@ -2,296 +2,187 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Task Tracker</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
+      margin: 0;
       display: flex;
     }
 
     /* Sidebar */
-    .sidebar {
+    #sidebar {
       width: 220px;
-      background: #1e293b;
+      background: #2c3e50;
       color: #fff;
+      padding: 20px;
       height: 100vh;
-      padding: 20px 10px;
-      box-sizing: border-box;
-    }
-    .sidebar h2 {
-      margin: 0 0 20px;
-      text-align: center;
-      font-size: 20px;
-    }
-    .sidebar a {
-      display: block;
-      padding: 10px;
-      margin: 5px 0;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 6px;
-    }
-    .sidebar a:hover {
-      background: #334155;
     }
 
-    /* Main Content */
-    .main {
+    #content {
       flex: 1;
       padding: 20px;
-      background: #f1f5f9;
+      background: #f4f4f4;
+      overflow-x: auto;
     }
 
-    /* Tabs */
-    .tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .tab {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      background: #e2e8f0;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    .tab.active {
-      background: #3b82f6;
-      color: #fff;
+    h2 {
+      margin-top: 0;
     }
 
-    /* Kanban Board */
-    .kanban {
+    .board {
       display: flex;
       gap: 20px;
-    }
-    .column {
-      flex: 1;
-      background: #fff;
-      padding: 10px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      max-height: 80vh;
-    }
-    .column h3 {
-      margin: 0 0 10px;
-      text-align: center;
-    }
-    .task-list {
-      flex: 1;
-      overflow-y: auto;
-      min-height: 50px;
-    }
-    .task {
-      background: #f9fafb;
-      margin: 5px 0;
-      padding: 10px;
-      border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: grab;
-    }
-    .task.overdue {
-      border: 2px solid #ef4444;
-    }
-    .task span {
-      flex: 1;
-      margin-left: 10px;
-    }
-    .task input[type="date"] {
-      margin-left: 10px;
-      font-size: 12px;
-    }
-    .task button {
-      border: none;
-      background: none;
-      cursor: pointer;
-      margin-left: 5px;
+      flex-wrap: nowrap;
     }
 
-    .add-btn {
-      margin-top: 10px;
-      padding: 6px;
-      border: none;
+    .category {
+      flex: 1;
+      min-width: 250px;
+      background: #ecf0f1;
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .category h3 {
+      text-align: center;
+    }
+
+    .task {
+      background: white;
+      margin: 10px 0;
+      padding: 10px;
       border-radius: 6px;
-      background: #3b82f6;
+      cursor: grab;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .add-task {
+      margin-top: 10px;
+      display: flex;
+      gap: 5px;
+    }
+
+    .add-task input {
+      flex: 1;
+      padding: 5px;
+    }
+
+    button {
+      background: #3498db;
       color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 5px;
       cursor: pointer;
     }
-    .add-btn:hover {
-      background: #2563eb;
+
+    button:hover {
+      background: #2980b9;
     }
   </style>
 </head>
 <body>
   <!-- Sidebar -->
-  <div class="sidebar">
+  <div id="sidebar">
     <h2>Menu</h2>
-    <a href="#">Dashboard</a>
-    <a href="#">Task Tracker</a>
-    <a href="#">Other Tool</a>
+    <iframe src="navbar.html" style="border:none; width:100%; height:80vh;"></iframe>
   </div>
 
-  <!-- Main Content -->
-  <div class="main">
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab active" onclick="switchCategory('work')">Work</button>
-      <button class="tab" onclick="switchCategory('personal')">Personal</button>
-    </div>
+  <!-- Content -->
+  <div id="content">
+    <h1>Task Tracker</h1>
 
-    <!-- Kanban Boards -->
-    <div id="work" class="kanban active-board">
-      <div class="column" data-category="work" data-timeframe="daily">
-        <h3>Daily</h3>
-        <div class="task-list"></div>
-        <button class="add-btn" onclick="addTask('work','daily')">+ Add Task</button>
-      </div>
-      <div class="column" data-category="work" data-timeframe="weekly">
-        <h3>Weekly</h3>
-        <div class="task-list"></div>
-        <button class="add-btn" onclick="addTask('work','weekly')">+ Add Task</button>
-      </div>
-      <div class="column" data-category="work" data-timeframe="longterm">
-        <h3>Long-Term</h3>
-        <div class="task-list"></div>
-        <button class="add-btn" onclick="addTask('work','longterm')">+ Add Task</button>
-      </div>
-    </div>
-
-    <div id="personal" class="kanban" style="display:none;">
-      <div class="column" data-category="personal" data-timeframe="daily">
-        <h3>Daily</h3>
-        <div class="task-list"></div>
-        <button class="add-btn" onclick="addTask('personal','daily')">+ Add Task</button>
-      </div>
-      <div class="column" data-category="personal" data-timeframe="weekly">
-        <h3>Weekly</h3>
-        <div class="task-list"></div>
-        <button class="add-btn" onclick="addTask('personal','weekly')">+ Add Task</button>
-      </div>
-      <div class="column" data-category="personal" data-timeframe="longterm">
-        <h3>Long-Term</h3>
-        <div class="task-list"></div>
-        <button class="add-btn" onclick="addTask('personal','longterm')">+ Add Task</button>
-      </div>
-    </div>
+    <div id="board-container"></div>
   </div>
 
   <script>
-    // Switch tabs
-    function switchCategory(cat) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelector(`.tab[onclick="switchCategory('${cat}')"]`).classList.add('active');
+    const API_URL = "https://script.google.com/macros/s/AKfycbxG7G0C5wvF_rx0HKiDI8nOcHNcrQz2n-4dtDfbiMYnE9jmMhzvMxNMgCYzuNtWGh-y/exec";
 
-      document.getElementById('work').style.display = (cat === 'work') ? 'flex' : 'none';
-      document.getElementById('personal').style.display = (cat === 'personal') ? 'flex' : 'none';
+    const categories = ["Daily", "Weekly", "Long-Term"];
+    const types = ["Personal", "Work"];
+
+    async function loadTasks() {
+      const res = await fetch(API_URL + "?action=getTasks");
+      const data = await res.json();
+      renderBoard(data);
     }
 
-    // Add Task
-    function addTask(category, timeframe) {
-      const taskList = document.querySelector(`.column[data-category="${category}"][data-timeframe="${timeframe}"] .task-list`);
-      const taskText = prompt("Enter task:");
-      if (!taskText) return;
+    function renderBoard(tasks) {
+      const container = document.getElementById("board-container");
+      container.innerHTML = "";
 
-      const task = createTaskElement(taskText, category, timeframe);
-      taskList.appendChild(task);
-      saveTasks();
-    }
+      types.forEach(type => {
+        const section = document.createElement("div");
+        section.innerHTML = `<h2>${type}</h2>`;
+        const board = document.createElement("div");
+        board.className = "board";
 
-    // Create task card
-    function createTaskElement(text, category, timeframe, dueDate = "") {
-      const task = document.createElement('div');
-      task.classList.add('task');
+        categories.forEach(cat => {
+          const col = document.createElement("div");
+          col.className = "category";
+          col.innerHTML = `<h3>${cat}</h3><div id="${type}-${cat}" class="task-list"></div>`;
 
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.onchange = saveTasks;
+          const inputRow = document.createElement("div");
+          inputRow.className = "add-task";
+          inputRow.innerHTML = `
+            <input type="text" placeholder="New task...">
+            <button>Add</button>
+          `;
 
-      const span = document.createElement('span');
-      span.textContent = text;
-      span.contentEditable = true;
-      span.oninput = saveTasks;
-
-      const dateInput = document.createElement('input');
-      dateInput.type = 'date';
-      if (dueDate) dateInput.value = dueDate;
-      dateInput.onchange = saveTasks;
-
-      const delBtn = document.createElement('button');
-      delBtn.innerHTML = '<i class="fas fa-trash"></i>';
-      delBtn.onclick = () => { task.remove(); saveTasks(); };
-
-      task.appendChild(checkbox);
-      task.appendChild(span);
-      task.appendChild(dateInput);
-      task.appendChild(delBtn);
-
-      return task;
-    }
-
-    // Save to localStorage
-    function saveTasks() {
-      const data = {};
-      document.querySelectorAll('.column').forEach(col => {
-        const cat = col.dataset.category;
-        const frame = col.dataset.timeframe;
-        if (!data[cat]) data[cat] = {};
-        data[cat][frame] = [];
-
-        col.querySelectorAll('.task').forEach(task => {
-          data[cat][frame].push({
-            text: task.querySelector('span').textContent,
-            checked: task.querySelector('input[type="checkbox"]').checked,
-            dueDate: task.querySelector('input[type="date"]').value
-          });
-        });
-      });
-      localStorage.setItem("tasks", JSON.stringify(data));
-    }
-
-    // Load from localStorage
-    function loadTasks() {
-      const data = JSON.parse(localStorage.getItem("tasks") || "{}");
-      for (let cat in data) {
-        for (let frame in data[cat]) {
-          const taskList = document.querySelector(`.column[data-category="${cat}"][data-timeframe="${frame}"] .task-list`);
-          if (!taskList) continue;
-          taskList.innerHTML = "";
-          data[cat][frame].forEach(t => {
-            const task = createTaskElement(t.text, cat, frame, t.dueDate);
-            task.querySelector('input[type="checkbox"]').checked = t.checked;
-            if (t.dueDate && new Date(t.dueDate) < new Date() && !t.checked) {
-              task.classList.add("overdue");
+          inputRow.querySelector("button").addEventListener("click", () => {
+            const val = inputRow.querySelector("input").value;
+            if (val.trim() !== "") {
+              addTask(type, cat, val);
+              inputRow.querySelector("input").value = "";
             }
-            taskList.appendChild(task);
           });
-        }
-      }
-    }
 
-    // Init drag & drop
-    function initDragDrop() {
-      document.querySelectorAll('.task-list').forEach(list => {
-        new Sortable(list, {
-          group: 'shared',
-          animation: 150,
-          onEnd: saveTasks
+          col.appendChild(inputRow);
+          board.appendChild(col);
+
+          new Sortable(col.querySelector(".task-list"), {
+            group: "shared",
+            animation: 150,
+            onEnd: (evt) => {
+              const taskText = evt.item.innerText;
+              const newCategory = evt.to.id.split("-")[1];
+              updateTask(type, taskText, newCategory);
+            }
+          });
         });
+
+        section.appendChild(board);
+        container.appendChild(section);
+      });
+
+      // Load tasks into board
+      tasks.forEach(t => {
+        const div = document.createElement("div");
+        div.className = "task";
+        div.innerText = t.task;
+        document.getElementById(`${t.type}-${t.category}`).appendChild(div);
       });
     }
 
-    // Init
+    async function addTask(type, category, task) {
+      await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "addTask", type, category, task })
+      });
+      loadTasks();
+    }
+
+    async function updateTask(type, task, category) {
+      await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "updateTask", type, task, category })
+      });
+    }
+
     loadTasks();
-    initDragDrop();
   </script>
 </body>
 </html>
