@@ -131,39 +131,64 @@
         
         /* Category Folders */
         .category-folder {
-            margin-bottom: 15px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 99, 71, 0.2);
+            margin-bottom: 18px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 99, 71, 0.15);
             overflow: hidden;
+            background: var(--card-bg);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         
         .category-header {
-            background: linear-gradient(135deg, var(--accent-color), #ff4500);
-            color: white;
-            padding: 12px 15px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            padding: 16px 20px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 1.1rem;
             transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
         }
         
         .category-header:hover {
-            background: linear-gradient(135deg, #ff4500, var(--accent-color));
+            background: rgba(255, 99, 71, 0.05);
+            border-bottom-color: var(--accent-color);
         }
         
         .category-title {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            flex: 1;
+            min-width: 0; /* Allows text to wrap/truncate properly */
+        }
+        
+        .category-title i {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            min-width: 20px;
+        }
+        
+        .category-name {
+            font-size: 1rem;
+            font-weight: 600;
+            word-wrap: break-word;
+            line-height: 1.3;
         }
         
         .page-count {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 2px 8px;
-            border-radius: 12px;
+            background: var(--accent-color);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 16px;
             font-size: 12px;
+            font-weight: bold;
+            min-width: 24px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(255, 99, 71, 0.3);
         }
         
         .page-list {
@@ -655,7 +680,7 @@ function renderCategories(searchTerm = "") {
         header.innerHTML = `
             <div class="category-title">
                 <i class="fas fa-folder"></i>
-                <span>${categoryName}</span>
+                <div class="category-name">${categoryName}</div>
             </div>
             <span class="page-count">${filteredPages.length}</span>
         `;
