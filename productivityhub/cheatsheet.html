@@ -820,17 +820,7 @@ function escapeRegExp(string) {
                     icon.classList.add('rotated');');
 }
 
-// Initialize all categories as collapsed on load
-document.addEventListener('DOMContentLoaded', function() {
-    // Optional: Auto-expand first category for better UX
-    const firstCategory = document.querySelector('.cheat-category');
-    if (firstCategory) {
-        const header = firstCategory.querySelector('.category-header');
-        if (header) {
-            toggleCategory(header);
-        }
-    }
-});
+// Remove the duplicate DOMContentLoaded listener that was causing the syntax error
 </script>
 </body>
 </html>
