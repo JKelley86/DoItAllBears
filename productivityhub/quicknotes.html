@@ -621,27 +621,72 @@ function initializeApp() {
 
 function initializeCanvas() {
     canvas = document.getElementById('drawing-canvas');
+    if (!canvas) {
+        console.error('Canvas not found');
+        return;
+    }
+    
     ctx = canvas.getContext('2d');
     
     function resizeCanvas() {
         const container = canvas.parentElement;
-        canvas.width = container.clientWidth;
-        canvas.height = container.clientHeight;
+        const rect = container.getBoundingClientRect();
+        canvas.width = rect.width - 4; // Account for border
+        canvas.height = rect.height - 4;
+        
+        // Set drawing properties
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
+        ctx.globalCompositeOperation = 'source-over';
     }
     
-    resizeCanvas();
+    // Initial resize
+    setTimeout(resizeCanvas, 100);
     window.addEventListener('resize', resizeCanvas);
     
-    canvas.addEventListener('mousedown', startDrawing);
-    canvas.addEventListener('mousemove', draw);
-    canvas.addEventListener('mouseup', stopDrawing);
-    canvas.addEventListener('mouseout', stopDrawing);
+    // Mouse events
+    canvas.addEventListener('mousedown', function(e) {
+        startDrawing(e);
+    });
     
-    canvas.addEventListener('touchstart', handleTouch);
-    canvas.addEventListener('touchmove', handleTouch);
-    canvas.addEventListener('touchend', stopDrawing);
+    canvas.addEventListener('mousemove', function(e) {
+        draw(e);
+    });
+    
+    canvas.addEventListener('mouseup', function(e) {
+        stopDrawing(e);
+    });
+    
+    canvas.addEventListener('mouseleave', function() {
+        isDrawing = false;
+    });
+    
+    // Touch events
+    canvas.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent('mousedown', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        canvas.dispatchEvent(mouseEvent);
+    });
+    
+    canvas.addEventListener('touchmove', function(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent('mousemove', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        canvas.dispatchEvent(mouseEvent);
+    });
+    
+    canvas.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        const mouseEvent = new MouseEvent('mouseup', {});
+        canvas.dispatchEvent(mouseEvent);
+    });
 }
 
 function setupEventListeners() {
@@ -893,91 +938,64 @@ function selectTool(tool) {
 }
 
 function startDrawing(e) {
+    if (!canvas || !ctx) return;
+    
     isDrawing = true;
     const rect = canvas.getBoundingClientRect();
     lastX = e.clientX - rect.left;
     lastY = e.clientY - rect.top;
     
+    console.log('Starting to draw at:', lastX, lastY); // Debug line
+    
     if (currentNote) {
         currentNote.modified = true;
+    }
+    
+    // Start the path for pen and eraser
+    if (currentTool === 'pen' || currentTool === 'eraser') {
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
     }
 }
 
 function draw(e) {
-    if (!isDrawing) return;
+    if (!isDrawing || !canvas || !ctx) return;
     
     const rect = canvas.getBoundingClientRect();
     const currentX = e.clientX - rect.left;
     const currentY = e.clientY - rect.top;
     
+    console.log('Drawing to:', currentX, currentY); // Debug line
+    
     ctx.lineWidth = currentSize;
-    ctx.strokeStyle = currentTool === 'eraser' ? 'white' : currentColor;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     
-    if (currentTool === 'pen' || currentTool === 'eraser') {
-        ctx.beginPath();
-        ctx.moveTo(lastX, lastY);
+    if (currentTool === 'pen') {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = currentColor;
         ctx.lineTo(currentX, currentY);
         ctx.stroke();
-        
-        lastX = currentX;
-        lastY = currentY;
-    } else if (currentTool === 'line') {
-        // For shapes, we'll handle them in mouseup
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (currentNote && currentNote.drawingData) {
-            const img = new Image();
-            img.src = currentNote.drawingData;
-            img.onload = function() {
-                ctx.drawImage(img, 0, 0);
-                drawShape(lastX, lastY, currentX, currentY);
-            };
-        } else {
-            drawShape(lastX, lastY, currentX, currentY);
-        }
+        ctx.beginPath();
+        ctx.moveTo(currentX, currentY);
+    } else if (currentTool === 'eraser') {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.arc(currentX, currentY, currentSize, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
     }
-}
-
-function drawShape(startX, startY, endX, endY) {
-    ctx.beginPath();
-    ctx.lineWidth = currentSize;
-    ctx.strokeStyle = currentColor;
     
-    if (currentTool === 'line') {
-        ctx.moveTo(startX, startY);
-        ctx.lineTo(endX, endY);
-    } else if (currentTool === 'rectangle') {
-        ctx.rect(startX, startY, endX - startX, endY - startY);
-    } else if (currentTool === 'circle') {
-        const radius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
-        ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
-    }
-    ctx.stroke();
+    lastX = currentX;
+    lastY = currentY;
 }
 
 function stopDrawing(e) {
     if (!isDrawing) return;
     isDrawing = false;
+    console.log('Stopped drawing'); // Debug line
     
-    // For shapes (line, rectangle, circle), finalize the drawing
-    if (currentTool !== 'pen' && currentTool !== 'eraser' && e) {
-        const rect = canvas.getBoundingClientRect();
-        const currentX = e.clientX - rect.left;
-        const currentY = e.clientY - rect.top;
-        
-        // Clear and redraw everything including the final shape
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (currentNote && currentNote.drawingData) {
-            const img = new Image();
-            img.src = currentNote.drawingData;
-            img.onload = function() {
-                ctx.drawImage(img, 0, 0);
-                drawShape(lastX, lastY, currentX, currentY);
-            };
-        } else {
-            drawShape(lastX, lastY, currentX, currentY);
-        }
+    if (ctx) {
+        ctx.beginPath(); // End current path
     }
 }
 
