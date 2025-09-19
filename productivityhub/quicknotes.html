@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Quick Notes & Journal</title>
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .notes-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+            height: calc(100vh - 200px);
+        }
+        
+        /* Left Sidebar - Notes List */
+        .notes-sidebar {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .notes-sidebar h2 {
+            color: var(--text-color);
+            margin: 0 0 20px 0;
+            font-size: 1.4rem;
+            text-align: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+        
+        .notes-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .notes-search {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .notes-search:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(255, 99, 71, 0.1);
+        }
+        
+        .new-note-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .new-note-btn:hover {
+            background: #ff4500;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 99, 71, 0.3);
+        }
+        
+        .notes-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .note-item {
+            background: var(--bg-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        
+        .note-item:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .note-item.active {
+            border-color: var(--accent-color);
+            background: rgba(255, 99, 71, 0.1);
+        }
+        
+        .note-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .note-preview {
+            font-size: 12px;
+            opacity: 0.7;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .note-date {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 5px;
+        }
+        
+        .note-type-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            opacity: 0.5;
+        }
+        
+        /* Right Content Area */
+        .notes-content {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .content-header {
+            padding: 20px 25px 15px 25px;
+            border-bottom: 2px solid var(--accent-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .note-title-input {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            font-weight: bold;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .note-title-input:focus {
+            outline: none;
+        }
+        
+        .note-title-input::placeholder {
+            color: var(--text-color);
+            opacity: 0.5;
+        }
+        
+        .content-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .action-btn:hover {
+            background: #ff4500;
+            transform: translateY(-1px);
+        }
+        
+        .action-btn.secondary {
+            background: transparent;
+            border: 2px solid var(--text-color);
+            color: var(--text-color);
+        }
+        
+        .action-btn.secondary:hover {
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
+        
+        .action-btn.danger {
+            background: #dc3545;
+        }
+        
+        .action-btn.danger:hover {
+            background: #c82333;
+        }
+        
+        .content-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .mode-selector {
+            padding: 15px 25px;
+            background: var(--bg-color);
+            display: flex;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 99, 71, 0.2);
+        }
+        
+        .mode-btn {
+            background: transparent;
+            border: 2px solid var(--text-color);
+            color: var(--text-color);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .mode-btn.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        
+        .mode-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        
+        /* Text Editor */
+        .text-editor {
+            flex: 1;
+            padding: 25px;
+            display: none;
+        }
+        
+        .text-editor.active {
+            display: block;
+        }
+        
+        .note-textarea {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            color: var(--text-color);
+            font-size: 16px;
+            line-height: 1.6;
+            resize: none;
+            font-family: inherit;
+        }
+        
+        .note-textarea:focus {
+            outline: none;
+        }
+        
+        .note-textarea::placeholder {
+            color: var(--text-color);
+            opacity: 0.5;
+        }
+        
+        /* Drawing Canvas */
+        .drawing-editor {
+            flex: 1;
+            padding: 15px 25px;
+            display: none;
+            flex-direction: column;
+        }
+        
+        .drawing-editor.active {
+            display: flex;
+        }
+        
+        .drawing-tools {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 99, 71, 0.2);
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .tool-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tool-btn {
+            background: var(--bg-color);
+            border: 2px solid var(--text-color);
+            color: var(--text-color);
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .tool-btn.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        
+        .tool-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        
+        .color-picker {
+            width: 36px;
+            height: 36px;
+            border: 2px solid var(--text-color);
+            border-radius: 6px;
+            cursor: pointer;
+            background: #000;
+        }
+        
+        .size-slider {
+            width: 100px;
+            accent-color: var(--accent-color);
+        }
+        
+        .size-display {
+            color: var(--text-color);
+            font-size: 14px;
+            min-width: 30px;
+        }
+        
+        .canvas-container {
+            flex: 1;
+            border: 2px solid var(--accent-color);
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+            position: relative;
+        }
+        
+        #drawing-canvas {
+            display: block;
+            cursor: crosshair;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            opacity: 0.6;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .notes-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .notes-sidebar {
+                order: 2;
+                max-height: 400px;
+            }
+            
+            .notes-content {
+                order: 1;
+                min-height: 600px;
+            }
+            
+            .content-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .drawing-tools {
+                justify-content: center;
+            }
+        }
+        
+        /* Custom Scrollbars */
+        .notes-sidebar::-webkit-scrollbar,
+        .notes-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .notes-sidebar::-webkit-scrollbar-track,
+        .notes-list::-webkit-scrollbar-track {
+            background: var(--bg-color);
+            border-radius: 4px;
+        }
+        
+        .notes-sidebar::-webkit-scrollbar-thumb,
+        .notes-list::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quick Notes & Journal</h1>
+        <p>Capture your thoughts, ideas, and sketches in one place</p>
+    </div>
+
+    <div class="notes-container">
+        <!-- Left Sidebar - Notes List -->
+        <div class="notes-sidebar">
+            <h2><i class="fas fa-sticky-note"></i> My Notes</h2>
+            
+            <div class="notes-controls">
+                <input type="text" id="notes-search" class="notes-search" 
+                       placeholder="Search notes...">
+                <button id="new-note-btn" class="new-note-btn">
+                    <i class="fas fa-plus"></i> New Note
+                </button>
+            </div>
+            
+            <div class="notes-list" id="notes-list">
+                <div class="empty-state">
+                    <i class="fas fa-note-sticky"></i>
+                    <div>No notes yet. Create your first note!</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Content Area -->
+        <div class="notes-content">
+            <div class="content-header">
+                <input type="text" id="note-title-input" class="note-title-input" 
+                       placeholder="Enter note title..." style="display: none;">
+                <div id="empty-title" class="note-title-input" style="opacity: 0.5;">
+                    Select or create a note
+                </div>
+                <div class="content-actions" id="note-actions" style="display: none;">
+                    <button id="save-btn" class="action-btn">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+                    <button id="delete-btn" class="action-btn danger">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content-body">
+                <div id="empty-content" class="empty-state">
+                    <i class="fas fa-edit"></i>
+                    <div>Select a note to start editing</div>
+                </div>
+                
+                <div id="note-content" style="display: none; flex: 1; flex-direction: column;">
+                    <div class="mode-selector">
+                        <button id="text-mode-btn" class="mode-btn active">
+                            <i class="fas fa-align-left"></i> Text
+                        </button>
+                        <button id="draw-mode-btn" class="mode-btn">
+                            <i class="fas fa-paint-brush"></i> Draw
+                        </button>
+                    </div>
+                    
+                    <!-- Text Editor -->
+                    <div class="text-editor active" id="text-editor">
+                        <textarea id="note-textarea" class="note-textarea" 
+                                  placeholder="Start writing your note..."></textarea>
+                    </div>
+                    
+                    <!-- Drawing Editor -->
+                    <div class="drawing-editor" id="drawing-editor">
+                        <div class="drawing-tools">
+                            <div class="tool-group">
+                                <button class="tool-btn active" data-tool="pen" title="Pen">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <button class="tool-btn" data-tool="eraser" title="Eraser">
+                                    <i class="fas fa-eraser"></i>
+                                </button>
+                                <button class="tool-btn" data-tool="line" title="Line">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <button class="tool-btn" data-tool="rectangle" title="Rectangle">
+                                    <i class="far fa-square"></i>
+                                </button>
+                                <button class="tool-btn" data-tool="circle" title="Circle">
+                                    <i class="far fa-circle"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="tool-group">
+                                <input type="color" id="color-picker" class="color-picker" value="#000000" title="Color">
+                                <input type="range" id="size-slider" class="size-slider" 
+                                       min="1" max="20" value="3" title="Brush Size">
+                                <span class="size-display" id="size-display">3px</span>
+                            </div>
+                            
+                            <div class="tool-group">
+                                <button class="tool-btn" id="clear-canvas" title="Clear Canvas">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="canvas-container">
+                            <canvas id="drawing-canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Your proper sidebar structure -->
+    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+    <div class="sidebar" id="sidebar">
+        <div class="clock" id="clock"></div>
+        <div id="sidebar-nav"></div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+    </div>
+
+    <footer> 
+        <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+    </footer> 
+
+<script>
+// Template functions
+function navigateTo(page) {
+    window.location.href = page;
+}
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('open');
+    }
+}
+
+function updateClock() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString();
+    const clockElement = document.getElementById('clock');
+    if (clockElement) {
+        clockElement.textContent = timeString;
+    }
+}
+
+function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    const theme = document.body.classList.contains('light-mode') ? 'light' : 'dark';
+    localStorage.setItem('theme', theme);
+}
+
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    const menuButton = document.querySelector('.menu-btn');
+    if (sidebar && menuButton && !sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+        sidebar.classList.remove('open');
+    }
+});
+
+// Notes & Journal functionality
+let currentNote = null;
+let notes = [];
+let canvas, ctx;
+let isDrawing = false;
+let currentTool = 'pen';
+let currentColor = '#000000';
+let currentSize = 3;
+let lastX = 0;
+let lastY = 0;
+
+function initializeApp() {
+    initializeCanvas();
+    loadNotes();
+    setupEventListeners();
+}
+
+function initializeCanvas() {
+    canvas = document.getElementById('drawing-canvas');
+    ctx = canvas.getContext('2d');
+    
+    function resizeCanvas() {
+        const container = canvas.parentElement;
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+    }
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    
+    // Canvas event listeners
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+    
+    // Touch events for mobile
+    canvas.addEventListener('touchstart', handleTouch);
+    canvas.addEventListener('touchmove', handleTouch);
+    canvas.addEventListener('touchend', stopDrawing);
+}
+
+function setupEventListeners() {
+    // New note button
+    document.getElementById('new-note-btn').addEventListener('click', createNewNote);
+    
+    // Save button
+    document.getElementById('save-btn').addEventListener('click', saveCurrentNote);
+    
+    // Delete button
+    document.getElementById('delete-btn').addEventListener('click', deleteCurrentNote);
+    
+    // Mode buttons
+    document.getElementById('text-mode-btn').addEventListener('click', function() {
+        switchMode('text');
+    });
+    
+    document.getElementById('draw-mode-btn').addEventListener('click', function() {
+        switchMode('draw');
+    });
+    
+    // Drawing tools
+    document.querySelectorAll('[data-tool]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            selectTool(this.dataset.tool);
+        });
+    });
+    
+    // Color picker
+    document.getElementById('color-picker').addEventListener('change', function() {
+        currentColor = this.value;
+    });
+    
+    // Size slider
+    document.getElementById('size-slider').addEventListener('input', function() {
+        currentSize = this.value;
+        document.getElementById('size-display').textContent = this.value + 'px';
+    });
+    
+    // Clear canvas
+    document.getElementById('clear-canvas').addEventListener('click', clearCanvas);
+    
+    // Search
+    document.getElementById('notes-search').addEventListener('input', searchNotes);
+    
+    // Auto-save on text change
+    document.getElementById('note-textarea').addEventListener('input', function() {
+        if (currentNote) {
+            currentNote.modified = true;
+        }
+    });
+    
+    document.getElementById('note-title-input').addEventListener('input', function() {
+        if (currentNote) {
+            currentNote.modified = true;
+        }
+    });
+}
+
+function loadNotes() {
+    const savedNotes = localStorage.getItem('quickNotes');
+    if (savedNotes) {
+        notes = JSON.parse(savedNotes);
+        renderNotesList();
+    }
+}
+
+function saveNotes() {
+    localStorage.setItem('quickNotes', JSON.stringify(notes));
+}
+
+function createNewNote() {
+    const newNote = {
+        id: Date.now(),
+        title: '',
+        textContent: '',
+        drawingData: '',
+        created: new Date().toISOString(),
+        modified: true,
+        mode: 'text'
+    };
+    
+    notes.unshift(newNote);
+    selectNote(newNote);
+    renderNotesList();
+    
+    // Focus on title input
+    setTimeout(function() {
+        document.getElementById('note-title-input').focus();
+    }, 100);
+}
+
+function selectNote(note) {
+    if (currentNote && currentNote.modified) {
+        saveCurrentNote();
+    }
+    
+    currentNote = note;
+    showNoteContent();
+    loadNoteContent();
+    highlightActiveNote();
+}
+
+function showNoteContent() {
+    document.getElementById('empty-content').style.display = 'none';
+    document.getElementById('note-content').style.display = 'flex';
+    document.getElementById('empty-title').style.display = 'none';
+    document.getElementById('note-title-input').style.display = 'block';
+    document.getElementById('note-actions').style.display = 'flex';
+}
+
+function loadNoteContent() {
+    if (!currentNote) return;
+    
+    document.getElementById('note-title-input').value = currentNote.title || '';
+    document.getElementById('note-textarea').value = currentNote.textContent || '';
+    
+    // Load drawing
+    if (currentNote.drawingData) {
+        const img = new Image();
+        img.onload = function() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+        };
+        img.src = currentNote.drawingData;
+    } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    
+    // Switch to saved mode
+    switchMode(currentNote.mode || 'text');
+}
+
+function saveCurrentNote() {
+    if (!currentNote) return;
+    
+    currentNote.title = document.getElementById('note-title-input').value || 'Untitled Note';
+    currentNote.textContent = document.getElementById('note-textarea').value;
+    currentNote.drawingData = canvas.toDataURL();
+    currentNote.modified = false;
+    currentNote.updated = new Date().toISOString();
+    
+    saveNotes();
+    renderNotesList();
+    highlightActiveNote();
+}
+
+function deleteCurrentNote() {
+    if (!currentNote) return;
+    
+    if (confirm('Are you sure you want to delete this note?')) {
+        const index = notes.findIndex(function(note) {
+            return note.id === currentNote.id;
+        });
+        
+        if (index !== -1) {
+            notes.splice(index, 1);
+            saveNotes();
+            renderNotesList();
+            
+            // Clear content
+            currentNote = null;
+            document.getElementById('empty-content').style.display = 'flex';
+            document.getElementById('note-content').style.display = 'none';
+            document.getElementById('empty-title').style.display = 'block';
+            document.getElementById('note-title-input').style.display = 'none';
+            document.getElementById('note-actions').style.display = 'none';
+        }
+    }
+}
+
+function renderNotesList() {
+    const container = document.getElementById('notes-list');
+    
+    if (notes.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-note-sticky"></i><div>No notes yet. Create your first note!</div></div>';
+        return;
+    }
+    
+    container.innerHTML = '';
+    
+    notes.forEach(function(note) {
+        const noteElement = document.createElement('div');
+        noteElement.className = 'note-item';
+        noteElement.onclick = function() { selectNote(note); };
+        
+        const title = note.title || 'Untitled Note';
+        const preview = note.textContent ? note.textContent.substring(0, 50) + '...' : 'No content';
+        const date = new Date(note.created).toLocaleDateString();
+        const hasDrawing = note.drawingData && note.drawingData.length > 100;
+        
+        noteElement.innerHTML = `
+            <i class="fas ${hasDrawing ? 'fa-paint-brush' : 'fa-align-left'} note-type-icon"></i>
+            <div class="note-title">${title}</div>
+            <div class="note-preview">${preview}</div>
+            <div class="note-date">${date}</div>
+        `;
+        
+        container.appendChild(noteElement);
+    });
+}
+
+function highlightActiveNote() {
+    document.querySelectorAll('.note-item').forEach(function(item) {
+        item.classList.remove('active');
+    });
+    
+    if (currentNote) {
+        const noteElements = document.querySelectorAll('.note-item');
+        const index = notes.findIndex(function(note) {
+            return note.id === currentNote.id;
+        });
+        
+        if (index !== -1 && noteElements[index]) {
+            noteElements[index].classList.add('active');
+        }
+    }
+}
+
+function switchMode(mode) {
+    // Update mode buttons
+    document.querySelectorAll('.mode-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+    });
+    
+    if (mode === 'text') {
+        document.getElementById('text-mode-btn').classList.add('active');
+        document.getElementById('text-editor').classList.add('active');
+        document.getElementById('drawing-editor').classList.remove('active');
+    } else {
+        document.getElementById('draw-mode-btn').classList.add('active');
+        document.getElementById('drawing-editor').classList.add('active');
+        document.getElementById('text-editor').classList.remove('active');
+    }
+    
+    if (currentNote) {
+        currentNote.mode = mode;
+        currentNote.modified = true;
+    }
+}
+
+function searchNotes() {
+    const searchTerm = document.getElementById('notes-search').value.toLowerCase();
+    const noteItems = document.querySelectorAll('.note-item');
+    
+    noteItems.forEach(function(item, index) {
+        const note = notes[index];
+        const title = (note.title || '').toLowerCase();
+        const content = (note.textContent || '').toLowerCase();
+        
+        if (title.includes(searchTerm) || content.includes(searchTerm)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// Drawing functions
+function selectTool(tool) {
+    currentTool = tool;
+    document.querySelectorAll('[data-tool]').forEach(function(btn) {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`[data-tool="${tool}"]`).classList.add('active');
+    
+    canvas.style.cursor = tool === 'eraser' ? 'crosshair' : 'crosshair';
+}
+
+function startDrawing(e) {
+    isDrawing = true;
+    const rect = canvas.getBoundingClientRect();
+    lastX = e.clientX - rect.left;
+    lastY = e.clientY - rect.top;
+    
+    if (currentNote) {
+        currentNote.modified = true;
+    }
+}
+
+function draw(e) {
+    if (!isDrawing) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const currentX = e.clientX - rect.left;
+    const currentY = e.clientY - rect.top;
+    
+    ctx.lineWidth = currentSize;
+    ctx.strokeStyle = currentTool === 'eraser' ? 'white' : currentColor;
+    
+    if (currentTool === 'pen' || currentTool === 'eraser') {
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(currentX, currentY);
+        ctx.stroke();
+    }
+    
+    lastX = currentX;
+    lastY = currentY;
+}
+
+function stopDrawing() {
+    isDrawing = false;
+}
+
+function handleTouch(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    
+    const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' :
