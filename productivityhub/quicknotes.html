@@ -912,20 +912,73 @@ function draw(e) {
     
     ctx.lineWidth = currentSize;
     ctx.strokeStyle = currentTool === 'eraser' ? 'white' : currentColor;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
     
     if (currentTool === 'pen' || currentTool === 'eraser') {
         ctx.beginPath();
         ctx.moveTo(lastX, lastY);
         ctx.lineTo(currentX, currentY);
         ctx.stroke();
+        
+        lastX = currentX;
+        lastY = currentY;
+    } else if (currentTool === 'line') {
+        // For shapes, we'll handle them in mouseup
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (currentNote && currentNote.drawingData) {
+            const img = new Image();
+            img.src = currentNote.drawingData;
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0);
+                drawShape(lastX, lastY, currentX, currentY);
+            };
+        } else {
+            drawShape(lastX, lastY, currentX, currentY);
+        }
     }
-    
-    lastX = currentX;
-    lastY = currentY;
 }
 
-function stopDrawing() {
+function drawShape(startX, startY, endX, endY) {
+    ctx.beginPath();
+    ctx.lineWidth = currentSize;
+    ctx.strokeStyle = currentColor;
+    
+    if (currentTool === 'line') {
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+    } else if (currentTool === 'rectangle') {
+        ctx.rect(startX, startY, endX - startX, endY - startY);
+    } else if (currentTool === 'circle') {
+        const radius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+        ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+    }
+    ctx.stroke();
+}
+
+function stopDrawing(e) {
+    if (!isDrawing) return;
     isDrawing = false;
+    
+    // For shapes (line, rectangle, circle), finalize the drawing
+    if (currentTool !== 'pen' && currentTool !== 'eraser' && e) {
+        const rect = canvas.getBoundingClientRect();
+        const currentX = e.clientX - rect.left;
+        const currentY = e.clientY - rect.top;
+        
+        // Clear and redraw everything including the final shape
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (currentNote && currentNote.drawingData) {
+            const img = new Image();
+            img.src = currentNote.drawingData;
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0);
+                drawShape(lastX, lastY, currentX, currentY);
+            };
+        } else {
+            drawShape(lastX, lastY, currentX, currentY);
+        }
+    }
 }
 
 function handleTouch(e) {
