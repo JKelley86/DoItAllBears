@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Cheat Sheet</title>
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* Cheat Sheet Specific Styling */
+        .cheat-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .search-section {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        
+        .cheat-search {
+            width: 100%;
+            max-width: 600px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .cheat-search:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(255, 99, 71, 0.1);
+        }
+        
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .cheat-category {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .cheat-category:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            border-color: var(--accent-color);
+        }
+        
+        .category-header {
+            background: linear-gradient(135deg, var(--accent-color), #ff4500);
+            color: white;
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .category-header:hover {
+            background: linear-gradient(135deg, #ff4500, var(--accent-color));
+        }
+        
+        .category-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        
+        .category-icon {
+            font-size: 1.5rem;
+        }
+        
+        .expand-icon {
+            transition: transform 0.3s ease;
+            font-size: 1.2rem;
+        }
+        
+        .expand-icon.rotated {
+            transform: rotate(180deg);
+        }
+        
+        .category-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            background: var(--bg-color);
+        }
+        
+        .category-content.expanded {
+            max-height: 800px;
+        }
+        
+        .shortcut-section {
+            padding: 20px;
+        }
+        
+        .shortcut-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .shortcut-item:hover {
+            background: var(--accent-color);
+            color: white;
+            border-left-color: #ff4500;
+            transform: translateX(5px);
+        }
+        
+        .shortcut-desc {
+            flex: 1;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        .shortcut-item:hover .shortcut-desc {
+            color: white;
+        }
+        
+        .shortcut-key {
+            background: #2c3e50;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            border: 1px solid #34495e;
+        }
+        
+        .shortcut-item:hover .shortcut-key {
+            background: #1a1a1a;
+            border-color: #333;
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 10px 0;
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .code-title {
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-color), transparent);
+            margin: 20px 0;
+            border-radius: 2px;
+        }
+        
+        /* Syntax highlighting colors */
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; font-style: italic; }
+        .function { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+        .operator { color: #d4d4d4; }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .category-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cheat-container {
+                padding: 15px;
+            }
+            
+            .shortcut-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .shortcut-key {
+                align-self: flex-end;
+            }
+        }
+        
+        /* Search highlighting */
+        .highlight {
+            background: rgba(255, 99, 71, 0.3);
+            padding: 2px 4px;
+            border-radius: 3px;
+            color: inherit;
+        }
+        
+        /* Hide categories that don't match search */
+        .cheat-category.hidden {
+            display: none;
+        }
+        
+        /* Custom scrollbar for code blocks */
+        .code-block::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .code-block::-webkit-scrollbar-track {
+            background: #333;
+            border-radius: 4px;
+        }
+        
+        .code-block::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Developer Cheat Sheet</h1>
+        <p>Quick reference guide for shortcuts, syntax, and code examples</p>
+    </div>
+
+    <div class="cheat-container">
+        <div class="search-section">
+            <input type="text" id="cheat-search" class="cheat-search" 
+                   placeholder="Search shortcuts, commands, or code examples...">
+        </div>
+
+        <div class="category-grid" id="category-grid">
+            <!-- Allen Bradley PLC -->
+            <div class="cheat-category" data-category="plc">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <div class="category-title">
+                        <i class="fas fa-microchip category-icon"></i>
+                        Allen Bradley PLC
+                    </div>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="category-content">
+                    <div class="shortcut-section">
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Download program to PLC</span>
+                            <span class="shortcut-key">Ctrl + D</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Upload from PLC</span>
+                            <span class="shortcut-key">Ctrl + U</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Go online/offline</span>
+                            <span class="shortcut-key">Ctrl + G</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Verify program</span>
+                            <span class="shortcut-key">Ctrl + W</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Find/Replace</span>
+                            <span class="shortcut-key">Ctrl + F</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Toggle forces</span>
+                            <span class="shortcut-key">Ctrl + T</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Cross reference</span>
+                            <span class="shortcut-key">Ctrl + R</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">New rung</span>
+                            <span class="shortcut-key">Alt + N</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Insert branch</span>
+                            <span class="shortcut-key">Alt + B</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Insert normally open contact</span>
+                            <span class="shortcut-key">I</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Insert normally closed contact</span>
+                            <span class="shortcut-key">Shift + I</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Insert output coil</span>
+                            <span class="shortcut-key">O</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Computer Shortcuts -->
+            <div class="cheat-category" data-category="computer">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <div class="category-title">
+                        <i class="fas fa-desktop category-icon"></i>
+                        Computer Shortcuts
+                    </div>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="category-content">
+                    <div class="shortcut-section">
+                        <div class="code-title">Windows Shortcuts</div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Copy</span>
+                            <span class="shortcut-key">Ctrl + C</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Paste</span>
+                            <span class="shortcut-key">Ctrl + V</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Cut</span>
+                            <span class="shortcut-key">Ctrl + X</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Undo</span>
+                            <span class="shortcut-key">Ctrl + Z</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Redo</span>
+                            <span class="shortcut-key">Ctrl + Y</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Select all</span>
+                            <span class="shortcut-key">Ctrl + A</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Find</span>
+                            <span class="shortcut-key">Ctrl + F</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">New window/tab</span>
+                            <span class="shortcut-key">Ctrl + N</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Switch between apps</span>
+                            <span class="shortcut-key">Alt + Tab</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Task Manager</span>
+                            <span class="shortcut-key">Ctrl + Shift + Esc</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Lock screen</span>
+                            <span class="shortcut-key">Win + L</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Screenshot</span>
+                            <span class="shortcut-key">Win + Shift + S</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Syntax Reference -->
+            <div class="cheat-category" data-category="syntax">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <div class="category-title">
+                        <i class="fas fa-code category-icon"></i>
+                        Programming Syntax
+                    </div>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="category-content">
+                    <div class="shortcut-section">
+                        <div class="code-title">JavaScript Syntax</div>
+                        <div class="code-block">
+<span class="comment">// Variables</span>
+<span class="keyword">let</span> variable = <span class="string">"value"</span>;
+<span class="keyword">const</span> constant = <span class="number">42</span>;
+
+<span class="comment">// Functions</span>
+<span class="keyword">function</span> <span class="function">myFunction</span>(param) {
+    <span class="keyword">return</span> param + <span class="number">1</span>;
+}
+
+<span class="comment">// Arrow functions</span>
+<span class="keyword">const</span> <span class="function">arrow</span> = (x) => x * <span class="number">2</span>;
+
+<span class="comment">// Objects</span>
+<span class="keyword">const</span> obj = {
+    prop: <span class="string">"value"</span>,
+    method() { <span class="keyword">return</span> <span class="keyword">this</span>.prop; }
+};
+                        </div>
+                        
+                        <div class="section-divider"></div>
+                        
+                        <div class="code-title">Python Syntax</div>
+                        <div class="code-block">
+<span class="comment"># Variables</span>
+variable = <span class="string">"value"</span>
+number = <span class="number">42</span>
+
+<span class="comment"># Functions</span>
+<span class="keyword">def</span> <span class="function">my_function</span>(param):
+    <span class="keyword">return</span> param + <span class="number">1</span>
+
+<span class="comment"># Lists</span>
+my_list = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]
+
+<span class="comment"># Dictionaries</span>
+my_dict = {<span class="string">"key"</span>: <span class="string">"value"</span>}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Commands -->
+            <div class="cheat-category" data-category="commands">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <div class="category-title">
+                        <i class="fas fa-terminal category-icon"></i>
+                        Command Line
+                    </div>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="category-content">
+                    <div class="shortcut-section">
+                        <div class="code-title">Git Commands</div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Initialize repository</span>
+                            <span class="shortcut-key">git init</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Add files</span>
+                            <span class="shortcut-key">git add .</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Commit changes</span>
+                            <span class="shortcut-key">git commit -m "message"</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Push to remote</span>
+                            <span class="shortcut-key">git push origin main</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Pull from remote</span>
+                            <span class="shortcut-key">git pull</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Check status</span>
+                            <span class="shortcut-key">git status</span>
+                        </div>
+                        
+                        <div class="section-divider"></div>
+                        
+                        <div class="code-title">Windows CMD</div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">List directory contents</span>
+                            <span class="shortcut-key">dir</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Change directory</span>
+                            <span class="shortcut-key">cd foldername</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Create directory</span>
+                            <span class="shortcut-key">mkdir foldername</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Delete file</span>
+                            <span class="shortcut-key">del filename</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Excel VBA -->
+            <div class="cheat-category" data-category="vba">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <div class="category-title">
+                        <i class="fas fa-file-excel category-icon"></i>
+                        Excel VBA Code
+                    </div>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="category-content">
+                    <div class="shortcut-section">
+                        <div class="code-title">Basic VBA Structure</div>
+                        <div class="code-block">
+<span class="keyword">Sub</span> <span class="function">MyMacro</span>()
+    <span class="comment">' Declare variables</span>
+    <span class="keyword">Dim</span> myVar <span class="keyword">As</span> <span class="keyword">String</span>
+    <span class="keyword">Dim</span> i <span class="keyword">As</span> <span class="keyword">Integer</span>
+    
+    <span class="comment">' Set values</span>
+    myVar = <span class="string">"Hello World"</span>
+    
+    <span class="comment">' Display message</span>
+    MsgBox myVar
+<span class="keyword">End Sub</span>
+                        </div>
+                        
+                        <div class="code-title">Cell Operations</div>
+                        <div class="code-block">
+<span class="comment">' Select cell</span>
+Range(<span class="string">"A1"</span>).Select
+
+<span class="comment">' Set cell value</span>
+Range(<span class="string">"A1"</span>).Value = <span class="string">"Text"</span>
+
+<span class="comment">' Get cell value</span>
+<span class="keyword">Dim</span> cellValue <span class="keyword">As</span> <span class="keyword">String</span>
+cellValue = Range(<span class="string">"A1"</span>).Value
+
+<span class="comment">' Loop through range</span>
+<span class="keyword">For Each</span> cell <span class="keyword">In</span> Range(<span class="string">"A1:A10"</span>)
+    cell.Value = cell.Value * <span class="number">2</span>
+<span class="keyword">Next</span> cell
+                        </div>
+                        
+                        <div class="code-title">Useful VBA Functions</div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Open VBA Editor</span>
+                            <span class="shortcut-key">Alt + F11</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Run macro</span>
+                            <span class="shortcut-key">F5</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Step through code</span>
+                            <span class="shortcut-key">F8</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HTML & JavaScript -->
+            <div class="cheat-category" data-category="web">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <div class="category-title">
+                        <i class="fas fa-globe category-icon"></i>
+                        HTML & JavaScript
+                    </div>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="category-content">
+                    <div class="shortcut-section">
+                        <div class="code-title">HTML Structure</div>
+                        <div class="code-block">
+<span class="operator">&lt;!</span><span class="keyword">DOCTYPE</span> html<span class="operator">&gt;</span>
+<span class="operator">&lt;</span><span class="keyword">html</span> lang=<span class="string">"en"</span><span class="operator">&gt;</span>
+<span class="operator">&lt;</span><span class="keyword">head</span><span class="operator">&gt;</span>
+    <span class="operator">&lt;</span><span class="keyword">meta</span> charset=<span class="string">"UTF-8"</span><span class="operator">&gt;</span>
+    <span class="operator">&lt;</span><span class="keyword">title</span><span class="operator">&gt;</span>Page Title<span class="operator">&lt;/</span><span class="keyword">title</span><span class="operator">&gt;</span>
+<span class="operator">&lt;/</span><span class="keyword">head</span><span class="operator">&gt;</span>
+<span class="operator">&lt;</span><span class="keyword">body</span><span class="operator">&gt;</span>
+    <span class="operator">&lt;</span><span class="keyword">h1</span><span class="operator">&gt;</span>Heading<span class="operator">&lt;/</span><span class="keyword">h1</span><span class="operator">&gt;</span>
+    <span class="operator">&lt;</span><span class="keyword">p</span><span class="operator">&gt;</span>Paragraph<span class="operator">&lt;/</span><span class="keyword">p</span><span class="operator">&gt;</span>
+<span class="operator">&lt;/</span><span class="keyword">body</span><span class="operator">&gt;</span>
+<span class="operator">&lt;/</span><span class="keyword">html</span><span class="operator">&gt;</span>
+                        </div>
+                        
+                        <div class="code-title">JavaScript DOM Manipulation</div>
+                        <div class="code-block">
+<span class="comment">// Get elements</span>
+<span class="keyword">const</span> element = document.<span class="function">getElementById</span>(<span class="string">'myId'</span>);
+<span class="keyword">const</span> elements = document.<span class="function">querySelectorAll</span>(<span class="string">'.myClass'</span>);
+
+<span class="comment">// Change content</span>
+element.textContent = <span class="string">'New text'</span>;
+element.innerHTML = <span class="string">'&lt;b&gt;Bold text&lt;/b&gt;'</span>;
+
+<span class="comment">// Add event listener</span>
+element.<span class="function">addEventListener</span>(<span class="string">'click'</span>, <span class="keyword">function</span>() {
+    <span class="function">alert</span>(<span class="string">'Clicked!'</span>);
+});
+
+<span class="comment">// Create new element</span>
+<span class="keyword">const</span> newDiv = document.<span class="function">createElement</span>(<span class="string">'div'</span>);
+newDiv.textContent = <span class="string">'New div'</span>;
+document.body.<span class="function">appendChild</span>(newDiv);
+                        </div>
+                        
+                        <div class="code-title">CSS Selectors</div>
+                        <div class="code-block">
+<span class="comment">/* Element selector */</span>
+p { color: blue; }
+
+<span class="comment">/* Class selector */</span>
+.myClass { font-size: 16px; }
+
+<span class="comment">/* ID selector */</span>
+#myId { background: red; }
+
+<span class="comment">/* Attribute selector */</span>
+[type="text"] { border: 1px solid black; }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Your proper sidebar structure -->
+    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+    <div class="sidebar" id="sidebar">
+        <div class="clock" id="clock"></div>
+        <div id="sidebar-nav"></div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+    </div>
+
+    <footer> 
+        <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+    </footer> 
+
+<script>
+// Your standard template functions
+function navigateTo(page) {
+    window.location.href = page;
+}
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('open');
+}
+
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    const menuButton = document.querySelector('.menu-btn');
+    if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+        sidebar.classList.remove('open');
+    }
+});
+
+function updateClock() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString();
+    document.getElementById('clock').textContent = timeString;
+}
+
+function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+}
+
+// Load theme and initialize
+window.onload = function() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+    }
+    initializeSearch();
+}
+
+fetch('sidebar.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('sidebar-nav').innerHTML = data;
+    });
+
+setInterval(updateClock, 1000);
+updateClock();
+
+// Cheat Sheet Functionality
+function toggleCategory(header) {
+    const content = header.nextElementSibling;
+    const icon = header.querySelector('.expand-icon');
+    
+    content.classList.toggle('expanded');
+    icon.classList.toggle('rotated');
+}
+
+function initializeSearch() {
+    const searchInput = document.getElementById('cheat-search');
+    searchInput.addEventListener('input', handleSearch);
+}
+
+function handleSearch() {
+    const searchTerm = document.getElementById('cheat-search').value.toLowerCase();
+    const categories = document.querySelectorAll('.cheat-category');
+    
+    categories.forEach(category => {
+        const categoryText = category.textContent.toLowerCase();
+        
+        if (searchTerm === '' || categoryText.includes(searchTerm)) {
+            category.classList.remove('hidden');
+            
+            // Highlight matching text
+            if (searchTerm !== '') {
+                highlightText(category, searchTerm);
+                // Auto-expand matching categories
+                const content = category.querySelector('.category-content');
+                const icon = category.querySelector('.expand-icon');
+                if (!content.classList.contains('expanded')) {
+                    content.classList.add('expanded');
+                    icon.classList.add('rotated');
