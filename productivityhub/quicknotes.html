@@ -634,29 +634,21 @@ function initializeCanvas() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
     
-    // Canvas event listeners
     canvas.addEventListener('mousedown', startDrawing);
     canvas.addEventListener('mousemove', draw);
     canvas.addEventListener('mouseup', stopDrawing);
     canvas.addEventListener('mouseout', stopDrawing);
     
-    // Touch events for mobile
     canvas.addEventListener('touchstart', handleTouch);
     canvas.addEventListener('touchmove', handleTouch);
     canvas.addEventListener('touchend', stopDrawing);
 }
 
 function setupEventListeners() {
-    // New note button
     document.getElementById('new-note-btn').addEventListener('click', createNewNote);
-    
-    // Save button
     document.getElementById('save-btn').addEventListener('click', saveCurrentNote);
-    
-    // Delete button
     document.getElementById('delete-btn').addEventListener('click', deleteCurrentNote);
     
-    // Mode buttons
     document.getElementById('text-mode-btn').addEventListener('click', function() {
         switchMode('text');
     });
@@ -665,31 +657,24 @@ function setupEventListeners() {
         switchMode('draw');
     });
     
-    // Drawing tools
     document.querySelectorAll('[data-tool]').forEach(function(btn) {
         btn.addEventListener('click', function() {
             selectTool(this.dataset.tool);
         });
     });
     
-    // Color picker
     document.getElementById('color-picker').addEventListener('change', function() {
         currentColor = this.value;
     });
     
-    // Size slider
     document.getElementById('size-slider').addEventListener('input', function() {
         currentSize = this.value;
         document.getElementById('size-display').textContent = this.value + 'px';
     });
     
-    // Clear canvas
     document.getElementById('clear-canvas').addEventListener('click', clearCanvas);
-    
-    // Search
     document.getElementById('notes-search').addEventListener('input', searchNotes);
     
-    // Auto-save on text change
     document.getElementById('note-textarea').addEventListener('input', function() {
         if (currentNote) {
             currentNote.modified = true;
@@ -730,7 +715,6 @@ function createNewNote() {
     selectNote(newNote);
     renderNotesList();
     
-    // Focus on title input
     setTimeout(function() {
         document.getElementById('note-title-input').focus();
     }, 100);
@@ -761,7 +745,6 @@ function loadNoteContent() {
     document.getElementById('note-title-input').value = currentNote.title || '';
     document.getElementById('note-textarea').value = currentNote.textContent || '';
     
-    // Load drawing
     if (currentNote.drawingData) {
         const img = new Image();
         img.onload = function() {
@@ -773,7 +756,6 @@ function loadNoteContent() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
     
-    // Switch to saved mode
     switchMode(currentNote.mode || 'text');
 }
 
@@ -804,7 +786,6 @@ function deleteCurrentNote() {
             saveNotes();
             renderNotesList();
             
-            // Clear content
             currentNote = null;
             document.getElementById('empty-content').style.display = 'flex';
             document.getElementById('note-content').style.display = 'none';
@@ -864,7 +845,6 @@ function highlightActiveNote() {
 }
 
 function switchMode(mode) {
-    // Update mode buttons
     document.querySelectorAll('.mode-btn').forEach(function(btn) {
         btn.classList.remove('active');
     });
@@ -902,7 +882,6 @@ function searchNotes() {
     });
 }
 
-// Drawing functions
 function selectTool(tool) {
     currentTool = tool;
     document.querySelectorAll('[data-tool]').forEach(function(btn) {
@@ -910,7 +889,7 @@ function selectTool(tool) {
     });
     document.querySelector(`[data-tool="${tool}"]`).classList.add('active');
     
-    canvas.style.cursor = tool === 'eraser' ? 'crosshair' : 'crosshair';
+    canvas.style.cursor = 'crosshair';
 }
 
 function startDrawing(e) {
@@ -952,6 +931,56 @@ function stopDrawing() {
 function handleTouch(e) {
     e.preventDefault();
     const touch = e.touches[0];
-    const rect = canvas.getBoundingClientRect();
     
-    const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' :
+    let eventType = 'mousedown';
+    if (e.type === 'touchmove') eventType = 'mousemove';
+    if (e.type === 'touchend') eventType = 'mouseup';
+    
+    const mouseEvent = new MouseEvent(eventType, {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+    });
+    
+    canvas.dispatchEvent(mouseEvent);
+}
+
+function clearCanvas() {
+    if (confirm('Clear drawing?')) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (currentNote) currentNote.modified = true;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+    }
+    
+    initializeApp();
+    updateClock();
+    setInterval(updateClock, 1000);
+    
+    fetch('sidebar.html')
+        .then(function(response) { return response.text(); })
+        .then(function(data) {
+            const sidebarNav = document.getElementById('sidebar-nav');
+            if (sidebarNav) sidebarNav.innerHTML = data;
+        })
+        .catch(function(error) {
+            console.log('Sidebar not found');
+        });
+});
+
+setInterval(function() {
+    if (currentNote && currentNote.modified) {
+        saveCurrentNote();
+    }
+}, 30000);
+
+window.addEventListener('beforeunload', function() {
+    if (currentNote && currentNote.modified) {
+        saveCurrentNote();
+    }
+});
+</script>
