@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="../theme.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* Cheat Sheet Specific Styling */
         .cheat-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -63,17 +62,6 @@
             border-color: var(--accent-color);
         }
         
-        /* Ensure clickable elements have proper z-index and pointer events */
-        .category-header {
-            position: relative;
-            z-index: 10;
-        }
-        
-        .menu-btn {
-            z-index: 1100 !important;
-            pointer-events: auto !important;
-        }
-        
         .category-header {
             background: linear-gradient(135deg, var(--accent-color), #ff4500);
             color: white;
@@ -83,6 +71,8 @@
             justify-content: space-between;
             align-items: center;
             transition: all 0.3s ease;
+            position: relative;
+            z-index: 10;
         }
         
         .category-header:hover {
@@ -198,7 +188,6 @@
             border-radius: 2px;
         }
         
-        /* Syntax highlighting colors */
         .keyword { color: #569cd6; }
         .string { color: #ce9178; }
         .comment { color: #6a9955; font-style: italic; }
@@ -206,28 +195,6 @@
         .number { color: #b5cea8; }
         .operator { color: #d4d4d4; }
         
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .category-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .cheat-container {
-                padding: 15px;
-            }
-            
-            .shortcut-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
-            }
-            
-            .shortcut-key {
-                align-self: flex-end;
-            }
-        }
-        
-        /* Search highlighting */
         .highlight {
             background: rgba(255, 99, 71, 0.3);
             padding: 2px 4px;
@@ -235,24 +202,30 @@
             color: inherit;
         }
         
-        /* Hide categories that don't match search */
         .cheat-category.hidden {
             display: none;
         }
         
-        /* Custom scrollbar for code blocks */
-        .code-block::-webkit-scrollbar {
-            height: 8px;
+        .menu-btn {
+            z-index: 1100 !important;
+            pointer-events: auto !important;
         }
         
-        .code-block::-webkit-scrollbar-track {
-            background: #333;
-            border-radius: 4px;
-        }
-        
-        .code-block::-webkit-scrollbar-thumb {
-            background: var(--accent-color);
-            border-radius: 4px;
+        @media (max-width: 768px) {
+            .category-grid {
+                grid-template-columns: 1fr;
+            }
+            .cheat-container {
+                padding: 15px;
+            }
+            .shortcut-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .shortcut-key {
+                align-self: flex-end;
+            }
         }
     </style>
 </head>
@@ -269,7 +242,6 @@
         </div>
 
         <div class="category-grid" id="category-grid">
-            <!-- Allen Bradley PLC -->
             <div class="cheat-category" data-category="plc">
                 <div class="category-header">
                     <div class="category-title">
@@ -332,7 +304,6 @@
                 </div>
             </div>
 
-            <!-- Computer Shortcuts -->
             <div class="cheat-category" data-category="computer">
                 <div class="category-header">
                     <div class="category-title">
@@ -396,7 +367,6 @@
                 </div>
             </div>
 
-            <!-- Syntax Reference -->
             <div class="cheat-category" data-category="syntax">
                 <div class="category-header">
                     <div class="category-title">
@@ -450,7 +420,6 @@ my_dict = {<span class="string">"key"</span>: <span class="string">"value"</span
                 </div>
             </div>
 
-            <!-- Commands -->
             <div class="cheat-category" data-category="commands">
                 <div class="category-header">
                     <div class="category-title">
@@ -510,7 +479,6 @@ my_dict = {<span class="string">"key"</span>: <span class="string">"value"</span
                 </div>
             </div>
 
-            <!-- Excel VBA -->
             <div class="cheat-category" data-category="vba">
                 <div class="category-header">
                     <div class="category-title">
@@ -571,7 +539,6 @@ cellValue = Range(<span class="string">"A1"</span>).Value
                 </div>
             </div>
 
-            <!-- HTML & JavaScript -->
             <div class="cheat-category" data-category="web">
                 <div class="category-header">
                     <div class="category-title">
@@ -611,26 +578,6 @@ element.innerHTML = <span class="string">'&lt;b&gt;Bold text&lt;/b&gt;'</span>;
 element.<span class="function">addEventListener</span>(<span class="string">'click'</span>, <span class="keyword">function</span>() {
     <span class="function">alert</span>(<span class="string">'Clicked!'</span>);
 });
-
-<span class="comment">// Create new element</span>
-<span class="keyword">const</span> newDiv = document.<span class="function">createElement</span>(<span class="string">'div'</span>);
-newDiv.textContent = <span class="string">'New div'</span>;
-document.body.<span class="function">appendChild</span>(newDiv);
-                        </div>
-                        
-                        <div class="code-title">CSS Selectors</div>
-                        <div class="code-block">
-<span class="comment">/* Element selector */</span>
-p { color: blue; }
-
-<span class="comment">/* Class selector */</span>
-.myClass { font-size: 16px; }
-
-<span class="comment">/* ID selector */</span>
-#myId { background: red; }
-
-<span class="comment">/* Attribute selector */</span>
-[type="text"] { border: 1px solid black; }
                         </div>
                     </div>
                 </div>
@@ -638,7 +585,6 @@ p { color: blue; }
         </div>
     </div>
 
-    <!-- Your proper sidebar structure -->
     <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
     <div class="sidebar" id="sidebar">
         <div class="clock" id="clock"></div>
@@ -651,113 +597,57 @@ p { color: blue; }
     </footer> 
 
 <script>
-// Your standard template functions
 function navigateTo(page) {
     window.location.href = page;
 }
 
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('open');
-}
-
-document.addEventListener('click', function(event) {
-    const sidebar = document.getElementById('sidebar');
-    const menuButton = document.querySelector('.menu-btn');
-    if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
-        sidebar.classList.remove('open');
+    if (sidebar) {
+        sidebar.classList.toggle('open');
     }
-});
+}
 
 function updateClock() {
     const now = new Date();
     const timeString = now.toLocaleTimeString();
-    document.getElementById('clock').textContent = timeString;
+    const clockElement = document.getElementById('clock');
+    if (clockElement) {
+        clockElement.textContent = timeString;
+    }
 }
 
 function toggleTheme() {
     document.body.classList.toggle('light-mode');
-    localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    const theme = document.body.classList.contains('light-mode') ? 'light' : 'dark';
+    localStorage.setItem('theme', theme);
 }
 
-// Load theme and initialize
-window.addEventListener('load', function() {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-        document.body.classList.add('light-mode');
-    }
-    initializeSearch();
-    initializeCategories();
-    updateClock();
-    setInterval(updateClock, 1000);
-});
-
-// Ensure sidebar navigation loads
-document.addEventListener('DOMContentLoaded', function() {
-    fetch('sidebar.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('sidebar-nav').innerHTML = data;
-        })
-        .catch(error => {
-            console.log('Sidebar navigation not found - that\'s okay for testing');
-        });
-});
-
-// Cheat Sheet Functionality
 function toggleCategory(header) {
     const content = header.nextElementSibling;
     const icon = header.querySelector('.expand-icon');
     
     if (content && icon) {
+        const isExpanded = content.classList.contains('expanded');
         content.classList.toggle('expanded');
         icon.classList.toggle('rotated');
     }
-}
-
-function initializeCategories() {
-    // Add click event listeners to all category headers
-    const headers = document.querySelectorAll('.category-header');
-    headers.forEach(header => {
-        header.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleCategory(this);
-        });
-    });
-    
-    // Optional: Auto-expand first category for better UX
-    const firstCategory = document.querySelector('.cheat-category');
-    if (firstCategory) {
-        const header = firstCategory.querySelector('.category-header');
-        if (header) {
-            toggleCategory(header);
-        }
-    }
-}
-
-function initializeSearch() {
-    const searchInput = document.getElementById('cheat-search');
-    searchInput.addEventListener('input', handleSearch);
 }
 
 function handleSearch() {
     const searchTerm = document.getElementById('cheat-search').value.toLowerCase();
     const categories = document.querySelectorAll('.cheat-category');
     
-    categories.forEach(category => {
+    categories.forEach(function(category) {
         const categoryText = category.textContent.toLowerCase();
         
         if (searchTerm === '' || categoryText.includes(searchTerm)) {
             category.classList.remove('hidden');
             
-            // Highlight matching text
             if (searchTerm !== '') {
-                highlightText(category, searchTerm);
-                // Auto-expand matching categories
                 const content = category.querySelector('.category-content');
                 const icon = category.querySelector('.expand-icon');
-                if (!content.classList.contains('expanded')) {
+                if (content && icon && !content.classList.contains('expanded')) {
                     content.classList.add('expanded');
                     icon.classList.add('rotated');
                 }
@@ -768,59 +658,57 @@ function handleSearch() {
     });
 }
 
-function highlightText(element, searchTerm) {
-    // Remove existing highlights
-    const existingHighlights = element.querySelectorAll('.highlight');
-    existingHighlights.forEach(highlight => {
-        const parent = highlight.parentNode;
-        parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
-        parent.normalize();
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    const menuButton = document.querySelector('.menu-btn');
+    if (sidebar && menuButton && !sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+        sidebar.classList.remove('open');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+    }
+    
+    const searchInput = document.getElementById('cheat-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', handleSearch);
+    }
+    
+    const headers = document.querySelectorAll('.category-header');
+    headers.forEach(function(header) {
+        header.addEventListener('click', function() {
+            toggleCategory(this);
+        });
     });
     
-    // Don't highlight if search term is too short
-    if (searchTerm.length < 2) return;
-    
-    // Get all text nodes
-    const walker = document.createTreeWalker(
-        element,
-        NodeFilter.SHOW_TEXT,
-        null,
-        false
-    );
-    
-    const textNodes = [];
-    let node;
-    while (node = walker.nextNode()) {
-        if (node.nodeValue.toLowerCase().includes(searchTerm)) {
-            textNodes.push(node);
+    const firstCategory = document.querySelector('.cheat-category');
+    if (firstCategory) {
+        const header = firstCategory.querySelector('.category-header');
+        if (header) {
+            setTimeout(function() {
+                toggleCategory(header);
+            }, 100);
         }
     }
     
-    // Highlight matches
-    textNodes.forEach(textNode => {
-        const text = textNode.nodeValue;
-        const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
-        
-        if (regex.test(text)) {
-            const highlightedHTML = text.replace(regex, '<span class="highlight">$1</span>');
-            const wrapper = document.createElement('div');
-            wrapper.innerHTML = highlightedHTML;
-            
-            while (wrapper.firstChild) {
-                textNode.parentNode.insertBefore(wrapper.firstChild, textNode);
+    updateClock();
+    setInterval(updateClock, 1000);
+    
+    fetch('sidebar.html')
+        .then(function(response) { return response.text(); })
+        .then(function(data) {
+            const sidebarNav = document.getElementById('sidebar-nav');
+            if (sidebarNav) {
+                sidebarNav.innerHTML = data;
             }
-            textNode.parentNode.removeChild(textNode);
-        }
-    });
-}
-
-function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\                if (!content.classList.contains('expanded')) {
-                    content.classList.add('expanded');
-                    icon.classList.add('rotated');');
-}
-
-// Remove the duplicate DOMContentLoaded listener that was causing the syntax error
+        })
+        .catch(function(error) {
+            console.log('Sidebar navigation not found');
+        });
+});
 </script>
 </body>
 </html>
