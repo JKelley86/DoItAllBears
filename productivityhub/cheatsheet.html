@@ -720,3 +720,77 @@ function handleSearch() {
                 if (!content.classList.contains('expanded')) {
                     content.classList.add('expanded');
                     icon.classList.add('rotated');
+                }
+            }
+        } else {
+            category.classList.add('hidden');
+        }
+    });
+}
+
+function highlightText(element, searchTerm) {
+    // Remove existing highlights
+    const existingHighlights = element.querySelectorAll('.highlight');
+    existingHighlights.forEach(highlight => {
+        const parent = highlight.parentNode;
+        parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+        parent.normalize();
+    });
+    
+    // Don't highlight if search term is too short
+    if (searchTerm.length < 2) return;
+    
+    // Get all text nodes
+    const walker = document.createTreeWalker(
+        element,
+        NodeFilter.SHOW_TEXT,
+        null,
+        false
+    );
+    
+    const textNodes = [];
+    let node;
+    while (node = walker.nextNode()) {
+        if (node.nodeValue.toLowerCase().includes(searchTerm)) {
+            textNodes.push(node);
+        }
+    }
+    
+    // Highlight matches
+    textNodes.forEach(textNode => {
+        const text = textNode.nodeValue;
+        const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+        
+        if (regex.test(text)) {
+            const highlightedHTML = text.replace(regex, '<span class="highlight">$1</span>');
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = highlightedHTML;
+            
+            while (wrapper.firstChild) {
+                textNode.parentNode.insertBefore(wrapper.firstChild, textNode);
+            }
+            textNode.parentNode.removeChild(textNode);
+        }
+    });
+}
+
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\                if (!content.classList.contains('expanded')) {
+                    content.classList.add('expanded');
+                    icon.classList.add('rotated');');
+}
+
+// Initialize all categories as collapsed on load
+document.addEventListener('DOMContentLoaded', function() {
+    // Optional: Auto-expand first category for better UX
+    const firstCategory = document.querySelector('.cheat-category');
+    if (firstCategory) {
+        const header = firstCategory.querySelector('.category-header');
+        if (header) {
+            toggleCategory(header);
+        }
+    }
+});
+</script>
+</body>
+</html>
