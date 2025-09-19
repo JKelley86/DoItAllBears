@@ -63,6 +63,17 @@
             border-color: var(--accent-color);
         }
         
+        /* Ensure clickable elements have proper z-index and pointer events */
+        .category-header {
+            position: relative;
+            z-index: 10;
+        }
+        
+        .menu-btn {
+            z-index: 1100 !important;
+            pointer-events: auto !important;
+        }
+        
         .category-header {
             background: linear-gradient(135deg, var(--accent-color), #ff4500);
             color: white;
@@ -260,7 +271,7 @@
         <div class="category-grid" id="category-grid">
             <!-- Allen Bradley PLC -->
             <div class="cheat-category" data-category="plc">
-                <div class="category-header" onclick="toggleCategory(this)">
+                <div class="category-header">
                     <div class="category-title">
                         <i class="fas fa-microchip category-icon"></i>
                         Allen Bradley PLC
@@ -323,7 +334,7 @@
 
             <!-- Computer Shortcuts -->
             <div class="cheat-category" data-category="computer">
-                <div class="category-header" onclick="toggleCategory(this)">
+                <div class="category-header">
                     <div class="category-title">
                         <i class="fas fa-desktop category-icon"></i>
                         Computer Shortcuts
@@ -387,7 +398,7 @@
 
             <!-- Syntax Reference -->
             <div class="cheat-category" data-category="syntax">
-                <div class="category-header" onclick="toggleCategory(this)">
+                <div class="category-header">
                     <div class="category-title">
                         <i class="fas fa-code category-icon"></i>
                         Programming Syntax
@@ -441,7 +452,7 @@ my_dict = {<span class="string">"key"</span>: <span class="string">"value"</span
 
             <!-- Commands -->
             <div class="cheat-category" data-category="commands">
-                <div class="category-header" onclick="toggleCategory(this)">
+                <div class="category-header">
                     <div class="category-title">
                         <i class="fas fa-terminal category-icon"></i>
                         Command Line
@@ -501,7 +512,7 @@ my_dict = {<span class="string">"key"</span>: <span class="string">"value"</span
 
             <!-- Excel VBA -->
             <div class="cheat-category" data-category="vba">
-                <div class="category-header" onclick="toggleCategory(this)">
+                <div class="category-header">
                     <div class="category-title">
                         <i class="fas fa-file-excel category-icon"></i>
                         Excel VBA Code
@@ -562,7 +573,7 @@ cellValue = Range(<span class="string">"A1"</span>).Value
 
             <!-- HTML & JavaScript -->
             <div class="cheat-category" data-category="web">
-                <div class="category-header" onclick="toggleCategory(this)">
+                <div class="category-header">
                     <div class="category-title">
                         <i class="fas fa-globe category-icon"></i>
                         HTML & JavaScript
@@ -670,30 +681,59 @@ function toggleTheme() {
 }
 
 // Load theme and initialize
-window.onload = function() {
+window.addEventListener('load', function() {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'light') {
         document.body.classList.add('light-mode');
     }
     initializeSearch();
-}
+    initializeCategories();
+    updateClock();
+    setInterval(updateClock, 1000);
+});
 
-fetch('sidebar.html')
-    .then(response => response.text())
-    .then(data => {
-        document.getElementById('sidebar-nav').innerHTML = data;
-    });
-
-setInterval(updateClock, 1000);
-updateClock();
+// Ensure sidebar navigation loads
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('sidebar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('sidebar-nav').innerHTML = data;
+        })
+        .catch(error => {
+            console.log('Sidebar navigation not found - that\'s okay for testing');
+        });
+});
 
 // Cheat Sheet Functionality
 function toggleCategory(header) {
     const content = header.nextElementSibling;
     const icon = header.querySelector('.expand-icon');
     
-    content.classList.toggle('expanded');
-    icon.classList.toggle('rotated');
+    if (content && icon) {
+        content.classList.toggle('expanded');
+        icon.classList.toggle('rotated');
+    }
+}
+
+function initializeCategories() {
+    // Add click event listeners to all category headers
+    const headers = document.querySelectorAll('.category-header');
+    headers.forEach(header => {
+        header.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleCategory(this);
+        });
+    });
+    
+    // Optional: Auto-expand first category for better UX
+    const firstCategory = document.querySelector('.cheat-category');
+    if (firstCategory) {
+        const header = firstCategory.querySelector('.category-header');
+        if (header) {
+            toggleCategory(header);
+        }
+    }
 }
 
 function initializeSearch() {
