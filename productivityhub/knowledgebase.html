@@ -824,6 +824,9 @@ async function savePage() {
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',  // Add this header
+            },
             body: JSON.stringify({
                 action: 'savePage',
                 category,
