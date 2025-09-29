@@ -57,6 +57,17 @@ body {
   line-height: 1.5;
 }
 
+.plus-one {
+  margin-top: 1.5rem;
+}
+
+.plus-one-text {
+  font-size: 1.1rem;
+  color: #ffcc80;
+  font-weight: bold;
+  text-shadow: 0 0 6px #ff6600;
+}
+
 .contact {
   margin-top: 2rem;
 }
