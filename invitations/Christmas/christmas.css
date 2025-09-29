@@ -1,0 +1,93 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  color: #fff;
+  background: url("https://images.unsplash.com/photo-1608889175241-67a3c89d8ef2?auto=format&fit=crop&w=1950&q=80")
+    no-repeat center center fixed;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Festive overlay */
+.overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 40, 0, 0.6); /* dark green tint */
+  z-index: 0;
+}
+
+.card {
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid #d32f2f; /* Christmas red */
+  border-radius: 20px;
+  padding: 2rem 3rem;
+  text-align: center;
+  max-width: 650px;
+  z-index: 1;
+  box-shadow: 0 0 25px rgba(220, 20, 60, 0.8);
+  animation: fadeInUp 1s ease-out;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #ff4444;
+  text-shadow: 0 0 10px #ff3333, 0 0 20px #ff0000;
+}
+
+.subtitle {
+  font-size: 1.6rem;
+  margin-bottom: 1.5rem;
+  color: #ffee99;
+}
+
+.details p {
+  font-size: 1.1rem;
+  margin: 0.5rem 0;
+  line-height: 1.5;
+  color: #fff;
+}
+
+.plus-one {
+  margin-top: 1.5rem;
+}
+
+.plus-one-text {
+  font-size: 1.1rem;
+  color: #a5ffb3;
+  font-weight: bold;
+  text-shadow: 0 0 6px #00ff66;
+}
+
+.contact {
+  margin-top: 2rem;
+}
+
+.rsvp-text {
+  font-size: 1.1rem;
+  color: #ffcccc;
+  font-style: italic;
+  text-shadow: 0 0 5px #ff6666, 0 0 10px #ff3333;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
