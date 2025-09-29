@@ -187,12 +187,22 @@
       Your complaint has been submitted and will be looked at eventually. Rest assured, it will be taken very seriously.
     </p>
 
-    <!-- Complaint ID + Copy button -->
+    <!-- Complaint ID + subtle copy button -->
     <p>
       <strong>Your Complaint ID:</strong>
-      <span id="complaintId"></span>
-      <button id="copyIdBtn" style="margin-left:10px; padding:5px 10px; font-size:0.9em; border:none; border-radius:5px; background:#28a745; color:#fff; cursor:pointer;">
-        Copy ID
+      <span id="complaintId" style="font-family: monospace; margin-left:5px;"></span>
+      <button id="copyIdBtn" style="
+        margin-left:5px; 
+        padding:2px 6px; 
+        font-size:0.8em; 
+        border:none; 
+        border-radius:3px; 
+        background:#eee; 
+        color:#333; 
+        cursor:pointer;
+        transition: 0.2s;
+      ">
+        Copy
       </button>
     </p>
 
@@ -276,7 +286,7 @@
     const idText = complaintId.textContent;
     navigator.clipboard.writeText(idText).then(() => {
       copyBtn.textContent = "Copied!";
-      setTimeout(() => copyBtn.textContent = "Copy ID", 1500);
+      setTimeout(() => copyBtn.textContent = "Copy", 1500);
     }).catch(err => console.error("Clipboard copy failed:", err));
   });
     
