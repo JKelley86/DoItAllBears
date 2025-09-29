@@ -103,14 +103,8 @@
 </head>
 <body>
 
-  <!-- Magnifying Glass Search -->
-<div style="position: fixed; top: 20px; right: 20px; z-index:1001;">
-  <button id="searchIcon" style="font-size:20px; padding:10px; border-radius:50%; cursor:pointer;">🔍</button>
-  <div id="searchContainer" style="display:none; margin-top:10px; text-align:right;">
-    <input type="text" id="searchInput" placeholder="Enter complaint ID" style="padding:5px 10px; border-radius:5px; border:1px solid #ccc;">
-    <button id="searchBtn" style="padding:5px 10px; border-radius:5px; background:#007bff; color:white; border:none; cursor:pointer;">Search</button>
-  </div>
-</div>
+<!-- Magnifying Glass -->
+<button id="searchIcon" style="position: fixed; top: 20px; right: 20px; font-size: 24px; border:none; background:none; cursor:pointer;">🔍</button>
   
   <h1>Official Butthurt Reporting Portal</h1>
   <p>Welcome to the official Butthurt Reporting Portal. Here, we take your complaints very seriously. Please read the following guidelines carefully before submitting your report. Failure to comply may result in being labeled as “soft.”</p>
@@ -194,11 +188,21 @@
     </div>
   </div>
 
-  <!-- Fake search result modal -->
-<div id="searchResultModal" class="modal">
+<!-- Search Popup Modal -->
+<div id="searchModal" class="modal">
   <div class="modal-content">
-    <p id="searchResultText"></p>
-    <button onclick="document.getElementById('searchResultModal').style.display='none'">Close</button>
+    <h3>Search Your Complaint ID</h3>
+    <input type="text" id="searchInput" placeholder="Enter BH Complaint ID" style="width:80%; padding:5px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;">
+    <div id="searchResults"></div>
+    <button id="closeSearch" style="margin-top:10px;">Close</button>
+  </div>
+</div>
+
+<!-- Seriousness Popup Modal -->
+<div id="seriousModal" class="modal">
+  <div class="modal-content">
+    <p>Are you really looking for this?</p>
+    <button onclick="document.getElementById('seriousModal').style.display='none'">Close</button>
   </div>
 </div>
   
@@ -248,34 +252,53 @@
     });
     
   </script>
+  
 <script>
   const searchIcon = document.getElementById('searchIcon');
-  const searchContainer = document.getElementById('searchContainer');
-  const searchBtn = document.getElementById('searchBtn');
+  const searchModal = document.getElementById('searchModal');
+  const closeSearch = document.getElementById('closeSearch');
   const searchInput = document.getElementById('searchInput');
-  const searchResultModal = document.getElementById('searchResultModal');
-  const searchResultText = document.getElementById('searchResultText');
+  const searchResults = document.getElementById('searchResults');
+  const seriousModal = document.getElementById('seriousModal');
 
-  // Toggle search input
+  // Show search popup
   searchIcon.addEventListener('click', () => {
-    searchContainer.style.display = searchContainer.style.display === 'none' ? 'block' : 'none';
+    searchModal.style.display = 'flex';
+    searchInput.value = '';
+    searchResults.innerHTML = '';
   });
 
-  // Search logic
-  searchBtn.addEventListener('click', () => {
+  // Close search popup
+  closeSearch.addEventListener('click', () => {
+    searchModal.style.display = 'none';
+  });
+
+  // Handle search input
+  searchInput.addEventListener('input', () => {
     const query = searchInput.value.trim();
-    if(query.toUpperCase().startsWith("BH")) {
-      searchResultText.textContent = `Are you seriously searching for this? [${query}]`;
-      searchResultModal.style.display = 'flex';
+    searchResults.innerHTML = ''; // clear previous results
+    if(query.toUpperCase().startsWith('BH')) {
+      const btn = document.createElement('button');
+      btn.textContent = query;
+      btn.style.marginTop = '10px';
+      btn.style.padding = '8px 12px';
+      btn.style.borderRadius = '5px';
+      btn.style.background = '#007bff';
+      btn.style.color = 'white';
+      btn.style.border = 'none';
+      btn.style.cursor = 'pointer';
+      btn.onclick = () => {
+        searchModal.style.display = 'none';
+        seriousModal.style.display = 'flex';
+      };
+      searchResults.appendChild(btn);
     }
   });
 
-  // Allow pressing Enter
-  searchInput.addEventListener('keypress', (e) => {
-    if(e.key === 'Enter') {
-      e.preventDefault();
-      searchBtn.click();
-    }
+  // Close serious modal on click outside or close button
+  window.addEventListener('click', (e) => {
+    if(e.target === searchModal) searchModal.style.display = 'none';
+    if(e.target === seriousModal) seriousModal.style.display = 'none';
   });
 </script>
   
