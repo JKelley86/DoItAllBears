@@ -179,7 +179,7 @@
   <!-- Submission Confirmation Modal -->
   <div id="submittedModal" class="modal">
     <div class="modal-content">
-      <p>Your complaint has been submitted and will be looked at eventually. Rest assured, it will be taken very seriously.</p>
+      <p id="submissionMessage">Your complaint has been submitted and will be looked at eventually. Rest assured, it will be taken very seriously.</p>
       <button onclick="document.getElementById('submittedModal').style.display='none'">Close</button>
     </div>
   </div>
@@ -225,8 +225,10 @@
     submitFormBtn.addEventListener('click', () => {
       actualForm.style.display = 'none';
       const id = generateComplaintId();
+      submissionMessage.innerHTML = `Your complaint has been submitted and will be looked at eventually. Rest assured, it will be taken very seriously.<br>ID: <strong>${id}</strong>`;
       submittedModal.style.display = 'flex';
     });
+    
   </script>
 </body>
 </html>
