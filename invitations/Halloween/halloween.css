@@ -8,7 +8,7 @@
 body {
   font-family: "Poppins", sans-serif;
   color: #fff;
-  background: url("https://images.unsplash.com/photo-1509228627152-72ae9ae6848d?auto=format&fit=crop&w=1950&q=80")
+  background: url("https://images.unsplash.com/photo-1508264165352-258a6b3a7c49?auto=format&fit=crop&w=1950&q=80")
     no-repeat center center fixed;
   background-size: cover;
   display: flex;
@@ -23,13 +23,13 @@ body {
   position: absolute;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.7);
   z-index: 0;
 }
 
 .card {
   background: rgba(20, 20, 20, 0.85);
-  border: 2px solid orange;
+  border: 2px solid #ff7518;
   border-radius: 20px;
   padding: 2rem 3rem;
   text-align: center;
@@ -57,23 +57,15 @@ body {
   line-height: 1.5;
 }
 
-.btn {
-  display: inline-block;
-  margin-top: 1.5rem;
-  padding: 0.75rem 1.5rem;
-  background: #ff6600;
-  color: #fff;
-  font-weight: bold;
-  border-radius: 30px;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 15px rgba(255, 102, 0, 0.6);
+.contact {
+  margin-top: 2rem;
 }
 
-.btn:hover {
-  background: #e65c00;
-  transform: scale(1.05);
-  box-shadow: 0 0 25px rgba(255, 102, 0, 0.9);
+.rsvp-text {
+  font-size: 1.1rem;
+  color: #ffcc80;
+  font-style: italic;
+  text-shadow: 0 0 5px #ff6600, 0 0 10px #ff3300;
 }
 
 /* Animation */
