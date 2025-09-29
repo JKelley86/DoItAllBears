@@ -5,80 +5,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Butthurt Report</title>
   <style>
-    /* General Reset */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
-
     body {
+      font-family: Arial, sans-serif;
       background-color: #f2f2f2;
       color: #333;
-      padding: 50px 20px;
-      line-height: 1.6;
+      padding: 40px 20px;
     }
-
     h1, h2 {
       text-align: center;
-      margin-bottom: 20px;
     }
-
     h1 {
       font-size: 2.5em;
-      color: #2a2a2a;
+      margin-bottom: 10px;
     }
-
-    h2 {
-      font-size: 1.8em;
-      margin-top: 40px;
-      color: #444;
-    }
-
     p {
       margin-bottom: 20px;
+      line-height: 1.6;
     }
-
-    ul {
-      margin-left: 40px;
-      margin-bottom: 30px;
-    }
-
     .report-container {
       text-align: center;
       margin: 40px 0;
     }
-
     button {
       background-color: #007bff;
       color: white;
       border: none;
-      padding: 15px 30px;
+      padding: 12px 25px;
       font-size: 1em;
       border-radius: 5px;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: 0.2s;
     }
+    button:hover { background-color: #0056b3; }
 
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    /* Modal Styles */
+    /* Modal styles */
     .modal {
-      display: none; /* Hidden by default */
+      display: none;
       position: fixed;
       z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
       background-color: rgba(0,0,0,0.5);
+      display: flex;
       align-items: center;
       justify-content: center;
     }
-
     .modal-content {
       background-color: #fff;
       padding: 30px;
@@ -88,56 +59,51 @@
       width: 90%;
       box-shadow: 0 6px 20px rgba(0,0,0,0.2);
     }
-
     .modal-content p {
       margin-bottom: 20px;
       font-size: 1.2em;
-      color: #333;
     }
+    .modal-content button { margin: 5px; }
 
-    .modal-content button {
-      margin: 5px;
+    /* Form styles */
+    #actualForm {
+      max-width: 600px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      display: none;
     }
-
-    /* Optional: fake footer */
-    footer {
-      margin-top: 50px;
-      text-align: center;
-      color: #777;
-      font-size: 0.9em;
+    #actualForm label {
+      display: block;
+      margin: 15px 0 5px;
+      font-weight: bold;
+    }
+    #actualForm textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .checkbox-group label {
+      display: block;
+      font-weight: normal;
+      margin: 3px 0;
     }
   </style>
 </head>
 <body>
   <h1>Official Butthurt Reporting Portal</h1>
-  <p>Welcome to the official Butthurt Reporting Portal. Here, we take your complaints very seriously. Please read the following guidelines carefully before submitting your report. Failure to comply may result in being labeled as “soft.”</p>
-
-  <h2>Who may file a Butthurt Report?</h2>
-  <p>Individuals who have experienced:</p>
-  <ul>
-    <li>Feeling slighted on social media without justification</li>
-    <li>Being “roasted” in a friendly conversation</li>
-    <li>Minor inconveniences that hurt your delicate sensibilities</li>
-    <li>Someone disagreeing with your opinion in a meeting</li>
-    <li>Anything else that triggers your emotional fragility</li>
-  </ul>
-
-  <h2>Possible entitlements</h2>
-  <p>Upon submission of a Butthurt Report, you may be entitled to the following (subject to verification):</p>
-  <ul>
-    <li>Recognition for being overly sensitive</li>
-    <li>A gold star for emotional endurance</li>
-    <li>Complimentary sympathy hugs (virtual)</li>
-    <li>Mandatory patience training for others around you</li>
-    <li>Official acknowledgment of “softness” status</li>
-  </ul>
+  <p>Welcome to the official Butthurt Reporting Portal. Please submit your complaints responsibly. Your emotional fragility is taken very seriously.</p>
 
   <div class="report-container">
     <button id="submitReport">Submit Your Butthurt Report</button>
   </div>
 
-  <!-- Modal -->
-  <div id="butthurtModal" class="modal">
+  <!-- Softness popup -->
+  <div id="softModal" class="modal">
     <div class="modal-content">
       <p>You're not butthurt, you're just soft!</p>
       <button id="iKnow">I know</button>
@@ -145,26 +111,83 @@
     </div>
   </div>
 
-  <footer>
-    © 2025 Official Butthurt Reporting Agency. All Rights Reserved.  
-  </footer>
+  <!-- Actual Form -->
+  <form id="actualForm">
+    <label for="cause">What caused the butthurt?</label>
+    <textarea id="cause" rows="3"></textarea>
 
-<script>
-const modal = document.getElementById('butthurtModal');
-const submitBtn = document.getElementById('submitReport');
-const iKnowBtn = document.getElementById('iKnow');
+    <label>Was a tissue needed for the tears?</label>
+    <label><input type="radio" name="tissue" value="Yes"> Yes</label>
+    <label><input type="radio" name="tissue" value="No"> No</label>
 
-// Open modal when report button clicked
-submitBtn.addEventListener('click', () => {
-  modal.style.display = 'flex'; // show the modal
-});
+    <label>Will you be able to move past it?</label>
+    <label><input type="radio" name="movePast" value="Yes"> Yes</label>
+    <label><input type="radio" name="movePast" value="No"> No</label>
+    <label><input type="radio" name="movePast" value="Not sure"> Not sure</label>
 
-// Close modal when "I know" clicked
-iKnowBtn.addEventListener('click', () => {
-  modal.style.display = 'none';
-});
+    <label>Reason for filling out the Report (check all that apply):</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="reason" value="I am an idiot"> I am an idiot</label>
+      <label><input type="checkbox" name="reason" value="I’m better than everyone else"> I’m better than everyone else</label>
+      <label><input type="checkbox" name="reason" value="I am a crybaby"> I am a crybaby</label>
+      <label><input type="checkbox" name="reason" value="I’m a prude"> I’m a prude</label>
+      <label><input type="checkbox" name="reason" value="I am thin-skinned"> I am thin-skinned</label>
+      <label><input type="checkbox" name="reason" value="It wasn’t my joke"> It wasn’t my joke</label>
+      <label><input type="checkbox" name="reason" value="I am a little bitch"> I am a little bitch</label>
+      <label><input type="checkbox" name="reason" value="No one liked my selfies today"> No one liked my selfies today</label>
+      <label><input type="checkbox" name="reason" value="I want my mommy!"> I want my mommy!</label>
+      <label><input type="checkbox" name="reason" value="Life just isn’t fair!"> Life just isn’t fair!</label>
+      <label><input type="checkbox" name="reason" value="I felt picked on"> I felt picked on</label>
+      <label><input type="checkbox" name="reason" value="Other"> Other (please explain below)</label>
+    </div>
 
-// "No I'm not" does nothing
-</script>
+    <label for="otherReason">Other explanation:</label>
+    <textarea id="otherReason" rows="2"></textarea>
+
+    <div class="report-container">
+      <button type="button" id="submitForm">Submit Complaint</button>
+    </div>
+  </form>
+
+  <!-- Submission Confirmation Modal -->
+  <div id="submittedModal" class="modal">
+    <div class="modal-content">
+      <p>Your complaint has been submitted and will be looked at eventually. Rest assured, it will be taken very seriously.</p>
+      <button onclick="document.getElementById('submittedModal').style.display='none'">Close</button>
+    </div>
+  </div>
+
+  <script>
+    const softModal = document.getElementById('softModal');
+    const submitBtn = document.getElementById('submitReport');
+    const iKnowBtn = document.getElementById('iKnow');
+    const noImNotBtn = document.getElementById('noImNot');
+    const actualForm = document.getElementById('actualForm');
+    const submitFormBtn = document.getElementById('submitForm');
+    const submittedModal = document.getElementById('submittedModal');
+
+    let noImNotClicks = 0;
+
+    // Open softness popup
+    submitBtn.addEventListener('click', () => { softModal.style.display = 'flex'; });
+
+    // "I know" closes the modal
+    iKnowBtn.addEventListener('click', () => { softModal.style.display = 'none'; });
+
+    // "No I'm not" behavior
+    noImNotBtn.addEventListener('click', () => {
+      noImNotClicks++;
+      if (noImNotClicks >= 3) {
+        softModal.style.display = 'none';
+        actualForm.style.display = 'block';
+      }
+    });
+
+    // Submit actual form
+    submitFormBtn.addEventListener('click', () => {
+      actualForm.style.display = 'none';
+      submittedModal.style.display = 'flex';
+    });
+  </script>
 </body>
 </html>
