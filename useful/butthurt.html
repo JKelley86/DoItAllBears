@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Butthurt Report</title>
+  <style>
+    /* General Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 50px 20px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 2.5em;
+      text-align: center;
+    }
+
+    p {
+      color: #666;
+      font-size: 1.1em;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .report-container {
+      background: #fff;
+      padding: 40px 30px;
+      border-radius: 10px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1em;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+
+    .modal-content p {
+      margin-bottom: 20px;
+      font-size: 1.2em;
+      color: #333;
+    }
+
+    .modal-content button {
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Butthurt Report</h1>
+  <p>Welcome to the official Butthurt Reporting Portal. Please submit your complaints below.</p>
+
+  <div class="report-container">
+    <button id="submitReport">Submit Butthurt Report</button>
+  </div>
+
+  <!-- Modal -->
+  <div id="butthurtModal" class="modal">
+    <div class="modal-content">
+      <p>You're not butthurt, you're just soft!</p>
+      <button id="iKnow">I know</button>
+      <button id="noImNot">No I'm not</button>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('butthurtModal');
+    const submitBtn = document.getElementById('submitReport');
+    const iKnowBtn = document.getElementById('iKnow');
+    const noImNotBtn = document.getElementById('noImNot');
+
+    // Open modal when report button clicked
+    submitBtn.addEventListener('click', () => {
+      modal.style.display = 'flex';
+    });
+
+    // Close modal when "I know" clicked
+    iKnowBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    // "No I'm not" does nothing, so no listener needed
+    // Optional: prevent modal from closing if clicked outside
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'flex'; // keeps it open if they click outside
+      }
+    });
+  </script>
+</body>
+</html>
