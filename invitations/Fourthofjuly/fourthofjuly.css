@@ -1,0 +1,93 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  color: #fff;
+  background: url("https://images.unsplash.com/photo-1594082661233-8babcdb02a89?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
+    no-repeat center center fixed;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Overlay */
+.overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 50, 0.6);
+  z-index: 0;
+}
+
+.card {
+  background: rgba(20, 20, 30, 0.85);
+  border: 2px solid #ff3333; /* red accent */
+  border-radius: 20px;
+  padding: 2rem 3rem;
+  text-align: center;
+  max-width: 650px;
+  z-index: 1;
+  box-shadow: 0 0 25px rgba(255, 0, 0, 0.8);
+  animation: fadeInUp 1s ease-out;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #3385ff; /* blue */
+  text-shadow: 0 0 10px #ff3333, 0 0 20px #ffffff;
+}
+
+.subtitle {
+  font-size: 1.6rem;
+  margin-bottom: 1.5rem;
+  color: #fffacd;
+}
+
+.details p {
+  font-size: 1.1rem;
+  margin: 0.5rem 0;
+  line-height: 1.5;
+  color: #f0f0f0;
+}
+
+.plus-one {
+  margin-top: 1.5rem;
+}
+
+.plus-one-text {
+  font-size: 1.1rem;
+  color: #ffcc00;
+  font-weight: bold;
+  text-shadow: 0 0 6px #ff3333, 0 0 12px #3385ff;
+}
+
+.contact {
+  margin-top: 2rem;
+}
+
+.rsvp-text {
+  font-size: 1.1rem;
+  color: #fff3e0;
+  font-style: italic;
+  text-shadow: 0 0 5px #ff3333, 0 0 10px #3385ff;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
