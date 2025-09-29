@@ -58,6 +58,17 @@ body {
   color: #fff3e0;
 }
 
+.plus-one {
+  margin-top: 1.5rem;
+}
+
+.plus-one-text {
+  font-size: 1.1rem;
+  color:  #ffda99;
+  font-weight: bold;
+  text-shadow: 0 0 6px #ff9933;
+}
+
 .contact {
   margin-top: 2rem;
 }
