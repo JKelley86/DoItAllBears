@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cabin Trip Invitation</title>
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      color: #fff;
+      background: url("https://images.unsplash.com/photo-1623681193221-261b6578180e?q=80&w=706&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
+        no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Overlay */
+    .overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(2px);
+      z-index: 0;
+    }
+
+    .card {
+      background: rgba(30, 30, 30, 0.85);
+      border: 2px solid #8b5a2b;
+      border-radius: 20px;
+      padding: 2rem 3rem;
+      text-align: center;
+      max-width: 750px;
+      z-index: 1;
+      box-shadow: 0 0 25px rgba(139, 90, 43, 0.7);
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .title {
+      font-size: 2.5rem;
+      color: #f4a460;
+      text-shadow: 0 0 10px #deb887, 0 0 20px #cd853f;
+    }
+
+    .subtitle {
+      font-size: 1.6rem;
+      margin-bottom: 1.5rem;
+      color: #ffffff;
+      text-shadow: 0 0 6px #666;
+    }
+
+    .details p {
+      font-size: 1.1rem;
+      margin: 0.5rem 0;
+      line-height: 1.5;
+    }
+
+    .food-section, .entertainment {
+      margin-top: 1.5rem;
+      text-align: left;
+    }
+
+    .food-section h3,
+    .entertainment h3 {
+      margin-bottom: 0.5rem;
+      font-size: 1.3rem;
+      color: #f4a460;
+    }
+
+    .food-section ul,
+    .entertainment ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .food-section li,
+    .entertainment li {
+      font-size: 1.1rem;
+      margin: 0.3rem 0;
+      color: #f5deb3;
+    }
+
+    .plus-one {
+      margin-top: 1.5rem;
+    }
+
+    .plus-one-text {
+      font-size: 1.1rem;
+      color: #ffcc66;
+      font-weight: bold;
+    }
+
+    .contact {
+      margin-top: 2rem;
+    }
+
+    .rsvp-text {
+      font-size: 1.1rem;
+      color: #ffe4b5;
+      font-style: italic;
+    }
+
+    /* Animation */
+    @keyframes fadeInUp {
+      from {
+        transform: translateY(40px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+  <main class="card">
+    <h1 class="title">🏔️ Cabin Weekend Getaway 🏔️</h1>
+    <h2 class="subtitle">Up North with Friends</h2>
+
+    <section class="details">
+      <p><strong>📅 Dates:</strong> Friday, June 6th – Sunday, June 8th, 2025</p>
+      <p><strong>🕖 Arrival Time:</strong> Anytime after 4:00 PM on Friday</p>
+      <p><strong>📍 Location:</strong> Family Cabin, 47289 188th Ave, McGregor, MN 55760</p>
+    </section>
+
+    <section class="food-section">
+      <h3>🍴 Food & Drinks:</h3>
+      <ul>
+        <li><strong>Friday Night:</strong> Burgers & beers</li>
+        <li><strong>Saturday Breakfast:</strong> Pancakes, eggs, coffee</li>
+        <li><strong>Saturday Lunch:</strong> Sandwiches & chips</li>
+        <li><strong>Saturday Dinner:</strong> Steak, potatoes, and drinks</li>
+        <li><strong>Sunday Breakfast:</strong> Donuts & coffee</li>
+      </ul>
+    </section>
+
+    <section class="entertainment">
+      <h3>🎶 Entertainment:</h3>
+      <ul>
+        <li>Fishing & boating</li>
+        <li>Bonfire & s’mores</li>
+        <li>Board & card games</li>
+        <li>Music & drinks</li>
+        <li>Hiking and relaxing</li>
+      </ul>
+    </section>
+
+    <section class="plus-one">
+      <p class="plus-one-text">➕ Bring a <strong>+1</strong> if you’d like — plenty of room at the cabin!</p>
+    </section>
+
+    <section class="contact">
+      <p class="rsvp-text">📱 Please text <strong>Justin</strong> or <strong>Bridget</strong> to RSVP and let us know if you’ll be bringing someone.</p>
+    </section>
+  </main>
+</body>
+</html>
