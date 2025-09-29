@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hangout Invitation</title>
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      color: #fff;
+      background: url("https://plus.unsplash.com/premium_photo-1701189585885-57fae9de1eb3?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
+        no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Overlay */
+    .overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(2px);
+      z-index: 0;
+    }
+
+    .card {
+      background: rgba(30, 30, 30, 0.85);
+      border: 2px solid #ffcc00;
+      border-radius: 20px;
+      padding: 2rem 3rem;
+      text-align: center;
+      max-width: 650px;
+      z-index: 1;
+      box-shadow: 0 0 25px rgba(255, 204, 0, 0.7);
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .title {
+      font-size: 2.5rem;
+      color: #ffcc00;
+      text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffaa00;
+    }
+
+    .subtitle {
+      font-size: 1.6rem;
+      margin-bottom: 1.5rem;
+      color: #ffffff;
+      text-shadow: 0 0 6px #999;
+    }
+
+    .details p {
+      font-size: 1.1rem;
+      margin: 0.5rem 0;
+      line-height: 1.5;
+    }
+
+    .plus-one {
+      margin-top: 1.5rem;
+    }
+
+    .plus-one-text {
+      font-size: 1.1rem;
+      color: #ffcc00;
+      font-weight: bold;
+    }
+
+    .contact {
+      margin-top: 2rem;
+    }
+
+    .rsvp-text {
+      font-size: 1.1rem;
+      color: #f0e68c;
+      font-style: italic;
+    }
+
+    /* Animation */
+    @keyframes fadeInUp {
+      from {
+        transform: translateY(40px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+  <main class="card">
+    <h1 class="title">🎉 You’re Invited 🎉</h1>
+    <h2 class="subtitle">Casual Hangout with Friends</h2>
+
+    <section class="details">
+      <p><strong>📅 Date:</strong> Friday, March 14th, 2025</p>
+      <p><strong>🕖 Time:</strong> 7:00 PM – 2:00 AM</p>
+      <p><strong>📍 Location:</strong> Kelley Residence, 35455 Grand Ave North Branch, MN 55056</p>
+      <p><strong>🍴 Food & Drinks:</strong> Snacks, pizza, and drinks provided</p>
+      <p><strong>🎶 Vibe:</strong> Music, games, bonfire, and good times</p>
+    </section>
+
+    <section class="plus-one">
+      <p class="plus-one-text">➕ Bring a <strong>+1</strong> if you’d like — the more the merrier!</p>
+    </section>
+
+    <section class="contact">
+      <p class="rsvp-text">📱 Please text <strong>Justin</strong> or <strong>Bridget</strong> to let us know if you can make it.</p>
+    </section>
+  </main>
+</body>
+</html>
