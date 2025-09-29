@@ -192,7 +192,7 @@
 <div id="searchModal" class="modal">
   <div class="modal-content">
     <h3>Search Your Complaint ID</h3>
-    <input type="text" id="searchInput" placeholder="Enter BH Complaint ID" style="width:80%; padding:5px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;">
+    <input type="text" id="searchInput" placeholder="Enter BH Complaint ID (Must start with BH)" style="width:80%; padding:5px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;">
     <div id="searchResults"></div>
     <button id="closeSearch" style="margin-top:10px;">Close</button>
   </div>
@@ -201,7 +201,8 @@
 <!-- Seriousness Popup Modal -->
 <div id="seriousModal" class="modal">
   <div class="modal-content">
-    <p>Are you really looking for this?</p>
+    <p>Are you really looking for this?</p><br>
+    <p>I think that's worse than filling out the form in the first place.</p>
     <button onclick="document.getElementById('seriousModal').style.display='none'">Close</button>
   </div>
 </div>
