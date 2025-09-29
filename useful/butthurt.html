@@ -188,10 +188,11 @@
     </p>
 
     <!-- Complaint ID + subtle copy button -->
-    <p>
+    <p style="margin-top:15px;">
       <strong>Your Complaint ID:</strong>
-      <span id="complaintId" style="font-family: monospace; margin-left:5px;"></span>
+      <span id="complaintId" style="font-family: monospace; margin-left:5px; display:inline-block;"></span>
       <button id="copyIdBtn" style="
+        display:inline-block;
         margin-left:5px; 
         padding:2px 6px; 
         font-size:0.8em; 
@@ -200,13 +201,14 @@
         background:#eee; 
         color:#333; 
         cursor:pointer;
+        vertical-align: middle;
         transition: 0.2s;
       ">
         Copy
       </button>
     </p>
 
-    <button id="closeSubmitted">Close</button>
+    <button id="closeSubmitted" style="margin-top:10px;">Close</button>
   </div>
 </div>
 
@@ -266,29 +268,20 @@
       return `BH-${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}-${rand}`;
     }
 
-    // Submit actual form
-    submitFormBtn.addEventListener('click', () => {
-      actualForm.style.display = 'none';
-      const id = generateComplaintId();
-      submissionMessage.innerHTML = `Your complaint has been submitted and will be looked at eventually. Rest assured, it will be taken very seriously.<br>ID: <strong>${id}</strong>`;
-      submittedModal.style.display = 'flex';
-    });
+// Submit actual form
+submitFormBtn.addEventListener('click', () => {
+  actualForm.style.display = 'none';
+  const id = generateComplaintId();
 
-  const copyBtn = document.getElementById('copyIdBtn');
-  const complaintId = document.getElementById('complaintId');
-  const closeSubmitted = document.getElementById('closeSubmitted');
+  // Set the main submission message
+  submissionMessage.textContent = 'Your complaint has been submitted and will be looked at eventually. Rest assured, it will be taken very seriously.';
 
-  closeSubmitted.addEventListener('click', () => {
-    document.getElementById('submittedModal').style.display = 'none';
-  });
+  // Fill the complaint ID span for the copy button
+  complaintId.textContent = id;
 
-  copyBtn.addEventListener('click', () => {
-    const idText = complaintId.textContent;
-    navigator.clipboard.writeText(idText).then(() => {
-      copyBtn.textContent = "Copied!";
-      setTimeout(() => copyBtn.textContent = "Copy", 1500);
-    }).catch(err => console.error("Clipboard copy failed:", err));
-  });
+  // Show the modal
+  submittedModal.style.display = 'flex';
+});
     
   </script>
   
