@@ -1,0 +1,129 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  color: #fff;
+  background: url("https://media.istockphoto.com/id/528341397/photo/ice.jpg?s=2048x2048&w=is&k=20&c=NL6J45rdOAk9DaHUDsSAX6Qz8MD5SAndSfctlz4CXZ8=")
+    no-repeat center center fixed;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Overlay */
+.overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 50, 20, 0.6);
+  z-index: 0;
+}
+
+.card {
+  background: rgba(20, 20, 20, 0.85);
+  border: 2px solid #ff0000; /* main accent red */
+  border-radius: 20px;
+  padding: 2rem 3rem;
+  text-align: center;
+  max-width: 700px;
+  z-index: 1;
+  box-shadow: 0 0 25px rgba(255, 0, 0, 0.7);
+  animation: fadeInUp 1s ease-out;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #ff3333;
+  text-shadow: 0 0 10px #ff0000, 0 0 20px #ff6666;
+}
+
+.subtitle {
+  font-size: 1.6rem;
+  margin-bottom: 1.5rem;
+  color: #00bfff;
+}
+
+.details p {
+  font-size: 1.1rem;
+  margin: 0.5rem 0;
+  line-height: 1.5;
+}
+
+.games h3, .teams h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+  color: #ffd700;
+}
+
+.games ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.games li {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  color: #fffacd;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+th, td {
+  border: 1px solid #fff;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+th {
+  background-color: #ff0000;
+  color: #fff;
+}
+
+td:nth-child(2) {
+  background-color: #1e90ff;
+}
+
+.plus-one {
+  margin-top: 1.5rem;
+}
+
+.plus-one-text {
+  font-size: 1.1rem;
+  color: #ffcc00;
+  font-weight: bold;
+}
+
+.contact {
+  margin-top: 2rem;
+}
+
+.rsvp-text {
+  font-size: 1.1rem;
+  color: #ffe4b5;
+  font-style: italic;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
