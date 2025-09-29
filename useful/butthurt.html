@@ -102,6 +102,16 @@
   </style>
 </head>
 <body>
+
+  <!-- Magnifying Glass Search -->
+<div style="position: fixed; top: 20px; right: 20px; z-index:1001;">
+  <button id="searchIcon" style="font-size:20px; padding:10px; border-radius:50%; cursor:pointer;">🔍</button>
+  <div id="searchContainer" style="display:none; margin-top:10px; text-align:right;">
+    <input type="text" id="searchInput" placeholder="Enter complaint ID" style="padding:5px 10px; border-radius:5px; border:1px solid #ccc;">
+    <button id="searchBtn" style="padding:5px 10px; border-radius:5px; background:#007bff; color:white; border:none; cursor:pointer;">Search</button>
+  </div>
+</div>
+  
   <h1>Official Butthurt Reporting Portal</h1>
   <p>Welcome to the official Butthurt Reporting Portal. Here, we take your complaints very seriously. Please read the following guidelines carefully before submitting your report. Failure to comply may result in being labeled as “soft.”</p>
 
@@ -183,6 +193,14 @@
       <button onclick="document.getElementById('submittedModal').style.display='none'">Close</button>
     </div>
   </div>
+
+  <!-- Fake search result modal -->
+<div id="searchResultModal" class="modal">
+  <div class="modal-content">
+    <p id="searchResultText"></p>
+    <button onclick="document.getElementById('searchResultModal').style.display='none'">Close</button>
+  </div>
+</div>
   
   <footer>
     © 2025 Official Butthurt Reporting Agency. All Rights Reserved.  
@@ -230,5 +248,36 @@
     });
     
   </script>
+<script>
+  const searchIcon = document.getElementById('searchIcon');
+  const searchContainer = document.getElementById('searchContainer');
+  const searchBtn = document.getElementById('searchBtn');
+  const searchInput = document.getElementById('searchInput');
+  const searchResultModal = document.getElementById('searchResultModal');
+  const searchResultText = document.getElementById('searchResultText');
+
+  // Toggle search input
+  searchIcon.addEventListener('click', () => {
+    searchContainer.style.display = searchContainer.style.display === 'none' ? 'block' : 'none';
+  });
+
+  // Search logic
+  searchBtn.addEventListener('click', () => {
+    const query = searchInput.value.trim();
+    if(query.toUpperCase().startsWith("BH")) {
+      searchResultText.textContent = `Are you seriously searching for this? [${query}]`;
+      searchResultModal.style.display = 'flex';
+    }
+  });
+
+  // Allow pressing Enter
+  searchInput.addEventListener('keypress', (e) => {
+    if(e.key === 'Enter') {
+      e.preventDefault();
+      searchBtn.click();
+    }
+  });
+</script>
+  
 </body>
 </html>
