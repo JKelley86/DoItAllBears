@@ -181,12 +181,24 @@
   </form>
 
   <!-- Submission Confirmation Modal -->
-  <div id="submittedModal" class="modal">
-    <div class="modal-content">
-      <p id="submissionMessage">Your complaint has been submitted and will be looked at eventually. Rest assured, it will be taken very seriously.</p>
-      <button onclick="document.getElementById('submittedModal').style.display='none'">Close</button>
-    </div>
+<div id="submittedModal" class="modal">
+  <div class="modal-content">
+    <p id="submissionMessage">
+      Your complaint has been submitted and will be looked at eventually. Rest assured, it will be taken very seriously.
+    </p>
+
+    <!-- Complaint ID + Copy button -->
+    <p>
+      <strong>Your Complaint ID:</strong>
+      <span id="complaintId"></span>
+      <button id="copyIdBtn" style="margin-left:10px; padding:5px 10px; font-size:0.9em; border:none; border-radius:5px; background:#28a745; color:#fff; cursor:pointer;">
+        Copy ID
+      </button>
+    </p>
+
+    <button id="closeSubmitted">Close</button>
   </div>
+</div>
 
 <!-- Search Popup Modal -->
 <div id="searchModal" class="modal">
@@ -251,6 +263,22 @@
       submissionMessage.innerHTML = `Your complaint has been submitted and will be looked at eventually. Rest assured, it will be taken very seriously.<br>ID: <strong>${id}</strong>`;
       submittedModal.style.display = 'flex';
     });
+
+  const copyBtn = document.getElementById('copyIdBtn');
+  const complaintId = document.getElementById('complaintId');
+  const closeSubmitted = document.getElementById('closeSubmitted');
+
+  closeSubmitted.addEventListener('click', () => {
+    document.getElementById('submittedModal').style.display = 'none';
+  });
+
+  copyBtn.addEventListener('click', () => {
+    const idText = complaintId.textContent;
+    navigator.clipboard.writeText(idText).then(() => {
+      copyBtn.textContent = "Copied!";
+      setTimeout(() => copyBtn.textContent = "Copy ID", 1500);
+    }).catch(err => console.error("Clipboard copy failed:", err));
+  });
     
   </script>
   
