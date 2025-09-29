@@ -180,7 +180,7 @@
     </div>
   </form>
 
-  <!-- Submission Confirmation Modal -->
+<!-- Submission Confirmation Modal -->
 <div id="submittedModal" class="modal">
   <div class="modal-content">
     <p id="submissionMessage">
@@ -203,9 +203,7 @@
         cursor:pointer;
         vertical-align: middle;
         transition: 0.2s;
-      ">
-        Copy
-      </button>
+      ">Copy</button>
     </p>
 
     <button id="closeSubmitted" style="margin-top:10px;">Close</button>
@@ -273,15 +271,38 @@ submitFormBtn.addEventListener('click', () => {
   actualForm.style.display = 'none';
   const id = generateComplaintId();
 
-  // Set the main submission message
-  submissionMessage.textContent = 'Your complaint has been submitted and will be looked at eventually. Rest assured, it will be taken very seriously.';
+  const copyBtn = document.getElementById('copyIdBtn');
+  const complaintId = document.getElementById('complaintId');
+  const closeSubmitted = document.getElementById('closeSubmitted');
 
-  // Fill the complaint ID span for the copy button
-  complaintId.textContent = id;
+  // Function to open modal with generated ID
+  function showSubmittedModal(id) {
+    complaintId.textContent = id; // set the actual complaint ID
+    document.getElementById('submittedModal').style.display = 'flex';
+  }
 
-  // Show the modal
-  submittedModal.style.display = 'flex';
-});
+  // Copy button functionality
+  copyBtn.addEventListener('click', () => {
+    const idText = complaintId.textContent;
+    if (!idText) return; // prevent copying empty
+    navigator.clipboard.writeText(idText).then(() => {
+      copyBtn.textContent = "Copied!";
+      setTimeout(() => copyBtn.textContent = "Copy", 1500);
+    }).catch(err => console.error("Clipboard copy failed:", err));
+  });
+
+  // Close modal
+  closeSubmitted.addEventListener('click', () => {
+    document.getElementById('submittedModal').style.display = 'none';
+  });
+
+  // Example usage with your existing form submit:
+  submitFormBtn.addEventListener('click', () => {
+    actualForm.style.display = 'none';
+    const id = generateComplaintId(); // your existing ID generator
+    submissionMessage.textContent = "Your complaint has been submitted and will be looked at eventually. Rest assured, it will be taken very seriously.";
+    showSubmittedModal(id);
+  });
     
   </script>
   
