@@ -247,13 +247,11 @@
     // Open softness popup
     submitBtn.addEventListener('click', () => { softModal.style.display = 'flex'; });
 
-    // "I know" closes the modal
+    submitBtn.addEventListener('click', () => { softModal.style.display = 'flex'; });
     iKnowBtn.addEventListener('click', () => { softModal.style.display = 'none'; });
-
-    // "No I'm not" behavior
     noImNotBtn.addEventListener('click', () => {
       noImNotClicks++;
-      if (noImNotClicks >= 2) {
+      if (noImNotClicks >= 3) {
         softModal.style.display = 'none';
         actualForm.style.display = 'block';
       }
