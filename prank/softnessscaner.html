@@ -64,16 +64,6 @@
     top: 0;
     left: 0;
   }
-  .categories {
-    margin-top: 25px;
-    font-size: 1em;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: left;
-  }
-  .category-title { font-weight: bold; margin-top: 15px; }
-
   /* Results Card */
   #resultsSection {
     display: none;
@@ -83,6 +73,7 @@
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     margin-top: 20px;
     text-align: center;
+    position: relative;
   }
   #resultsSection h2 {
     margin-top: 0;
@@ -96,12 +87,23 @@
     border-radius:5px;
     cursor:pointer;
   }
+  /* Watermark / Stamp */
+  #watermark {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    opacity: 0.3;
+    font-size: 14px;
+    font-weight: bold;
+    color: red;
+    transform: rotate(-15deg);
+    pointer-events: none;
+  }
 </style>
 </head>
 <body>
 
 <h1>Softness Meter</h1>
-<p>Test your emotional resilience. Are you rock-solid, or soft as a marshmallow?</p>
 
 <div class="camera-view" id="cameraView">
   <video id="cameraFeed" autoplay muted></video>
@@ -115,15 +117,13 @@
 <div class="stage-text" id="stageText">Press "Start Scan" to begin!</div>
 <button id="startBtn">Start Scan</button>
 
-<!-- Category roasts will be added here temporarily -->
-<div class="categories" id="categoryOutput"></div>
-
 <!-- Final Results Section -->
 <div id="resultsSection">
   <h2>Softness Meter Results</h2>
   <p id="softnessResult" style="font-size:24px; font-weight:bold;"></p>
   <p id="mainInsult" style="font-size:20px; color:#007bff;"></p>
   <div id="categoryRoasts" style="margin-top:15px; text-align:left;"></div>
+  <div id="watermark">OFFICIAL SOFTNESS REPORT ✅</div>
   <button id="downloadReportBtn">Download Report</button>
 </div>
 
@@ -161,8 +161,6 @@ const stageText = document.getElementById('stageText');
 const startBtn = document.getElementById('startBtn');
 const scanLine = document.getElementById('scanLine');
 const cameraFeed = document.getElementById('cameraFeed');
-const categoryOutput = document.getElementById('categoryOutput');
-
 const resultsSection = document.getElementById('resultsSection');
 const softnessResult = document.getElementById('softnessResult');
 const mainInsult = document.getElementById('mainInsult');
@@ -173,7 +171,6 @@ let scanInterval;
 
 startBtn.addEventListener('click', () => {
   startBtn.disabled = true;
-  categoryOutput.innerHTML = '';
   resultsSection.style.display = 'none';
   meterBar.style.width = '0%';
   stageText.textContent = "Starting scan...";
@@ -200,17 +197,14 @@ function startScan() {
 
   function nextStage() {
     if(stageIndex >= stages.length) {
-      // Scan complete
       const softnessPct = Math.floor(Math.random()*101);
       meterBar.style.width = softnessPct + '%';
 
       const insultObj = insults.find(i => softnessPct <= i.max);
       stageText.textContent = `Softness Level: ${softnessPct}% 💦 — ${insultObj.text}`;
 
-      // Category roasts
       const categoryObj = categories.find(c => softnessPct <= c.max);
 
-      // Show results section
       softnessResult.textContent = `Softness Level: ${softnessPct}%`;
       mainInsult.textContent = insultObj.text;
       categoryRoasts.innerHTML = '';
@@ -265,7 +259,7 @@ function stopScanAnimation() {
   clearInterval(scanInterval);
 }
 
-// Download report
+// Download report with watermark
 downloadBtn.addEventListener('click', () => {
   html2canvas(resultsSection).then(canvas => {
     const link = document.createElement('a');
