@@ -42,13 +42,19 @@
     color: white;
   }
   .camera-view {
-    width: 200px;
-    height: 150px;
+    width: 300px;
+    height: 225px;
     margin: 20px auto;
-    background: #000;
     border-radius: 10px;
+    background: #000;
     position: relative;
     overflow: hidden;
+  }
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
   }
   .scan-line {
     position: absolute;
@@ -58,33 +64,23 @@
     top: 0;
     left: 0;
   }
-  .categories {
-    margin-top: 30px;
-    text-align: left;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .categories h3 { margin-bottom: 5px; }
-  .categories ul { margin-bottom: 15px; }
 </style>
 </head>
 <body>
 
 <h1>Softness Meter</h1>
+
 <div class="camera-view" id="cameraView">
+  <video id="cameraFeed" autoplay muted></video>
   <div class="scan-line" id="scanLine"></div>
 </div>
+
 <div class="meter-container">
   <div class="meter-bar" id="meterBar"></div>
 </div>
+
 <div class="stage-text" id="stageText">Press "Start Scan" to begin!</div>
 <button id="startBtn">Start Scan</button>
-
-<div class="categories" id="categoryResults" style="display:none;">
-  <h3>Softness Categories & Roasts:</h3>
-  <ul id="roastList"></ul>
-</div>
 
 <script>
 const stages = [
@@ -96,28 +92,39 @@ const stages = [
   { text: "Compiling roast suggestions...", duration: 2000, progress: 5 }
 ];
 
-const categories = [
-  { category: "Social Media Sensitivity", roast: "You cry more than your notifications." },
-  { category: "Thin-skinned Reactions", roast: "Glass ceilings? More like glass feelings." },
-  { category: "Minor Insults", roast: "Even a mild joke can trigger your waterworks." },
-  { category: "Life Challenges", roast: "Life threw you lemons, and you bottled them in tears." },
-  { category: "Opinion Disagreement", roast: "Disagree with you? Prepare the tissues." },
+const insults = [
+  { max: 20, text: "You're practically made of tissue paper." },
+  { max: 40, text: "Even a slight breeze could offend you." },
+  { max: 60, text: "You handle minor inconveniences poorly." },
+  { max: 80, text: "Careful, you might spontaneously cry." },
+  { max: 100, text: "Congratulations! You are soft as marshmallow fluff." }
 ];
 
 const meterBar = document.getElementById('meterBar');
 const stageText = document.getElementById('stageText');
 const startBtn = document.getElementById('startBtn');
-const cameraView = document.getElementById('cameraView');
 const scanLine = document.getElementById('scanLine');
-const categoryResults = document.getElementById('categoryResults');
-const roastList = document.getElementById('roastList');
+const cameraFeed = document.getElementById('cameraFeed');
+
+let scanInterval;
 
 startBtn.addEventListener('click', () => {
   startBtn.disabled = true;
-  categoryResults.style.display = 'none';
-  startScan();
-  startScanAnimation();
+  startCamera();
 });
+
+function startCamera() {
+  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then(stream => {
+      cameraFeed.srcObject = stream;
+      startScan();
+      startScanAnimation();
+    })
+    .catch(err => {
+      stageText.textContent = "Camera access denied. Cannot run scan.";
+      console.error(err);
+    });
+}
 
 function startScan() {
   let pct = 0;
@@ -125,8 +132,13 @@ function startScan() {
 
   function nextStage() {
     if(stageIndex >= stages.length) {
-      stageText.textContent = `Scan complete! Softness Level: ${Math.floor(Math.random()*101)}% 💦`;
-      showCategories();
+      // Scan complete
+      const softnessPct = Math.floor(Math.random()*101);
+      meterBar.style.width = softnessPct + '%';
+
+      const insult = insults.find(i => softnessPct <= i.max);
+      stageText.textContent = `Softness Level: ${softnessPct}% 💦 — ${insult.text}`;
+
       stopScanAnimation();
       return;
     }
@@ -134,7 +146,7 @@ function startScan() {
     const stage = stages[stageIndex];
     stageText.textContent = stage.text;
 
-    const intervalTime = 50; // 50ms for smooth animation
+    const intervalTime = 50;
     const steps = stage.duration / intervalTime;
     const increment = stage.progress / steps;
     let stepCount = 0;
@@ -156,29 +168,18 @@ function startScan() {
   nextStage();
 }
 
-let scanInterval;
 function startScanAnimation() {
   let pos = 0;
   scanLine.style.top = '0px';
   scanInterval = setInterval(() => {
     pos += 2;
-    if(pos > cameraView.offsetHeight) pos = 0;
+    if(pos > cameraFeed.offsetHeight) pos = 0;
     scanLine.style.top = pos + 'px';
   }, 20);
 }
 
 function stopScanAnimation() {
   clearInterval(scanInterval);
-}
-
-function showCategories() {
-  roastList.innerHTML = '';
-  categories.forEach(cat => {
-    const li = document.createElement('li');
-    li.textContent = `${cat.category}: ${cat.roast}`;
-    roastList.appendChild(li);
-  });
-  categoryResults.style.display = 'block';
 }
 </script>
 
