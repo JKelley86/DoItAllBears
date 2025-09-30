@@ -53,6 +53,12 @@
       font-size: 1.4em;
       display: none;
     }
+    #roast {
+      margin-top: 15px;
+      font-size: 1.1em;
+      color: #555;
+      display: none;
+    }
     #certificate {
       margin-top: 20px;
       padding: 15px 25px;
@@ -79,6 +85,7 @@
   </div>
 
   <div id="result"></div>
+  <div id="roast"></div>
   <div id="certificate"></div>
 
   <script>
@@ -87,6 +94,7 @@
     const progress = document.getElementById("progress");
     const scanStatus = document.getElementById("scanStatus");
     const result = document.getElementById("result");
+    const roast = document.getElementById("roast");
     const certificate = document.getElementById("certificate");
 
     scanBtn.addEventListener("click", () => {
@@ -112,18 +120,27 @@
 
       const softness = Math.floor(Math.random() * 101); // 0–100
       let message = "";
+      let roastText = "";
+
       if (softness <= 20) {
         message = "Hard as nails 💪 (0–20% Soft)";
+        roastText = "You're so tough that sandpaper calls you rough. Probably the person who eats cereal without milk.";
       } else if (softness <= 50) {
         message = "Moderately soft 😏 (21–50% Soft)";
+        roastText = "You act tough, but a mildly sad movie scene has you holding back tears harder than your Wi-Fi signal on a stormy night.";
       } else if (softness <= 80) {
         message = "Soft and squishy 🧻 (51–80% Soft)";
+        roastText = "You probably ask for extra napkins at restaurants just in case. Emotional support water bottle confirmed.";
       } else {
         message = "Ultra soft ☁️ (81–100% Soft)";
+        roastText = "Pillow companies are studying you for new product lines. One mean tweet and you’re down for 3–5 business days.";
       }
 
       result.style.display = "block";
       result.textContent = `Softness Level: ${softness}% — ${message}`;
+
+      roast.style.display = "block";
+      roast.textContent = roastText;
 
       certificate.style.display = "block";
       certificate.innerHTML = `
