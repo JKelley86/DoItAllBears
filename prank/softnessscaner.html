@@ -24,8 +24,9 @@
 </head>
 <body>
 <h1>Softness Meter™ — Live Scan</h1>
+<p>Test your emotional resilience. Are you rock-solid, or soft as a marshmallow?</p>
 <button id="startBtn" class="primary">Start Live Softness Scan</button>
-<button id="fakeNoCam" class="ghost">Skip Camera (Fake Scan)</button>
+<button id="fakeNoCam" class="ghost">Skip Camera (Less Accurate)</button>
 <button id="resetBtn" class="ghost" style="display:none;">Run Again</button>
 
 <div class="scanner-wrap" id="scanner">
@@ -63,10 +64,10 @@ let stream = null;
 function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
 
 function roastFor(softness){
-  if(softness<=20) return "Hard as nails. Emotional warranty expired years ago.";
-  if(softness<=50) return "Moderately soft. Mildly sad memes slow you down.";
-  if(softness<=80) return "Soft and squishy. Tissues always nearby.";
-  return "Ultra soft. One mean comment turns you into a puddle.";
+  if(softness<=20) return "You're so tough that sandpaper calls you rough. Probably the person who eats cereal without milk.";
+  if(softness<=50) return "You act tough, but a mildly sad movie scene has you holding back tears harder than your Wi-Fi signal on a stormy night.";
+  if(softness<=80) return "You probably ask for extra napkins at restaurants just in case. Emotional support water bottle confirmed.";
+  return "Pillow companies are studying you for new product lines. One mean tweet and you’re down for 3–5 business days.";
 }
 
 function makeCertificate(softness){
@@ -88,10 +89,10 @@ function runScan(useCamera){
 
   let pct=0;
   const stages=[
-    {text:'Calibrating empathy matrix...',duration:900,minInc:6,maxInc:12},
-    {text:'Analyzing tear duct responsiveness...',duration:1000,minInc:5,maxInc:11},
-    {text:'Measuring sarcasm absorption...',duration:1100,minInc:4,maxInc:9},
-    {text:'Finalizing softness index...',duration:900,minInc:6,maxInc:12}
+    {text:'Calibrating empathy matrix...',duration:2000,minInc:6,maxInc:12},
+    {text:'Analyzing tear duct responsiveness...',duration:2000,minInc:5,maxInc:11},
+    {text:'Measuring sarcasm absorption...',duration:2000,minInc:4,maxInc:9},
+    {text:'Finalizing softness index...',duration:2000,minInc:6,maxInc:12}
   ];
 
   let stageIndex=0;
