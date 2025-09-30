@@ -28,6 +28,31 @@
     <section class="contact">
       <p class="rsvp-text">📱 Please text <strong>Justin</strong> or <strong>Bridget</strong> to RSVP and let us know if you’ll be bringing someone!</p>
     </section>
+
+    <section class="contact">
+      <form action="https://formspree.io/f/mnqkgrrb" method="POST" class="rsvp-form">
+  <label for="name">Your Name</label>
+  <input type="text" name="name" id="name" required>
+
+  <label for="plusone">Bringing a +1?</label>
+  <select name="plusone" id="plusone">
+    <option value="No">No</option>
+    <option value="Yes">Yes</option>
+  </select>
+
+  <label for="attending">Will you attend?</label>
+  <select name="attending" id="attending" required>
+    <option value="Yes">Yes</option>
+    <option value="No">No</option>
+    <option value="Maybe">Maybe</option>
+  </select>
+
+  <label for="notes">Any Notes (food, allergies, etc.)</label>
+  <textarea name="notes" id="notes"></textarea>
+
+  <button type="submit">Submit RSVP</button>
+</form>
+    </section>
   </main>
 </body>
 </html>
