@@ -64,6 +64,15 @@
     top: 0;
     left: 0;
   }
+  .categories {
+    margin-top: 25px;
+    font-size: 1em;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+  }
+  .category-title { font-weight: bold; margin-top: 15px; }
 </style>
 </head>
 <body>
@@ -82,9 +91,11 @@
 <div class="stage-text" id="stageText">Press "Start Scan" to begin!</div>
 <button id="startBtn">Start Scan</button>
 
+<div class="categories" id="categoryOutput"></div>
+
 <script>
 const stages = [
-  { text: "Initializing camera...", duration: 1500, progress: 15 },
+  { text: "Initializing camera...", duration: 2000, progress: 15 },
   { text: "Scanning emotional stability...", duration: 2000, progress: 20 },
   { text: "Analyzing reactions to minor insults...", duration: 2000, progress: 20 },
   { text: "Evaluating social media sensitivity...", duration: 2000, progress: 20 },
@@ -100,16 +111,28 @@ const insults = [
   { max: 100, text: "Congratulations! You are soft as marshmallow fluff." }
 ];
 
+const categories = [
+  { max: 20, text: ["Fragile Ego: Handle with care.", "Prone to tears at minor inconveniences."] },
+  { max: 40, text: ["Thin-skinned: Minor jabs sting.", "Sensitive to social media comments."] },
+  { max: 60, text: ["Moderate Softness: Watch your words.", "Slightly prone to whining."] },
+  { max: 80, text: ["High Softness: Might cry at jokes.", "Emotional reactions are dramatic."] },
+  { max: 100, text: ["Ultra Soft: Marshmallow level achieved!", "Cannot handle any criticism."] }
+];
+
 const meterBar = document.getElementById('meterBar');
 const stageText = document.getElementById('stageText');
 const startBtn = document.getElementById('startBtn');
 const scanLine = document.getElementById('scanLine');
 const cameraFeed = document.getElementById('cameraFeed');
+const categoryOutput = document.getElementById('categoryOutput');
 
 let scanInterval;
 
 startBtn.addEventListener('click', () => {
   startBtn.disabled = true;
+  categoryOutput.innerHTML = '';
+  meterBar.style.width = '0%';
+  stageText.textContent = "Starting scan...";
   startCamera();
 });
 
@@ -123,6 +146,7 @@ function startCamera() {
     .catch(err => {
       stageText.textContent = "Camera access denied. Cannot run scan.";
       console.error(err);
+      startBtn.disabled = false;
     });
 }
 
@@ -139,7 +163,16 @@ function startScan() {
       const insult = insults.find(i => softnessPct <= i.max);
       stageText.textContent = `Softness Level: ${softnessPct}% 💦 — ${insult.text}`;
 
+      // Show category roasts
+      const category = categories.find(c => softnessPct <= c.max);
+      category.text.forEach(line => {
+        const p = document.createElement('p');
+        p.textContent = "• " + line;
+        categoryOutput.appendChild(p);
+      });
+
       stopScanAnimation();
+      startBtn.disabled = false; // Re-enable button
       return;
     }
 
