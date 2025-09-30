@@ -57,7 +57,7 @@
       text-align: left;
       background: none;
       border: none;
-      color: #333;
+      color: #000000;
       font-size: 1em;
       cursor: pointer;
     }
@@ -121,8 +121,8 @@
 <div class="menu-container">
   <button class="menu-btn">☰</button>
   <div class="dropdown" id="dropdownMenu">
-    <button id="openSearch">🔍 Search Complaint ID</button>
-    <button id="openScanner">🧪 Softness Scanner</button>
+    <button id="openSearch">Search Complaint ID</button>
+    <button id="openScanner">Softness Scanner</button>
   </div>
 </div>
   
@@ -350,7 +350,7 @@
   // Softness Scanner navigation
   document.getElementById('openScanner').addEventListener('click', () => {
     dropdown.style.display = 'none';
-    window.location.href = "softnessscanner.html"; // update path if needed
+    window.location.href = "softnessscaner.html"; // update path if needed
   });
 
   // -----------------------
