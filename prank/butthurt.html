@@ -251,6 +251,7 @@
 </footer>
 
 <script>
+  // Modals & Form
   const softModal = document.getElementById('softModal');
   const submitBtn = document.getElementById('submitReport');
   const iKnowBtn = document.getElementById('iKnow');
@@ -263,7 +264,19 @@
   const closeSubmitted = document.getElementById('closeSubmitted');
   let noImNotClicks = 0;
 
-  // Open softness popup
+  // Menu
+  const menuBtn = document.querySelector('.menu-btn');
+  const dropdown = document.getElementById('dropdownMenu');
+
+  // Search Modals
+  const searchModal = document.getElementById('searchModal');
+  const searchInput = document.getElementById('searchInput');
+  const searchResults = document.getElementById('searchResults');
+  const seriousModal = document.getElementById('seriousModal');
+
+  // -----------------------
+  // Form & Softness logic
+  // -----------------------
   submitBtn.addEventListener('click', () => { softModal.style.display = 'flex'; });
   iKnowBtn.addEventListener('click', () => { softModal.style.display = 'none'; });
   noImNotBtn.addEventListener('click', () => {
@@ -281,7 +294,6 @@
     return `BH-${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}-${rand}`;
   }
 
-  // Submit actual form
   submitFormBtn.addEventListener('click', () => {
     actualForm.style.display = 'none';
     const id = generateComplaintId();
@@ -289,37 +301,23 @@
     submittedModal.style.display = 'flex';
   });
 
-  // Copy button
   copyBtn.addEventListener('click', () => {
-    const idText = complaintId.textContent;
-    if (!idText) return;
-    navigator.clipboard.writeText(idText).then(() => {
+    navigator.clipboard.writeText(complaintId.textContent).then(() => {
       copyBtn.textContent = "Copied!";
       setTimeout(() => copyBtn.textContent = "Copy", 1500);
     });
   });
 
-  // Close submitted modal
-  closeSubmitted.addEventListener('click', () => {
-    submittedModal.style.display = 'none';
-  });
+  closeSubmitted.addEventListener('click', () => { submittedModal.style.display = 'none'; });
 
-  // Search system
-  const searchIcon = document.getElementById('searchIcon');
-  const searchModal = document.getElementById('searchModal');
-  const closeSearch = document.getElementById('closeSearch');
-  const searchInput = document.getElementById('searchInput');
-  const searchResults = document.getElementById('searchResults');
-  const seriousModal = document.getElementById('seriousModal');
-
-  searchIcon.addEventListener('click', () => {
+  // -----------------------
+  // Search System
+  // -----------------------
+  document.getElementById('openSearch').addEventListener('click', () => {
+    dropdown.style.display = 'none';
     searchModal.style.display = 'flex';
     searchInput.value = '';
     searchResults.innerHTML = '';
-  });
-
-  closeSearch.addEventListener('click', () => {
-    searchModal.style.display = 'none';
   });
 
   searchInput.addEventListener('input', () => {
@@ -336,35 +334,30 @@
       searchResults.appendChild(btn);
     }
   });
-    const menuBtn = document.querySelector('.menu-btn');
-  const dropdown = document.getElementById('dropdownMenu');
-  const searchModal = document.getElementById('searchModal');
-  const seriousModal = document.getElementById('seriousModal');
 
-  // Toggle dropdown
-  menuBtn.addEventListener('click', () => {
+  document.getElementById('closeSearch').addEventListener('click', () => {
+    searchModal.style.display = 'none';
+  });
+
+  // -----------------------
+  // Dropdown Menu
+  // -----------------------
+  menuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
     dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
   });
 
-  // Close dropdown if clicking outside
-  window.addEventListener('click', (e) => {
-    if (!e.target.closest('.menu-container')) {
-      dropdown.style.display = 'none';
-    }
+  // Softness Scanner navigation
+  document.getElementById('openScanner').addEventListener('click', () => {
+    dropdown.style.display = 'none';
+    window.location.href = "softnessscanner.html"; // update path if needed
   });
 
-  // Menu actions
-  document.getElementById('openSearch').addEventListener('click', () => {
-    dropdown.style.display = 'none';
-    searchModal.style.display = 'flex';
-  });
-  // Menu scanner navigation
-document.getElementById('openScanner').addEventListener('click', () => {
-  dropdown.style.display = 'none';
-  window.location.href = "softnessscanner.html"; // update with correct path
-});
-  
+  // -----------------------
+  // Close modals on outside click
+  // -----------------------
   window.addEventListener('click', (e) => {
+    if (!e.target.closest('.menu-container')) dropdown.style.display = 'none';
     if(e.target === searchModal) searchModal.style.display = 'none';
     if(e.target === seriousModal) seriousModal.style.display = 'none';
     if(e.target === softModal) softModal.style.display = 'none';
