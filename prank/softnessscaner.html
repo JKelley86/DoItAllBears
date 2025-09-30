@@ -1,152 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Softness Meter — Live Scan</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Softness Meter</title>
 <style>
-  body { font-family: Arial, sans-serif; background:#f0f6ff; text-align:center; padding:40px; }
-  h1 { font-size:2rem; }
-  button { padding:12px 20px; margin:6px; border:none; border-radius:8px; cursor:pointer; }
-  button.primary { background: #6b46ff; color:white; }
-  button.ghost { background:transparent; border:1px solid #ccc; }
-  .scanner-wrap { width:80%; max-width:500px; height:300px; margin:20px auto; background:#071028; position:relative; display:none; border-radius:10px; overflow:hidden; color:#fff; }
-  video { width:100%; height:100%; object-fit:cover; transform: scaleX(-1); }
-  .overlay { position:absolute; inset:0; pointer-events:none; }
-  .sweep { position:absolute; left:-40%; top:0; width:140%; height:100%; background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0) 100%); transform:skewX(-20deg); animation:sweep 3s linear infinite; }
-  @keyframes sweep { to { transform: translateX(20%) skewX(-20deg); } }
-  .progress-wrap { width:90%; background: rgba(255,255,255,0.1); height:12px; margin:12px auto; border-radius:10px; overflow:hidden; }
-  .progress { width:0%; height:100%; background:#ff8b5a; transition: width 0.2s linear; }
-  .scan-note { color:#cfe6ff; margin-top:6px; }
-  .result { display:none; margin-top:16px; background:#fff; padding:16px; border-radius:10px; max-width:500px; margin-left:auto;margin-right:auto; }
-  .certificate { background:#fef3c7; padding:12px; margin-top:12px; border-radius:8px; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
+    text-align: center;
+    padding: 40px;
+  }
+  h1 { font-size: 2.5em; margin-bottom: 20px; }
+  .meter-container {
+    width: 80%;
+    margin: 30px auto;
+    background: #ddd;
+    border-radius: 20px;
+    overflow: hidden;
+    height: 30px;
+  }
+  .meter-bar {
+    height: 100%;
+    width: 0%;
+    background: #007bff;
+    transition: width 0.1s linear;
+  }
+  .stage-text {
+    margin-top: 20px;
+    font-size: 1.2em;
+    min-height: 1.5em;
+  }
+  button {
+    margin-top: 30px;
+    padding: 12px 25px;
+    font-size: 1em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #007bff;
+    color: white;
+  }
 </style>
 </head>
 <body>
-<h1>Softness Meter™ — Live Scan</h1>
-<p>Test your emotional resilience. Are you rock-solid, or soft as a marshmallow?</p>
-<button id="startBtn" class="primary">Start Live Softness Scan</button>
-<button id="fakeNoCam" class="ghost">Skip Camera (Less Accurate)</button>
-<button id="resetBtn" class="ghost" style="display:none;">Run Again</button>
 
-<div class="scanner-wrap" id="scanner">
-  <video id="cameraView" autoplay muted playsinline></video>
-  <div class="overlay">
-    <div class="sweep"></div>
-    <div style="position:absolute; left:10px; right:10px; bottom:10px;">
-      <div class="progress-wrap"><div id="progress" class="progress"></div></div>
-      <div class="scan-note" id="scanNote">Initializing sensors...</div>
-    </div>
-  </div>
+<h1>Softness Meter</h1>
+<div class="meter-container">
+  <div class="meter-bar" id="meterBar"></div>
 </div>
-
-<div class="result" id="resultPanel">
-  <h2 id="softnessText"></h2>
-  <div class="roast" id="roastText"></div>
-  <div class="certificate" id="certBlock"></div>
-</div>
+<div class="stage-text" id="stageText">Press "Start Scan" to begin!</div>
+<button id="startBtn">Start Scan</button>
 
 <script>
+const stages = [
+  { text: "Checking emotional stability...", duration: 2000, progress: 20 },
+  { text: "Scanning for overreactions...", duration: 2000, progress: 25 },
+  { text: "Evaluating social media sensitivity...", duration: 2000, progress: 25 },
+  { text: "Analyzing responses to minor insults...", duration: 2000, progress: 20 },
+  { text: "Finalizing softness rating...", duration: 2000, progress: 10 },
+];
+
+const meterBar = document.getElementById('meterBar');
+const stageText = document.getElementById('stageText');
 const startBtn = document.getElementById('startBtn');
-const fakeNoCam = document.getElementById('fakeNoCam');
-const resetBtn = document.getElementById('resetBtn');
-const scanner = document.getElementById('scanner');
-const cameraView = document.getElementById('cameraView');
-const progressEl = document.getElementById('progress');
-const scanNote = document.getElementById('scanNote');
-const resultPanel = document.getElementById('resultPanel');
-const softnessText = document.getElementById('softnessText');
-const roastText = document.getElementById('roastText');
-const certBlock = document.getElementById('certBlock');
 
-let stream = null;
+startBtn.addEventListener('click', () => {
+  startBtn.disabled = true;
+  startScan();
+});
 
-function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function startScan() {
+  let pct = 0;
+  let stageIndex = 0;
 
-function roastFor(softness){
-  if(softness<=20) return "You're so tough that sandpaper calls you rough. Probably the person who eats cereal without milk.";
-  if(softness<=50) return "You act tough, but a mildly sad movie scene has you holding back tears harder than your Wi-Fi signal on a stormy night.";
-  if(softness<=80) return "You probably ask for extra napkins at restaurants just in case. Emotional support water bottle confirmed.";
-  return "Pillow companies are studying you for new product lines. One mean tweet and you’re down for 3–5 business days.";
-}
+  function nextStage() {
+    if(stageIndex >= stages.length) {
+      stageText.textContent = `Scan complete! Your Softness Level: ${Math.floor(Math.random()*101)}% 💦`;
+      return;
+    }
 
-function makeCertificate(softness){
-  const date = new Date().toLocaleDateString();
-  const category = softness<=20?'Rock Solid':softness<=50?'Sturdy':softness<=80?'Squishy':'Marshmallow';
-  return `<div>Softness Score: <strong>${softness}%</strong><br>Category: <strong>${category}</strong><br>Issued: ${date}</div>`;
-}
+    const stage = stages[stageIndex];
+    stageText.textContent = stage.text;
 
-function stopCamera(){
-  if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; cameraView.srcObject=null;}
-}
+    const intervalTime = 50; // update every 50ms
+    const steps = stage.duration / intervalTime;
+    const increment = stage.progress / steps;
+    let stepCount = 0;
 
-function runScan(useCamera){
-  resultPanel.style.display='none';
-  resetBtn.style.display='none';
-  scanner.style.display='flex';
-  progressEl.style.width='0%';
-  scanNote.textContent='Booting sensors...';
-
-  let pct=0;
-  const stages=[
-    {text:'Calibrating empathy matrix...',duration:2000,minInc:6,maxInc:12},
-    {text:'Analyzing tear duct responsiveness...',duration:2000,minInc:5,maxInc:11},
-    {text:'Measuring sarcasm absorption...',duration:2000,minInc:4,maxInc:9},
-    {text:'Finalizing softness index...',duration:2000,minInc:6,maxInc:12}
-  ];
-
-  let stageIndex=0;
-  function nextStage(){
-    if(stageIndex>=stages.length){ finishScan(useCamera); return; }
-    const stage=stages[stageIndex];
-    scanNote.textContent=stage.text;
-    const interval=setInterval(()=>{
-      pct=Math.min(98,pct+randInt(stage.minInc,stage.maxInc));
-      progressEl.style.width=pct+'%';
-    },160);
-    setTimeout(()=>{
-      clearInterval(interval);
-      stageIndex++;
-      nextStage();
-    }, stage.duration);
+    const interval = setInterval(() => {
+      if(stepCount >= steps) {
+        clearInterval(interval);
+        stageIndex++;
+        nextStage();
+      } else {
+        pct += increment;
+        if(pct > 100) pct = 100;
+        meterBar.style.width = pct + '%';
+        stepCount++;
+      }
+    }, intervalTime);
   }
+
   nextStage();
 }
-
-function finishScan(useCamera){
-  stopCamera();
-  progressEl.style.width='100%';
-  scanNote.textContent='Analyzing results...';
-  setTimeout(()=>{
-    const softness = randInt(0,100);
-    softnessText.textContent=`Softness Level: ${softness}%`;
-    roastText.textContent = roastFor(softness);
-    certBlock.innerHTML = makeCertificate(softness);
-    resultPanel.style.display='block';
-    resetBtn.style.display='inline-block';
-    scanner.style.display='none';
-  },500);
-}
-
-// Button events
-startBtn.addEventListener('click', async ()=>{
-  startBtn.style.display='none';
-  try{
-    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});
-    cameraView.srcObject=stream;
-    runScan(true);
-  }catch(err){
-    console.warn('Camera unavailable, running fake scan.',err);
-    runScan(false);
-  }
-});
-fakeNoCam.addEventListener('click', ()=>{ startBtn.style.display='none'; runScan(false); });
-resetBtn.addEventListener('click', ()=>{
-  resultPanel.style.display='none';
-  scanner.style.display='none';
-  startBtn.style.display='inline-block';
-  resetBtn.style.display='none';
-});
 </script>
+
 </body>
 </html>
