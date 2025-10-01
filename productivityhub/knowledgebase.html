@@ -13,6 +13,36 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
+    <!-- Firebase -->
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+      import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+      
+      // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBJaG8JkfOSeYoXR1NbFtBhL-CqYr0CmTQ",
+      authDomain: "knowledge-base-7bdfc.firebaseapp.com",
+      projectId: "knowledge-base-7bdfc",
+      storageBucket: "knowledge-base-7bdfc.firebasestorage.app",
+      messagingSenderId: "893440933651",
+      appId: "1:893440933651:web:c17ad223a164a1724ee4e6"
+    };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      
+      // Make Firebase available globally
+      window.firebaseApp = app;
+      window.db = db;
+      
+      // Signal that Firebase is ready
+      window.firebaseReady = true;
+      if (window.initializeKnowledgeBase) {
+        window.initializeKnowledgeBase();
+      }
+    </script>
+    
     <style>
         /* Knowledge Base Specific Styling */
         .kb-container {
@@ -163,7 +193,7 @@
             align-items: center;
             gap: 12px;
             flex: 1;
-            min-width: 0; /* Allows text to wrap/truncate properly */
+            min-width: 0;
         }
         
         .category-title i {
@@ -359,7 +389,6 @@
             border-color: var(--accent-color);
         }
         
-        /* Quill Editor Customizations */
         .ql-toolbar {
             border-top: none;
             border-left: none;
@@ -372,13 +401,11 @@
             font-size: 16px;
         }
         
-        /* Fix Quill editor text color in dark mode */
         .ql-editor {
             color: #333 !important;
             background: white !important;
         }
         
-        /* Ensure content viewer text is visible in both themes */
         .content-viewer {
             color: var(--text-color) !important;
         }
@@ -387,7 +414,6 @@
             color: inherit !important;
         }
         
-        /* Custom Scrollbars */
         .kb-sidebar::-webkit-scrollbar,
         .content-viewer::-webkit-scrollbar,
         .page-list::-webkit-scrollbar {
@@ -408,7 +434,6 @@
             border-radius: 4px;
         }
         
-        /* Responsive Design */
         @media (max-width: 768px) {
             .kb-container {
                 grid-template-columns: 1fr;
@@ -426,7 +451,6 @@
             }
         }
         
-        /* Loading Animation */
         .loading {
             display: flex;
             align-items: center;
@@ -451,7 +475,6 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* Highlight searched terms */
         .highlight {
             background: rgba(255, 99, 71, 0.3);
             padding: 2px 4px;
@@ -467,7 +490,6 @@
 
     <div class="container">
         <div class="kb-container">
-            <!-- Left Sidebar -->
             <div class="kb-sidebar">
                 <h2><i class="fas fa-book"></i> Categories</h2>
                 
@@ -493,7 +515,6 @@
                 </div>
             </div>
             
-            <!-- Right Content Area -->
             <div class="kb-content">
                 <div class="content-header">
                     <div>
@@ -531,7 +552,6 @@
         </div>
     </div>
 
-    <!-- Your proper sidebar structure -->
     <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
     <div class="sidebar" id="sidebar">
         <div class="clock" id="clock"></div>
@@ -543,8 +563,21 @@
         <span>&copy; 2024 Justin's Website. All rights reserved.</span>
     </footer> 
 
-<script>
-// Your standard template functions
+<script type="module">
+import { 
+  collection, 
+  doc, 
+  getDocs, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  serverTimestamp,
+  query,
+  where,
+  orderBy
+} from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
+// Template functions
 function navigateTo(page) {
     window.location.href = page;
 }
@@ -553,14 +586,6 @@ function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     sidebar.classList.toggle('open');
 }
-
-document.addEventListener('click', function(event) {
-    const sidebar = document.getElementById('sidebar');
-    const menuButton = document.querySelector('.menu-btn');
-    if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
-        sidebar.classList.remove('open');
-    }
-});
 
 function updateClock() {
     const now = new Date();
@@ -573,34 +598,35 @@ function toggleTheme() {
     localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
 }
 
-// Load theme and sidebar
-window.onload = function() {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-        document.body.classList.add('light-mode');
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    const menuButton = document.querySelector('.menu-btn');
+    if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+        sidebar.classList.remove('open');
     }
-    initializeKnowledgeBase();
-}
-
-fetch('sidebar.html')
-    .then(response => response.text())
-    .then(data => {
-        document.getElementById('sidebar-nav').innerHTML = data;
-    });
-
-setInterval(updateClock, 1000);
-updateClock();
+});
 
 // Knowledge Base Logic
-const API_URL = "https://script.google.com/macros/s/AKfycbwXcgiMBXqtmyE5LbDgSFUStJ5MwuaA5u6nt3cINuN2hO0EKrIOtndyoES9whrzlQrh/exec";
-
 let quill;
 let categoriesData = {};
 let selectedCategory = "";
 let selectedPage = null;
 let isEditing = false;
 
-function initializeKnowledgeBase() {
+// Wait for Firebase to be ready
+function waitForFirebase() {
+    return new Promise((resolve) => {
+        if (window.firebaseReady && window.db) {
+            resolve();
+        } else {
+            setTimeout(() => waitForFirebase().then(resolve), 100);
+        }
+    });
+}
+
+window.initializeKnowledgeBase = async function() {
+    await waitForFirebase();
+    
     // Initialize Quill editor
     quill = new Quill('#quill-editor', {
         theme: 'snow',
@@ -629,16 +655,30 @@ function initializeKnowledgeBase() {
 
     // Load initial data
     loadKnowledgeBase();
-}
+};
 
 async function loadKnowledgeBase() {
     try {
-        const response = await fetch(API_URL + "?sheet=Knowledge%20Base");
-        categoriesData = await response.json();
+        const pagesCollection = collection(window.db, 'knowledge-base');
+        const snapshot = await getDocs(pagesCollection);
         
-        if (categoriesData.error) {
-            throw new Error(categoriesData.error);
-        }
+        categoriesData = {};
+        
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            const category = data.category || 'Uncategorized';
+            
+            if (!categoriesData[category]) {
+                categoriesData[category] = [];
+            }
+            
+            categoriesData[category].push({
+                id: doc.id,
+                title: data.title,
+                content: data.content,
+                lastUpdated: data.lastUpdated?.toDate?.()?.toISOString() || new Date().toISOString()
+            });
+        });
         
         updateCategorySelect();
         renderCategories();
@@ -715,10 +755,10 @@ function renderCategories(searchTerm = "") {
             pageDiv.innerHTML = `
                 <div class="page-title">${title}</div>
                 <div class="page-actions">
-                    <button class="action-btn" onclick="openPage('${categoryName}', '${page.title}')">
+                    <button class="action-btn" onclick="openPage('${categoryName}', '${page.id}')">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="action-btn delete" onclick="confirmDeletePage('${categoryName}', '${page.title}')">
+                    <button class="action-btn delete" onclick="confirmDeletePage('${page.id}', '${page.title}')">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -726,7 +766,7 @@ function renderCategories(searchTerm = "") {
             
             pageDiv.addEventListener('click', (e) => {
                 if (!e.target.closest('.page-actions')) {
-                    openPage(categoryName, page.title);
+                    openPage(categoryName, page.id);
                 }
             });
             
@@ -739,7 +779,6 @@ function renderCategories(searchTerm = "") {
             icon.className = pageList.classList.contains('open') ? 'fas fa-folder-open' : 'fas fa-folder';
         });
         
-        // Auto-open folders by default unless we're searching for specific terms
         if (!searchTerm || filteredPages.length > 0) {
             pageList.classList.add('open');
             header.querySelector('i').className = 'fas fa-folder-open';
@@ -751,13 +790,13 @@ function renderCategories(searchTerm = "") {
     });
 }
 
-function openPage(category, title) {
-    const page = categoriesData[category]?.find(p => p.title === title);
+window.openPage = function(category, pageId) {
+    const page = categoriesData[category]?.find(p => p.id === pageId);
     if (!page) return;
     
     selectedPage = { category, ...page };
     
-    document.getElementById('page-title').textContent = title;
+    document.getElementById('page-title').textContent = page.title;
     document.getElementById('page-meta').textContent = 
         `Category: ${category} • Last updated: ${new Date(page.lastUpdated).toLocaleString()}`;
     
@@ -822,26 +861,33 @@ async function savePage() {
     const category = selectedCategory || document.getElementById('category-select').value || 'Uncategorized';
     
     try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            // Remove the Content-Type header to avoid preflight
-            body: JSON.stringify({
-                action: 'savePage',
-                category,
-                title,
-                content
-            })
-        });
+        const pagesCollection = collection(window.db, 'knowledge-base');
         
-        const result = await response.text();
-        console.log('Save result:', result);
+        if (selectedPage && selectedPage.id) {
+            // Update existing page
+            const pageDoc = doc(window.db, 'knowledge-base', selectedPage.id);
+            await updateDoc(pageDoc, {
+                title,
+                content,
+                category,
+                lastUpdated: serverTimestamp()
+            });
+        } else {
+            // Create new page
+            await addDoc(pagesCollection, {
+                title,
+                content,
+                category,
+                lastUpdated: serverTimestamp()
+            });
+        }
         
         await loadKnowledgeBase();
         
-        // Open the saved page
+        // Find and open the saved page
         const savedPage = categoriesData[category]?.find(p => p.title === title);
         if (savedPage) {
-            openPage(category, title);
+            openPage(category, savedPage.id);
         }
         
     } catch (error) {
@@ -852,7 +898,7 @@ async function savePage() {
 
 function cancelEdit() {
     if (selectedPage) {
-        openPage(selectedPage.category, selectedPage.title);
+        openPage(selectedPage.category, selectedPage.id);
     } else {
         showViewer();
         document.getElementById('content-viewer').classList.add('empty');
@@ -865,81 +911,6 @@ function cancelEdit() {
     }
 }
 
-function confirmDeletePage(category, title) {
+window.confirmDeletePage = function(pageId, title) {
     if (confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) {
-        deletePageAction(category, title);
-    }
-}
-
-async function deletePageAction(category, title) {
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            body: JSON.stringify({
-                action: 'deletePage',
-                category,
-                title
-            })
-        });
-        
-        const result = await response.text();
-        console.log('Delete result:', result);
-        
-        if (selectedPage && selectedPage.category === category && selectedPage.title === title) {
-            selectedPage = null;
-            cancelEdit();
-        }
-        
-        await loadKnowledgeBase();
-        
-    } catch (error) {
-        console.error('Error deleting page:', error);
-        alert('Error deleting page. Please try again.');
-    }
-}
-
-function deletePage() {
-    if (selectedPage) {
-        confirmDeletePage(selectedPage.category, selectedPage.title);
-    }
-}
-
-function handleSearch(e) {
-    const searchTerm = e.target.value.trim();
-    selectedCategory = ""; // Clear category filter when searching
-    document.getElementById('category-select').value = "";
-    renderCategories(searchTerm);
-}
-
-function handleCategoryFilter(e) {
-    selectedCategory = e.target.value;
-    document.getElementById('search-input').value = ""; // Clear search when filtering
-    renderCategories();
-}
-
-function showViewer() {
-    document.getElementById('content-viewer').style.display = 'block';
-    document.getElementById('editor-container').style.display = 'none';
-    document.getElementById('edit-btn').style.display = selectedPage ? 'inline-flex' : 'none';
-    document.getElementById('delete-btn').style.display = selectedPage ? 'inline-flex' : 'none';
-    document.getElementById('save-btn').style.display = 'none';
-    document.getElementById('cancel-btn').style.display = 'none';
-    isEditing = false;
-}
-
-function showEditor() {
-    document.getElementById('content-viewer').style.display = 'none';
-    document.getElementById('editor-container').style.display = 'flex';
-    document.getElementById('edit-btn').style.display = 'none';
-    document.getElementById('delete-btn').style.display = 'none';
-    document.getElementById('save-btn').style.display = 'inline-flex';
-    document.getElementById('cancel-btn').style.display = 'inline-flex';
-    isEditing = true;
-    
-    setTimeout(() => {
-        document.getElementById('page-title-input').focus();
-    }, 100);
-}
-</script>
-</body>
-</html>
+        deletePageAction(page
