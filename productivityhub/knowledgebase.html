@@ -913,4 +913,95 @@ function cancelEdit() {
 
 window.confirmDeletePage = function(pageId, title) {
     if (confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) {
-        deletePageAction(page
+        deletePageAction(pageId);
+    }
+}
+
+async function deletePageAction(pageId) {
+    try {
+        const pageDoc = doc(window.db, 'knowledge-base', pageId);
+        await deleteDoc(pageDoc);
+        
+        if (selectedPage && selectedPage.id === pageId) {
+            selectedPage = null;
+            cancelEdit();
+        }
+        
+        await loadKnowledgeBase();
+        
+    } catch (error) {
+        console.error('Error deleting page:', error);
+        alert('Error deleting page. Please try again.');
+    }
+}
+
+function deletePage() {
+    if (selectedPage) {
+        confirmDeletePage(selectedPage.id, selectedPage.title);
+    }
+}
+
+function handleSearch(e) {
+    const searchTerm = e.target.value.trim();
+    selectedCategory = "";
+    document.getElementById('category-select').value = "";
+    renderCategories(searchTerm);
+}
+
+function handleCategoryFilter(e) {
+    selectedCategory = e.target.value;
+    document.getElementById('search-input').value = "";
+    renderCategories();
+}
+
+function showViewer() {
+    document.getElementById('content-viewer').style.display = 'block';
+    document.getElementById('editor-container').style.display = 'none';
+    document.getElementById('edit-btn').style.display = selectedPage ? 'inline-flex' : 'none';
+    document.getElementById('delete-btn').style.display = selectedPage ? 'inline-flex' : 'none';
+    document.getElementById('save-btn').style.display = 'none';
+    document.getElementById('cancel-btn').style.display = 'none';
+    isEditing = false;
+}
+
+function showEditor() {
+    document.getElementById('content-viewer').style.display = 'none';
+    document.getElementById('editor-container').style.display = 'flex';
+    document.getElementById('edit-btn').style.display = 'none';
+    document.getElementById('delete-btn').style.display = 'none';
+    document.getElementById('save-btn').style.display = 'inline-flex';
+    document.getElementById('cancel-btn').style.display = 'inline-flex';
+    isEditing = true;
+    
+    setTimeout(() => {
+        document.getElementById('page-title-input').focus();
+    }, 100);
+}
+
+// Load theme and initialize
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'light') {
+    document.body.classList.add('light-mode');
+}
+
+// Load sidebar
+fetch('sidebar.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('sidebar-nav').innerHTML = data;
+    })
+    .catch(error => {
+        console.log('Sidebar not found');
+    });
+
+// Start clock
+setInterval(updateClock, 1000);
+updateClock();
+
+// Initialize when Firebase is ready
+if (window.firebaseReady) {
+    window.initializeKnowledgeBase();
+}
+</script>
+</body>
+</html>
