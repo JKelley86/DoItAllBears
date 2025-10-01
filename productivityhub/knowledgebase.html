@@ -160,6 +160,11 @@
         }
         
         /* Category Folders */
+        #categories-container {
+            display: flex;
+            flex-direction: column; /* stack folders vertically */
+            gap: 15px;
+        }
         .category-folder {
             margin-bottom: 18px;
             border-radius: 12px;
@@ -167,6 +172,7 @@
             overflow: hidden;
             background: var(--card-bg);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
         }
         
         .category-header {
@@ -181,6 +187,7 @@
             font-size: 1.1rem;
             transition: all 0.3s ease;
             border-bottom: 2px solid transparent;
+            width: 100%; /* ensure header stretches */
         }
         
         .category-header:hover {
@@ -226,6 +233,9 @@
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease;
+            display: flex;
+            flex-direction: column; /* pages stacked vertically */
+            width: 100%;
         }
         
         .page-list.open {
