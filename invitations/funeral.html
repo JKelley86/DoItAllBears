@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Funeral Service Invitation</title>
+  <title>Celebrating the Life of Rick Peterson</title>
   <style>
     body {
       font-family: "Georgia", serif;
@@ -20,14 +20,14 @@
     .overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.55);
     }
 
     .card {
       position: relative;
       z-index: 1;
       max-width: 700px;
-      background: rgba(20, 20, 20, 0.85);
+      background: rgba(30, 30, 30, 0.85);
       padding: 2.5rem;
       border-radius: 16px;
       text-align: center;
@@ -35,22 +35,28 @@
     }
 
     h1.title {
-      font-size: 2.2rem;
+      font-size: 2.4rem;
       margin-bottom: 0.5rem;
+      color: #ffd27f;
     }
 
     h2.subtitle {
-      font-size: 1.3rem;
+      font-size: 1.4rem;
       font-weight: normal;
       margin-bottom: 1.5rem;
-      color: #d3d3d3;
+      color: #f0e6d2;
     }
 
     .details {
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       line-height: 1.6;
       text-align: left;
       margin-bottom: 2rem;
+    }
+
+    .highlight {
+      color: #ffd27f;
+      font-weight: bold;
     }
 
     .rsvp-section {
@@ -59,33 +65,34 @@
     }
 
     .rsvp-title {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       margin-bottom: 1rem;
-      color: #d3d3d3;
+      color: #f0e6d2;
     }
 
     .rsvp-text {
       font-size: 1rem;
-      color: #ccc;
+      color: #ddd;
     }
   </style>
 </head>
 <body>
   <div class="overlay"></div>
   <main class="card">
-    <h1 class="title">In Loving Memory Of Rick Peterson</h1>
-    <h2 class="subtitle">You are invited to join us in remembrance</h2>
+    <h1 class="title">Celebrating the Life of Rick Peterson</h1>
+    <h2 class="subtitle">A life well-lived, a spirit that lives on</h2>
 
     <section class="details">
-      <p><strong>📅 Date:</strong> Saturday, October 4th, 2025</p>
-      <p><strong>🕘 Time:</strong> 1:00 PM</p>
-      <p><strong>📍 Location:</strong> Strike Life Tributes - Cambridge, 720 1st Ave E, Cambridge, MN 55008, US</p>
-      <p><strong>🕊️ Reception:</strong> Following the service at Pizza Pub In Cambridge</p>
+      <p><strong>📅 Date:</strong> <span class="highlight">Saturday, October 4th, 2025</span></p>
+      <p><strong>🕘 Time:</strong> <span class="highlight">1:00 PM</span></p>
+      <p><strong>📍 Location:</strong> Strike Life Tributes - Cambridge<br>
+      720 1st Ave E, Cambridge, MN 55008</p>
+      <p><strong>🕊️ Reception:</strong> Join us afterward for food, stories, and laughter at <span class="highlight">Pizza Pub, Cambridge</span>.</p>
     </section>
 
     <section class="rsvp-section">
       <h2 class="rsvp-title">Attendance</h2>
-      <p class="rsvp-text">📱 Please text <strong>Justin</strong> or <strong>Bridget</strong> to let us know if you will be attending.</p>
+      <p class="rsvp-text">📱 Please text <strong>Justin</strong> or <strong>Bridget</strong> to let us know if you’ll be joining us as we celebrate Rick’s life.</p>
     </section>
   </main>
 </body>
