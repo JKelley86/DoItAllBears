@@ -4,6 +4,7 @@
     --text-color: #fff;
     --card-bg: #000;
     --accent-color: #ff6347;
+	--table-color: #ffffff;
 }
 
 /* Light Mode */
@@ -11,6 +12,7 @@ body.light-mode {
     --bg-color: #f4f4f4;
     --text-color: #121212;
     --card-bg: #fff;
+	--table-color: #a1a1a1;
 }
 
 /* Body Styling */
@@ -49,6 +51,9 @@ html, body {
     max-width: 600px;
     border-radius: 25px;
 }
+
+table {
+	background: var(--table-color);
 
 /* Headings and Text */
 h1 {
