@@ -1,164 +1,820 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-<title>Archery Practice</title>
-<style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    background: #87CEEB;
-    touch-action: none; /* prevent scrolling while dragging */
-  }
-  #gameCanvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    display: block;
-    background: linear-gradient(#87CEEB 70%, #4CAF50 30%);
-  }
-  #rotateMsg {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: "Comic Sans MS", sans-serif;
-    font-size: 1.3rem;
-    background: rgba(0,0,0,0.7);
-    color: #fff;
-    padding: 15px 25px;
-    border-radius: 12px;
-    display: none;
-    text-align: center;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcane Archer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            touch-action: none;
+            background: #0a0a0a;
+        }
+
+        #gameCanvas {
+            display: block;
+            background: linear-gradient(180deg, #1a2332 0%, #2d3e50 50%, #3d5266 100%);
+            touch-action: none;
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .menu-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 50%, #0f1419 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            pointer-events: all;
+        }
+
+        .menu-screen.hidden {
+            display: none;
+        }
+
+        .game-title {
+            font-size: 4em;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5),
+                         0 4px 20px rgba(0, 0, 0, 0.8);
+            margin-bottom: 20px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .game-subtitle {
+            font-size: 1.2em;
+            color: #aaa;
+            margin-bottom: 60px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .menu-btn {
+            background: linear-gradient(135deg, #d4a574 0%, #8b6f47 100%);
+            border: 2px solid #ffd700;
+            color: #0f1419;
+            padding: 20px 60px;
+            font-size: 1.4em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            margin: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            pointer-events: all;
+            border-radius: 4px;
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            background: linear-gradient(135deg, #e4b584 0%, #9b7f57 100%);
+        }
+
+        .menu-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        .health-bar-container {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 8px;
+            padding: 10px 15px;
+            min-width: 200px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .health-label {
+            color: #ffd700;
+            font-size: 0.9em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .health-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(139, 0, 0, 0.6);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.8);
+        }
+
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4444 0%, #ff6666 100%);
+            transition: width 0.5s ease;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .health-text {
+            color: #fff;
+            font-size: 1.1em;
+            font-weight: 700;
+            text-align: center;
+            margin-top: 5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .power-meter {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 300px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 8px;
+            padding: 10px;
+            display: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .power-meter.active {
+            display: block;
+        }
+
+        .power-fill {
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(0deg, #ffd700 0%, #ff6600 50%, #ff0000 100%);
+            border-radius: 4px;
+            position: absolute;
+            bottom: 10px;
+            transition: height 0.1s linear;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .power-label {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ffd700;
+            font-size: 0.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+            white-space: nowrap;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .score-popup {
+            position: absolute;
+            font-size: 3em;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8),
+                         0 0 40px rgba(255, 215, 0, 0.4),
+                         0 4px 10px rgba(0, 0, 0, 0.8);
+            animation: scoreFloat 1.5s ease-out forwards;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes scoreFloat {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(0.5);
+            }
+            50% {
+                transform: translateY(-30px) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-60px) scale(1);
+            }
+        }
+
+        .turn-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid #ffd700;
+            border-radius: 12px;
+            padding: 30px 60px;
+            font-size: 2.5em;
+            font-weight: 900;
+            color: #ffd700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            display: none;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.8),
+                        0 0 60px rgba(255, 215, 0, 0.3);
+            animation: turnPulse 0.6s ease-out;
+        }
+
+        @keyframes turnPulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            pointer-events: all;
+        }
+
+        .game-over.show {
+            display: flex;
+        }
+
+        .game-over-text {
+            font-size: 4em;
+            font-weight: 900;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 30px currentColor,
+                         0 4px 20px rgba(0, 0, 0, 0.8);
+        }
+
+        .victory {
+            color: #ffd700;
+        }
+
+        .defeat {
+            color: #ff4444;
+        }
+
+        .crosshair {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            pointer-events: none;
+            display: none;
+        }
+
+        .crosshair::before,
+        .crosshair::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 215, 0, 0.8);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+        }
+
+        .crosshair::before {
+            width: 2px;
+            height: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .crosshair::after {
+            width: 100%;
+            height: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    </style>
 </head>
 <body>
-<canvas id="gameCanvas"></canvas>
-<div id="rotateMsg">🔄 Please rotate your device<br>to landscape mode</div>
+    <canvas id="gameCanvas"></canvas>
+    
+    <div class="ui-overlay">
+        <div class="menu-screen" id="mainMenu">
+            <div class="game-title">ARCANE ARCHER</div>
+            <div class="game-subtitle">Master the Ancient Art</div>
+            <button class="menu-btn" onclick="startMode('practice')">Practice Mode</button>
+            <button class="menu-btn" onclick="startMode('battle')">Battle Mode</button>
+        </div>
 
-<script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
-<script>
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-const rotateMsg = document.getElementById("rotateMsg");
+        <div class="hud" id="hud" style="display: none;">
+            <div class="health-bar-container">
+                <div class="health-label">Your Health</div>
+                <div class="health-bar">
+                    <div class="health-fill" id="playerHealth" style="width: 100%"></div>
+                </div>
+                <div class="health-text" id="playerHealthText">100 / 100</div>
+            </div>
+            <div class="health-bar-container">
+                <div class="health-label">Enemy Health</div>
+                <div class="health-bar">
+                    <div class="health-fill" id="enemyHealth" style="width: 100%"></div>
+                </div>
+                <div class="health-text" id="enemyHealthText">100 / 100</div>
+            </div>
+        </div>
 
-function resize() {
-  const landscape = window.innerWidth > window.innerHeight;
-  rotateMsg.style.display = landscape ? "none" : "block";
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-window.addEventListener("resize", resize);
-resize();
+        <div class="power-meter" id="powerMeter">
+            <div class="power-label">POWER</div>
+            <div class="power-fill" id="powerFill"></div>
+        </div>
 
-// === Physics setup ===
-const { Engine, World, Bodies, Body } = Matter;
-const engine = Engine.create();
-const world = engine.world;
-world.gravity.y = 0.8;
+        <div class="crosshair" id="crosshair"></div>
+        <div class="turn-indicator" id="turnIndicator"></div>
+        
+        <div class="game-over" id="gameOver">
+            <div class="game-over-text" id="gameOverText"></div>
+            <button class="menu-btn" onclick="returnToMenu()">Return to Menu</button>
+        </div>
+    </div>
 
-// Scene positions
-const bowPos = { x: 150, y: canvas.height - 200 };
-const targetPos = { x: canvas.width - 200, y: canvas.height - 220 };
-const targetRadius = 40;
-const ground = Bodies.rectangle(canvas.width / 2, canvas.height - 20, canvas.width, 40, { isStatic: true });
-World.add(world, ground);
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-let arrows = [];
-let pulling = false;
-let pullStart, pullEnd;
+        let gameMode = null;
+        let gameState = 'menu';
+        let playerHealth = 100;
+        let enemyHealth = 100;
+        let isPlayerTurn = true;
+        let bowAngle = 0;
+        let pullStrength = 0;
+        let isPulling = false;
+        let arrows = [];
+        let targetHits = [];
 
-// Input handlers
-function startPull(x, y) { pulling = true; pullStart = {x, y}; pullEnd = {x, y}; }
-function movePull(x, y) { if (pulling) pullEnd = {x, y}; }
-function releasePull() {
-  if (!pulling) return;
-  pulling = false;
-  const dx = pullStart.x - pullEnd.x;
-  const dy = pullStart.y - pullEnd.y;
-  const dist = Math.sqrt(dx*dx + dy*dy);
-  if (dist < 10) return;
-  const angle = Math.atan2(dy, dx);
-  const power = Math.min(dist / 6, 25);
-  const arrow = Bodies.rectangle(bowPos.x, bowPos.y, 60, 5, { density: 0.003, frictionAir: 0.01 });
-  Body.setAngle(arrow, angle);
-  Body.setVelocity(arrow, { x: -Math.cos(angle) * power, y: -Math.sin(angle) * power });
-  arrows.push(arrow);
-  World.add(world, arrow);
-}
+        const bow = {
+            x: 100,
+            y: canvas.height / 2,
+            width: 60,
+            height: 120
+        };
 
-function getXY(e) {
-  if (e.touches && e.touches.length) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-  return { x: e.offsetX, y: e.offsetY };
-}
-canvas.addEventListener("mousedown", e => { const {x,y}=getXY(e); startPull(x,y); });
-canvas.addEventListener("mousemove", e => { const {x,y}=getXY(e); movePull(x,y); });
-canvas.addEventListener("mouseup", e => releasePull());
-canvas.addEventListener("touchstart", e => { const {x,y}=getXY(e); startPull(x,y); });
-canvas.addEventListener("touchmove", e => { const {x,y}=getXY(e); movePull(x,y); });
-canvas.addEventListener("touchend", e => releasePull());
+        const target = {
+            x: canvas.width - 200,
+            y: canvas.height / 2,
+            radius: 80
+        };
 
-// === Draw functions ===
-function drawGround() {
-  ctx.fillStyle = "#388E3C";
-  ctx.fillRect(0, canvas.height - 40, canvas.width, 40);
-}
-function drawBow() {
-  ctx.strokeStyle = "#5D4037";
-  ctx.lineWidth = 6;
-  ctx.beginPath();
-  ctx.arc(bowPos.x, bowPos.y, 40, Math.PI / 2, -Math.PI / 2, true);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(bowPos.x, bowPos.y - 40);
-  ctx.lineTo(pulling ? pullEnd.x : bowPos.x, pulling ? pullEnd.y : bowPos.y);
-  ctx.lineTo(bowPos.x, bowPos.y + 40);
-  ctx.strokeStyle = "gray";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-}
-function drawTarget() {
-  const colors = ["white","black","blue","red","yellow"];
-  for (let i = colors.length-1; i >= 0; i--) {
-    ctx.beginPath();
-    ctx.arc(targetPos.x, targetPos.y, targetRadius - i*8, 0, Math.PI*2);
-    ctx.fillStyle = colors[i];
-    ctx.fill();
-  }
-}
-function drawArrows() {
-  ctx.fillStyle = "brown";
-  arrows.forEach(a => {
-    ctx.save();
-    ctx.translate(a.position.x, a.position.y);
-    ctx.rotate(a.angle);
-    ctx.fillRect(-30, -2, 60, 4);
-    ctx.restore();
-  });
-}
+        const player = {
+            x: 150,
+            y: canvas.height / 2,
+            width: 60,
+            height: 120
+        };
 
-// === Game Loop ===
-function loop() {
-  if (window.innerWidth < window.innerHeight) {
-    requestAnimationFrame(loop);
-    return;
-  }
-  Engine.update(engine, 1000/60);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawGround();
-  drawTarget();
-  drawArrows();
-  drawBow();
-  requestAnimationFrame(loop);
-}
-loop();
-</script>
+        const enemy = {
+            x: canvas.width - 150,
+            y: canvas.height / 2,
+            width: 60,
+            height: 120
+        };
+
+        function startMode(mode) {
+            gameMode = mode;
+            gameState = 'playing';
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('hud').style.display = mode === 'battle' ? 'flex' : 'none';
+            
+            if (mode === 'battle') {
+                playerHealth = 100;
+                enemyHealth = 100;
+                updateHealthBars();
+                showTurnIndicator('YOUR TURN');
+            }
+        }
+
+        function returnToMenu() {
+            gameMode = null;
+            gameState = 'menu';
+            arrows = [];
+            targetHits = [];
+            isPlayerTurn = true;
+            document.getElementById('mainMenu').classList.remove('hidden');
+            document.getElementById('hud').style.display = 'none';
+            document.getElementById('gameOver').classList.remove('show');
+        }
+
+        function updateHealthBars() {
+            document.getElementById('playerHealth').style.width = playerHealth + '%';
+            document.getElementById('playerHealthText').textContent = Math.max(0, Math.round(playerHealth)) + ' / 100';
+            document.getElementById('enemyHealth').style.width = enemyHealth + '%';
+            document.getElementById('enemyHealthText').textContent = Math.max(0, Math.round(enemyHealth)) + ' / 100';
+        }
+
+        function showTurnIndicator(text) {
+            const indicator = document.getElementById('turnIndicator');
+            indicator.textContent = text;
+            indicator.style.display = 'block';
+            setTimeout(() => {
+                indicator.style.display = 'none';
+            }, 1500);
+        }
+
+        function showScorePopup(x, y, score) {
+            const popup = document.createElement('div');
+            popup.className = 'score-popup';
+            popup.textContent = score;
+            popup.style.left = x + 'px';
+            popup.style.top = y + 'px';
+            document.body.appendChild(popup);
+            
+            setTimeout(() => {
+                popup.remove();
+            }, 1500);
+        }
+
+        function gameOver(playerWon) {
+            gameState = 'gameover';
+            const gameOverDiv = document.getElementById('gameOver');
+            const gameOverText = document.getElementById('gameOverText');
+            
+            if (playerWon) {
+                gameOverText.textContent = 'VICTORY';
+                gameOverText.className = 'game-over-text victory';
+            } else {
+                gameOverText.textContent = 'DEFEAT';
+                gameOverText.className = 'game-over-text defeat';
+            }
+            
+            gameOverDiv.classList.add('show');
+        }
+
+        function drawBow() {
+            const x = gameMode === 'practice' ? bow.x : player.x;
+            const y = bowAngle + (gameMode === 'practice' ? bow.y : player.y);
+            
+            ctx.save();
+            ctx.translate(x, y);
+            
+            // Bow
+            ctx.strokeStyle = '#8b6f47';
+            ctx.lineWidth = 8;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.arc(0, 0, 30, -Math.PI * 0.7, Math.PI * 0.7);
+            ctx.stroke();
+            
+            // String
+            const pullback = isPulling ? pullStrength * 50 : 0;
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-10, -40);
+            ctx.lineTo(-pullback, 0);
+            ctx.lineTo(-10, 40);
+            ctx.stroke();
+            
+            // Arrow when pulling
+            if (isPulling) {
+                ctx.strokeStyle = '#cd7f32';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(-pullback, 0);
+                ctx.lineTo(-pullback - 60, 0);
+                ctx.stroke();
+                
+                // Arrowhead
+                ctx.fillStyle = '#888';
+                ctx.beginPath();
+                ctx.moveTo(-pullback - 60, 0);
+                ctx.lineTo(-pullback - 50, -5);
+                ctx.lineTo(-pullback - 50, 5);
+                ctx.closePath();
+                ctx.fill();
+            }
+            
+            ctx.restore();
+        }
+
+        function drawTarget() {
+            const rings = [
+                { radius: 80, color: '#fff', score: 1 },
+                { radius: 65, color: '#000', score: 3 },
+                { radius: 50, color: '#4a90e2', score: 5 },
+                { radius: 35, color: '#e74c3c', score: 7 },
+                { radius: 20, color: '#ffd700', score: 10 }
+            ];
+            
+            rings.forEach(ring => {
+                ctx.fillStyle = ring.color;
+                ctx.beginPath();
+                ctx.arc(target.x, target.y, ring.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+        }
+
+        function drawCharacter(char, isEnemy = false) {
+            ctx.fillStyle = isEnemy ? '#8b0000' : '#4a90e2';
+            
+            // Body
+            ctx.fillRect(char.x - char.width / 2, char.y - 20, char.width, 80);
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(char.x, char.y - 40, 20, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Legs
+            ctx.fillRect(char.x - 20, char.y + 60, 15, 40);
+            ctx.fillRect(char.x + 5, char.y + 60, 15, 40);
+        }
+
+        function updateArrows() {
+            arrows = arrows.filter(arrow => {
+                arrow.x += arrow.vx;
+                arrow.y += arrow.vy;
+                arrow.vy += 0.3; // Gravity
+                
+                // Check target hit (practice mode)
+                if (gameMode === 'practice') {
+                    const dist = Math.sqrt(Math.pow(arrow.x - target.x, 2) + Math.pow(arrow.y - target.y, 2));
+                    if (dist < 80) {
+                        let score = 1;
+                        if (dist < 20) score = 10;
+                        else if (dist < 35) score = 7;
+                        else if (dist < 50) score = 5;
+                        else if (dist < 65) score = 3;
+                        
+                        targetHits.push({ x: arrow.x, y: arrow.y });
+                        showScorePopup(arrow.x, arrow.y, score);
+                        return false;
+                    }
+                }
+                
+                // Check enemy hit (battle mode)
+                if (gameMode === 'battle' && isPlayerTurn) {
+                    const hitHead = Math.abs(arrow.x - enemy.x) < 30 && 
+                                  Math.abs(arrow.y - (enemy.y - 40)) < 20;
+                    const hitBody = Math.abs(arrow.x - enemy.x) < 30 && 
+                                  arrow.y > enemy.y - 20 && arrow.y < enemy.y + 60;
+                    
+                    if (hitHead) {
+                        enemyHealth = 0;
+                        showScorePopup(arrow.x, arrow.y, 'HEADSHOT!');
+                        updateHealthBars();
+                        setTimeout(() => gameOver(true), 1000);
+                        return false;
+                    } else if (hitBody) {
+                        const distFromCenter = Math.abs(arrow.y - enemy.y);
+                        const damage = 50 - distFromCenter;
+                        enemyHealth -= damage;
+                        showScorePopup(arrow.x, arrow.y, '-' + Math.round(damage));
+                        updateHealthBars();
+                        
+                        if (enemyHealth <= 0) {
+                            setTimeout(() => gameOver(true), 1000);
+                        } else {
+                            isPlayerTurn = false;
+                            setTimeout(() => {
+                                showTurnIndicator('ENEMY TURN');
+                                setTimeout(enemyShoot, 2000);
+                            }, 1000);
+                        }
+                        return false;
+                    }
+                }
+                
+                // Remove if off screen
+                return arrow.x < canvas.width + 100 && arrow.y < canvas.height + 100;
+            });
+        }
+
+        function enemyShoot() {
+            if (gameState !== 'playing') return;
+            
+            const accuracy = 0.7 + Math.random() * 0.3;
+            const targetY = player.y + (Math.random() - 0.5) * 100 * (1 - accuracy);
+            const distance = enemy.x - player.x;
+            const power = 12 + Math.random() * 6;
+            const angle = Math.atan2(targetY - enemy.y, -distance);
+            
+            arrows.push({
+                x: enemy.x - 30,
+                y: enemy.y,
+                vx: Math.cos(angle) * power,
+                vy: Math.sin(angle) * power,
+                isEnemy: true
+            });
+            
+            setTimeout(checkEnemyHit, 800);
+        }
+
+        function checkEnemyHit() {
+            const enemyArrow = arrows.find(a => a.isEnemy);
+            if (!enemyArrow) {
+                isPlayerTurn = true;
+                showTurnIndicator('YOUR TURN');
+                return;
+            }
+            
+            const hitHead = Math.abs(enemyArrow.x - player.x) < 30 && 
+                          Math.abs(enemyArrow.y - (player.y - 40)) < 20;
+            const hitBody = Math.abs(enemyArrow.x - player.x) < 30 && 
+                          enemyArrow.y > player.y - 20 && enemyArrow.y < player.y + 60;
+            
+            if (hitHead) {
+                playerHealth = 0;
+                updateHealthBars();
+                setTimeout(() => gameOver(false), 1000);
+            } else if (hitBody) {
+                const distFromCenter = Math.abs(enemyArrow.y - player.y);
+                const damage = 50 - distFromCenter;
+                playerHealth -= damage;
+                updateHealthBars();
+                
+                if (playerHealth <= 0) {
+                    setTimeout(() => gameOver(false), 1000);
+                } else {
+                    isPlayerTurn = true;
+                    showTurnIndicator('YOUR TURN');
+                }
+            } else {
+                isPlayerTurn = true;
+                showTurnIndicator('YOUR TURN');
+            }
+        }
+
+        function drawArrows() {
+            arrows.forEach(arrow => {
+                const angle = Math.atan2(arrow.vy, arrow.vx);
+                ctx.save();
+                ctx.translate(arrow.x, arrow.y);
+                ctx.rotate(angle);
+                
+                // Arrow shaft
+                ctx.strokeStyle = arrow.isEnemy ? '#8b0000' : '#cd7f32';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(-40, 0);
+                ctx.stroke();
+                
+                // Arrowhead
+                ctx.fillStyle = '#888';
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(-10, -5);
+                ctx.lineTo(-10, 5);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.restore();
+            });
+        }
+
+        function drawTargetHits() {
+            targetHits.forEach(hit => {
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(hit.x - 10, hit.y);
+                ctx.lineTo(hit.x + 10, hit.y);
+                ctx.stroke();
+            });
+        }
+
+        function drawScene() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Ground
+            ctx.fillStyle = '#2d4f2f';
+            ctx.fillRect(0, canvas.height - 100, canvas.width, 100);
+            
+            if (gameMode === 'practice') {
+                drawTarget();
+                drawTargetHits();
+                drawBow();
+            } else if (gameMode === 'battle') {
+                drawCharacter(player);
+                drawCharacter(enemy, true);
+                if (isPlayerTurn) {
+                    drawBow();
+                }
+            }
+            
+            drawArrows();
+        }
+
+        function gameLoop() {
+            if (gameState === 'playing') {
+                updateArrows();
+                drawScene();
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Touch controls
+        let touchStartY = 0;
+        let touchStartTime = 0;
+
+        canvas.addEventListener('touchstart', (e) => {
+            if (gameState !== 'playing') return;
+            if (gameMode === 'battle' && !isPlayerTurn) return;
+            
+            e.preventDefault();
+            touchStartY = e.touches[0].clientY;
+            touchStartTime = Date.now();
+            isPulling = true;
+            document.getElementById('powerMeter').classList.add('active');
+            
+            const powerInterval = setInterval(() => {
+                if (!isPulling) {
+                    clearInterval(powerInterval);
+                    return;
+                }
+                pullStrength = Math.min(1, (Date.now() - touchStartTime) / 1500);
+                document.getElementById('powerFill').style.height = (pullStrength * 100) + '%';
+            }, 16);
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            if (!isPulling) return;
+            e.preventDefault();
+            const deltaY = e.touches[0].clientY - touchStartY;
+            bowAngle = Math.max(-150, Math.min(150, deltaY));
+        });
+
+        canvas.addEventListener('touchend', (e) => {
+            if (!isPulling) return;
+            e.preventDefault();
+            
+            isPulling = false;
+            document.getElementById('powerMeter').classList.remove('active');
+            document.getElementById('powerFill').style.height = '0%';
+            
+            const startX = gameMode === 'practice' ? bow.x : player.x;
+            const startY = bowAngle + (gameMode === 'practice' ? bow.y : player.y);
+            const power = 8 + pullStrength * 12;
+            const angle = 0;
+            
+            arrows.push({
+                x: startX + 30,
+                y: startY,
+                vx: Math.cos(angle) * power,
+                vy: Math.sin(angle) * power + (bowAngle / 100),
+                isEnemy: false
+            });
+            
+            bowAngle = 0;
+            pullStrength = 0;
+        });
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            target.x = canvas.width - 200;
+            enemy.x = canvas.width - 150;
+        });
+
+        gameLoop();
+    </script>
 </body>
 </html>
