@@ -54,6 +54,7 @@ html, body {
 
 table {
 	background: var(--table-color);
+}
 
 /* Headings and Text */
 h1 {
