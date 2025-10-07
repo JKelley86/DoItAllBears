@@ -376,8 +376,20 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Update positions based on new canvas size
+            target.x = canvas.width * 0.75;
+            target.y = canvas.height / 2;
+            enemy.x = canvas.width * 0.85;
+            enemy.y = canvas.height / 2;
+            bow.y = canvas.height / 2;
+            player.y = canvas.height / 2;
+        }
+        
+        resizeCanvas();
 
         let gameMode = null;
         let gameState = 'menu';
@@ -398,8 +410,8 @@
         };
 
         const target = {
-            x: canvas.width - 200,
-            y: canvas.height / 2,
+            x: window.innerWidth * 0.75,
+            y: window.innerHeight / 2,
             radius: 80
         };
 
@@ -411,8 +423,8 @@
         };
 
         const enemy = {
-            x: canvas.width - 150,
-            y: canvas.height / 2,
+            x: window.innerWidth * 0.85,
+            y: window.innerHeight / 2,
             width: 60,
             height: 120
         };
@@ -574,12 +586,13 @@
             arrows = arrows.filter(arrow => {
                 arrow.x += arrow.vx;
                 arrow.y += arrow.vy;
-                arrow.vy += 0.3; // Gravity
+                arrow.vy += 0.2; // Reduced gravity for better range
+                arrow.vx *= 0.995; // Slight air resistance
                 
                 // Check target hit (practice mode)
                 if (gameMode === 'practice') {
                     const dist = Math.sqrt(Math.pow(arrow.x - target.x, 2) + Math.pow(arrow.y - target.y, 2));
-                    if (dist < 80) {
+                    if (dist < 85 && arrow.x > target.x - 85) { // Expanded hit detection
                         let score = 1;
                         if (dist < 20) score = 10;
                         else if (dist < 35) score = 7;
@@ -626,7 +639,7 @@
                 }
                 
                 // Remove if off screen
-                return arrow.x < canvas.width + 100 && arrow.y < canvas.height + 100;
+                return arrow.x < canvas.width + 100 && arrow.y < canvas.height + 100 && arrow.y > -100;
             });
         }
 
@@ -795,14 +808,14 @@
             
             const startX = gameMode === 'practice' ? bow.x : player.x;
             const startY = bowAngle + (gameMode === 'practice' ? bow.y : player.y);
-            const power = 8 + pullStrength * 12;
+            const power = 10 + pullStrength * 15; // Increased power range
             const angle = 0;
             
             arrows.push({
                 x: startX + 30,
                 y: startY,
                 vx: Math.cos(angle) * power,
-                vy: Math.sin(angle) * power + (bowAngle / 100),
+                vy: Math.sin(angle) * power + (bowAngle / 80), // More responsive to aim
                 isEnemy: false
             });
             
@@ -811,10 +824,7 @@
         });
 
         window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            target.x = canvas.width - 200;
-            enemy.x = canvas.width - 150;
+            resizeCanvas();
         });
 
         gameLoop();
