@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Arcane Archer</title>
     <style>
         * {
@@ -17,6 +17,9 @@
             overflow: hidden;
             touch-action: none;
             background: #0a0a0a;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
         }
 
         #gameCanvas {
@@ -54,7 +57,7 @@
         }
 
         .game-title {
-            font-size: 4em;
+            font-size: clamp(2em, 8vw, 4em);
             font-weight: 900;
             color: #fff;
             text-shadow: 0 0 30px rgba(255, 215, 0, 0.5),
@@ -65,7 +68,7 @@
         }
 
         .game-subtitle {
-            font-size: 1.2em;
+            font-size: clamp(0.8em, 3vw, 1.2em);
             color: #aaa;
             margin-bottom: 60px;
             text-transform: uppercase;
@@ -76,8 +79,8 @@
             background: linear-gradient(135deg, #d4a574 0%, #8b6f47 100%);
             border: 2px solid #ffd700;
             color: #0f1419;
-            padding: 20px 60px;
-            font-size: 1.4em;
+            padding: clamp(15px, 3vh, 20px) clamp(40px, 8vw, 60px);
+            font-size: clamp(1em, 3vw, 1.4em);
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -279,7 +282,7 @@
         }
 
         .game-over-text {
-            font-size: 4em;
+            font-size: clamp(2em, 8vw, 4em);
             font-weight: 900;
             margin-bottom: 30px;
             text-transform: uppercase;
