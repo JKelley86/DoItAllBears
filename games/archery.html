@@ -8,34 +8,40 @@
   html, body {
     margin: 0;
     padding: 0;
+    height: 100%;
+    width: 100%;
     overflow: hidden;
     background: #87CEEB;
-    width: 100%;
-    height: 100%;
+    touch-action: none; /* prevent scrolling while dragging */
   }
-  canvas {
+  #gameCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     display: block;
     background: linear-gradient(#87CEEB 70%, #4CAF50 30%);
   }
   #rotateMsg {
-    display: none;
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     font-family: "Comic Sans MS", sans-serif;
-    font-size: 1.5rem;
-    background: rgba(0,0,0,0.6);
-    color: white;
+    font-size: 1.3rem;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
     padding: 15px 25px;
-    border-radius: 10px;
+    border-radius: 12px;
+    display: none;
     text-align: center;
   }
 </style>
 </head>
 <body>
 <canvas id="gameCanvas"></canvas>
-<div id="rotateMsg">🔄 Rotate your device<br>to landscape mode</div>
+<div id="rotateMsg">🔄 Please rotate your device<br>to landscape mode</div>
 
 <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
 <script>
@@ -43,102 +49,81 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const rotateMsg = document.getElementById("rotateMsg");
 
-function fitCanvas() {
+function resize() {
   const landscape = window.innerWidth > window.innerHeight;
   rotateMsg.style.display = landscape ? "none" : "block";
-  if (!landscape) return;
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
-window.addEventListener("resize", fitCanvas);
-fitCanvas();
+window.addEventListener("resize", resize);
+resize();
 
 // === Physics setup ===
-const Engine = Matter.Engine,
-      World = Matter.World,
-      Bodies = Matter.Bodies,
-      Body = Matter.Body,
-      Vector = Matter.Vector;
-
+const { Engine, World, Bodies, Body } = Matter;
 const engine = Engine.create();
 const world = engine.world;
 world.gravity.y = 0.8;
 
-// Scene scale
-const groundY = canvas.height - 50;
-const ground = Bodies.rectangle(canvas.width/2, groundY, canvas.width, 60, {isStatic: true});
+// Scene positions
+const bowPos = { x: 150, y: canvas.height - 200 };
+const targetPos = { x: canvas.width - 200, y: canvas.height - 220 };
+const targetRadius = 40;
+const ground = Bodies.rectangle(canvas.width / 2, canvas.height - 20, canvas.width, 40, { isStatic: true });
 World.add(world, ground);
 
-// Bow and target positions (always visible)
-let bowPos = {x: 150, y: groundY - 100};
-let targetPos = {x: canvas.width - 200, y: groundY - 120};
-let targetRadius = 40;
-
-// Arrow list
 let arrows = [];
+let pulling = false;
+let pullStart, pullEnd;
 
-// Aim variables
-let isPulling = false;
-let pullStart = null;
-let pullEnd = null;
-
-function startPull(x, y) { isPulling = true; pullStart = {x, y}; pullEnd = {x, y}; }
-function movePull(x, y) { if(isPulling) pullEnd = {x, y}; }
+// Input handlers
+function startPull(x, y) { pulling = true; pullStart = {x, y}; pullEnd = {x, y}; }
+function movePull(x, y) { if (pulling) pullEnd = {x, y}; }
 function releasePull() {
-  if (!isPulling) return;
-  isPulling = false;
+  if (!pulling) return;
+  pulling = false;
   const dx = pullStart.x - pullEnd.x;
   const dy = pullStart.y - pullEnd.y;
-  const pullDist = Math.sqrt(dx*dx + dy*dy);
-  if (pullDist < 10) return; // too short
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  if (dist < 10) return;
   const angle = Math.atan2(dy, dx);
-  const power = Math.min(pullDist / 8, 30);
-  const arrow = Bodies.rectangle(bowPos.x, bowPos.y, 60, 5, {density:0.003, frictionAir:0.01});
+  const power = Math.min(dist / 6, 25);
+  const arrow = Bodies.rectangle(bowPos.x, bowPos.y, 60, 5, { density: 0.003, frictionAir: 0.01 });
   Body.setAngle(arrow, angle);
-  Body.setVelocity(arrow, {x: -Math.cos(angle)*power, y: -Math.sin(angle)*power});
+  Body.setVelocity(arrow, { x: -Math.cos(angle) * power, y: -Math.sin(angle) * power });
   arrows.push(arrow);
   World.add(world, arrow);
 }
 
-// Touch + Mouse controls
-const handle = (method, e) => {
-  let x, y;
-  if (e.touches && e.touches.length) { x = e.touches[0].clientX; y = e.touches[0].clientY; }
-  else { x = e.offsetX; y = e.offsetY; }
-  if (method === "start") startPull(x, y);
-  if (method === "move") movePull(x, y);
-  if (method === "end") releasePull();
-};
-canvas.addEventListener("mousedown", e => handle("start", e));
-canvas.addEventListener("mousemove", e => handle("move", e));
-canvas.addEventListener("mouseup", e => handle("end", e));
-canvas.addEventListener("touchstart", e => handle("start", e));
-canvas.addEventListener("touchmove", e => handle("move", e));
-canvas.addEventListener("touchend", e => handle("end", e));
+function getXY(e) {
+  if (e.touches && e.touches.length) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  return { x: e.offsetX, y: e.offsetY };
+}
+canvas.addEventListener("mousedown", e => { const {x,y}=getXY(e); startPull(x,y); });
+canvas.addEventListener("mousemove", e => { const {x,y}=getXY(e); movePull(x,y); });
+canvas.addEventListener("mouseup", e => releasePull());
+canvas.addEventListener("touchstart", e => { const {x,y}=getXY(e); startPull(x,y); });
+canvas.addEventListener("touchmove", e => { const {x,y}=getXY(e); movePull(x,y); });
+canvas.addEventListener("touchend", e => releasePull());
 
-// === Drawing ===
+// === Draw functions ===
 function drawGround() {
   ctx.fillStyle = "#388E3C";
-  ctx.fillRect(0, groundY, canvas.width, 60);
+  ctx.fillRect(0, canvas.height - 40, canvas.width, 40);
 }
-
 function drawBow() {
   ctx.strokeStyle = "#5D4037";
   ctx.lineWidth = 6;
   ctx.beginPath();
-  ctx.arc(bowPos.x, bowPos.y, 40, Math.PI/2, -Math.PI/2, true);
+  ctx.arc(bowPos.x, bowPos.y, 40, Math.PI / 2, -Math.PI / 2, true);
   ctx.stroke();
-  // Draw string
   ctx.beginPath();
-  ctx.moveTo(bowPos.x, bowPos.y-40);
-  if(isPulling) ctx.lineTo(pullEnd.x, pullEnd.y);
-  else ctx.lineTo(bowPos.x, bowPos.y);
-  ctx.lineTo(bowPos.x, bowPos.y+40);
+  ctx.moveTo(bowPos.x, bowPos.y - 40);
+  ctx.lineTo(pulling ? pullEnd.x : bowPos.x, pulling ? pullEnd.y : bowPos.y);
+  ctx.lineTo(bowPos.x, bowPos.y + 40);
   ctx.strokeStyle = "gray";
   ctx.lineWidth = 2;
   ctx.stroke();
 }
-
 function drawTarget() {
   const colors = ["white","black","blue","red","yellow"];
   for (let i = colors.length-1; i >= 0; i--) {
@@ -148,7 +133,6 @@ function drawTarget() {
     ctx.fill();
   }
 }
-
 function drawArrows() {
   ctx.fillStyle = "brown";
   arrows.forEach(a => {
@@ -160,9 +144,10 @@ function drawArrows() {
   });
 }
 
-function gameLoop() {
+// === Game Loop ===
+function loop() {
   if (window.innerWidth < window.innerHeight) {
-    requestAnimationFrame(gameLoop);
+    requestAnimationFrame(loop);
     return;
   }
   Engine.update(engine, 1000/60);
@@ -171,9 +156,9 @@ function gameLoop() {
   drawTarget();
   drawArrows();
   drawBow();
-  requestAnimationFrame(gameLoop);
+  requestAnimationFrame(loop);
 }
-gameLoop();
+loop();
 </script>
 </body>
 </html>
