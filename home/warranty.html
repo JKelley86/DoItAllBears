@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Warranty Tracker</title>
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+  import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+  import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBJaG8JkfOSeYoXR1NbFtBhL-CqYr0CmTQ",
+    authDomain: "knowledge-base-7bdfc.firebaseapp.com",
+    projectId: "knowledge-base-7bdfc",
+    storageBucket: "knowledge-base-7bdfc.firebasestorage.app",
+    messagingSenderId: "893440933651",
+    appId: "1:893440933651:web:c17ad223a164a1724ee4e6"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+  window.db = db;
+  window.storage = storage;
+</script>
+
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+  h1 { color: #ff4500; }
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+  th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+  th { background: #ff4500; color: white; }
+  tr:nth-child(even) { background: #f2f2f2; }
+  input, select { padding: 8px; width: 100%; box-sizing: border-box; margin-bottom: 10px; }
+  button { padding: 8px 12px; cursor: pointer; background: #ff4500; color: white; border: none; border-radius: 5px; }
+  button:hover { background: #e03e00; }
+  .form-container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+  .actions button { margin-right: 5px; }
+</style>
+</head>
+<body>
+
+<h1>Home Warranty Tracker</h1>
+
+<div class="form-container">
+  <h3>Add / Edit Warranty</h3>
+  <input type="hidden" id="warranty-id">
+  <label>Item Name</label>
+  <input type="text" id="item-name" placeholder="Dishwasher, Furnace, etc.">
+  
+  <label>Brand / Model</label>
+  <input type="text" id="brand-model">
+  
+  <label>Expiration Date</label>
+  <input type="date" id="expiration-date">
+  
+  <label>Notes</label>
+  <input type="text" id="notes">
+  
+  <label>Manual (PDF)</label>
+  <input type="file" id="manual-file" accept="application/pdf">
+  
+  <button id="save-btn">Save Warranty</button>
+  <button id="cancel-btn" style="background:#888;">Cancel</button>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Item</th>
+      <th>Brand/Model</th>
+      <th>Expiration</th>
+      <th>Manual</th>
+      <th>Notes</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="warranty-table">
+    <tr><td colspan="6" style="text-align:center;">Loading...</td></tr>
+  </tbody>
+</table>
+
+<script type="module">
+  import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+  import { ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js';
+
+  const db = window.db;
+  const storage = window.storage;
+  const tableBody = document.getElementById('warranty-table');
+
+  let warranties = [];
+
+  async function loadWarranties() {
+    const snapshot = await getDocs(collection(db, 'home-warranty'));
+    warranties = [];
+    snapshot.forEach(docSnap => {
+      warranties.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    renderTable();
+  }
+
+  function renderTable() {
+    tableBody.innerHTML = '';
+    if (warranties.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No warranties added yet.</td></tr>';
+      return;
+    }
+
+    warranties.forEach(w => {
+      const manualLink = w.manualURL ? `<a href="${w.manualURL}" target="_blank">View PDF</a>` : '';
+      tableBody.innerHTML += `
+        <tr>
+          <td>${w.itemName}</td>
+          <td>${w.brandModel}</td>
+          <td>${w.expirationDate}</td>
+          <td>${manualLink}</td>
+          <td>${w.notes || ''}</td>
+          <td class="actions">
+            <button onclick="editWarranty('${w.id}')">Edit</button>
+            <button onclick="deleteWarranty('${w.id}')">Delete</button>
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+  window.editWarranty = (id) => {
+    const w = warranties.find(x => x.id === id);
+    if (!w) return;
+    document.getElementById('warranty-id').value = w.id;
+    document.getElementById('item-name').value = w.itemName;
+    document.getElementById('brand-model').value = w.brandModel;
+    document.getElementById('expiration-date').value = w.expirationDate;
+    document.getElementById('notes').value = w.notes || '';
+  };
+
+  window.deleteWarranty = async (id) => {
+    if (!confirm('Are you sure you want to delete this warranty?')) return;
+    await deleteDoc(doc(db, 'home-warranty', id));
+    loadWarranties();
+  };
+
+  document.getElementById('cancel-btn').addEventListener('click', () => {
+    document.getElementById('warranty-id').value = '';
+    document.getElementById('item-name').value = '';
+    document.getElementById('brand-model').value = '';
+    document.getElementById('expiration-date').value = '';
+    document.getElementById('notes').value = '';
+    document.getElementById('manual-file').value = '';
+  });
+
+  document.getElementById('save-btn').addEventListener('click', async () => {
+    const id = document.getElementById('warranty-id').value;
+    const itemName = document.getElementById('item-name').value.trim();
+    const brandModel = document.getElementById('brand-model').value.trim();
+    const expirationDate = document.getElementById('expiration-date').value;
+    const notes = document.getElementById('notes').value.trim();
+    const manualFile = document.getElementById('manual-file').files[0];
+
+    if (!itemName || !brandModel || !expirationDate) {
+      alert('Item name, brand/model, and expiration date are required.');
+      return;
+    }
+
+    let manualURL = null;
+    if (manualFile) {
+      const storageRef = ref(storage, `manuals/${Date.now()}_${manualFile.name}`);
+      const snapshot = await uploadBytes(storageRef, manualFile);
+      manualURL = await getDownloadURL(snapshot.ref);
+    }
+
+    const data = {
+      itemName,
+      brandModel,
+      expirationDate,
+      notes,
+      manualURL,
+      lastUpdated: serverTimestamp()
+    };
+
+    if (id) {
+      await updateDoc(doc(db, 'home-warranty', id), data);
+    } else {
+      await addDoc(collection(db, 'home-warranty'), data);
+    }
+
+    document.getElementById('cancel-btn').click();
+    loadWarranties();
+  });
+
+  loadWarranties();
+</script>
+
+</body>
+</html>
