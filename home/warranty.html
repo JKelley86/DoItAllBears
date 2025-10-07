@@ -235,14 +235,23 @@
   }
 
 // Load sidebar
-  fetch('sidebar.html')
-      .then(response => response.text())
-      .then(data => {
-          document.getElementById('sidebar-nav').innerHTML = data;
-      })
-      .catch(error => {
-          console.log('Sidebar not found');
+fetch('sidebar.html')
+  .then(response => response.text())
+  .then(data => {
+      const sidebarNav = document.getElementById('sidebar-nav');
+      sidebarNav.innerHTML = data;
+
+      // Attach navigation clicks
+      sidebarNav.querySelectorAll('.sidebar-card').forEach(card => {
+          card.addEventListener('click', () => {
+              const page = card.getAttribute('onclick')?.match(/navigateTo\('(.+?)'\)/)?.[1];
+              if (page) navigateTo(page);
+          });
       });
+  })
+  .catch(error => {
+      console.log('Sidebar not found', error);
+  });
 
 // Start clock
   setInterval(updateClock, 1000);
