@@ -228,6 +228,26 @@
       }
   });
 
+  // Load theme and initialize
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'light') {
+      document.body.classList.add('light-mode');
+  }
+
+// Load sidebar
+  fetch('sidebar.html')
+      .then(response => response.text())
+      .then(data => {
+          document.getElementById('sidebar-nav').innerHTML = data;
+      })
+      .catch(error => {
+          console.log('Sidebar not found');
+      });
+
+// Start clock
+  setInterval(updateClock, 1000);
+  updateClock();
+
   loadWarranties();
 </script>
 
