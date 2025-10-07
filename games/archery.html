@@ -1,603 +1,169 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
-<title>Cartoon Archery — Practice Mode</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>Archery Practice</title>
 <style>
-  :root{
-    --bg1: #b6ecff;
-    --bg2: #9de6a6;
-    --panel: rgba(255,255,255,0.9);
-    --accent: #f59e0b;
-    --text: #1f2937;
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: linear-gradient(to top, #87CEEB, #E0F7FA);
+    height: 100%;
+    width: 100%;
   }
-  html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
-  body{
-    display:flex;
-    flex-direction:column;
-    background: linear-gradient(180deg,var(--bg1) 0%, #9fe7f2 50%, var(--bg2) 100%);
-    color:var(--text);
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
+  #gameCanvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: #a6e4a6;
   }
-  header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:12px 16px;
-    gap:12px;
-    box-shadow:0 2px 8px rgba(16,24,40,0.06);
-    background:linear-gradient(90deg, rgba(255,255,255,0.65), rgba(255,255,255,0.5));
-    backdrop-filter: blur(6px);
-  }
-  header h1{font-size:18px;margin:0;letter-spacing:-0.2px;}
-  .controls{
-    display:flex;
-    gap:8px;
-    align-items:center;
-  }
-  .btn{
-    background:var(--panel);
-    border-radius:10px;
-    padding:8px 12px;
-    border:1px solid rgba(0,0,0,0.06);
-    font-weight:600;
-    cursor:pointer;
-  }
-  .small{font-size:13px;padding:6px 10px;border-radius:8px;}
-  #hud{
-    display:flex;
-    gap:14px;
-    align-items:center;
-    font-weight:600;
-    font-size:14px;
-  }
-
-  main{flex:1; display:flex; align-items:center; justify-content:center; padding:8px;}
-  #gamewrap{
-    width:100%;
-    max-width:1100px;
-    height:calc(100vh - 100px);
-    background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
-    border-radius:14px;
-    box-shadow: 0 8px 30px rgba(2,6,23,0.12);
-    overflow:hidden;
-    position:relative;
-  }
-  canvas{display:block; width:100%; height:100%;}
-  .ui-bottom{
-    position:absolute;
-    bottom:12px;
-    left:12px;
-    display:flex;
-    gap:10px;
-    align-items:center;
-    background: rgba(255,255,255,0.7);
-    padding:8px 10px;
-    border-radius:10px;
-    font-weight:600;
-  }
-  .score{
-    font-size:18px;
-    color: #0f172a;
-  }
-  .meter{
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-    align-items:flex-start;
-    font-size:13px;
-  }
-  .hint{font-weight:500; font-size:13px; opacity:0.9;}
-  /* mobile tweaks */
-  @media (max-width:600px){
-    header h1{font-size:16px;}
-    .btn{padding:6px 8px;}
-    .small{font-size:12px;padding:6px 8px;}
+  #rotateMsg {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: sans-serif;
+    font-size: 1.5em;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
   }
 </style>
 </head>
 <body>
-<header>
-  <h1>Cartoon Archery — Practice Mode</h1>
-  <div class="controls">
-    <div id="hud">
-      <div>Shots: <span id="shots">0</span></div>
-      <div>Score: <span id="score">0</span></div>
-      <div>Last Hit: <span id="lasthit">—</span></div>
-    </div>
-    <button id="resetBtn" class="btn small">Reset</button>
-    <button id="newTarget" class="btn small">Randomize Target</button>
-  </div>
-</header>
-
-<main>
-  <div id="gamewrap">
-    <canvas id="game"></canvas>
-
-    <div class="ui-bottom" aria-hidden="true">
-      <div class="meter">
-        <div class="hint">Drag from the bow to aim and pull back for power</div>
-        <div class="hint">Tap/click to start a new shot</div>
-      </div>
-      <div style="width:12px"></div>
-      <div style="display:flex; align-items:center; gap:8px;">
-        <div style="font-size:13px; opacity:0.8;">Power</div>
-        <div id="powerBar" style="width:160px; height:10px; background:rgba(0,0,0,0.08); border-radius:6px; overflow:hidden;">
-          <div id="powerFill" style="height:100%; width:0%; background:linear-gradient(90deg,#ffb86b,#ff5d8f);"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</main>
-
+<canvas id="gameCanvas"></canvas>
+<div id="rotateMsg">🔄 Please rotate your device to landscape</div>
+<script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
 <script>
-/*
-Cartoon Archery — Practice Mode
-Features:
-- Drag from bow to aim and set pull strength.
-- Trajectory preview (projectile arc).
-- Arrow flight + basic rotation.
-- Concentric target with scoring rings.
-- Touch + mouse support. Responsive.
-*/
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const rotateMsg = document.getElementById("rotateMsg");
 
-(() => {
-  const canvas = document.getElementById('game');
-  const ctx = canvas.getContext('2d', { alpha: true });
-  let DPR = Math.max(1, window.devicePixelRatio || 1);
+function resizeCanvas() {
+  const landscape = window.innerWidth > window.innerHeight;
+  rotateMsg.style.display = landscape ? "none" : "block";
+  if (!landscape) return;
+  const scale = window.devicePixelRatio || 1;
+  canvas.width = window.innerWidth * scale;
+  canvas.height = window.innerHeight * scale;
+  ctx.scale(scale, scale);
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 
-  // Game state
-  let W = 800, H = 450;
-  let bow = { x: 140, y: H - 120 };
-  let aiming = false;
-  let startDrag = null;
-  let aimVec = { x: 0, y: 0 };
-  let arrow = null; // {x,y,vx,vy,rot,active}
-  let gravity = 1300; // px/s^2
-  let maxPull = 220; // pixels -> max power
-  let maxVel = 1400; // px/s top arrow speed
-  let shots = 0, score = 0, lastHit = '—';
-  const rings = [40, 80, 120, 160, 200]; // radii for concentric rings from center
-  const ringScores = [100,80,60,40,20]; // matching rings
-  let target = createRandomTarget();
+const Engine = Matter.Engine,
+      World = Matter.World,
+      Bodies = Matter.Bodies,
+      Body = Matter.Body,
+      Vector = Matter.Vector;
 
-  // UI elements
-  const shotsEl = document.getElementById('shots');
-  const scoreEl = document.getElementById('score');
-  const lastEl = document.getElementById('lasthit');
-  const resetBtn = document.getElementById('resetBtn');
-  const randBtn = document.getElementById('newTarget');
-  const powerFill = document.getElementById('powerFill');
+const engine = Engine.create();
+const world = engine.world;
 
-  function createRandomTarget(){
-    // Target sits to the right side; randomize distance within range
-    const margin = 140;
-    const cx = Math.round(W * (0.55 + Math.random() * 0.35));
-    const cy = H - 140;
-    // size scale
-    const scale = 1 + Math.random() * 0.4;
-    return { x: cx, y: cy, scale };
+const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight - 20, window.innerWidth, 40, { isStatic: true });
+World.add(world, ground);
+
+const target = Bodies.circle(window.innerWidth - 150, window.innerHeight - 200, 40, { isStatic: true });
+World.add(world, target);
+
+let arrows = [];
+let pulling = false;
+let bowPos = { x: 150, y: window.innerHeight - 150 };
+let pullStart = { x: 0, y: 0 };
+let pullEnd = { x: 0, y: 0 };
+
+function startPull(x, y) {
+  pulling = true;
+  pullStart = { x, y };
+}
+function movePull(x, y) {
+  if (pulling) pullEnd = { x, y };
+}
+function releasePull() {
+  if (!pulling) return;
+  pulling = false;
+  const dx = pullStart.x - pullEnd.x;
+  const dy = pullStart.y - pullEnd.y;
+  const power = Math.min(Math.sqrt(dx * dx + dy * dy) / 5, 30);
+  const angle = Math.atan2(dy, dx);
+  const arrow = Bodies.rectangle(bowPos.x, bowPos.y, 60, 5, { density: 0.002, frictionAir: 0.01 });
+  Body.setAngle(arrow, angle);
+  Body.setVelocity(arrow, { x: -Math.cos(angle) * power, y: -Math.sin(angle) * power });
+  arrows.push(arrow);
+  World.add(world, arrow);
+}
+
+canvas.addEventListener("mousedown", e => startPull(e.offsetX, e.offsetY));
+canvas.addEventListener("mousemove", e => movePull(e.offsetX, e.offsetY));
+canvas.addEventListener("mouseup", releasePull);
+
+canvas.addEventListener("touchstart", e => {
+  const t = e.touches[0];
+  startPull(t.clientX, t.clientY);
+});
+canvas.addEventListener("touchmove", e => {
+  const t = e.touches[0];
+  movePull(t.clientX, t.clientY);
+});
+canvas.addEventListener("touchend", releasePull);
+
+function drawTarget() {
+  ctx.beginPath();
+  const x = target.position.x, y = target.position.y;
+  const rings = ["white", "black", "blue", "red", "yellow"];
+  for (let i = rings.length - 1; i >= 0; i--) {
+    ctx.fillStyle = rings[i];
+    ctx.beginPath();
+    ctx.arc(x, y, 10 + i * 10, 0, Math.PI * 2);
+    ctx.fill();
   }
+}
 
-  function resize(){
-    const rect = canvas.getBoundingClientRect();
-    // choose desired canvas pixel size by container
-    W = Math.max(480, rect.width);
-    H = Math.max(300, rect.height);
-    canvas.width = Math.floor(W * DPR);
-    canvas.height = Math.floor(H * DPR);
-    canvas.style.width = rect.width + 'px';
-    canvas.style.height = rect.height + 'px';
-    ctx.setTransform(DPR,0,0,DPR,0,0);
-    // reposition bow with bottom offset
-    bow.x = Math.round(Math.min(170, W * 0.18));
-    bow.y = Math.round(H - 120);
-  }
-
-  window.addEventListener('resize', () => {
-    resize();
-    draw(); // immediate redraw
+function drawArrows() {
+  ctx.fillStyle = "brown";
+  arrows.forEach(a => {
+    ctx.save();
+    ctx.translate(a.position.x, a.position.y);
+    ctx.rotate(a.angle);
+    ctx.fillRect(-30, -2, 60, 4);
+    ctx.restore();
   });
+}
 
-  // Input handling (mouse & touch)
-  function getPointerPos(e){
-    let clientX, clientY;
-    if (e.touches && e.touches.length) {
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
-    const rect = canvas.getBoundingClientRect();
-    return { x: (clientX - rect.left), y: (clientY - rect.top) };
-  }
-
-  function startAiming(e){
-    const p = getPointerPos(e);
-    // if within bow area (or if arrow exists and is inactive) start aiming
-    const dx = p.x - bow.x, dy = p.y - bow.y;
-    if (Math.hypot(dx,dy) < 120){
-      aiming = true;
-      startDrag = p;
-      aimVec = { x: 0, y: 0 };
-      e.preventDefault();
-    }
-  }
-  function moveAiming(e){
-    if (!aiming) return;
-    const p = getPointerPos(e);
-    aimVec.x = p.x - startDrag.x;
-    aimVec.y = p.y - startDrag.y;
-    // update power UI
-    const pull = Math.min(maxPull, Math.hypot(aimVec.x, aimVec.y));
-    const pct = Math.round((pull / maxPull) * 100);
-    powerFill.style.width = pct + '%';
-    e.preventDefault();
-  }
-  function releaseAim(e){
-    if (!aiming) return;
-    const p = getPointerPos(e);
-    aimVec.x = p.x - startDrag.x;
-    aimVec.y = p.y - startDrag.y;
-    shootFromVector(aimVec);
-    aiming = false;
-    startDrag = null;
-    powerFill.style.width = '0%';
-    e.preventDefault();
-  }
-
-  // Touch / mouse events
-  canvas.addEventListener('mousedown', startAiming);
-  canvas.addEventListener('mousemove', moveAiming);
-  window.addEventListener('mouseup', releaseAim);
-
-  canvas.addEventListener('touchstart', startAiming, {passive:false});
-  canvas.addEventListener('touchmove', moveAiming, {passive:false});
-  window.addEventListener('touchend', releaseAim, {passive:false});
-  window.addEventListener('touchcancel', releaseAim, {passive:false});
-
-  // Shoot arrow given the drag vector (pull is opposite direction of drag)
-  function shootFromVector(vec){
-    // In our UX, dragging backward (leftward/up) determines power/angle relative to bow.
-    // We'll compute direction from bow to the drag origin -> the aimed direction is from bow to startDrag - vec
-    // simpler: direction vector = (startDrag - p) -> but vec currently is p - startDrag -> so use -vec.
-    const pull = Math.min(maxPull, Math.hypot(vec.x, vec.y));
-    if (pull < 6) return; // too small
-    const dir = { x: -vec.x / pull, y: -vec.y / pull }; // normalized
-    const speed = (pull / maxPull) * maxVel;
-    const vx = dir.x * speed;
-    const vy = dir.y * speed;
-    // Arrow spawn offset so arrow starts at bow tip
-    const spawnX = bow.x + dir.x * 36;
-    const spawnY = bow.y + dir.y * 36;
-    arrow = {
-      x: spawnX,
-      y: spawnY,
-      vx, vy,
-      rot: Math.atan2(vy, vx),
-      active: true,
-      traveled: 0,
-      stuck: false
-    };
-    shots++;
-    shotsEl.textContent = shots;
-    // once shot, immediately check if intersects target on path — we will check continuously in update.
-  }
-
-  // Trajectory preview: simulate projectile path ignoring collisions for preview
-  function computeTrajectoryPreview(dirX, dirY, speed){
-    const points = [];
-    const dt = 1/60;
-    let x = bow.x + dirX * 36, y = bow.y + dirY * 36;
-    let vx = dirX * speed, vy = dirY * speed;
-    for (let i=0;i<60;i++){
-      x += vx*dt;
-      y += vy*dt;
-      vy += gravity*dt;
-      points.push({x,y});
-      if (y > H + 40) break;
-    }
-    return points;
-  }
-
-  // Check collision with target via checking arrow tip (simple)
-  function checkArrowHit(a){
-    // arrow tip coordinates (slightly ahead along rotation)
-    const tipX = a.x + Math.cos(a.rot) * 18;
-    const tipY = a.y + Math.sin(a.rot) * 18;
-    const dx = tipX - target.x;
-    const dy = tipY - target.y;
-    const d = Math.hypot(dx,dy);
-    // scale target rings by target.scale
-    for (let i=0;i<rings.length;i++){
-      const r = rings[i] * target.scale;
-      if (d <= r){
-        // hit ring i
-        return { ringIndex: i, distance:d };
-      }
-    }
-    // also check ground collision (y beyond ground)
-    if (tipY > H - 20) return { ground:true };
-    // no hit
-    return null;
-  }
-
-  // integrate arrow physics
-  function update(dt){
-    if (arrow && arrow.active && !arrow.stuck){
-      // update position
-      arrow.x += arrow.vx * dt;
-      arrow.y += arrow.vy * dt;
-      arrow.vy += gravity * dt;
-      arrow.rot = Math.atan2(arrow.vy, arrow.vx);
-      arrow.traveled += Math.hypot(arrow.vx*dt, arrow.vy*dt);
-
-      // check for hit
-      const hit = checkArrowHit(arrow);
-      if (hit){
-        if (hit.ground){
-          arrow.active = false;
-          arrow.stuck = true;
-          lastHit = 'Ground';
-          lastEl.textContent = lastHit;
-        } else {
-          // score
-          const ringIndex = hit.ringIndex;
-          const s = ringScores[ringIndex] || 0;
-          score += s;
-          scoreEl.textContent = score;
-          lastHit = s + ' pts';
-          lastEl.textContent = lastHit;
-          arrow.active = false;
-          arrow.stuck = true;
-          // attach arrow to target at collision point (very simple)
-          const tipX = arrow.x + Math.cos(arrow.rot) * 18;
-          const tipY = arrow.y + Math.sin(arrow.rot) * 18;
-          arrow.x = tipX - Math.cos(arrow.rot) * 12;
-          arrow.y = tipY - Math.sin(arrow.rot) * 12;
-        }
-      }
-
-      // if arrow goes off screen, deactivate after some time
-      if (arrow.x > W + 200 || arrow.x < -200 || arrow.y > H + 300){
-        arrow.active = false;
-      }
-    }
-  }
-
-  // Drawing helpers
-  function drawBackground(){
-    // simple rolling hills
-    ctx.save();
-    ctx.fillStyle = 'rgba(255,255,255,0.06)';
-    ctx.fillRect(0,0,W,H);
-    // sky gradient
-    const g = ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0, '#b6ecff');
-    g.addColorStop(0.6, '#9fe7f2');
-    g.addColorStop(1, '#c8f0cf');
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,W,H);
-
-    // ground
-    ctx.fillStyle = '#77c05b';
-    ctx.fillRect(0, H - 120, W, 120);
-
-    // hills
+function drawBow() {
+  ctx.beginPath();
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 6;
+  ctx.arc(bowPos.x, bowPos.y, 40, Math.PI / 2, -Math.PI / 2, true);
+  ctx.stroke();
+  if (pulling) {
     ctx.beginPath();
-    ctx.fillStyle = '#6fc25a';
-    ctx.ellipse(W*0.35, H - 60, W*0.6, 80, 0, 0, Math.PI*2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.fillStyle = '#5fb04f';
-    ctx.ellipse(W*0.8, H - 70, W*0.4, 78, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    ctx.restore();
-  }
-
-  function drawBow(){
-    // draw bow on left side (cartoon)
-    ctx.save();
-    // bow shadow / ground anchor
-    // draw quiver + ground plank
-    // Bow body (arc)
-    ctx.translate(bow.x, bow.y);
-    // string
-    ctx.beginPath();
-    ctx.lineWidth = 2.5;
-    ctx.strokeStyle = '#4b2e2e';
-    const strPull = aiming && startDrag ? Math.min(maxPull, Math.hypot(aimVec.x, aimVec.y)) : 0;
-    const dirX = aiming ? -aimVec.x/(strPull||1) : -0.5;
-    const dirY = aiming ? -aimVec.y/(strPull||1) : -0.6;
-    // string line from top to bottom via pulled point
-    const top = { x: -6, y: -48 };
-    const bot = { x: -6, y: 48 };
-    const pulled = { x: dirX*strPull*0.14, y: dirY*strPull*0.14 };
-    ctx.moveTo(top.x, top.y);
-    ctx.quadraticCurveTo(pulled.x, pulled.y, bot.x, bot.y);
-    ctx.stroke();
-
-    // bow limbs
-    ctx.beginPath();
-    ctx.lineWidth = 8;
-    ctx.strokeStyle = '#6b2b2b';
-    ctx.moveTo(12, -60);
-    ctx.quadraticCurveTo(-26, -10, 12, 60);
-    ctx.stroke();
-
-    // grip
-    ctx.fillStyle = '#3f2a22';
-    ctx.fillRect(-6, -10, 12, 20);
-
-    ctx.restore();
-  }
-
-  function drawArrow(a){
-    ctx.save();
-    ctx.translate(a.x, a.y);
-    ctx.rotate(a.rot);
-    // shaft
-    ctx.fillStyle = '#6b4f3a';
-    ctx.fillRect(-16, -3, 32, 6);
-    // fletchings
-    ctx.fillStyle = '#ff7ab6';
-    ctx.beginPath();
-    ctx.moveTo(-16, -3); ctx.lineTo(-24, -9); ctx.lineTo(-10, -3); ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(-16, 3); ctx.lineTo(-24, 9); ctx.lineTo(-10, 3); ctx.fill();
-    // arrowhead
-    ctx.fillStyle = '#cbd5e1';
-    ctx.beginPath();
-    ctx.moveTo(16, 0); ctx.lineTo(8, -6); ctx.lineTo(8, 6); ctx.closePath(); ctx.fill();
-    ctx.restore();
-  }
-
-  function drawTarget(t){
-    // concentric rings
-    ctx.save();
-    ctx.translate(t.x, t.y);
-    // soft shadow / stand
-    ctx.fillStyle = '#5b3d1f';
-    ctx.fillRect(-12, 20, 24, 36);
-    ctx.beginPath();
-    ctx.moveTo(0,50); ctx.lineTo(-6,90); ctx.lineTo(6,90); ctx.closePath();
-    ctx.fill();
-
-    // rings: from outermost to innermost
-    const colors = ['#ffefd5','#ffd7d7','#ffd1a8','#fff28a','#ffe08a'];
-    // but we'll pick cartoon colors: outer dark, inner bright
-    const ringColors = ['#e34f4f','#ff9f43','#ffd54a','#d3f261','#ff6b6b'];
-    for (let i=rings.length-1; i>=0; i--){
-      const r = rings[i] * t.scale;
-      ctx.beginPath();
-      ctx.fillStyle = ringColors[i % ringColors.length];
-      ctx.arc(0,0,r,0,Math.PI*2);
-      ctx.fill();
-      // stroke
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = 'rgba(0,0,0,0.08)';
-      ctx.stroke();
-    }
-    // center white highlight
-    ctx.beginPath();
-    ctx.fillStyle = 'rgba(255,255,255,0.25)';
-    ctx.arc(-10, -10, 10, 0, Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-    // label distance
-    ctx.fillStyle = 'rgba(0,0,0,0.6)';
-    ctx.font = '600 12px Inter, system-ui, sans-serif';
-    ctx.fillText('Target', t.x - 28, t.y - (rings[rings.length-1]*t.scale) - 12);
-  }
-
-  function drawTrajectoryPreview(){
-    if (!aiming || !startDrag) return;
-    const pull = Math.min(maxPull, Math.hypot(aimVec.x, aimVec.y));
-    if (pull < 6) return;
-    const dir = { x: -aimVec.x/pull, y: -aimVec.y/pull };
-    const speed = (pull/maxPull) * maxVel;
-    const pts = computeTrajectoryPreview(dir.x, dir.y, speed);
-    if (!pts || pts.length === 0) return;
-    ctx.save();
+    ctx.moveTo(bowPos.x, bowPos.y - 40);
+    ctx.lineTo(pullEnd.x, pullEnd.y);
+    ctx.lineTo(bowPos.x, bowPos.y + 40);
+    ctx.strokeStyle = "gray";
     ctx.lineWidth = 2;
-    ctx.setLineDash([6,8]);
-    ctx.strokeStyle = 'rgba(35,45,75,0.55)';
-    ctx.beginPath();
-    for (let i=0;i<pts.length;i++){
-      const p = pts[i];
-      if (i===0) ctx.moveTo(p.x, p.y);
-      else ctx.lineTo(p.x, p.y);
-    }
     ctx.stroke();
-    ctx.restore();
-    // small dots
-    ctx.save();
-    for (let i=0;i<pts.length;i+=6){
-      ctx.beginPath();
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
-      ctx.arc(pts[i].x, pts[i].y, 3, 0, Math.PI*2);
-      ctx.fill();
-    }
-    ctx.restore();
   }
+}
 
-  function drawHUD(){
-    // draw health of target (not needed) or simply show UI overlays — handled in HTML
-  }
-
-  function clear(){
-    ctx.clearRect(0,0,W,H);
-  }
-
-  function draw(){
-    clear();
-    drawBackground();
-    // target
-    drawTarget(target);
-    // trajectory preview
-    drawTrajectoryPreview();
-    // bow
-    drawBow();
-    // if immediate aiming pointer draw a small indicator
-    if (aiming && startDrag){
-      // draw release hint near bow
-      ctx.save();
-      ctx.beginPath();
-      ctx.fillStyle = 'rgba(16,24,40,0.06)';
-      ctx.arc(bow.x, bow.y+8, 10, 0, Math.PI*2);
-      ctx.fill();
-      ctx.restore();
-    }
-    // arrow
-    if (arrow){
-      drawArrow(arrow);
-    }
-  }
-
-  // Main loop with fixed time step
-  let lastTime = performance.now();
-  function loop(now){
-    const dt = Math.min(0.033, (now - lastTime) / 1000); // clamp ~30fps min step
-    lastTime = now;
-    update(dt);
-    draw();
+function loop() {
+  if (window.innerWidth < window.innerHeight) {
     requestAnimationFrame(loop);
+    return;
   }
-
-  // Buttons
-  resetBtn.addEventListener('click', () => {
-    shots = 0; score = 0; lastHit = '—';
-    arrow = null;
-    target = createRandomTarget();
-    shotsEl.textContent = shots;
-    scoreEl.textContent = score;
-    lastEl.textContent = lastHit;
-  });
-  randBtn.addEventListener('click', () => {
-    target = createRandomTarget();
-  });
-
-  // initial setup
-  function init(){
-    // set canvas container size
-    const wrap = document.getElementById('gamewrap');
-    const bounds = wrap.getBoundingClientRect();
-    canvas.style.width = bounds.width + 'px';
-    canvas.style.height = bounds.height + 'px';
-    resize();
-    target = createRandomTarget();
-    shotsEl.textContent = shots;
-    scoreEl.textContent = score;
-    lastEl.textContent = lastHit;
-    requestAnimationFrame(loop);
-  }
-  init();
-
-})();
+  Engine.update(engine);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawTarget();
+  drawArrows();
+  drawBow();
+  requestAnimationFrame(loop);
+}
+loop();
 </script>
 </body>
 </html>
