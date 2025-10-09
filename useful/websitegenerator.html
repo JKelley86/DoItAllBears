@@ -1,0 +1,842 @@
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Website Builder</title>
+  <style>
+    :root{
+      --sidebar-w: 280px;
+      --inspector-w: 320px;
+      --gutter: 12px;
+      --bg: #0f172a;
+      --panel-bg: #1e293b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #f97316;
+      --border: #334155;
+    }
+    html,body{height:100%;margin:0;font-family:'Inter',system-ui,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    .app{display:grid;grid-template-columns:var(--sidebar-w) 1fr var(--inspector-w);grid-template-rows:1fr auto;gap:var(--gutter);height:100vh;padding:var(--gutter)}
+    
+    /* Sidebar */
+    .sidebar{background:var(--panel-bg);border-radius:12px;padding:16px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.3);border:1px solid var(--border)}
+    .sidebar h2{margin:0 0 12px 0;color:var(--text);font-size:18px;border-bottom:2px solid var(--accent);padding-bottom:8px}
+    .category{margin-bottom:16px}
+    .category h3{margin:0 0 8px 0;color:var(--muted);font-size:13px;text-transform:uppercase;font-weight:600}
+    .comp-list{display:flex;flex-direction:column;gap:8px}
+    .comp{background:#334155;border:2px dashed #475569;padding:12px;border-radius:8px;cursor:grab;user-select:none;transition:all 0.2s;color:var(--text)}
+    .comp:hover{background:#3f4c5f;border-color:var(--accent);transform:translateX(4px)}
+    .comp:active{cursor:grabbing}
+    .comp small{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+    
+    /* Canvas */
+    .canvas-wrap{display:flex;flex-direction:column;gap:10px;padding:8px}
+    .canvas-header{display:flex;justify-content:space-between;align-items:center;background:var(--panel-bg);padding:14px;border-radius:10px;border:1px solid var(--border)}
+    .canvas-header h2{margin:0;font-size:18px}
+    .canvas-header small{color:var(--muted);font-size:12px}
+    .btn-group{display:flex;gap:8px}
+    .btn{padding:8px 14px;border-radius:8px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-weight:600;transition:all 0.2s;font-size:13px}
+    .btn:hover{background:#ea580c;transform:translateY(-1px)}
+    .btn.secondary{background:#475569}
+    .btn.secondary:hover{background:#64748b}
+    
+    .canvas{background:#f1f5f9;border-radius:12px;padding:24px;min-height:65vh;box-shadow:0 8px 24px rgba(0,0,0,0.3);overflow:auto;border:2px solid var(--border);position:relative}
+    .canvas.drag-over{background:#e0e7ff;border-color:var(--accent)}
+    .drop-hint{color:#64748b;text-align:center;padding:60px 20px;font-size:16px;opacity:0.6}
+    
+    /* Draggable elements in canvas */
+    .builder-element{position:relative;margin:10px 0;display:inline-block;cursor:move;transition:all 0.2s}
+    .builder-element:hover{outline:2px dashed #cbd5e1}
+    .builder-element.selected{outline:3px solid var(--accent);box-shadow:0 0 0 3px rgba(249,115,22,0.2)}
+    .builder-element.dragging{opacity:0.5}
+    
+    /* Resize handles */
+    .resize-handle{position:absolute;width:10px;height:10px;background:var(--accent);border:2px solid #fff;border-radius:50%;display:none;z-index:10}
+    .builder-element.selected .resize-handle{display:block}
+    .resize-se{bottom:-5px;right:-5px;cursor:nwse-resize}
+    .resize-sw{bottom:-5px;left:-5px;cursor:nesw-resize}
+    .resize-ne{top:-5px;right:-5px;cursor:nesw-resize}
+    .resize-nw{top:-5px;left:-5px;cursor:nwse-resize}
+    
+    /* Delete button on element */
+    .delete-btn{position:absolute;top:-10px;right:-10px;width:24px;height:24px;background:#ef4444;color:#fff;border:none;border-radius:50%;cursor:pointer;display:none;font-size:14px;line-height:1;z-index:10}
+    .builder-element.selected .delete-btn{display:flex;align-items:center;justify-content:center}
+    .delete-btn:hover{background:#dc2626}
+    
+    /* Inspector */
+    .inspector{background:var(--panel-bg);border-radius:12px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,0.3);overflow-y:auto;border:1px solid var(--border)}
+    .inspector h3{margin:0 0 12px 0;font-size:16px;border-bottom:2px solid var(--accent);padding-bottom:8px}
+    .inspector-empty{color:var(--muted);text-align:center;padding:40px 20px;font-size:14px}
+    .control-group{margin-bottom:16px}
+    .control-label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px;font-weight:600;text-transform:uppercase}
+    .control-input{width:100%;padding:8px;border-radius:6px;border:1px solid var(--border);background:#334155;color:var(--text);font-size:14px}
+    .control-input:focus{outline:none;border-color:var(--accent)}
+    input[type="color"]{height:40px;cursor:pointer}
+    input[type="range"]{accent-color:var(--accent)}
+    .value-display{display:inline-block;margin-left:8px;color:var(--accent);font-weight:600}
+    
+    /* Code panels */
+    .codepanels{grid-column:1 / span 3;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:8px}
+    .codebox{background:#0f172a;border:1px solid var(--border);padding:14px;border-radius:10px;display:flex;flex-direction:column;max-height:220px}
+    .codehead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:8px}
+    .codehead h4{margin:0;color:var(--accent);font-size:14px}
+    .copy-btn{padding:4px 8px;background:#334155;color:var(--text);border:none;border-radius:4px;cursor:pointer;font-size:11px}
+    .copy-btn:hover{background:#475569}
+    .codebox pre{margin:0;overflow:auto;white-space:pre-wrap;font-family:'Courier New',monospace;font-size:12px;color:#94a3b8;flex:1}
+    
+    @media (max-width:1200px){
+      .app{grid-template-columns:1fr;grid-template-rows:auto 1fr auto}
+      .inspector,.sidebar{display:none}
+      .codepanels{grid-column:1}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar with components -->
+    <aside class="sidebar">
+      <h2>📦 Components</h2>
+      
+      <div class="category">
+        <h3>Text</h3>
+        <div class="comp-list">
+          <div class="comp" draggable="true" data-type="h1">
+            <strong>H1 Heading</strong>
+            <small>Main page title</small>
+          </div>
+          <div class="comp" draggable="true" data-type="h2">
+            <strong>H2 Heading</strong>
+            <small>Section title</small>
+          </div>
+          <div class="comp" draggable="true" data-type="h3">
+            <strong>H3 Heading</strong>
+            <small>Subsection title</small>
+          </div>
+          <div class="comp" draggable="true" data-type="paragraph">
+            <strong>Paragraph</strong>
+            <small>Body text block</small>
+          </div>
+          <div class="comp" draggable="true" data-type="link">
+            <strong>Link</strong>
+            <small>Clickable text</small>
+          </div>
+          <div class="comp" draggable="true" data-type="blockquote">
+            <strong>Blockquote</strong>
+            <small>Quote or callout</small>
+          </div>
+          <div class="comp" draggable="true" data-type="list">
+            <strong>Bullet List</strong>
+            <small>Unordered list</small>
+          </div>
+          <div class="comp" draggable="true" data-type="orderedlist">
+            <strong>Numbered List</strong>
+            <small>Ordered list</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="category">
+        <h3>Layout</h3>
+        <div class="comp-list">
+          <div class="comp" draggable="true" data-type="container">
+            <strong>Container</strong>
+            <small>Box for content</small>
+          </div>
+          <div class="comp" draggable="true" data-type="section">
+            <strong>Section</strong>
+            <small>Full-width block</small>
+          </div>
+          <div class="comp" draggable="true" data-type="card">
+            <strong>Card</strong>
+            <small>Content card</small>
+          </div>
+          <div class="comp" draggable="true" data-type="hero">
+            <strong>Hero Banner</strong>
+            <small>Large header section</small>
+          </div>
+          <div class="comp" draggable="true" data-type="twocolumn">
+            <strong>Two Columns</strong>
+            <small>Side by side layout</small>
+          </div>
+          <div class="comp" draggable="true" data-type="threecolumn">
+            <strong>Three Columns</strong>
+            <small>Three column grid</small>
+          </div>
+          <div class="comp" draggable="true" data-type="grid">
+            <strong>Grid Layout</strong>
+            <small>Responsive grid</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="category">
+        <h3>Media</h3>
+        <div class="comp-list">
+          <div class="comp" draggable="true" data-type="image">
+            <strong>Image</strong>
+            <small>Picture placeholder</small>
+          </div>
+          <div class="comp" draggable="true" data-type="video">
+            <strong>Video</strong>
+            <small>Video player</small>
+          </div>
+          <div class="comp" draggable="true" data-type="icon">
+            <strong>Icon</strong>
+            <small>Font awesome icon</small>
+          </div>
+          <div class="comp" draggable="true" data-type="avatar">
+            <strong>Avatar</strong>
+            <small>Profile picture</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="category">
+        <h3>Interactive</h3>
+        <div class="comp-list">
+          <div class="comp" draggable="true" data-type="button">
+            <strong>Button</strong>
+            <small>Call-to-action</small>
+          </div>
+          <div class="comp" draggable="true" data-type="input">
+            <strong>Text Input</strong>
+            <small>Form field</small>
+          </div>
+          <div class="comp" draggable="true" data-type="textarea">
+            <strong>Text Area</strong>
+            <small>Multi-line input</small>
+          </div>
+          <div class="comp" draggable="true" data-type="checkbox">
+            <strong>Checkbox</strong>
+            <small>Toggle option</small>
+          </div>
+          <div class="comp" draggable="true" data-type="radio">
+            <strong>Radio Button</strong>
+            <small>Single choice</small>
+          </div>
+          <div class="comp" draggable="true" data-type="select">
+            <strong>Dropdown</strong>
+            <small>Select menu</small>
+          </div>
+          <div class="comp" draggable="true" data-type="form">
+            <strong>Form</strong>
+            <small>Complete form</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="category">
+        <h3>Navigation</h3>
+        <div class="comp-list">
+          <div class="comp" draggable="true" data-type="navbar">
+            <strong>Navigation Bar</strong>
+            <small>Site menu</small>
+          </div>
+          <div class="comp" draggable="true" data-type="breadcrumb">
+            <strong>Breadcrumb</strong>
+            <small>Page path</small>
+          </div>
+          <div class="comp" draggable="true" data-type="tabs">
+            <strong>Tabs</strong>
+            <small>Tabbed content</small>
+          </div>
+          <div class="comp" draggable="true" data-type="pagination">
+            <strong>Pagination</strong>
+            <small>Page numbers</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="category">
+        <h3>Content Blocks</h3>
+        <div class="comp-list">
+          <div class="comp" draggable="true" data-type="table">
+            <strong>Table</strong>
+            <small>Data table</small>
+          </div>
+          <div class="comp" draggable="true" data-type="badge">
+            <strong>Badge</strong>
+            <small>Label or tag</small>
+          </div>
+          <div class="comp" draggable="true" data-type="alert">
+            <strong>Alert Box</strong>
+            <small>Notice message</small>
+          </div>
+          <div class="comp" draggable="true" data-type="progress">
+            <strong>Progress Bar</strong>
+            <small>Loading indicator</small>
+          </div>
+          <div class="comp" draggable="true" data-type="divider">
+            <strong>Divider</strong>
+            <small>Horizontal line</small>
+          </div>
+          <div class="comp" draggable="true" data-type="spacer">
+            <strong>Spacer</strong>
+            <small>Empty space</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="category">
+        <h3>Social</h3>
+        <div class="comp-list">
+          <div class="comp" draggable="true" data-type="socialicons">
+            <strong>Social Icons</strong>
+            <small>Social media links</small>
+          </div>
+          <div class="comp" draggable="true" data-type="testimonial">
+            <strong>Testimonial</strong>
+            <small>Customer review</small>
+          </div>
+          <div class="comp" draggable="true" data-type="pricing">
+            <strong>Pricing Card</strong>
+            <small>Price table</small>
+          </div>
+          <div class="comp" draggable="true" data-type="profile">
+            <strong>Profile Card</strong>
+            <small>Team member</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="category">
+        <h3>Footer</h3>
+        <div class="comp-list">
+          <div class="comp" draggable="true" data-type="footer">
+            <strong>Footer</strong>
+            <small>Page footer</small>
+          </div>
+          <div class="comp" draggable="true" data-type="copyright">
+            <strong>Copyright</strong>
+            <small>Copyright text</small>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main canvas -->
+    <main class="canvas-wrap">
+      <div class="canvas-header">
+        <div>
+          <h2>Design Canvas</h2>
+          <small>Drag components here, click to select and edit</small>
+        </div>
+        <div class="btn-group">
+          <button class="btn secondary" id="clearBtn">Clear All</button>
+          <button class="btn" id="exportBtn">Export Code</button>
+        </div>
+      </div>
+      
+      <div class="canvas" id="canvas">
+        <div class="drop-hint">
+          <div style="font-size:48px;margin-bottom:12px">⬇️</div>
+          <div>Drag components from the sidebar and drop them here</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Inspector panel -->
+    <aside class="inspector">
+      <h3>⚙️ Properties</h3>
+      <div id="inspector-content">
+        <div class="inspector-empty">
+          Select an element to edit its properties
+        </div>
+      </div>
+    </aside>
+
+    <!-- Code output panels -->
+    <div class="codepanels">
+      <div class="codebox">
+        <div class="codehead">
+          <h4>HTML</h4>
+          <button class="copy-btn" onclick="copyCode('html')">Copy</button>
+        </div>
+        <pre id="htmlCode">&lt;!-- Your HTML will appear here --&gt;</pre>
+      </div>
+      <div class="codebox">
+        <div class="codehead">
+          <h4>CSS</h4>
+          <button class="copy-btn" onclick="copyCode('css')">Copy</button>
+        </div>
+        <pre id="cssCode">/* Your CSS will appear here */</pre>
+      </div>
+      <div class="codebox">
+        <div class="codehead">
+          <h4>JavaScript</h4>
+          <button class="copy-btn" onclick="copyCode('js')">Copy</button>
+        </div>
+        <pre id="jsCode">// Interactive JS (if needed)</pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedElement = null;
+    let elementCounter = 0;
+    let isDragging = false;
+    let isResizing = false;
+    let startX, startY, startWidth, startHeight;
+    
+    const canvas = document.getElementById('canvas');
+    const inspectorContent = document.getElementById('inspector-content');
+    
+    // Component templates
+    const templates = {
+      heading: { tag: 'h1', content: 'Your Heading Here', styles: { fontSize: '32px', fontWeight: 'bold' } },
+      paragraph: { tag: 'p', content: 'This is a paragraph. Click to edit the text.', styles: { fontSize: '16px', lineHeight: '1.6' } },
+      container: { tag: 'div', content: '<p>Container content here</p>', styles: { padding: '20px', border: '1px solid #ddd' } },
+      section: { tag: 'section', content: '<h2>Section Title</h2><p>Section content</p>', styles: { padding: '40px', background: '#f8f9fa' } },
+      image: { tag: 'img', content: '', styles: { width: '300px', height: '200px', background: '#ddd', display: 'block' }, attrs: { src: 'https://via.placeholder.com/300x200', alt: 'Placeholder' } },
+      button: { tag: 'button', content: 'Click Me', styles: { padding: '12px 24px', background: '#f97316', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '16px', fontWeight: '600' } },
+      h1: { tag: 'h1', content: 'Main Heading', styles: { fontSize: '48px', fontWeight: 'bold', margin: '0', color: '#111' } },
+      h2: { tag: 'h2', content: 'Section Heading', styles: { fontSize: '36px', fontWeight: 'bold', margin: '0', color: '#111' } },
+      h3: { tag: 'h3', content: 'Subsection Heading', styles: { fontSize: '24px', fontWeight: '600', margin: '0', color: '#111' } },
+      paragraph: { tag: 'p', content: 'This is a paragraph. Click to edit the text.', styles: { fontSize: '16px', lineHeight: '1.6', margin: '0', color: '#333' } },
+      link: { tag: 'a', content: 'Click here', styles: { color: '#f97316', textDecoration: 'underline', fontSize: '16px' }, attrs: { href: '#' } },
+      blockquote: { tag: 'blockquote', content: 'This is a quote or important callout text.', styles: { fontSize: '20px', fontStyle: 'italic', borderLeft: '4px solid #f97316', paddingLeft: '20px', margin: '0', color: '#555' } },
+      list: { tag: 'ul', content: '<li>List item 1</li><li>List item 2</li><li>List item 3</li>', styles: { fontSize: '16px', paddingLeft: '20px', margin: '0' } },
+      orderedlist: { tag: 'ol', content: '<li>First item</li><li>Second item</li><li>Third item</li>', styles: { fontSize: '16px', paddingLeft: '20px', margin: '0' } },
+      
+      container: { tag: 'div', content: '<p style="margin:0">Container content here</p>', styles: { padding: '20px', border: '1px solid #ddd', borderRadius: '8px', background: '#fff' } },
+      section: { tag: 'section', content: '<h2 style="margin:0 0 10px 0">Section Title</h2><p style="margin:0">Section content</p>', styles: { padding: '40px 20px', background: '#f8f9fa' } },
+      card: { tag: 'div', content: '<h3 style="margin:0 0 10px 0">Card Title</h3><p style="margin:0">Card description text goes here.</p>', styles: { padding: '20px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' } },
+      hero: { tag: 'div', content: '<h1 style="margin:0 0 15px 0;font-size:48px">Hero Headline</h1><p style="margin:0 0 20px 0;font-size:20px">Subheading text for your hero section</p><button style="padding:12px 24px;background:#f97316;color:#fff;border:none;border-radius:6px;font-size:16px;cursor:pointer">Get Started</button>', styles: { padding: '80px 40px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: '#fff', textAlign: 'center', borderRadius: '12px' } },
+      twocolumn: { tag: 'div', content: '<div style="flex:1;padding:20px;background:#f3f4f6;border-radius:8px"><h3 style="margin:0 0 10px 0">Left Column</h3><p style="margin:0">Left content</p></div><div style="flex:1;padding:20px;background:#f3f4f6;border-radius:8px"><h3 style="margin:0 0 10px 0">Right Column</h3><p style="margin:0">Right content</p></div>', styles: { display: 'flex', gap: '20px' } },
+      threecolumn: { tag: 'div', content: '<div style="flex:1;padding:20px;background:#f3f4f6;border-radius:8px;text-align:center"><h4 style="margin:0 0 10px 0">Column 1</h4><p style="margin:0">Content</p></div><div style="flex:1;padding:20px;background:#f3f4f6;border-radius:8px;text-align:center"><h4 style="margin:0 0 10px 0">Column 2</h4><p style="margin:0">Content</p></div><div style="flex:1;padding:20px;background:#f3f4f6;border-radius:8px;text-align:center"><h4 style="margin:0 0 10px 0">Column 3</h4><p style="margin:0">Content</p></div>', styles: { display: 'flex', gap: '15px' } },
+      grid: { tag: 'div', content: '<div style="padding:20px;background:#dbeafe;border-radius:8px">Item 1</div><div style="padding:20px;background:#dbeafe;border-radius:8px">Item 2</div><div style="padding:20px;background:#dbeafe;border-radius:8px">Item 3</div><div style="padding:20px;background:#dbeafe;border-radius:8px">Item 4</div>', styles: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px' } },
+      
+      image: { tag: 'img', content: '', styles: { width: '300px', height: '200px', objectFit: 'cover', borderRadius: '8px' }, attrs: { src: 'https://via.placeholder.com/300x200', alt: 'Placeholder' } },
+      video: { tag: 'video', content: '', styles: { width: '560px', height: '315px', borderRadius: '8px' }, attrs: { src: '', controls: true } },
+      icon: { tag: 'i', content: '⭐', styles: { fontSize: '48px', color: '#f97316' } },
+      avatar: { tag: 'img', content: '', styles: { width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #f97316' }, attrs: { src: 'https://via.placeholder.com/100', alt: 'Avatar' } },
+      
+      button: { tag: 'button', content: 'Click Me', styles: { padding: '12px 24px', background: '#f97316', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '16px', fontWeight: '600' } },
+      input: { tag: 'input', content: '', styles: { padding: '10px 15px', fontSize: '16px', border: '1px solid #d1d5db', borderRadius: '6px', width: '300px' }, attrs: { type: 'text', placeholder: 'Enter text...' } },
+      textarea: { tag: 'textarea', content: 'Enter your text here...', styles: { padding: '10px 15px', fontSize: '16px', border: '1px solid #d1d5db', borderRadius: '6px', width: '300px', minHeight: '100px', fontFamily: 'inherit' }, attrs: { rows: 5 } },
+      checkbox: { tag: 'label', content: '<input type="checkbox" style="margin-right:8px"> Checkbox option', styles: { fontSize: '16px', display: 'flex', alignItems: 'center', cursor: 'pointer' } },
+      radio: { tag: 'label', content: '<input type="radio" name="radio" style="margin-right:8px"> Radio option', styles: { fontSize: '16px', display: 'flex', alignItems: 'center', cursor: 'pointer' } },
+      select: { tag: 'select', content: '<option>Option 1</option><option>Option 2</option><option>Option 3</option>', styles: { padding: '10px 15px', fontSize: '16px', border: '1px solid #d1d5db', borderRadius: '6px', background: '#fff', cursor: 'pointer' } },
+      form: { tag: 'form', content: '<div style="margin-bottom:15px"><label style="display:block;margin-bottom:5px;font-weight:600">Name</label><input type="text" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px" placeholder="Your name"></div><div style="margin-bottom:15px"><label style="display:block;margin-bottom:5px;font-weight:600">Email</label><input type="email" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px" placeholder="your@email.com"></div><button type="submit" style="padding:12px 24px;background:#f97316;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600">Submit</button>', styles: { padding: '20px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', maxWidth: '400px' } },
+      
+      navbar: { tag: 'nav', content: '<div style="font-size:20px;font-weight:bold">Logo</div><div style="display:flex;gap:20px"><a href="#" style="color:#111;text-decoration:none">Home</a><a href="#" style="color:#111;text-decoration:none">About</a><a href="#" style="color:#111;text-decoration:none">Services</a><a href="#" style="color:#111;text-decoration:none">Contact</a></div>', styles: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 30px', background: '#fff', borderBottom: '1px solid #e5e7eb' } },
+      breadcrumb: { tag: 'nav', content: '<a href="#" style="color:#f97316;text-decoration:none">Home</a> / <a href="#" style="color:#f97316;text-decoration:none">Category</a> / <span style="color:#6b7280">Current Page</span>', styles: { fontSize: '14px', padding: '10px 0' } },
+      tabs: { tag: 'div', content: '<div style="display:flex;border-bottom:2px solid #e5e7eb;margin-bottom:20px"><button style="padding:10px 20px;border:none;border-bottom:2px solid #f97316;background:transparent;cursor:pointer;font-weight:600;color:#f97316">Tab 1</button><button style="padding:10px 20px;border:none;background:transparent;cursor:pointer;color:#6b7280">Tab 2</button><button style="padding:10px 20px;border:none;background:transparent;cursor:pointer;color:#6b7280">Tab 3</button></div><div><p style="margin:0">Tab content goes here</p></div>', styles: {} },
+      pagination: { tag: 'div', content: '<button style="padding:8px 12px;border:1px solid #d1d5db;background:#fff;cursor:pointer;border-radius:4px">← Prev</button><button style="padding:8px 12px;border:1px solid #d1d5db;background:#f97316;color:#fff;cursor:pointer;border-radius:4px;margin:0 5px">1</button><button style="padding:8px 12px;border:1px solid #d1d5db;background:#fff;cursor:pointer;border-radius:4px;margin:0 5px">2</button><button style="padding:8px 12px;border:1px solid #d1d5db;background:#fff;cursor:pointer;border-radius:4px;margin:0 5px">3</button><button style="padding:8px 12px;border:1px solid #d1d5db;background:#fff;cursor:pointer;border-radius:4px">Next →</button>', styles: { display: 'flex', alignItems: 'center', gap: '5px' } },
+      
+      table: { tag: 'table', content: '<thead><tr><th style="padding:12px;background:#f3f4f6;border:1px solid #e5e7eb;text-align:left">Header 1</th><th style="padding:12px;background:#f3f4f6;border:1px solid #e5e7eb;text-align:left">Header 2</th></tr></thead><tbody><tr><td style="padding:12px;border:1px solid #e5e7eb">Data 1</td><td style="padding:12px;border:1px solid #e5e7eb">Data 2</td></tr><tr><td style="padding:12px;border:1px solid #e5e7eb">Data 3</td><td style="padding:12px;border:1px solid #e5e7eb">Data 4</td></tr></tbody>', styles: { borderCollapse: 'collapse', width: '100%', background: '#fff' } },
+      badge: { tag: 'span', content: 'New', styles: { padding: '4px 12px', background: '#f97316', color: '#fff', borderRadius: '12px', fontSize: '12px', fontWeight: '600' } },
+      alert: { tag: 'div', content: '<strong style="display:block;margin-bottom:5px">Notice!</strong>This is an important alert message.', styles: { padding: '15px 20px', background: '#fef3c7', border: '1px solid #fbbf24', borderRadius: '8px', color: '#92400e' } },
+      progress: { tag: 'div', content: '<div style="height:20px;background:#e5e7eb;border-radius:10px;overflow:hidden"><div style="width:60%;height:100%;background:#f97316"></div></div>', styles: { width: '300px' } },
+      divider: { tag: 'hr', content: '', styles: { border: 'none', borderTop: '2px solid #e5e7eb', margin: '20px 0' } },
+      spacer: { tag: 'div', content: '', styles: { height: '50px', background: 'transparent' } },
+      
+      socialicons: { tag: 'div', content: '<a href="#" style="display:inline-block;width:40px;height:40px;background:#3b5998;color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin:0 5px;text-decoration:none">f</a><a href="#" style="display:inline-block;width:40px;height:40px;background:#1da1f2;color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin:0 5px;text-decoration:none">t</a><a href="#" style="display:inline-block;width:40px;height:40px;background:#e4405f;color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin:0 5px;text-decoration:none">i</a>', styles: { display: 'flex', gap: '10px', justifyContent: 'center' } },
+      testimonial: { tag: 'div', content: '<p style="margin:0 0 15px 0;font-style:italic;font-size:18px">"This is an amazing testimonial from a happy customer!"</p><div style="display:flex;align-items:center;gap:10px"><img src="https://via.placeholder.com/50" style="width:50px;height:50px;border-radius:50%"><div><strong>John Doe</strong><div style="color:#6b7280;font-size:14px">CEO, Company</div></div></div>', styles: { padding: '25px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', maxWidth: '500px' } },
+      pricing: { tag: 'div', content: '<h3 style="margin:0 0 10px 0;font-size:24px">Pro Plan</h3><div style="font-size:48px;font-weight:bold;color:#f97316;margin:15px 0">$29<span style="font-size:18px;color:#6b7280">/mo</span></div><ul style="list-style:none;padding:0;margin:20px 0"><li style="padding:8px 0">✓ Feature 1</li><li style="padding:8px 0">✓ Feature 2</li><li style="padding:8px 0">✓ Feature 3</li></ul><button style="width:100%;padding:12px;background:#f97316;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600">Choose Plan</button>', styles: { padding: '30px', background: '#fff', border: '2px solid #e5e7eb', borderRadius: '12px', textAlign: 'center', maxWidth: '300px' } },
+      profile: { tag: 'div', content: '<img src="https://via.placeholder.com/150" style="width:150px;height:150px;border-radius:50%;margin-bottom:15px"><h3 style="margin:0 0 5px 0">Jane Smith</h3><p style="margin:0 0 15px 0;color:#6b7280">Senior Developer</p><p style="margin:0;font-size:14px;color:#6b7280">Passionate about creating amazing user experiences.</p>', styles: { padding: '30px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', textAlign: 'center', maxWidth: '300px' } },
+      
+      footer: { tag: 'footer', content: '<div style="display:flex;justify-content:space-between;margin-bottom:20px"><div><h4 style="margin:0 0 10px 0">Company</h4><a href="#" style="display:block;margin:5px 0;color:#6b7280;text-decoration:none">About</a><a href="#" style="display:block;margin:5px 0;color:#6b7280;text-decoration:none">Careers</a></div><div><h4 style="margin:0 0 10px 0">Support</h4><a href="#" style="display:block;margin:5px 0;color:#6b7280;text-decoration:none">Help</a><a href="#" style="display:block;margin:5px 0;color:#6b7280;text-decoration:none">Contact</a></div></div><div style="text-align:center;padding-top:20px;border-top:1px solid #e5e7eb;color:#6b7280">© 2025 Your Company. All rights reserved.</div>', styles: { padding: '40px 20px', background: '#f9fafb' } },
+      copyright: { tag: 'p', content: '© 2025 Your Company. All rights reserved.', styles: { textAlign: 'center', color: '#6b7280', fontSize: '14px', margin: '0', padding: '20px' } }
+    };
+    
+    // Drag from sidebar
+    document.querySelectorAll('.comp').forEach(comp => {
+      comp.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('componentType', comp.dataset.type);
+        e.dataTransfer.effectAllowed = 'copy';
+      });
+    });
+    
+    // Canvas drop zone
+    canvas.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+      canvas.classList.add('drag-over');
+    });
+    
+    canvas.addEventListener('dragleave', () => {
+      canvas.classList.remove('drag-over');
+    });
+    
+    canvas.addEventListener('drop', (e) => {
+      e.preventDefault();
+      canvas.classList.remove('drag-over');
+      
+      const type = e.dataTransfer.getData('componentType');
+      if (type) {
+        createElement(type, e.clientX, e.clientY);
+      }
+    });
+    
+    // Create element from template
+    function createElement(type, x, y) {
+      const template = templates[type];
+      if (!template) return;
+      
+      const wrapper = document.createElement('div');
+      wrapper.className = 'builder-element';
+      wrapper.id = 'element-' + (++elementCounter);
+      wrapper.setAttribute('data-type', type);
+      wrapper.style.position = 'relative';
+      
+      const element = document.createElement(template.tag);
+      if (template.tag === 'img') {
+        element.src = template.attrs.src;
+        element.alt = template.attrs.alt;
+      } else {
+        element.innerHTML = template.content;
+        element.contentEditable = 'true';
+      }
+      
+      // Apply default styles
+      Object.assign(element.style, template.styles);
+      
+      wrapper.appendChild(element);
+      
+      // Add resize handles
+      ['nw', 'ne', 'sw', 'se'].forEach(pos => {
+        const handle = document.createElement('div');
+        handle.className = `resize-handle resize-${pos}`;
+        handle.dataset.position = pos;
+        wrapper.appendChild(handle);
+      });
+      
+      // Add delete button
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.innerHTML = '×';
+      deleteBtn.onclick = (e) => {
+        e.stopPropagation();
+        wrapper.remove();
+        if (selectedElement === wrapper) {
+          selectedElement = null;
+          showInspector(null);
+        }
+        updateCode();
+      };
+      wrapper.appendChild(deleteBtn);
+      
+      // Remove drop hint if present
+      const hint = canvas.querySelector('.drop-hint');
+      if (hint) hint.remove();
+      
+      canvas.appendChild(wrapper);
+      
+      // Make draggable within canvas
+      makeDraggable(wrapper);
+      makeResizable(wrapper);
+      
+      // Select new element
+      selectElement(wrapper);
+      updateCode();
+    }
+    
+    // Make element draggable
+    function makeDraggable(el) {
+      let offsetX, offsetY;
+      
+      el.addEventListener('mousedown', (e) => {
+        if (e.target.classList.contains('resize-handle') || e.target.classList.contains('delete-btn')) return;
+        if (e.target.contentEditable === 'true' && e.target !== el) return;
+        
+        e.preventDefault();
+        selectElement(el);
+        isDragging = true;
+        el.classList.add('dragging');
+        
+        const rect = el.getBoundingClientRect();
+        const canvasRect = canvas.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        
+        const onMouseMove = (e) => {
+          if (!isDragging) return;
+          const x = e.clientX - canvasRect.left - offsetX;
+          const y = e.clientY - canvasRect.top - offsetY;
+          el.style.position = 'absolute';
+          el.style.left = Math.max(0, x) + 'px';
+          el.style.top = Math.max(0, y) + 'px';
+        };
+        
+        const onMouseUp = () => {
+          isDragging = false;
+          el.classList.remove('dragging');
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp);
+          updateCode();
+        };
+        
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+      });
+    }
+    
+    // Make element resizable
+    function makeResizable(el) {
+      el.querySelectorAll('.resize-handle').forEach(handle => {
+        handle.addEventListener('mousedown', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          
+          isResizing = true;
+          startX = e.clientX;
+          startY = e.clientY;
+          startWidth = el.offsetWidth;
+          startHeight = el.offsetHeight;
+          
+          const position = handle.dataset.position;
+          
+          const onMouseMove = (e) => {
+            if (!isResizing) return;
+            
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+            
+            if (position.includes('e')) {
+              el.style.width = (startWidth + deltaX) + 'px';
+            }
+            if (position.includes('s')) {
+              el.style.height = (startHeight + deltaY) + 'px';
+            }
+            if (position.includes('w')) {
+              el.style.width = (startWidth - deltaX) + 'px';
+              el.style.left = (parseInt(el.style.left) || 0) + deltaX + 'px';
+            }
+            if (position.includes('n')) {
+              el.style.height = (startHeight - deltaY) + 'px';
+              el.style.top = (parseInt(el.style.top) || 0) + deltaY + 'px';
+            }
+          };
+          
+          const onMouseUp = () => {
+            isResizing = false;
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            updateCode();
+          };
+          
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
+        });
+      });
+    }
+    
+    // Select element
+    function selectElement(el) {
+      if (selectedElement) {
+        selectedElement.classList.remove('selected');
+      }
+      selectedElement = el;
+      el.classList.add('selected');
+      showInspector(el);
+    }
+    
+    // Click canvas to deselect
+    canvas.addEventListener('click', (e) => {
+      if (e.target === canvas) {
+        if (selectedElement) {
+          selectedElement.classList.remove('selected');
+          selectedElement = null;
+          showInspector(null);
+        }
+      }
+    });
+    
+    // Inspector panel
+    function showInspector(el) {
+      if (!el) {
+        inspectorContent.innerHTML = '<div class="inspector-empty">Select an element to edit its properties</div>';
+        return;
+      }
+      
+      const child = el.firstElementChild;
+      const computedStyle = window.getComputedStyle(child);
+      
+      inspectorContent.innerHTML = `
+        <div class="control-group">
+          <label class="control-label">Background Color</label>
+          <input type="color" class="control-input" id="bgColor" value="${rgbToHex(computedStyle.backgroundColor)}">
+        </div>
+        <div class="control-group">
+          <label class="control-label">Text Color</label>
+          <input type="color" class="control-input" id="textColor" value="${rgbToHex(computedStyle.color)}">
+        </div>
+        <div class="control-group">
+          <label class="control-label">Border Width <span class="value-display" id="borderWidthVal">${parseInt(computedStyle.borderWidth) || 0}px</span></label>
+          <input type="range" class="control-input" id="borderWidth" min="0" max="10" value="${parseInt(computedStyle.borderWidth) || 0}">
+        </div>
+        <div class="control-group">
+          <label class="control-label">Border Color</label>
+          <input type="color" class="control-input" id="borderColor" value="${rgbToHex(computedStyle.borderColor)}">
+        </div>
+        <div class="control-group">
+          <label class="control-label">Border Radius <span class="value-display" id="borderRadiusVal">${parseInt(computedStyle.borderRadius) || 0}px</span></label>
+          <input type="range" class="control-input" id="borderRadius" min="0" max="50" value="${parseInt(computedStyle.borderRadius) || 0}">
+        </div>
+        <div class="control-group">
+          <label class="control-label">Padding <span class="value-display" id="paddingVal">${parseInt(computedStyle.padding) || 0}px</span></label>
+          <input type="range" class="control-input" id="padding" min="0" max="100" value="${parseInt(computedStyle.padding) || 0}">
+        </div>
+        <div class="control-group">
+          <label class="control-label">Font Size <span class="value-display" id="fontSizeVal">${parseInt(computedStyle.fontSize)}px</span></label>
+          <input type="range" class="control-input" id="fontSize" min="10" max="72" value="${parseInt(computedStyle.fontSize)}">
+        </div>
+        <div class="control-group">
+          <label class="control-label">Width <span class="value-display" id="widthVal">${el.offsetWidth}px</span></label>
+          <input type="range" class="control-input" id="width" min="50" max="800" value="${el.offsetWidth}">
+        </div>
+      `;
+      
+      // Attach event listeners
+      document.getElementById('bgColor').addEventListener('input', (e) => {
+        child.style.background = e.target.value;
+        updateCode();
+      });
+      
+      document.getElementById('textColor').addEventListener('input', (e) => {
+        child.style.color = e.target.value;
+        updateCode();
+      });
+      
+      document.getElementById('borderWidth').addEventListener('input', (e) => {
+        child.style.borderWidth = e.target.value + 'px';
+        child.style.borderStyle = 'solid';
+        document.getElementById('borderWidthVal').textContent = e.target.value + 'px';
+        updateCode();
+      });
+      
+      document.getElementById('borderColor').addEventListener('input', (e) => {
+        child.style.borderColor = e.target.value;
+        child.style.borderStyle = 'solid';
+        updateCode();
+      });
+      
+      document.getElementById('borderRadius').addEventListener('input', (e) => {
+        child.style.borderRadius = e.target.value + 'px';
+        document.getElementById('borderRadiusVal').textContent = e.target.value + 'px';
+        updateCode();
+      });
+      
+      document.getElementById('padding').addEventListener('input', (e) => {
+        child.style.padding = e.target.value + 'px';
+        document.getElementById('paddingVal').textContent = e.target.value + 'px';
+        updateCode();
+      });
+      
+      document.getElementById('fontSize').addEventListener('input', (e) => {
+        child.style.fontSize = e.target.value + 'px';
+        document.getElementById('fontSizeVal').textContent = e.target.value + 'px';
+        updateCode();
+      });
+      
+      document.getElementById('width').addEventListener('input', (e) => {
+        el.style.width = e.target.value + 'px';
+        document.getElementById('widthVal').textContent = e.target.value + 'px';
+        updateCode();
+      });
+    }
+    
+    // RGB to Hex converter
+    function rgbToHex(rgb) {
+      if (rgb.startsWith('#')) return rgb;
+      const match = rgb.match(/\d+/g);
+      if (!match) return '#000000';
+      const hex = match.map(x => {
+        const h = parseInt(x).toString(16);
+        return h.length === 1 ? '0' + h : h;
+      }).join('');
+      return '#' + hex;
+    }
+    
+    // Update code panels
+    function updateCode() {
+      const elements = canvas.querySelectorAll('.builder-element');
+      let html = '';
+      let css = '';
+      
+      elements.forEach((el, index) => {
+        const child = el.firstElementChild;
+        const tag = child.tagName.toLowerCase();
+        const id = `element-${index + 1}`;
+        
+        // HTML
+        if (tag === 'img') {
+          html += `<${tag} id="${id}" src="${child.src}" alt="${child.alt}" />\n`;
+        } else {
+          html += `<${tag} id="${id}">${child.innerHTML}</${tag}>\n`;
+        }
+        
+        // CSS
+        const styles = child.style.cssText;
+        if (styles) {
+          css += `#${id} {\n`;
+          styles.split(';').forEach(rule => {
+            if (rule.trim()) css += `  ${rule.trim()};\n`;
+          });
+          css += `}\n\n`;
+        }
+      });
+      
+      document.getElementById('htmlCode').textContent = html || '<!-- Your HTML will appear here -->';
+      document.getElementById('cssCode').textContent = css || '/* Your CSS will appear here */';
+    }
+    
+    // Copy code to clipboard
+    window.copyCode = function(type) {
+      const codeMap = {
+        html: document.getElementById('htmlCode').textContent,
+        css: document.getElementById('cssCode').textContent,
+        js: document.getElementById('jsCode').textContent
+      };
+      
+      navigator.clipboard.writeText(codeMap[type]).then(() => {
+        alert('Code copied to clipboard!');
+      });
+    };
+    
+    // Clear canvas
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      if (confirm('Clear all elements?')) {
+        canvas.innerHTML = '<div class="drop-hint"><div style="font-size:48px;margin-bottom:12px">⬇️</div><div>Drag components from the sidebar and drop them here</div></div>';
+        selectedElement = null;
+        showInspector(null);
+        updateCode();
+      }
+    });
+    
+    // Export code
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const html = document.getElementById('htmlCode').textContent;
+      const css = document.getElementById('cssCode').textContent;
+      
+      const fullHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Page</title>
+  <style>
+${css}
+  </style>
+</head>
+<body>
+${html}
+</body>
+</html>`;
+      
+      const blob = new Blob([fullHTML], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'webpage.html';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+    
+    // Initial code update
+    updateCode();
+  </script>
+</body>
+</html>
