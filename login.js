@@ -27,23 +27,17 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function addHouseCardToMain() {
-        if (!mainContainer || mainContainer.querySelector('[data-dynamic="house"]')) return;
-
-        const card = document.createElement('div');
-        card.className = 'nav-card';
-        card.textContent = '🏡 Home';
-        card.setAttribute('data-dynamic', 'house');
-
-        card.addEventListener('click', () => navigateTo('home/index.html'));
-
-        mainContainer.insertBefore(card, mainContainer.firstChild);
-    }
-
-    function logout() {
-        localStorage.removeItem('loggedInUser');
-        location.reload();
-    }
+        function addHouseCardToMain() {
+            if (!mainContainer || mainContainer.querySelector('[data-dynamic="house"]')) return;
+            const card = document.createElement('div');
+            card.className = 'nav-card';
+            card.textContent = '🏡 Home';
+            card.setAttribute('data-dynamic', 'house');
+            card.addEventListener('click', () => {
+                window.location.href = 'home/index.html';
+            });
+            mainContainer.insertBefore(card, mainContainer.firstChild);
+        }
 
     function updateUIIfLoggedIn() {
         const user = localStorage.getItem('loggedInUser');
