@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
             card.textContent = '🏡 Home';
             card.setAttribute('data-dynamic', 'house');
             card.onclick = function() {
-                window.location.href = 'home/index.html';
+            card.location.href = 'home/index.html';
             };
             mainContainer.insertBefore(card, mainContainer.firstChild);
         }
