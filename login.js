@@ -33,9 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
             card.className = 'nav-card';
             card.textContent = '🏡 Home';
             card.setAttribute('data-dynamic', 'house');
-            card.onclick = function() {
-            card.location.href = 'home/index.html';
-            };
+            card.addEventListener('click', () => navigateTo('home/index.html'));
             mainContainer.insertBefore(card, mainContainer.firstChild);
         }
 
