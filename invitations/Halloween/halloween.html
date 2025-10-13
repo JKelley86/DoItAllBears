@@ -68,16 +68,16 @@
   fetch(sheetURL)
     .then(res => res.text())
     .then(csv => {
-      const rows = csv.split("\n").slice(1); // skip header
+      const rows = csv.split("\n").slice(1); // skip header row (row 1)
       const foodItems = rows
-        .map(r => r.split(",")[1]) // 2nd column = Food
-        .filter(f => f && f.trim() !== ""); // remove empty cells
+        .map(r => r.split(",")[1]?.trim()) // column B = Food
+        .filter(f => f && f !== ""); // remove empty cells
 
       const ul = document.getElementById("food-list");
       if (foodItems.length === 0) {
         ul.innerHTML = "<li>No food items yet</li>";
       } else {
-        ul.innerHTML = foodItems.map(f => `<li>${f.trim()}</li>`).join("");
+        ul.innerHTML = foodItems.map(f => `<li>${f}</li>`).join("");
       }
     })
     .catch(err => {
@@ -103,6 +103,7 @@
 
   section h2 {
     margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
   }
 </style>
 
