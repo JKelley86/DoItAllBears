@@ -25,36 +25,86 @@
       <p class="plus-one-text">➕ Feel free to bring a <strong>+1</strong> — the more scary costumes the better!</p>
     </section>
     
-    <!--<section class="contact">
-      <p class="rsvp-text">📱 Please text <strong>Justin</strong> or <strong>Bridget</strong> to RSVP and let us know if you’ll be bringing someone!</p>
-    </section>-->
-<br>
-<section class="rsvp-section">
-  <h2 class="rsvp-title">📝 RSVP</h2>
-  <form action="https://formspree.io/f/xovkddwo" method="POST" class="rsvp-form">
-    <label for="name">Your Name</label>
-    <input type="text" name="name" id="name" required>
+    <br>
+    <section class="rsvp-section">
+      <h2 class="rsvp-title">📝 RSVP</h2>
+      <form action="https://formspree.io/f/xovkddwo" method="POST" class="rsvp-form">
+        <label for="name">Your Name</label>
+        <input type="text" name="name" id="name" required>
 
-    <label for="plusone">Bringing a +1?</label>
-    <select name="plusone" id="plusone">
-      <option value="No">No</option>
-      <option value="Yes">Yes</option>
-    </select>
+        <label for="plusone">Bringing a +1?</label>
+        <select name="plusone" id="plusone">
+          <option value="No">No</option>
+          <option value="Yes">Yes</option>
+        </select>
 
-    <label for="attending">Will you attend?</label>
-    <select name="attending" id="attending" required>
-      <option value="Yes">Yes</option>
-      <option value="No">No</option>
-      <option value="Maybe">Maybe</option>
-    </select>
+        <label for="attending">Will you attend?</label>
+        <select name="attending" id="attending" required>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Maybe">Maybe</option>
+        </select>
 
-    <label for="notes">What food will you be bringing?</label>
-    <textarea name="notes" id="notes"></textarea>
+        <label for="notes">What food will you be bringing?</label>
+        <textarea name="notes" id="notes"></textarea>
 
-    <button type="submit">Submit RSVP</button>
-  </form>
-</section>
+        <button type="submit">Submit RSVP</button>
+      </form>
+    </section>
+
+    <!-- Dynamic Food List Section -->
+    <section>
+      <h2>What Everyone is Bringing</h2>
+      <ul id="food-list">
+        <li>Loading...</li>
+      </ul>
+    </section>
 
   </main>
+
+  <script>
+    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNyO2losyWu2cTVbOGkX1pN29iyxzrm7kuR5EyvSycOWMEWD1B6W--ZmTHruizLZGfdspTMU0jLy92/pub?gid=0&single=true&output=csv";
+
+    fetch(sheetURL)
+      .then(res => res.text())
+      .then(csv => {
+        const rows = csv.split("\n").slice(1); // skip header row
+        const foodItems = rows
+          .map(r => r.split(",")[2]) // 3rd column = Food
+          .filter(f => f && f.trim() !== ""); // remove empty cells
+
+        const ul = document.getElementById("food-list");
+        if (foodItems.length === 0) {
+          ul.innerHTML = "<li>No food items yet</li>";
+        } else {
+          ul.innerHTML = foodItems.map(f => `<li>${f.trim()}</li>`).join("");
+        }
+      })
+      .catch(err => {
+        document.getElementById("food-list").innerHTML = "<li>Failed to load food list</li>";
+        console.error(err);
+      });
+  </script>
+
+  <style>
+    #food-list {
+      list-style-type: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+
+    #food-list li {
+      background-color: rgba(255, 255, 255, 0.1);
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 5px;
+      color: #fff;
+    }
+
+    section h2 {
+      margin-bottom: 0.5rem;
+    }
+  </style>
+
 </body>
 </html>
