@@ -62,49 +62,49 @@
 
   </main>
 
-  <script>
-    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNyO2losyWu2cTVbOGkX1pN29iyxzrm7kuR5EyvSycOWMEWD1B6W--ZmTHruizLZGfdspTMU0jLy92/pub?gid=0&single=true&output=csv";
+<script>
+  const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNyO2losyWu2cTVbOGkX1pN29iyxzrm7kuR5EyvSycOWMEWD1B6W--ZmTHruizLZGfdspTMU0jLy92/pub?gid=0&single=true&output=csv";
 
-    fetch(sheetURL)
-      .then(res => res.text())
-      .then(csv => {
-        const rows = csv.split("\n").slice(1); // skip header row
-        const foodItems = rows
-          .map(r => r.split(",")[2]) // 3rd column = Food
-          .filter(f => f && f.trim() !== ""); // remove empty cells
+  fetch(sheetURL)
+    .then(res => res.text())
+    .then(csv => {
+      const rows = csv.split("\n").slice(1); // skip header
+      const foodItems = rows
+        .map(r => r.split(",")[1]) // 2nd column = Food
+        .filter(f => f && f.trim() !== ""); // remove empty cells
 
-        const ul = document.getElementById("food-list");
-        if (foodItems.length === 0) {
-          ul.innerHTML = "<li>No food items yet</li>";
-        } else {
-          ul.innerHTML = foodItems.map(f => `<li>${f.trim()}</li>`).join("");
-        }
-      })
-      .catch(err => {
-        document.getElementById("food-list").innerHTML = "<li>Failed to load food list</li>";
-        console.error(err);
-      });
-  </script>
+      const ul = document.getElementById("food-list");
+      if (foodItems.length === 0) {
+        ul.innerHTML = "<li>No food items yet</li>";
+      } else {
+        ul.innerHTML = foodItems.map(f => `<li>${f.trim()}</li>`).join("");
+      }
+    })
+    .catch(err => {
+      document.getElementById("food-list").innerHTML = "<li>Failed to load food list</li>";
+      console.error(err);
+    });
+</script>
 
-  <style>
-    #food-list {
-      list-style-type: none;
-      padding: 0;
-      margin-top: 1rem;
-    }
+<style>
+  #food-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 1rem;
+  }
 
-    #food-list li {
-      background-color: rgba(255, 255, 255, 0.1);
-      margin: 5px 0;
-      padding: 10px;
-      border-radius: 5px;
-      color: #fff;
-    }
+  #food-list li {
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+    color: #fff;
+  }
 
-    section h2 {
-      margin-bottom: 0.5rem;
-    }
-  </style>
+  section h2 {
+    margin-bottom: 0.5rem;
+  }
+</style>
 
 </body>
 </html>
