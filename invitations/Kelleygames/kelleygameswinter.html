@@ -107,6 +107,65 @@
     <button type="submit">Submit RSVP</button>
   </form>
 </section>
+
+    <!-- Dynamic Food List Section -->
+    <section>
+      <h2>What Everyone is Bringing</h2>
+      <ul id="food-list">
+        <li>Loading...</li>
+      </ul>
+    </section>
+
+  </main>
+
+<script>
+  const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNyO2losyWu2cTVbOGkX1pN29iyxzrm7kuR5EyvSycOWMEWD1B6W--ZmTHruizLZGfdspTMU0jLy92/pub?gid=0&single=true&output=csv";
+
+  fetch(sheetURL)
+    .then(res => res.text())
+    .then(csv => {
+      const rows = csv.split("\n").slice(1); // skip header row (row 1)
+      const foodItems = rows
+        .map(r => r.split(",")[1]?.trim()) // column B = Food
+        .filter(f => f && f !== ""); // remove empty cells
+
+      const ul = document.getElementById("food-list");
+      if (foodItems.length === 0) {
+        ul.innerHTML = "<li>No food items yet</li>";
+      } else {
+        ul.innerHTML = foodItems.map(f => `<li>${f}</li>`).join("");
+      }
+    })
+    .catch(err => {
+      document.getElementById("food-list").innerHTML = "<li>Failed to load food list</li>";
+      console.error(err);
+    });
+</script>
+
+<style>
+  #food-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 1rem;
+  }
+
+  #food-list li {
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+    color: #fff;
+  }
+
+  section h2 {
+    margin-bottom: 0.5rem;
+    margin-top: 1rem;
+  }
+</style>
+
+</body>
+</html>
+    
   </main>
 </body>
 </html>
