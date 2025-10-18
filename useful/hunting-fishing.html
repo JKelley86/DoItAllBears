@@ -6,32 +6,44 @@
   <title>MN Hunting & Fishing Seasons</title>
   <link rel="stylesheet" href="../theme.css">
   <style>
-    section {
-      padding: 2rem;
+    .content {
+      margin-left: 260px;
+      padding: 20px;
+      transition: margin-left 0.3s ease;
     }
 
-    h2 {
-      text-align: center;
-      margin-bottom: 1rem;
+    .header {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 5px;
     }
 
     .season-card {
       background: var(--card-bg);
-      color: var(--text-color);
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      color: var(--text);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-bottom: 15px;
+      transition: transform 0.2s ease;
     }
 
-    .season-card h3 {
-      margin-top: 0;
-      color: var(--text-color);
+    .season-card:hover {
+      transform: translateY(-4px);
     }
 
-    ul {
-      padding-left: 20px;
+    .season-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .season-details {
+      font-size: 0.95rem;
+      line-height: 1.5;
     }
 
     footer {
@@ -48,132 +60,59 @@
     <h1>Minnesota Hunting & Fishing Seasons</h1>
   </header>
 
-  <nav>
-    <a href="#hunting">Hunting Seasons</a>
-    <a href="#fishing">Fishing Seasons</a>
-    <a href="#requirements">Requirements & Regulations</a>
-  </nav>
+    <h1>Hunting Seasons</h1>
 
-  <!-- Hunting Section -->
-  <section id="hunting">
-    <h2>Hunting Seasons & Zones</h2>
-
+    <!-- Example Animal: Deer -->
+    <div class="header">🦌 Deer</div>
     <div class="season-card">
-      <h3>Deer Hunting</h3>
-      <ul>
-        <li><strong>Archery:</strong> Mid-September to Late December</li>
-        <li><strong>Firearm:</strong> Early November to Mid-November (Varies by Zone)</li>
-        <li><strong>Muzzleloader:</strong> Late November to Mid-December</li>
-      </ul>
-      <p>Zones: 100 Series (Northeast), 200 Series (Central), 300 Series (Southeast)</p>
+      <div class="season-title">Archery Season</div>
+      <div class="season-details">
+        <strong>Dates:</strong> Sept 14 – Dec 31<br />
+        <strong>Requirements:</strong> Archery License, Blaze Orange during firearm seasons<br />
+        <strong>Notes:</strong> Best hunting around mid-October and rut.
+      </div>
     </div>
 
     <div class="season-card">
-      <h3>Early Antlerless Season</h3>
-      <ul>
-        <li><strong>Dates:</strong> Typically mid-October (4-day season, select permit areas only)</li>
-        <li><strong>Purpose:</strong> Allows harvest of antlerless deer to manage population.</li>
-        <li><strong>Requirements:</strong> Must have an antlerless permit for that area.</li>
-      </ul>
+      <div class="season-title">Firearm Season</div>
+      <div class="season-details">
+        <strong>Dates:</strong> Nov 9 – Nov 24<br />
+        <strong>Requirements:</strong> Firearm License, Blaze Orange, Tag validation<br />
+        <strong>Notes:</strong> Private land zones vary slightly.
+      </div>
+    </div>
+
+    <!-- Example Animal: Turkey -->
+    <div class="header">🦃 Turkey</div>
+    <div class="season-card">
+      <div class="season-title">Spring Season</div>
+      <div class="season-details">
+        <strong>Dates:</strong> Apr 17 – May 31<br />
+        <strong>Requirements:</strong> Turkey License, Spring Tag, Shotgun or Archery<br />
+        <strong>Notes:</strong> Limited lottery tags in certain zones.
+      </div>
     </div>
 
     <div class="season-card">
-      <h3>Youth Deer Season</h3>
-      <ul>
-        <li><strong>Dates:</strong> Typically mid-October (Thursday–Sunday)</li>
-        <li><strong>Eligibility:</strong> Ages 10–17, with adult mentor (no firearms license required for mentor).</li>
-        <li><strong>Zone:</strong> Statewide participation allowed.</li>
-      </ul>
+      <div class="season-title">Fall Season</div>
+      <div class="season-details">
+        <strong>Dates:</strong> Sept 1 – Oct 31<br />
+        <strong>Requirements:</strong> Turkey License, Fall Tag<br />
+        <strong>Notes:</strong> Either sex allowed.
+      </div>
     </div>
 
+    <!-- Example Animal: Waterfowl -->
+    <div class="header">🦆 Waterfowl</div>
     <div class="season-card">
-      <h3>Late Antlerless / Metro Hunts</h3>
-      <ul>
-        <li><strong>Dates:</strong> Typically mid–late December in select permit areas.</li>
-        <li><strong>Restrictions:</strong> Antlerless deer only.</li>
-      </ul>
+      <div class="season-title">Duck Season</div>
+      <div class="season-details">
+        <strong>Dates:</strong> Sept 28 – Dec 3<br />
+        <strong>Requirements:</strong> Federal Duck Stamp, Small Game License, HIP Certification<br />
+        <strong>Notes:</strong> Early teal season opens Sept 1.
+      </div>
     </div>
-
-    <div class="season-card">
-      <h3>Waterfowl Hunting</h3>
-      <ul>
-        <li><strong>North Zone:</strong> Late September to Late December</li>
-        <li><strong>Central Zone:</strong> Late September, then October to December</li>
-        <li><strong>South Zone:</strong> Split season structure</li>
-      </ul>
-    </div>
-
-    <div class="season-card">
-      <h3>Upland Bird Hunting</h3>
-      <ul>
-        <li><strong>Grouse:</strong> Mid-September to Early January</li>
-        <li><strong>Pheasant:</strong> Mid-October to Early January</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- Requirements Section -->
-  <section id="requirements">
-    <h2>License, Clothing, & Equipment Requirements</h2>
-
-    <div class="season-card">
-      <h3>License Requirements</h3>
-      <ul>
-        <li><strong>Firearm Deer:</strong> Resident Deer License (Standard or Bonus Antlerless).</li>
-        <li><strong>Archery Deer:</strong> Resident Archery Deer License.</li>
-        <li><strong>Muzzleloader:</strong> Muzzleloader Deer License (separate tag required).</li>
-        <li><strong>Youth:</strong> Youth Deer License.</li>
-        <li><strong>Waterfowl:</strong> Small Game License + State Duck Stamp + Federal Duck Stamp (age 16+).</li>
-        <li><strong>Upland Birds:</strong> Small Game License only.</li>
-      </ul>
-    </div>
-
-    <div class="season-card">
-      <h3>Clothing Requirements</h3>
-      <ul>
-        <li><strong>Firearm Deer Season:</strong> Minimum of 50% blaze orange or pink outer clothing visible above the waist (hat, vest, or jacket).</li>
-        <li><strong>Small Game / Upland Bird:</strong> Blaze orange hat or vest recommended for safety.</li>
-        <li><strong>Archery Deer:</strong> Blaze orange/pink required during overlapping firearm seasons.</li>
-      </ul>
-    </div>
-
-    <div class="season-card">
-      <h3>Firearm & Ammunition Limits</h3>
-      <ul>
-        <li><strong>Shotgun (Waterfowl):</strong> Maximum of 3 shells (including one in the chamber).</li>
-        <li><strong>Rifle (Deer):</strong> No magazine capacity limit, but must comply with centerfire restrictions.</li>
-        <li><strong>Archery:</strong> Broadheads required; explosive or poisoned arrows prohibited.</li>
-      </ul>
-    </div>
-
-    <div class="season-card">
-      <h3>Hunter Orange & Safety Notes</h3>
-      <ul>
-        <li>Always wear visible blaze orange/pink during any firearm deer season in the field.</li>
-        <li>Crossbows are legal for all hunters during archery season (2023 law update).</li>
-        <li>Check <a href="https://www.dnr.state.mn.us/hunting/index.html" target="_blank">MN DNR Hunting Regulations</a> for yearly updates.</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- Fishing Section -->
-  <section id="fishing">
-    <h2>Fishing Seasons & Zones</h2>
-    <div class="season-card">
-      <h3>General Fishing Opener</h3>
-      <p>Two weeks before Memorial Day (May 10–11 in 2024)</p>
-    </div>
-
-    <div class="season-card">
-      <h3>Species-Specific Seasons</h3>
-      <ul>
-        <li><strong>Walleye, Sauger, Pike:</strong> Opener to Late February</li>
-        <li><strong>Muskie:</strong> Starts Early June</li>
-        <li><strong>Stream Trout:</strong> Opens Mid-April</li>
-        <li><strong>Lake Trout:</strong> Mid-May to Late September</li>
-      </ul>
-    </div>
-  </section>
+  </div>
 
   <div class="container" id="main-container"></div>
 
