@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Size Reference Chart</title>
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Firebase -->
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+      import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+      
+      const firebaseConfig = {
+        apiKey: "AIzaSyD3RT8GwOdg3G3bGm4SKLm1XMKdifW63WU",
+        authDomain: "mygarden-3440d.firebaseapp.com",
+        projectId: "mygarden-3440d",
+        storageBucket: "mygarden-3440d.firebasestorage.app",
+        messagingSenderId: "793732208634",
+        appId: "1:793732208634:web:6c1797b22502309c48b643"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      
+      window.firebaseApp = app;
+      window.db = db;
+      window.firebaseReady = true;
+      
+      if (window.initializeSizeChart) {
+        window.initializeSizeChart();
+      }
+    </script>
+    
+    <style>
+        .size-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            height: calc(100vh - 200px);
+        }
+        
+        .size-sidebar {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+        }
+        
+        .size-sidebar h2 {
+            color: var(--text-color);
+            margin: 0 0 20px 0;
+            font-size: 1.4rem;
+            text-align: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+        
+        .filter-group {
+            margin-bottom: 20px;
+        }
+        
+        .filter-label {
+            display: block;
+            color: var(--text-color);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        .add-btn {
+            width: 100%;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        
+        .add-btn:hover {
+            background: #ff4500;
+            transform: translateY(-2px);
+        }
+        
+        .size-content {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 15px;
+        }
+        
+        .content-header h2 {
+            color: var(--text-color);
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        
+        .loading {
+            text-align: center;
+            color: var(--text-color);
+            padding: 40px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: var(--text-color);
+            opacity: 0.6;
+            padding: 60px 20px;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .size-card {
+            background: var(--bg-color);
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .size-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .size-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+        
+        .size-card-title {
+            color: var(--text-color);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .size-card-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .size-card-delete:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+        
+        .size-detail {
+            color: var(--text-color);
+            font-size: 14px;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .size-detail-label {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        
+        .size-badge {
+            display: inline-block;
+            background: var(--accent-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 15px;
+        }
+        
+        .modal-header h3 {
+            color: var(--text-color);
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            color: var(--text-color);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        
+        .btn-cancel {
+            flex: 1;
+            background: transparent;
+            border: 2px solid var(--text-color);
+            color: var(--text-color);
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-cancel:hover {
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
+        
+        .btn-save {
+            flex: 1;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-save:hover {
+            background: #ff4500;
+        }
+        
+        @media (max-width: 768px) {
+            .size-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .size-sidebar {
+                order: 2;
+            }
+            
+            .size-content {
+                order: 1;
+            }
+            
+            .size-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Size Reference Chart</h1>
+        <p>Never forget your clothing sizes again - organized by person, type, and brand</p>
+    </div>
+
+    <div class="size-container">
+        <div class="size-sidebar">
+            <h2><i class="fas fa-filter"></i> Filters</h2>
+            
+            <div class="filter-group">
+                <label class="filter-label">Person</label>
+                <select id="personFilter" class="filter-select">
+                    <option value="">All People</option>
+                    <option value="Justin">Justin</option>
+                    <option value="Bridget">Bridget</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">Clothing Type</label>
+                <select id="typeFilter" class="filter-select">
+                    <option value="">All Types</option>
+                    <option value="Shoes">Shoes</option>
+                    <option value="Jeans">Jeans</option>
+                    <option value="Dress Pants">Dress Pants</option>
+                    <option value="T-Shirts">T-Shirts</option>
+                    <option value="Sweatshirts">Sweatshirts</option>
+                    <option value="Jackets">Jackets</option>
+                    <option value="Gloves">Gloves</option>
+                    <option value="Hats">Hats</option>
+                    <option value="Belts">Belts</option>
+                    <option value="Socks">Socks</option>
+                    <option value="Shorts">Shorts</option>
+                    <option value="Dress Shirts">Dress Shirts</option>
+                    <option value="Sweaters">Sweaters</option>
+                    <option value="Underwear">Underwear</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">Brand</label>
+                <select id="brandFilter" class="filter-select">
+                    <option value="">All Brands</option>
+                </select>
+            </div>
+            
+            <button class="add-btn" id="addSizeBtn">
+                <i class="fas fa-plus"></i> Add Size Info
+            </button>
+        </div>
+        
+        <div class="size-content">
+            <div class="content-header">
+                <h2>Size Information</h2>
+            </div>
+            
+            <div id="sizeList" class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <div>Loading sizes...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="sizeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Size Information</h3>
+                <button class="modal-close" onclick="closeSizeModal()">×</button>
+            </div>
+            
+            <form id="sizeForm">
+                <div class="form-group">
+                    <label class="form-label">Person *</label>
+                    <select class="form-input" id="personInput" required>
+                        <option value="">Select person...</option>
+                        <option value="Justin">Justin</option>
+                        <option value="Bridget">Bridget</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Clothing Type *</label>
+                    <select class="form-input" id="typeInput" required>
+                        <option value="">Select type...</option>
+                        <option value="Shoes">Shoes</option>
+                        <option value="Jeans">Jeans</option>
+                        <option value="Dress Pants">Dress Pants</option>
+                        <option value="T-Shirts">T-Shirts</option>
+                        <option value="Sweatshirts">Sweatshirts</option>
+                        <option value="Jackets">Jackets</option>
+                        <option value="Gloves">Gloves</option>
+                        <option value="Hats">Hats</option>
+                        <option value="Belts">Belts</option>
+                        <option value="Socks">Socks</option>
+                        <option value="Shorts">Shorts</option>
+                        <option value="Dress Shirts">Dress Shirts</option>
+                        <option value="Sweaters">Sweaters</option>
+                        <option value="Underwear">Underwear</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Brand *</label>
+                    <input type="text" class="form-input" id="brandInput" placeholder="e.g., Carhartt, Nike, Levi's" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Fit/Style Type</label>
+                    <input type="text" class="form-input" id="fitTypeInput" placeholder="e.g., Loose Fit, Slim Fit, Athletic">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Size *</label>
+                    <input type="text" class="form-input" id="sizeInput" placeholder="e.g., Large, 32x32, 10.5" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <input type="text" class="form-input" id="notesInput" placeholder="Any additional details...">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeSizeModal()">Cancel</button>
+                    <button type="submit" class="btn-save">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+    <div class="sidebar" id="sidebar">
+        <div class="clock" id="clock"></div>
+        <div id="sidebar-nav"></div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+    </div>
+
+    <footer> 
+        <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+    </footer> 
+
+<script type="module">
+import { 
+  collection, 
+  doc, 
+  getDocs, 
+  addDoc, 
+  deleteDoc, 
+  serverTimestamp,
+  query,
+  where,
+  orderBy
+} from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
+// Template functions
+function navigateTo(page) {
+    window.location.href = page;
+}
+
+window.toggleSidebar = function() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('open');
+}
+
+function updateClock() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString();
+    document.getElementById('clock').textContent = timeString;
+}
+
+window.toggleTheme = function() {
+    document.body.classList.toggle('light-mode');
+    localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+}
+
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    const menuButton = document.querySelector('.menu-btn');
+    if (sidebar && menuButton && !sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+        sidebar.classList.remove('open');
+    }
+});
+
+// Size Chart Logic
+let allSizes = [];
+let currentFilters = {
+    person: '',
+    type: '',
+    brand: ''
+};
+
+function waitForFirebase() {
+    return new Promise((resolve) => {
+        if (window.firebaseReady && window.db) {
+            resolve();
+        } else {
+            setTimeout(() => waitForFirebase().then(resolve), 100);
+        }
+    });
+}
+
+window.initializeSizeChart = async function() {
+    await waitForFirebase();
+    
+    // Load theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+    }
+    
+    // Event listeners
+    document.getElementById('addSizeBtn').addEventListener('click', openSizeModal);
+    document.getElementById('sizeForm').addEventListener('submit', handleSaveSize);
+    
+    document.getElementById('personFilter').addEventListener('change', (e) => {
+        currentFilters.person = e.target.value;
+        renderSizes();
+    });
+    
+    document.getElementById('typeFilter').addEventListener('change', (e) => {
+        currentFilters.type = e.target.value;
+        renderSizes();
+    });
+    
+    document.getElementById('brandFilter').addEventListener('change', (e) => {
+        currentFilters.brand = e.target.value;
+        renderSizes();
+    });
+    
+    // Load sizes
+    await loadSizes();
+    
+    updateClock();
+    setInterval(updateClock, 1000);
+    
+    // Load sidebar
+    fetch('sidebar.html')
+        .then(response => response.text())
+        .then(data => {
+            const sidebarNav = document.getElementById('sidebar-nav');
+            if (sidebarNav) sidebarNav.innerHTML = data;
+        })
+        .catch(error => {
+            console.log('Sidebar not found');
+        });
+};
+
+async function loadSizes() {
+    try {
+        const sizesCollection = collection(window.db, 'size-reference');
+        const snapshot = await getDocs(sizesCollection);
+        
+        allSizes = [];
+        const brands = new Set();
+        
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            allSizes.push({
+                id: doc.id,
+                ...data
+            });
+            if (data.brand) brands.add(data.brand);
+        });
+        
+        // Update brand filter
+        const brandFilter = document.getElementById('brandFilter');
+        brandFilter.innerHTML = '<option value="">All Brands</option>';
+        Array.from(brands).sort().forEach(brand => {
+            const option = document.createElement('option');
+            option.value = brand;
+            option.textContent = brand;
+            brandFilter.appendChild(option);
+        });
+        
+        renderSizes();
+    } catch (error) {
+        console.error('Error loading sizes:', error);
+        document.getElementById('sizeList').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><div>Error loading data</div></div>';
+    }
+}
+
+function renderSizes() {
+    const container = document.getElementById('sizeList');
+    
+    // Filter sizes
+    let filteredSizes = allSizes.filter(size => {
+        if (currentFilters.person && size.person !== currentFilters.person) return false;
+        if (currentFilters.type && size.type !== currentFilters.type) return false;
+        if (currentFilters.brand && size.brand !== currentFilters.brand) return false;
+        return true;
+    });
+    
+    // Sort by person, then type, then brand
+    filteredSizes.sort((a, b) => {
+        if (a.person !== b.person) return a.person.localeCompare(b.person);
+        if (a.type !== b.type) return a.type.localeCompare(b.type);
+        return a.brand.localeCompare(b.brand);
+    });
+    
+    if (filteredSizes.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-ruler"></i><div>No size information found<br><small>Add your first size entry to get started!</small></div></div>';
+        return;
+    }
+    
+    const grid = document.createElement('div');
+    grid.className = 'size-grid';
+    
+    filteredSizes.forEach(size => {
+        const card = document.createElement('div');
+        card.className = 'size-card';
+        
+        card.innerHTML = `
+            <div class="size-card-header">
+                <h3 class="size-card-title">${size.brand}</h3>
+                <button class="size-card-delete" onclick="deleteSize('${size.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <div class="size-detail">
+                <span class="size-detail-label">Person:</span>
+                <span>${size.person}</span>
+            </div>
+            <div class="size-detail">
+                <span class="size-detail-label">Type:</span>
+                <span>${size.type}</span>
+            </div>
+            ${size.fitType ? `
+            <div class="size-detail">
+                <span class="size-detail-label">Fit:</span>
+                <span>${size.fitType}</span>
+            </div>
+            ` : ''}
+            <div class="size-detail" style="margin-top:12px">
+                <span class="size-badge">Size: ${size.size}</span>
+            </div>
+            ${size.notes ? `
+            <div class="size-detail" style="margin-top:12px;font-style:italic;opacity:0.8">
+                <i class="fas fa-sticky-note" style="color:var(--accent-color)"></i>
+                <span>${size.notes}</span>
+            </div>
+            ` : ''}
+        `;
+        
+        grid.appendChild(card);
+    });
+    
+    container.innerHTML = '';
+    container.appendChild(grid);
+}
+
+function openSizeModal() {
+    document.getElementById('sizeModal').classList.add('active');
+    document.getElementById('sizeForm').reset();
+}
+
+window.closeSizeModal = function() {
+    document.getElementById('sizeModal').classList.remove('active');
+}
+
+async function handleSaveSize(e) {
+    e.preventDefault();
+    
+    const sizeData = {
+        person: document.getElementById('personInput').value,
+        type: document.getElementById('typeInput').value,
+        brand: document.getElementById('brandInput').value,
+        fitType: document.getElementById('fitTypeInput').value,
+        size: document.getElementById('sizeInput').value,
+        notes: document.getElementById('notesInput').value,
+        created: serverTimestamp()
+    };
+    
+    try {
+        const sizesCollection = collection(window.db, 'size-reference');
+        await addDoc(sizesCollection, sizeData);
+        
+        closeSizeModal();
+        await loadSizes();
+    } catch (error) {
+        console.error('Error saving size:', error);
+        alert('Error saving size information. Please try again.');
+    }
+}
+
+window.deleteSize = async function(id) {
+    if (!confirm('Are you sure you want to delete this size entry?')) return;
+    
+    try {
+        const sizeDoc = doc(window.db, 'size-reference', id);
+        await deleteDoc(sizeDoc);
+        await loadSizes();
+    } catch (error) {
+        console.error('Error deleting size:', error);
+        alert('Error deleting size. Please try again.');
+    }
+}
+
+// Initialize on load
+if (window.firebaseReady) {
+    window.initializeSizeChart();
+}
+</script>
+</body>
+</html>
