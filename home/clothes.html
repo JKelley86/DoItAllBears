@@ -529,7 +529,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 
 // Template functions
-function navigateTo(page) {
+window.navigateTo = function(page) {
     window.location.href = page;
 }
 
