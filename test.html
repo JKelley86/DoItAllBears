@@ -124,43 +124,6 @@
             background: rgba(0, 0, 0, 0.15);
         }
 
-        .search-bar-container {
-            position: fixed;
-            top: 1.5rem;
-            right: 1.5rem;
-            width: 300px;
-            z-index: 1000;
-        }
-
-        .search-bar {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border: none;
-            border-radius: 25px;
-            background: rgba(255, 255, 255, 0.15);
-            color: #fff;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(8px);
-        }
-
-        body.light-mode .search-bar {
-            background: rgba(0, 0, 0, 0.1);
-            color: #333;
-        }
-
-        .search-bar:focus {
-            outline: none;
-            box-shadow: 0 0 15px rgba(0, 255, 200, 0.5);
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        body.light-mode .search-bar:focus {
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-            background: rgba(0, 0, 0, 0.15);
-        }
-
         .popup {
             position: fixed;
             top: 50%;
@@ -244,46 +207,6 @@
             z-index: 998;
         }
 
-        .controls {
-            position: fixed;
-            bottom: 10%;
-            right: 5%;
-            display: grid;
-            grid-template-areas:
-                ". up ."
-                "left down right";
-            gap: 10px;
-            z-index: 999;
-        }
-
-        .controls button {
-            width: 50px;
-            height: 50px;
-            background: rgba(0, 0, 0, 0.7);
-            border: none;
-            border-radius: 10px;
-            color: #fff;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-
-        body.light-mode .controls button {
-            background: rgba(255, 255, 255, 0.7);
-            color: #333;
-        }
-
-        .controls button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 15px rgba(0, 255, 200, 0.5);
-        }
-
-        .up { grid-area: up; }
-        .left { grid-area: left; }
-        .down { grid-area: down; }
-        .right { grid-area: right; }
-
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -298,9 +221,6 @@
         @media (max-width: 768px) {
             .sidebar { width: 280px; }
             .popup { width: 90%; }
-            .controls { bottom: 5%; right: 2%; gap: 5px; }
-            .controls button { width: 40px; height: 40px; font-size: 1.2rem; }
-            .search-bar-container { width: 250px; top: 1rem; right: 1rem; }
         }
     </style>
 </head>
@@ -310,27 +230,8 @@
 
     <div class="sidebar" id="sidebar">
         <div class="clock" id="clock"></div>
-        <a href="recipes/index.html"><i class="fas fa-book-open"></i> Recipes</a>
-        <a href="movies/showtracker.html"><i class="fas fa-film"></i> Movies</a>
-        <a href="useful/gaming.html"><i class="fas fa-gamepad"></i> Game Library</a>
-        <a href="productivityhub/index.html"><i class="fas fa-briefcase"></i> Productivity Hub</a>
-        <a href="useful/camping.html"><i class="fas fa-campground"></i> Camping</a>
-        <a href="woodworking/index.html"><i class="fas fa-hammer"></i> Wood Working</a>
-        <a href="prank/butthurt.html"><i class="fas fa-file-alt"></i> Butthurt Report</a>
-        <a href="currentevents.html"><i class="fas fa-newspaper"></i> Current Events</a>
         <button class="popup-button" onclick="openLoginPopup()"><i class="fas fa-key"></i> Login</button>
         <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i> Toggle Theme</button>
-    </div>
-
-    <div class="search-bar-container">
-        <input type="text" class="search-bar" id="search-bar" placeholder="Search..." oninput="filterSigns()" autocomplete="off" />
-    </div>
-
-    <div class="controls">
-        <button class="up" onclick="moveForward()"><i class="fas fa-arrow-up"></i></button>
-        <button class="left" onclick="moveLeft()"><i class="fas fa-arrow-left"></i></button>
-        <button class="down" onclick="moveBackward()"><i class="fas fa-arrow-down"></i></button>
-        <button class="right" onclick="moveRight()"><i class="fas fa-arrow-right"></i></button>
     </div>
 
     <div id="login-popup" class="popup" style="display:none;">
@@ -374,24 +275,15 @@
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
         directionalLight.position.set(5, 10, 5);
         directionalLight.castShadow = true;
-        directionalLight.shadow.mapSize.width = 2048;
-        directionalLight.shadow.mapSize.height = 2048;
         scene.add(directionalLight);
         console.log('Lights added');
 
         // Materials
         const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 });
         const skyMaterial = new THREE.MeshBasicMaterial({ color: 0x87ceeb, side: THREE.BackSide });
-        const woodMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
-        const boardMaterial = new THREE.MeshStandardMaterial({ color: 0x4682b4 });
-        const tentBaseMaterial = new THREE.MeshStandardMaterial({ color: 0x2f4f4f });
-        const tentRoofMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff88 });
-        const logMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
-        const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
-        const foliageMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 });
 
         // Ground
-        const groundGeometry = new THREE.PlaneGeometry(100, 100, 50, 50);
+        const groundGeometry = new THREE.PlaneGeometry(100, 100);
         const ground = new THREE.Mesh(groundGeometry, groundMaterial);
         ground.rotation.x = -Math.PI / 2;
         ground.receiveShadow = true;
@@ -403,124 +295,6 @@
         const sky = new THREE.Mesh(skyGeometry, skyMaterial);
         scene.add(sky);
         console.log('Sky added');
-
-        // Fog
-        scene.fog = new THREE.FogExp2(0x0a0a23, 0.01);
-
-        // Tent
-        const tentGroup = new THREE.Group();
-        const tentBaseGeometry = new THREE.BoxGeometry(4, 2, 4);
-        const tentBase = new THREE.Mesh(tentBaseGeometry, tentBaseMaterial);
-        tentBase.position.y = 1;
-        tentBase.castShadow = true;
-        tentGroup.add(tentBase);
-        const tentRoofGeometry = new THREE.ConeGeometry(3, 3, 4);
-        const tentRoof = new THREE.Mesh(tentRoofGeometry, tentRoofMaterial);
-        tentRoof.position.y = 3.5;
-        tentRoof.rotation.y = Math.PI / 4;
-        tentGroup.add(tentRoof);
-        tentGroup.position.set(-10, 0, -5);
-        scene.add(tentGroup);
-        console.log('Tent added');
-
-        // Campfire
-        const campfireGroup = new THREE.Group();
-        for (let i = 0; i < 3; i++) {
-            const logGeometry = new THREE.CylinderGeometry(0.2, 0.2, 2, 8);
-            const log = new THREE.Mesh(logGeometry, logMaterial);
-            log.rotation.z = Math.PI / 2;
-            log.position.set(Math.sin(i * 2 * Math.PI / 3) * 0.5, 0.2, Math.cos(i * 2 * Math.PI / 3) * 0.5);
-            log.castShadow = true;
-            campfireGroup.add(log);
-        }
-        campfireGroup.position.set(0, 0, -5);
-        scene.add(campfireGroup);
-        console.log('Campfire added');
-
-        // Fire
-        const fireGeometry = new THREE.PlaneGeometry(2, 4);
-        const fireMaterial = new THREE.MeshBasicMaterial({ color: 0xff4500, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
-        const fire = new THREE.Mesh(fireGeometry, fireMaterial);
-        fire.position.set(0, 1, -5);
-        scene.add(fire);
-        console.log('Fire added');
-
-        // Trees
-        for (let t = 0; t < 8; t++) {
-            const treeGroup = new THREE.Group();
-            const trunkGeometry = new THREE.CylinderGeometry(0.5, 0.5, 4, 8);
-            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
-            trunk.position.y = 2;
-            trunk.castShadow = true;
-            treeGroup.add(trunk);
-            for (let l = 0; l < 3; l++) {
-                const foliageGeometry = new THREE.SphereGeometry(1.5 - l * 0.3, 16, 16);
-                const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
-                foliage.position.y = 4 + l * 1.2;
-                foliage.castShadow = true;
-                treeGroup.add(foliage);
-            }
-            treeGroup.position.set((Math.random() - 0.5) * 50, 0, (Math.random() - 0.5) * 50);
-            scene.add(treeGroup);
-        }
-        console.log('Trees added');
-
-        // Signposts
-        const links = [
-            { text: 'Recipes', url: 'recipes/index.html' },
-            { text: 'Movies', url: 'movies/showtracker.html' },
-            { text: 'Game Library', url: 'useful/gaming.html' },
-            { text: 'Productivity Hub', url: 'productivityhub/index.html' },
-            { text: 'Camping', url: 'useful/camping.html' },
-            { text: 'Wood Working', url: 'woodworking/index.html' },
-            { text: 'Butthurt Report', url: 'prank/butthurt.html' },
-            { text: 'Current Events', url: 'currentevents.html' },
-            { text: 'Useful', url: 'useful/index.html' },
-            { text: 'Calculators', url: 'Calculators/index.html' },
-            { text: 'Plants', url: 'plants/index.html' },
-            { text: 'Animals', url: 'animals/index.html' },
-            { text: 'Games', url: 'games/index.html' },
-            { text: 'Invitations', url: 'invitations/index.html' }
-        ];
-
-        const signs = [];
-        links.forEach((link, index) => {
-            const group = new THREE.Group();
-            const postGeometry = new THREE.CylinderGeometry(0.2, 0.2, 3, 8);
-            const post = new THREE.Mesh(postGeometry, woodMaterial);
-            post.position.y = 1.5;
-            group.add(post);
-
-            const boardGeometry = new THREE.BoxGeometry(3, 1.5, 0.2);
-            const board = new THREE.Mesh(boardGeometry, boardMaterial);
-            board.position.y = 2.75;
-            group.add(board);
-
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 512;
-            canvas.height = 256;
-            ctx.fillStyle = 'transparent';
-            ctx.fillRect(0, 0, 512, 256);
-            ctx.fillStyle = '#00ff88';
-            ctx.font = 'bold 60px Orbitron';
-            ctx.fillText(link.text, 20, 150);
-            const texture = new THREE.CanvasTexture(canvas);
-            const textMaterial = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
-            const textPlaneGeometry = new THREE.PlaneGeometry(2.8, 1.3);
-            const textPlane = new THREE.Mesh(textPlaneGeometry, textMaterial);
-            textPlane.position.y = 2.75;
-            textPlane.position.z = 0.11;
-            group.add(textPlane);
-
-            group.userData = { url: link.url, text: link.text };
-            const angle = index * 2 * Math.PI / links.length;
-            group.position.set(Math.cos(angle) * 10, 0, Math.sin(angle) * 10);
-            group.rotation.y = -angle;
-            scene.add(group);
-            signs.push(group);
-            console.log(`Signpost ${link.text} added at position`, group.position);
-        });
 
         // Camera
         camera.position.set(0, 5, 15);
@@ -535,99 +309,9 @@
         controls.maxDistance = 50;
         console.log('OrbitControls initialized');
 
-        // Click interaction
-        let focusedObject = null;
-        function onClick(event) {
-            event.preventDefault();
-            const raycaster = new THREE.Raycaster();
-            const mouse = new THREE.Vector2((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1);
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(signs, true);
-            if (intersects.length > 0) {
-                const obj = intersects[0].object.parent;
-                console.log('Clicked signpost:', obj.userData.text);
-                if (focusedObject === obj) {
-                    window.location.href = obj.userData.url;
-                } else {
-                    const targetPos = obj.position.clone().add(new THREE.Vector3(0, 2, 4));
-                    new TWEEN.Tween(camera.position)
-                        .to(targetPos, 1000)
-                        .easing(TWEEN.Easing.Quadratic.InOut)
-                        .onUpdate(() => {
-                            camera.lookAt(obj.position);
-                        })
-                        .start();
-                    focusedObject = obj;
-                }
-            } else {
-                focusedObject = null;
-                new TWEEN.Tween(camera.position)
-                    .to(new THREE.Vector3(0, 5, 15), 1000)
-                    .easing(TWEEN.Easing.Quadratic.InOut)
-                    .onUpdate(() => {
-                        camera.lookAt(0, 0, 0);
-                    })
-                    .start();
-            }
-        }
-        renderer.domElement.addEventListener('click', onClick);
-
-        // Movement controls
-        const moveSpeed = 1;
-        window.moveForward = function() {
-            const direction = new THREE.Vector3();
-            camera.getWorldDirection(direction);
-            direction.y = 0;
-            direction.normalize();
-            new TWEEN.Tween(camera.position)
-                .to(camera.position.clone().add(direction.multiplyScalar(moveSpeed)), 500)
-                .easing(TWEEN.Easing.Quadratic.InOut)
-                .start();
-            console.log('Moved forward to', camera.position);
-        };
-
-        window.moveBackward = function() {
-            const direction = new THREE.Vector3();
-            camera.getWorldDirection(direction);
-            direction.y = 0;
-            direction.normalize();
-            new TWEEN.Tween(camera.position)
-                .to(camera.position.clone().sub(direction.multiplyScalar(moveSpeed)), 500)
-                .easing(TWEEN.Easing.Quadratic.InOut)
-                .start();
-            console.log('Moved backward to', camera.position);
-        };
-
-        window.moveLeft = function() {
-            const direction = new THREE.Vector3();
-            camera.getWorldDirection(direction);
-            direction.y = 0;
-            direction.normalize();
-            const left = direction.clone().cross(camera.up).normalize();
-            new TWEEN.Tween(camera.position)
-                .to(camera.position.clone().add(left.multiplyScalar(moveSpeed)), 500)
-                .easing(TWEEN.Easing.Quadratic.InOut)
-                .start();
-            console.log('Moved left to', camera.position);
-        };
-
-        window.moveRight = function() {
-            const direction = new THREE.Vector3();
-            camera.getWorldDirection(direction);
-            direction.y = 0;
-            direction.normalize();
-            const right = direction.clone().cross(camera.up).normalize().negate();
-            new TWEEN.Tween(camera.position)
-                .to(camera.position.clone().add(right.multiplyScalar(moveSpeed)), 500)
-                .easing(TWEEN.Easing.Quadratic.InOut)
-                .start();
-            console.log('Moved right to', camera.position);
-        };
-
         // Animation loop
         function animate() {
             requestAnimationFrame(animate);
-            fire.rotation.y += 0.01;
             TWEEN.update();
             controls.update();
             renderer.render(scene, camera);
@@ -644,26 +328,13 @@
 
         // Theme update
         function updateTheme(isLight) {
-            scene.fog.color.setHex(isLight ? 0xe6e6fa : 0x0a0a23);
-            ambientLight.color.setHex(isLight ? 0xffffff : 0xaaaaaa);
-            directionalLight.color.setHex(isLight ? 0xffffff : 0xffddaa);
-            woodMaterial.color.setHex(isLight ? 0x5c4033 : 0x8b4513);
-            tentBaseMaterial.color.setHex(isLight ? 0x4a6262 : 0x2f4f4f);
-            logMaterial.color.setHex(isLight ? 0x5c4033 : 0x8b4513);
-            trunkMaterial.color.setHex(isLight ? 0x5c4033 : 0x8b4513);
-            foliageMaterial.color.setHex(isLight ? 0x90ee90 : 0x228b22);
+            scene.fog = new THREE.FogExp2(isLight ? 0xe6e6fa : 0x0a0a23, 0.01);
             groundMaterial.color.setHex(isLight ? 0x90ee90 : 0x228b22);
             skyMaterial.color.setHex(isLight ? 0xb0e0e6 : 0x87ceeb);
-            tentRoofMaterial.color.setHex(isLight ? 0x98fb98 : 0x00ff88);
-            boardMaterial.color.setHex(isLight ? 0x87cefa : 0x4682b4);
             console.log('Theme updated:', isLight ? 'light' : 'dark');
         }
 
         // Global functions
-        window.navigateTo = function(url) {
-            window.location.href = url;
-        };
-
         window.toggleSidebar = function() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('open');
@@ -689,14 +360,6 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        window.filterSigns = function() {
-            const searchTerm = document.getElementById('search-bar').value.toLowerCase();
-            signs.forEach(sign => {
-                sign.visible = sign.userData.text.toLowerCase().includes(searchTerm);
-            });
-            console.log('Signs filtered with term:', searchTerm);
-        };
-
         window.toggleTheme = function() {
             document.body.classList.toggle('light-mode');
             localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
@@ -711,7 +374,6 @@
                 document.body.classList.remove('light-mode');
             }
             updateTheme(document.body.classList.contains('light-mode'));
-            document.getElementById('search-bar').value = '';
             console.log('Page loaded, theme:', savedTheme || 'dark');
         };
 
