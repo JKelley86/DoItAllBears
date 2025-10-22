@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>Justin's Campsite Hub</title>
     <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAB5JREFUOE9jZKAQMFKon4E4MBo4Mxg4Mxg4MxgYAAArvAbmL3D0jwAAAABJRU5ErkJggg==" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" crossorigin="anonymous" />
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         * {
@@ -81,6 +81,7 @@
             flex-direction: column;
             gap: 1.2rem;
             backdrop-filter: blur(12px);
+            overflow-y: auto;
         }
 
         body.light-mode .sidebar {
@@ -114,6 +115,11 @@
             border-radius: 12px;
             font-size: 1.3rem;
             transition: all 0.3s ease;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            width: 100%;
         }
 
         .sidebar a:hover, .sidebar button:hover {
@@ -163,6 +169,7 @@
         }
 
         .popup {
+            display: none;
             position: fixed;
             top: 50%;
             left: 50%;
@@ -176,6 +183,10 @@
             text-align: center;
             animation: popIn 0.5s ease;
             backdrop-filter: blur(10px);
+        }
+
+        .popup.show {
+            display: block;
         }
 
         body.light-mode .popup {
@@ -319,8 +330,8 @@
         <a href="woodworking/index.html"><i class="fas fa-hammer"></i> Wood Working</a>
         <a href="prank/butthurt.html"><i class="fas fa-file-alt"></i> Butthurt Report</a>
         <a href="currentevents.html"><i class="fas fa-newspaper"></i> Current Events</a>
-        <button class="popup-button" onclick="openLoginPopup()"><i class="fas fa-key"></i> Login</button>
-        <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i> Toggle Theme</button>
+        <button onclick="openLoginPopup()"><i class="fas fa-key"></i> Login</button>
+        <button onclick="toggleTheme()"><i class="fas fa-moon"></i> Toggle Theme</button>
     </div>
 
     <div class="search-bar-container">
@@ -334,7 +345,7 @@
         <button class="right" onclick="moveRight()"><i class="fas fa-arrow-right"></i></button>
     </div>
 
-    <div id="login-popup" class="popup" style="display:none;">
+    <div id="login-popup" class="popup">
         <h3>Login</h3>
         <form onsubmit="event.preventDefault(); login();">
             <input type="text" id="username" placeholder="Username" autocomplete="username" />
@@ -354,10 +365,6 @@
         import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.168.0/examples/jsm/controls/OrbitControls.js';
         import * as TWEEN from 'https://cdn.jsdelivr.net/npm/@tweenjs/tween.js@23.1.3/dist/tween.esm.js';
 
-        console.log('Three.js loaded:', !!THREE);
-        console.log('OrbitControls loaded:', !!OrbitControls);
-        console.log('TWEEN loaded:', !!TWEEN);
-
         // Scene setup
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -367,7 +374,6 @@
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        console.log('Renderer initialized:', renderer);
 
         // Lights
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -375,10 +381,7 @@
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
         directionalLight.position.set(5, 10, 5);
         directionalLight.castShadow = true;
-        directionalLight.shadow.mapSize.width = 2048;
-        directionalLight.shadow.mapSize.height = 2048;
         scene.add(directionalLight);
-        console.log('Lights added');
 
         // Materials
         const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 });
@@ -392,18 +395,16 @@
         const foliageMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 });
 
         // Ground
-        const groundGeometry = new THREE.PlaneGeometry(100, 100, 50, 50);
+        const groundGeometry = new THREE.PlaneGeometry(100, 100);
         const ground = new THREE.Mesh(groundGeometry, groundMaterial);
         ground.rotation.x = -Math.PI / 2;
         ground.receiveShadow = true;
         scene.add(ground);
-        console.log('Ground added');
 
         // Sky
         const skyGeometry = new THREE.SphereGeometry(500, 32, 32);
         const sky = new THREE.Mesh(skyGeometry, skyMaterial);
         scene.add(sky);
-        console.log('Sky added');
 
         // Fog
         scene.fog = new THREE.FogExp2(0x0a0a23, 0.01);
@@ -422,7 +423,6 @@
         tentGroup.add(tentRoof);
         tentGroup.position.set(-10, 0, -5);
         scene.add(tentGroup);
-        console.log('Tent added');
 
         // Campfire
         const campfireGroup = new THREE.Group();
@@ -436,15 +436,18 @@
         }
         campfireGroup.position.set(0, 0, -5);
         scene.add(campfireGroup);
-        console.log('Campfire added');
 
         // Fire
         const fireGeometry = new THREE.PlaneGeometry(2, 4);
-        const fireMaterial = new THREE.MeshBasicMaterial({ color: 0xff4500, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
+        const fireMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0xff4500, 
+            transparent: true, 
+            opacity: 0.8, 
+            blending: THREE.AdditiveBlending 
+        });
         const fire = new THREE.Mesh(fireGeometry, fireMaterial);
         fire.position.set(0, 1, -5);
         scene.add(fire);
-        console.log('Fire added');
 
         // Trees
         for (let t = 0; t < 8; t++) {
@@ -464,7 +467,6 @@
             treeGroup.position.set((Math.random() - 0.5) * 50, 0, (Math.random() - 0.5) * 50);
             scene.add(treeGroup);
         }
-        console.log('Trees added');
 
         // Signposts
         const links = [
@@ -475,13 +477,7 @@
             { text: 'Camping', url: 'useful/camping.html' },
             { text: 'Wood Working', url: 'woodworking/index.html' },
             { text: 'Butthurt Report', url: 'prank/butthurt.html' },
-            { text: 'Current Events', url: 'currentevents.html' },
-            { text: 'Useful', url: 'useful/index.html' },
-            { text: 'Calculators', url: 'Calculators/index.html' },
-            { text: 'Plants', url: 'plants/index.html' },
-            { text: 'Animals', url: 'animals/index.html' },
-            { text: 'Games', url: 'games/index.html' },
-            { text: 'Invitations', url: 'invitations/index.html' }
+            { text: 'Current Events', url: 'currentevents.html' }
         ];
 
         const signs = [];
@@ -497,16 +493,17 @@
             board.position.y = 2.75;
             group.add(board);
 
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 512;
-            canvas.height = 256;
+            const canvasEl = document.createElement('canvas');
+            const ctx = canvasEl.getContext('2d');
+            canvasEl.width = 512;
+            canvasEl.height = 256;
             ctx.fillStyle = 'transparent';
             ctx.fillRect(0, 0, 512, 256);
             ctx.fillStyle = '#00ff88';
             ctx.font = 'bold 60px Orbitron';
-            ctx.fillText(link.text, 20, 150);
-            const texture = new THREE.CanvasTexture(canvas);
+            ctx.textAlign = 'center';
+            ctx.fillText(link.text, 256, 150);
+            const texture = new THREE.CanvasTexture(canvasEl);
             const textMaterial = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
             const textPlaneGeometry = new THREE.PlaneGeometry(2.8, 1.3);
             const textPlane = new THREE.Mesh(textPlaneGeometry, textMaterial);
@@ -520,13 +517,11 @@
             group.rotation.y = -angle;
             scene.add(group);
             signs.push(group);
-            console.log(`Signpost ${link.text} added at position`, group.position);
         });
 
         // Camera
         camera.position.set(0, 5, 15);
         camera.lookAt(0, 0, 0);
-        console.log('Camera set at', camera.position);
 
         // Orbit Controls
         const controls = new OrbitControls(camera, renderer.domElement);
@@ -534,19 +529,21 @@
         controls.dampingFactor = 0.05;
         controls.minDistance = 5;
         controls.maxDistance = 50;
-        console.log('OrbitControls initialized');
 
         // Click interaction
         let focusedObject = null;
         function onClick(event) {
             event.preventDefault();
             const raycaster = new THREE.Raycaster();
-            const mouse = new THREE.Vector2((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1);
+            const mouse = new THREE.Vector2(
+                (event.clientX / window.innerWidth) * 2 - 1, 
+                -(event.clientY / window.innerHeight) * 2 + 1
+            );
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(signs, true);
+            
             if (intersects.length > 0) {
                 const obj = intersects[0].object.parent;
-                console.log('Clicked signpost:', obj.userData.text);
                 if (focusedObject === obj) {
                     window.location.href = obj.userData.url;
                 } else {
@@ -584,7 +581,6 @@
                 .to(camera.position.clone().add(direction.multiplyScalar(moveSpeed)), 500)
                 .easing(TWEEN.Easing.Quadratic.InOut)
                 .start();
-            console.log('Moved forward to', camera.position);
         };
 
         window.moveBackward = function() {
@@ -596,7 +592,6 @@
                 .to(camera.position.clone().sub(direction.multiplyScalar(moveSpeed)), 500)
                 .easing(TWEEN.Easing.Quadratic.InOut)
                 .start();
-            console.log('Moved backward to', camera.position);
         };
 
         window.moveLeft = function() {
@@ -609,7 +604,6 @@
                 .to(camera.position.clone().add(left.multiplyScalar(moveSpeed)), 500)
                 .easing(TWEEN.Easing.Quadratic.InOut)
                 .start();
-            console.log('Moved left to', camera.position);
         };
 
         window.moveRight = function() {
@@ -622,7 +616,6 @@
                 .to(camera.position.clone().add(right.multiplyScalar(moveSpeed)), 500)
                 .easing(TWEEN.Easing.Quadratic.InOut)
                 .start();
-            console.log('Moved right to', camera.position);
         };
 
         // Animation loop
@@ -640,7 +633,6 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            console.log('Window resized to', window.innerWidth, window.innerHeight);
         });
 
         // Theme update
@@ -657,7 +649,6 @@
             skyMaterial.color.setHex(isLight ? 0xb0e0e6 : 0x87ceeb);
             tentRoofMaterial.color.setHex(isLight ? 0x98fb98 : 0x00ff88);
             boardMaterial.color.setHex(isLight ? 0x87cefa : 0x4682b4);
-            console.log('Theme updated:', isLight ? 'light' : 'dark');
         }
 
         // Global functions
@@ -668,16 +659,14 @@
         window.toggleSidebar = function() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('open');
-            console.log('Sidebar toggled:', sidebar.classList.contains('open') ? 'open' : 'closed');
         };
 
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const menuButton = document.querySelector('.menu-btn');
-            const canvas = document.getElementById('webgl-canvas');
-            if (!sidebar.contains(event.target) && !menuButton.contains(event.target) && event.target !== canvas) {
+            const canvasElement = document.getElementById('webgl-canvas');
+            if (!sidebar.contains(event.target) && !menuButton.contains(event.target) && event.target !== canvasElement) {
                 sidebar.classList.remove('open');
-                console.log('Sidebar closed via outside click');
             }
         });
 
@@ -695,7 +684,6 @@
             signs.forEach(sign => {
                 sign.visible = sign.userData.text.toLowerCase().includes(searchTerm);
             });
-            console.log('Signs filtered with term:', searchTerm);
         };
 
         window.toggleTheme = function() {
@@ -704,78 +692,8 @@
             updateTheme(document.body.classList.contains('light-mode'));
         };
 
-        window.onload = function() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'light') {
-                document.body.classList.add('light-mode');
-            } else {
-                document.body.classList.remove('light-mode');
-            }
-            updateTheme(document.body.classList.contains('light-mode'));
-            document.getElementById('search-bar').value = '';
-            console.log('Page loaded, theme:', savedTheme || 'dark');
-        };
-
         window.openLoginPopup = function() {
-            document.getElementById("login-popup").style.display = "block";
-            console.log('Login popup opened');
+            document.getElementById("login-popup").classList.add('show');
         };
 
-        window.closeLoginPopup = function() {
-            document.getElementById("login-popup").style.display = "none";
-            console.log('Login popup closed');
-        };
-
-        window.login = async function() {
-            const username = document.getElementById("username").value.trim();
-            const password = document.getElementById("password").value.trim();
-            const messageBox = document.getElementById("login-message");
-            if (!username || !password) {
-                messageBox.textContent = "Please fill in both fields.";
-                messageBox.style.color = "red";
-                return;
-            }
-            try {
-                const mockUsers = {
-                    "testuser": "testpass",
-                    "admin": "admin123"
-                };
-                const response = await fetch("https://jkelley86.github.io/DoItAllBears/users.json").catch(() => {
-                    console.warn('Failed to fetch users.json, using mock data');
-                    return { ok: true, json: () => Promise.resolve(mockUsers) };
-                });
-                if (!response.ok) throw new Error("Failed to fetch user data.");
-                const users = await response.json();
-                if (users[username] && users[username] === password) {
-                    localStorage.setItem("loggedInUser", username);
-                    messageBox.textContent = "Login successful!";
-                    messageBox.style.color = "green";
-                    setTimeout(() => {
-                        closeLoginPopup();
-                        location.reload();
-                    }, 1000);
-                } else {
-                    messageBox.textContent = "Invalid username or password.";
-                    messageBox.style.color = "red";
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                messageBox.textContent = "Error logging in. Using mock data.";
-                messageBox.style.color = "red";
-                const mockUsers = { "testuser": "testpass", "admin": "admin123" };
-                if (mockUsers[username] && mockUsers[username] === password) {
-                    localStorage.setItem("loggedInUser", username);
-                    messageBox.textContent = "Login successful (mock data)!";
-                    messageBox.style.color = "green";
-                    setTimeout(() => {
-                        closeLoginPopup();
-                        location.reload();
-                    }, 1000);
-                }
-            }
-        };
-
-        console.log('Scene setup complete, objects:', scene.children.length);
-    </script>
-</body>
-</html>
+        window.closeLoginPopup =
