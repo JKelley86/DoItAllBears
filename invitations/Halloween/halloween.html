@@ -58,6 +58,7 @@
       <ul id="food-list">
         <li>Loading...</li>
       </ul>
+      <p id="attendee-count" style="margin-top: 1rem; font-weight: bold;">Loading attendee count...</p>
     </section>
 
   </main>
@@ -80,8 +81,21 @@
         ul.innerHTML = foodItems.map(f => `<li>${f}</li>`).join("");
       }
     })
+
+
+      // Attendee count (cell D1)
+      const attendeeCount = rows[0][3]?.trim(); // D1 = column index 3 (0-based)
+      const countElement = document.getElementById("attendee-count");
+      if (attendeeCount) {
+        countElement.textContent = `👥 Currently ${attendeeCount} people are coming`;
+      } else {
+        countElement.textContent = "👥 Attendee count not available";
+      }
+    })
+    
     .catch(err => {
       document.getElementById("food-list").innerHTML = "<li>Failed to load food list</li>";
+      document.getElementById("attendee-count").textContent = "👥 Unable to load attendee count";
       console.error(err);
     });
 </script>
