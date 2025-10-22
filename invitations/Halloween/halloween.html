@@ -69,19 +69,14 @@
   fetch(sheetURL)
     .then(res => res.text())
     .then(csv => {
-      const rows = csv.split("\n").slice(1); // skip header row (row 1)
-      const foodItems = rows
-        .map(r => r.split(",")[1]?.trim()) // column B = Food
-        .filter(f => f && f !== ""); // remove empty cells
+      const rows = csv.split("\n").map(r => r.split(","));
+      const foodItems = rows.slice(1).map(r => r[1]?.trim()).filter(f => f && f !== "");
 
+      // Food list
       const ul = document.getElementById("food-list");
-      if (foodItems.length === 0) {
-        ul.innerHTML = "<li>No food items yet</li>";
-      } else {
-        ul.innerHTML = foodItems.map(f => `<li>${f}</li>`).join("");
-      }
-    })
-
+      ul.innerHTML = foodItems.length > 0
+        ? foodItems.map(f => `<li>${f}</li>`).join("")
+        : "<li>No food items yet</li>";
 
       // Attendee count (cell D1)
       const attendeeCount = rows[0][3]?.trim(); // D1 = column index 3 (0-based)
@@ -92,7 +87,6 @@
         countElement.textContent = "👥 Attendee count not available";
       }
     })
-    
     .catch(err => {
       document.getElementById("food-list").innerHTML = "<li>Failed to load food list</li>";
       document.getElementById("attendee-count").textContent = "👥 Unable to load attendee count";
