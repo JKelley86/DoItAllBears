@@ -335,10 +335,12 @@
 
     <div id="login-popup" class="popup" style="display:none;">
         <h3>Login</h3>
-        <input type="text" id="username" placeholder="Username" />
-        <input type="password" id="password" placeholder="Password" />
-        <button onclick="login()">Login</button>
-        <button onclick="closeLoginPopup()">Cancel</button>
+        <form onsubmit="event.preventDefault(); login();">
+            <input type="text" id="username" placeholder="Username" />
+            <input type="password" id="password" placeholder="Password" />
+            <button type="submit">Login</button>
+            <button type="button" onclick="closeLoginPopup()">Cancel</button>
+        </form>
         <div id="login-message" style="margin-top: 10px;"></div>
     </div>
 
@@ -377,16 +379,16 @@
         scene.add(directionalLight);
         console.log('Lights added');
 
-        // Materials (updated colors for realism)
-        const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 }); // Green grass
-        const skyMaterial = new THREE.MeshBasicMaterial({ color: 0x87ceeb, side: THREE.BackSide }); // Sky blue
-        const woodMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 }); // Brown wood
-        const boardMaterial = new THREE.MeshStandardMaterial({ color: 0x4682b4 }); // Steel blue
-        const tentBaseMaterial = new THREE.MeshStandardMaterial({ color: 0x2f4f4f }); // Dark slate gray
-        const tentRoofMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff88 }); // Bright green
-        const logMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 }); // Brown logs
-        const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 }); // Brown trunk
-        const foliageMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 }); // Green foliage
+        // Materials
+        const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 });
+        const skyMaterial = new THREE.MeshBasicMaterial({ color: 0x87ceeb, side: THREE.BackSide });
+        const woodMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+        const boardMaterial = new THREE.MeshStandardMaterial({ color: 0x4682b4 });
+        const tentBaseMaterial = new THREE.MeshStandardMaterial({ color: 0x2f4f4f });
+        const tentRoofMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff88 });
+        const logMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+        const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+        const foliageMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 });
 
         // Ground
         const groundGeometry = new THREE.PlaneGeometry(100, 100, 50, 50);
@@ -437,7 +439,7 @@
 
         // Fire
         const fireGeometry = new THREE.PlaneGeometry(2, 4);
-        const fireMaterial = new THREE.MeshBasicMaterial({ color: 0xff4500, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending }); // Orange-red fire
+        const fireMaterial = new THREE.MeshBasicMaterial({ color: 0xff4500, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
         const fire = new THREE.Mesh(fireGeometry, fireMaterial);
         fire.position.set(0, 1, -5);
         scene.add(fire);
@@ -657,7 +659,7 @@
             console.log('Theme updated:', isLight ? 'light' : 'dark');
         }
 
-        // Original functions
+        // Global functions
         window.navigateTo = function(url) {
             window.location.href = url;
         };
@@ -733,7 +735,6 @@
                 return;
             }
             try {
-                // Mock users for fallback
                 const mockUsers = {
                     "testuser": "testpass",
                     "admin": "admin123"
