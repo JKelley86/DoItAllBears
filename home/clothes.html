@@ -181,6 +181,11 @@
             margin-bottom: 15px;
         }
         
+        .size-card-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
         .size-card-title {
             color: var(--text-color);
             font-size: 1.1rem;
@@ -188,23 +193,31 @@
             margin: 0;
         }
         
-        .size-card-delete {
-            background: #dc3545;
+        .size-card-btn {
+            background: var(--accent-color);
             color: white;
             border: none;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
+            font-size: 14px;
         }
         
-        .size-card-delete:hover {
-            background: #c82333;
+        .size-card-btn:hover {
             transform: scale(1.1);
+        }
+        
+        .size-card-btn.delete {
+            background: #dc3545;
+        }
+        
+        .size-card-btn.delete:hover {
+            background: #c82333;
         }
         
         .size-detail {
@@ -355,18 +368,89 @@
             .size-container {
                 grid-template-columns: 1fr;
                 height: auto;
+                padding: 10px;
+                gap: 15px;
             }
             
             .size-sidebar {
                 order: 2;
+                padding: 15px;
             }
             
             .size-content {
                 order: 1;
+                padding: 15px;
             }
             
             .size-grid {
                 grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .container h1 {
+                font-size: 1.8rem;
+            }
+            
+            .container p {
+                font-size: 0.9rem;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .content-header h2 {
+                font-size: 1.4rem;
+            }
+            
+            .size-card {
+                padding: 15px;
+            }
+            
+            .add-btn {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                z-index: 100;
+                padding: 0;
+                font-size: 24px;
+            }
+            
+            .add-btn span {
+                display: none;
+            }
+            
+            .filter-group {
+                margin-bottom: 15px;
+            }
+            
+            .size-card-title {
+                font-size: 1rem;
+            }
+            
+            .size-detail {
+                font-size: 13px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .modal-actions {
+                flex-direction: column;
+            }
+            
+            .content-header {
+                flex-direction: column;
+                gap: 10px;
             }
         }
     </style>
@@ -420,7 +504,7 @@
             </div>
             
             <button class="add-btn" id="addSizeBtn">
-                <i class="fas fa-plus"></i> Add Size Info
+                <i class="fas fa-plus"></i><span> Add Size Info</span>
             </button>
         </div>
         
@@ -440,11 +524,13 @@
     <div class="modal" id="sizeModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Add Size Information</h3>
+                <h3 id="modalTitle">Add Size Information</h3>
                 <button class="modal-close" onclick="closeSizeModal()">×</button>
             </div>
             
             <form id="sizeForm">
+                <input type="hidden" id="editingId">
+                
                 <div class="form-group">
                     <label class="form-label">Person *</label>
                     <select class="form-input" id="personInput" required>
@@ -521,6 +607,7 @@ import {
   doc, 
   getDocs, 
   addDoc, 
+  updateDoc,
   deleteDoc, 
   serverTimestamp,
   query,
@@ -688,9 +775,14 @@ function renderSizes() {
         card.innerHTML = `
             <div class="size-card-header">
                 <h3 class="size-card-title">${size.brand}</h3>
-                <button class="size-card-delete" onclick="deleteSize('${size.id}')">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <div class="size-card-actions">
+                    <button class="size-card-btn" onclick="editSize('${size.id}')" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="size-card-btn delete" onclick="deleteSize('${size.id}')" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             </div>
             <div class="size-detail">
                 <span class="size-detail-label">Person:</span>
@@ -727,14 +819,36 @@ function renderSizes() {
 function openSizeModal() {
     document.getElementById('sizeModal').classList.add('active');
     document.getElementById('sizeForm').reset();
+    document.getElementById('editingId').value = '';
+    document.getElementById('modalTitle').textContent = 'Add Size Information';
 }
 
 window.closeSizeModal = function() {
     document.getElementById('sizeModal').classList.remove('active');
+    document.getElementById('sizeForm').reset();
+    document.getElementById('editingId').value = '';
+}
+
+window.editSize = function(id) {
+    const size = allSizes.find(s => s.id === id);
+    if (!size) return;
+    
+    document.getElementById('editingId').value = id;
+    document.getElementById('personInput').value = size.person;
+    document.getElementById('typeInput').value = size.type;
+    document.getElementById('brandInput').value = size.brand;
+    document.getElementById('fitTypeInput').value = size.fitType || '';
+    document.getElementById('sizeInput').value = size.size;
+    document.getElementById('notesInput').value = size.notes || '';
+    
+    document.getElementById('modalTitle').textContent = 'Edit Size Information';
+    document.getElementById('sizeModal').classList.add('active');
 }
 
 async function handleSaveSize(e) {
     e.preventDefault();
+    
+    const editingId = document.getElementById('editingId').value;
     
     const sizeData = {
         person: document.getElementById('personInput').value,
@@ -743,12 +857,21 @@ async function handleSaveSize(e) {
         fitType: document.getElementById('fitTypeInput').value,
         size: document.getElementById('sizeInput').value,
         notes: document.getElementById('notesInput').value,
-        created: serverTimestamp()
+        updated: serverTimestamp()
     };
     
     try {
         const sizesCollection = collection(window.db, 'size-reference');
-        await addDoc(sizesCollection, sizeData);
+        
+        if (editingId) {
+            // Update existing entry
+            const sizeDoc = doc(window.db, 'size-reference', editingId);
+            await updateDoc(sizeDoc, sizeData);
+        } else {
+            // Add new entry
+            sizeData.created = serverTimestamp();
+            await addDoc(sizesCollection, sizeData);
+        }
         
         closeSizeModal();
         await loadSizes();
