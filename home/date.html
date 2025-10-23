@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Date Ideas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      padding: 40px;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+    }
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    input, textarea, button {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .date-card {
+      background: #fafafa;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+      border: 1px solid #ddd;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .random {
+      background: #28a745;
+    }
+  </style>
+</head>
+<body>
+  <h1>💞 Date Ideas</h1>
+  <div class="container">
+    <input type="text" id="idea" placeholder="Enter date idea..." />
+    <textarea id="details" placeholder="Optional details (place, activity, notes)..."></textarea>
+    <button id="addBtn">Add Date Idea</button>
+    <hr>
+    <button class="random" id="randomBtn">🎲 Pick a Random Date</button>
+    <div id="output"></div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    // Import Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, push, set, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    // Your Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBytsujikovxmALWlt3VQhgzri9306x2TY",
+      authDomain: "plc-dashboard-99f31.firebaseapp.com",
+      databaseURL: "https://plc-dashboard-99f31-default-rtdb.firebaseio.com",
+      projectId: "plc-dashboard-99f31",
+      storageBucket: "plc-dashboard-99f31.firebasestorage.app",
+      messagingSenderId: "781768573643",
+      appId: "1:781768573643:web:56a4f7996bf0c4aab1514e",
+      measurementId: "G-RT2V4D5P19"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const ideaInput = document.getElementById("idea");
+    const detailsInput = document.getElementById("details");
+    const addBtn = document.getElementById("addBtn");
+    const output = document.getElementById("output");
+    const randomBtn = document.getElementById("randomBtn");
+
+    const dateRef = ref(db, "dateIdeas");
+
+    // Add new date idea
+    addBtn.onclick = async () => {
+      const idea = ideaInput.value.trim();
+      if (!idea) return alert("Please enter a date idea!");
+      const details = detailsInput.value.trim();
+      const newDateRef = push(dateRef);
+      await set(newDateRef, {
+        idea,
+        details,
+        lastDone: "Never"
+      });
+      ideaInput.value = "";
+      detailsInput.value = "";
+    };
+
+    // Display ideas
+    onValue(dateRef, (snapshot) => {
+      output.innerHTML = "";
+      const data = snapshot.val();
+      if (!data) {
+        output.innerHTML = "<p>No date ideas yet!</p>";
+        return;
+      }
+
+      Object.entries(data).forEach(([key, item]) => {
+        const card = document.createElement("div");
+        card.className = "date-card";
+        card.innerHTML = `
+          <strong>${item.idea}</strong><br>
+          <small>${item.details || ""}</small><br>
+          <em>Last Done: ${item.lastDone}</em>
+          <div class="actions">
+            <button onclick="updateLastDone('${key}')">Refresh Date</button>
+            <button onclick="editIdea('${key}', '${item.idea.replace(/'/g, "\\'")}', '${(item.details || "").replace(/'/g, "\\'")}')">Edit</button>
+            <button onclick="deleteIdea('${key}')">Delete</button>
+          </div>
+        `;
+        output.appendChild(card);
+      });
+    });
+
+    // Random date picker
+    randomBtn.onclick = async () => {
+      const snapshot = await new Promise(resolve => onValue(dateRef, resolve, { onlyOnce: true }));
+      const data = snapshot.val();
+      if (!data) return alert("No date ideas yet!");
+      const items = Object.values(data);
+      const random = items[Math.floor(Math.random() * items.length)];
+      alert(`🎯 Your Random Date: ${random.idea}\n${random.details || ""}`);
+    };
+
+    // Expose helper functions globally
+    window.updateLastDone = async (key) => {
+      const today = new Date().toLocaleDateString();
+      await update(ref(db, `dateIdeas/${key}`), { lastDone: today });
+    };
+
+    window.editIdea = async (key, oldIdea, oldDetails) => {
+      const newIdea = prompt("Edit idea:", oldIdea);
+      if (newIdea === null) return;
+      const newDetails = prompt("Edit details:", oldDetails);
+      await update(ref(db, `dateIdeas/${key}`), {
+        idea: newIdea,
+        details: newDetails
+      });
+    };
+
+    window.deleteIdea = async (key) => {
+      if (confirm("Are you sure you want to delete this idea?")) {
+        await remove(ref(db, `dateIdeas/${key}`));
+      }
+    };
+  </script>
+</body>
+</html>
