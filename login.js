@@ -28,14 +28,21 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
         function addHouseCardToMain() {
-            if (!mainContainer || mainContainer.querySelector('[data-dynamic="house"]')) return;
-            const card = document.createElement('div');
-            card.className = 'nav-card';
-            card.textContent = '🏡 Home';
-            card.setAttribute('data-dynamic', 'house');
-            card.addEventListener('click', () => navigateTo('home/index.html'));
-            mainContainer.insertBefore(card, mainContainer.firstChild);
-        }
+            // Always (re)add the listener even if the card exists
+            let card = mainContainer.querySelector('[data-dynamic="house"]');
+            if (!mainContainer) return;
+
+            if (!card) {
+                card = document.createElement('div');
+                card.className = 'nav-card';
+                card.textContent = '🏡 Home';
+                card.setAttribute('data-dynamic', 'house');
+                mainContainer.insertBefore(card, mainContainer.firstChild);
+            }
+
+    // Reattach click listener
+    card.onclick = () => navigateTo('index.html');
+}
 
     function updateUIIfLoggedIn() {
         const user = localStorage.getItem('loggedInUser');
