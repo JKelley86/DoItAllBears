@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
     // Reattach click listener
-    card.onclick = () => navigateTo('index.html');
+    card.onclick = () => navigateTo('home/index.html');
 }
 
     function updateUIIfLoggedIn() {
