@@ -149,6 +149,12 @@ async function login() {
         messageBox.style.color = "red";
     }
 }
+
+function logout() {
+    localStorage.removeItem("loggedInUser");
+    location.reload();
+}
+    
 </script>
 
 <!-- Load login.js AFTER navigateTo is defined -->
