@@ -77,6 +77,8 @@ fetch('navbar.html')
     .then(response => response.text())
     .then(data => {
         document.getElementById('main-container').innerHTML += data;
+                // Fire event for login.js to react to
+        document.dispatchEvent(new Event('navbarLoaded'));
     });
 
 setInterval(updateClock, 1000);
