@@ -5,616 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>Home</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            min-height: 100vh;
-            color: #fff;
-            transition: all 0.3s ease;
-        }
-
-        body.light-mode {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: #1a1a1a;
-        }
-
-        /* Container Styles */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        .container h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-align: center;
-            animation: slideDown 0.6s ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .container p {
-            text-align: center;
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            opacity: 0.9;
-        }
-
-        body.light-mode .container p {
-            opacity: 0.8;
-        }
-
-        .container h6 {
-            text-align: center;
-            font-size: 0.9rem;
-            opacity: 0.6;
-            font-weight: 400;
-            font-style: italic;
-        }
-
-        /* Search Bar */
-        .search-bar-container {
-            max-width: 600px;
-            margin: 30px auto;
-            padding: 0 20px;
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .search-bar {
-            width: 100%;
-            padding: 16px 24px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50px;
-            color: #fff;
-            font-size: 16px;
-            outline: none;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        body.light-mode .search-bar {
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid rgba(0, 0, 0, 0.1);
-            color: #1a1a1a;
-        }
-
-        .search-bar::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        body.light-mode .search-bar::placeholder {
-            color: rgba(0, 0, 0, 0.4);
-        }
-
-        .search-bar:focus {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: #667eea;
-            box-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
-            transform: translateY(-2px);
-        }
-
-        body.light-mode .search-bar:focus {
-            background: rgba(255, 255, 255, 1);
-            box-shadow: 0 0 30px rgba(102, 126, 234, 0.2);
-        }
-
-        /* Menu Button */
-        .menu-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        body.light-mode .menu-btn {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            color: #1a1a1a;
-        }
-
-        .menu-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        body.light-mode .menu-btn:hover {
-            background: rgba(255, 255, 255, 1);
-        }
-
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -320px;
-            width: 300px;
-            height: 100vh;
-            background: rgba(20, 20, 40, 0.95);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 80px 20px 20px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 999;
-            overflow-y: auto;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-        }
-
-        body.light-mode .sidebar {
-            background: rgba(255, 255, 255, 0.95);
-            border-right: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar.open {
-            left: 0;
-        }
-
-        .clock {
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 30px;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            color: #fff;
-        }
-
-        .sidebar a,
-        .sidebar button {
-            display: block;
-            padding: 15px 20px;
-            margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            color: #fff;
-            text-decoration: none;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-        }
-
-        body.light-mode .sidebar a,
-        body.light-mode .sidebar button {
-            background: rgba(0, 0, 0, 0.03);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            color: #1a1a1a;
-        }
-
-        .sidebar a:hover,
-        .sidebar button:hover {
-            background: rgba(102, 126, 234, 0.2);
-            border-color: #667eea;
-            transform: translateX(5px);
-        }
-
-        body.light-mode .sidebar a:hover,
-        body.light-mode .sidebar button:hover {
-            background: rgba(102, 126, 234, 0.1);
-        }
-
-        .popup-button,
-        .theme-toggle {
-            margin-top: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            color: #fff !important;
-        }
-
-        .popup-button:hover,
-        .theme-toggle:hover {
-            transform: translateX(5px) translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 30px 20px;
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: 60px;
-        }
-
-        body.light-mode footer {
-            background: rgba(255, 255, 255, 0.5);
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        footer span {
-            opacity: 0.7;
-            font-size: 14px;
-        }
-
-        /* Main Container Grid */
-        #main-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Login Popup Styles */
-        .popup {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            animation: popupFadeIn 0.3s ease-out;
-            pointer-events: auto;
-        }
-
-        body.light-mode .popup {
-            background: rgba(0, 0, 0, 0.4);
-        }
-
-        @keyframes popupFadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .popup-content-wrapper {
-            background: rgba(20, 20, 30, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 50px 40px;
-            width: 90%;
-            max-width: 440px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5),
-                        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-            position: relative;
-            overflow: hidden;
-            animation: slideUp 0.5s ease-out;
-        }
-
-        body.light-mode .popup-content-wrapper {
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3),
-                        0 0 0 1px rgba(0, 0, 0, 0.05) inset;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .popup-content-wrapper::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, 
-                transparent, 
-                rgba(102, 126, 234, 0.1), 
-                transparent);
-            animation: rotate 10s linear infinite;
-        }
-
-        @keyframes rotate {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .popup-inner-content {
-            position: relative;
-            z-index: 1;
-        }
-
-        .popup h3 {
-            color: #fff;
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-align: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        body.light-mode .popup h3 {
-            color: #1a1a1a;
-        }
-
-        .popup-subtitle {
-            color: rgba(255, 255, 255, 0.7);
-            text-align: center;
-            margin-bottom: 35px;
-            font-size: 14px;
-        }
-
-        body.light-mode .popup-subtitle {
-            color: rgba(0, 0, 0, 0.6);
-        }
-
-        .fingerprint-icon {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
-            }
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
-            }
-        }
-
-        .popup-input-group {
-            position: relative;
-            margin-bottom: 25px;
-        }
-
-        .popup #username,
-        .popup #password {
-            width: 100%;
-            padding: 16px 50px 16px 20px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            outline: none;
-            box-sizing: border-box;
-        }
-
-        body.light-mode .popup #username,
-        body.light-mode .popup #password {
-            background: rgba(0, 0, 0, 0.05);
-            border: 2px solid rgba(0, 0, 0, 0.1);
-            color: #1a1a1a;
-        }
-
-        .popup #username::placeholder,
-        .popup #password::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        body.light-mode .popup #username::placeholder,
-        body.light-mode .popup #password::placeholder {
-            color: rgba(0, 0, 0, 0.4);
-        }
-
-        .popup #username:focus,
-        .popup #password:focus {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: #667eea;
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
-        }
-
-        body.light-mode .popup #username:focus,
-        body.light-mode .popup #password:focus {
-            background: rgba(0, 0, 0, 0.08);
-            border-color: #667eea;
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
-        }
-
-        .popup-input-icon {
-            position: absolute;
-            right: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 18px;
-            pointer-events: none;
-        }
-
-        body.light-mode .popup-input-icon {
-            color: rgba(0, 0, 0, 0.4);
-        }
-
-        .popup-button-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 30px;
-        }
-
-        .popup button {
-            padding: 14px;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .popup button:first-of-type {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .popup button:last-of-type {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        body.light-mode .popup button:last-of-type {
-            background: rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(0, 0, 0, 0.2);
-            color: #1a1a1a;
-        }
-
-        .popup button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .popup button:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        .popup button:first-of-type:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .popup button:last-of-type:hover {
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            transform: translateY(-2px);
-        }
-
-        body.light-mode .popup button:last-of-type:hover {
-            background: rgba(0, 0, 0, 0.15);
-        }
-
-        .popup button:active {
-            transform: translateY(0);
-        }
-
-        .popup #login-message {
-            margin-top: 20px;
-            padding: 14px;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 500;
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-        }
-
-        .popup #login-message.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .popup #login-message[style*="color: red"] {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #fca5a5 !important;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .popup #login-message[style*="color: green"] {
-            background: rgba(34, 197, 94, 0.2);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            color: #86efac !important;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(102, 126, 234, 0.5);
-            border-radius: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(102, 126, 234, 0.7);
-        }
-
-        body.light-mode ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        body.light-mode ::-webkit-scrollbar-thumb {
-            background: rgba(102, 126, 234, 0.4);
-        }
     </style>
 </head>
 <body>
@@ -632,6 +22,7 @@
 <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
 <div class="sidebar" id="sidebar">
     <div class="clock" id="clock"></div>
+    <a href="themeselector.html">Theme Selector</a>
     <a href="recipes/index.html">📖 Recipes</a>
     <a href="movies/showtracker.html">🎥 Movies</a>
     <a href="useful/gaming.html">🎮 Game Library</a>
@@ -801,8 +192,54 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+   
+// Theme Loader System
+// Add this script to the <head> of every page BEFORE theme.css
+
+(function() {
+    // Get selected theme from localStorage (default to 'classic')
+    const selectedTheme = localStorage.getItem('selectedTheme') || 'classic';
     
+    // Map of theme names to CSS files
+    const themeFiles = {
+        'classic': 'theme-classic.css',
+        'modern': 'theme-modern.css',
+        'neon': 'theme-neon.css',
+        'ocean': 'theme-ocean.css',
+        'sunset': 'theme-sunset.css',
+        'forest': 'theme-forest.css'
+    };
+    
+    // Get the CSS file for the selected theme
+    const cssFile = themeFiles[selectedTheme] || themeFiles['classic'];
+    
+    // Create and inject the link element
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = cssFile;
+    link.id = 'theme-stylesheet';
+    
+    // Insert before any existing stylesheets
+    const head = document.head || document.getElementsByTagName('head')[0];
+    const firstLink = head.querySelector('link[rel="stylesheet"]');
+    
+    if (firstLink) {
+        head.insertBefore(link, firstLink);
+    } else {
+        head.appendChild(link);
+    }
+    
+    // Apply light/dark mode from localStorage
+    window.addEventListener('DOMContentLoaded', function() {
+        const lightMode = localStorage.getItem('theme') === 'light';
+        if (lightMode) {
+            document.body.classList.add('light-mode');
+        }
+    });
+})();
+ 
 </script>
+
 
 <!-- Load login.js AFTER navigateTo is defined -->
 <script src="login.js"></script>
