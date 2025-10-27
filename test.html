@@ -1,699 +1,458 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"> 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <title>Justin's Campsite Hub</title>
-    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAB5JREFUOE9jZKAQMFKon4E4MBo4Mxg4Mxg4MxgYAAArvAbmL3D0jwAAAABJRU5ErkJggg==" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" crossorigin="anonymous" />
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <title>Home</title>
+    <link rel="stylesheet" href="theme.css" />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #0a0a23;
-            color: #fff;
-            min-height: 100vh;
-            overflow: hidden;
-        }
-
-        body.light-mode {
-            background: #e6e6fa;
-            color: #1a1a1a;
-        }
-
-        #webgl-canvas {
+        /* Modern Login Popup Styles */
+        .popup {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
-            display: block;
-        }
-
-        .menu-btn {
-            position: fixed;
-            top: 1.5rem;
-            left: 1.5rem;
-            background: rgba(0, 0, 0, 0.7);
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 1.8rem;
-            color: #fff;
-            cursor: pointer;
-            z-index: 1001;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 10000;
+            animation: popupFadeIn 0.3s ease-out;
         }
 
-        body.light-mode .menu-btn {
-            background: rgba(255, 255, 255, 0.7);
-            color: #333;
+        @keyframes popupFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
 
-        .menu-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 15px rgba(0, 255, 200, 0.5);
+        .popup-content-wrapper {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 50px 40px;
+            width: 90%;
+            max-width: 440px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5),
+                        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
         }
 
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -350px;
-            width: 350px;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            padding: 2rem;
-            transition: left 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-            backdrop-filter: blur(12px);
-            overflow-y: auto;
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
-        body.light-mode .sidebar {
-            background: rgba(255, 255, 255, 0.85);
+        .popup-content-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, 
+                transparent, 
+                rgba(102, 126, 234, 0.1), 
+                transparent);
+            animation: rotate 10s linear infinite;
         }
 
-        .sidebar.open {
-            left: 0;
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
-        .clock {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            text-align: center;
-            margin-bottom: 2rem;
-            color: #00ff88;
-            animation: pulse 2s infinite;
-        }
-
-        body.light-mode .clock {
-            color: #ff4d4d;
-        }
-
-        .sidebar a, .sidebar button {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            padding: 1rem;
-            color: inherit;
-            text-decoration: none;
-            border-radius: 12px;
-            font-size: 1.3rem;
-            transition: all 0.3s ease;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            text-align: left;
-            width: 100%;
-        }
-
-        .sidebar a:hover, .sidebar button:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateX(10px);
-        }
-
-        body.light-mode .sidebar a:hover, body.light-mode .sidebar button:hover {
-            background: rgba(0, 0, 0, 0.15);
-        }
-
-        .search-bar-container {
-            position: fixed;
-            top: 1.5rem;
-            right: 1.5rem;
-            width: 300px;
-            z-index: 1000;
-        }
-
-        .search-bar {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border: none;
-            border-radius: 25px;
-            background: rgba(255, 255, 255, 0.15);
-            color: #fff;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(8px);
-        }
-
-        body.light-mode .search-bar {
-            background: rgba(0, 0, 0, 0.1);
-            color: #333;
-        }
-
-        .search-bar:focus {
-            outline: none;
-            box-shadow: 0 0 15px rgba(0, 255, 200, 0.5);
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        body.light-mode .search-bar:focus {
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-            background: rgba(0, 0, 0, 0.15);
-        }
-
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            padding: 2.5rem;
-            border-radius: 20px;
-            box-shadow: 0 0 40px rgba(0, 255, 200, 0.3);
-            z-index: 1002;
-            width: 350px;
-            text-align: center;
-            animation: popIn 0.5s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .popup.show {
-            display: block;
-        }
-
-        body.light-mode .popup {
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
+        .popup-inner-content {
+            position: relative;
+            z-index: 1;
         }
 
         .popup h3 {
-            margin-bottom: 1.5rem;
-            font-family: 'Orbitron', sans-serif;
-            color: #00ff88;
+            color: #fff;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        body.light-mode .popup h3 {
-            color: #ff4d4d;
+        .popup-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            margin-bottom: 35px;
+            font-size: 14px;
         }
 
-        .popup input {
+        .fingerprint-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+            }
+        }
+
+        .popup-input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .popup #username,
+        .popup #password {
             width: 100%;
-            padding: 0.9rem;
-            margin: 0.7rem 0;
-            border: none;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.15);
-            color: inherit;
-            font-size: 1rem;
+            padding: 16px 50px 16px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .popup #username::placeholder,
+        .popup #password::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .popup #username:focus,
+        .popup #password:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .popup-input-icon {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        .popup-button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 30px;
         }
 
         .popup button {
-            padding: 0.9rem 2rem;
-            margin: 0.7rem 0.5rem;
+            padding: 14px;
+            color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: 600;
+            position: relative;
+            overflow: hidden;
         }
 
         .popup button:first-of-type {
-            background: #00ff88;
-            color: #000;
-        }
-
-        body.light-mode .popup button:first-of-type {
-            background: #ff4d4d;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
         .popup button:last-of-type {
-            background: #ff4d4d;
-            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        body.light-mode .popup button:last-of-type {
-            background: #4d79ff;
-        }
-
-        footer {
-            position: fixed;
-            bottom: 1rem;
+        .popup button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-            padding: 1rem;
-            font-size: 0.9rem;
-            opacity: 0.7;
-            font-family: 'Orbitron', sans-serif;
-            z-index: 998;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
         }
 
-        .controls {
-            position: fixed;
-            bottom: 10%;
-            right: 5%;
-            display: grid;
-            grid-template-areas:
-                ". up ."
-                "left down right";
-            gap: 10px;
-            z-index: 999;
+        .popup button:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
-        .controls button {
-            width: 50px;
-            height: 50px;
-            background: rgba(0, 0, 0, 0.7);
-            border: none;
+        .popup button:first-of-type:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .popup button:last-of-type:hover {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .popup button:active {
+            transform: translateY(0);
+        }
+
+        .popup #login-message {
+            margin-top: 20px;
+            padding: 14px;
             border-radius: 10px;
-            color: #fff;
-            font-size: 1.5rem;
-            cursor: pointer;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(-10px);
             transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
         }
 
-        body.light-mode .controls button {
-            background: rgba(255, 255, 255, 0.7);
-            color: #333;
+        .popup #login-message.show {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .controls button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 15px rgba(0, 255, 200, 0.5);
+        .popup #login-message[style*="color: red"] {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5 !important;
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .up { grid-area: up; }
-        .left { grid-area: left; }
-        .down { grid-area: down; }
-        .right { grid-area: right; }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes popIn {
-            from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
-            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
-
-        @media (max-width: 768px) {
-            .sidebar { width: 280px; }
-            .popup { width: 90%; }
-            .controls { bottom: 5%; right: 2%; gap: 5px; }
-            .controls button { width: 40px; height: 40px; font-size: 1.2rem; }
-            .search-bar-container { width: 250px; top: 1rem; right: 1rem; }
+        .popup #login-message[style*="color: green"] {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #86efac !important;
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
-    <canvas id="webgl-canvas"></canvas>
-    <button class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+<div class="container">
+    <h1>Welcome To The Home Page Of Useful Items</h1>
+    <p>This is a one-stop shop for anything you may need!</p>
+    <h6>Please note this website is a work in progress. Some things may not work as expected.</h6>
+</div>
 
-    <div class="sidebar" id="sidebar">
-        <div class="clock" id="clock"></div>
-        <a href="recipes/index.html"><i class="fas fa-book-open"></i> Recipes</a>
-        <a href="movies/showtracker.html"><i class="fas fa-film"></i> Movies</a>
-        <a href="useful/gaming.html"><i class="fas fa-gamepad"></i> Game Library</a>
-        <a href="productivityhub/index.html"><i class="fas fa-briefcase"></i> Productivity Hub</a>
-        <a href="useful/camping.html"><i class="fas fa-campground"></i> Camping</a>
-        <a href="woodworking/index.html"><i class="fas fa-hammer"></i> Wood Working</a>
-        <a href="prank/butthurt.html"><i class="fas fa-file-alt"></i> Butthurt Report</a>
-        <a href="currentevents.html"><i class="fas fa-newspaper"></i> Current Events</a>
-        <button onclick="openLoginPopup()"><i class="fas fa-key"></i> Login</button>
-        <button onclick="toggleTheme()"><i class="fas fa-moon"></i> Toggle Theme</button>
-    </div>
+<div class="search-bar-container">
+    <input type="text" class="search-bar" id="search-bar" placeholder="Search..." oninput="filterCards()" />
+</div>
+<div class="container" id="main-container"></div>
 
-    <div class="search-bar-container">
-        <input type="text" class="search-bar" id="search-bar" placeholder="Search..." oninput="filterSigns()" autocomplete="off" />
-    </div>
+<button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+<div class="sidebar" id="sidebar">
+    <div class="clock" id="clock"></div>
+    <a href="recipes/index.html">📖 Recipes</a>
+    <a href="movies/showtracker.html">🎥 Movies</a>
+    <a href="useful/gaming.html">🎮 Game Library</a>
+    <a href="productivityhub/index.html">📚 Productivity Hub</a>
+    <a href="useful/camping.html">⛺ Camping</a>
+    <a href="woodworking/index.html">🔨 Wood Working</a>
+    <a href="prank/butthurt.html">📄 Butthurt Report</a>
+    <a href="currentevents.html">📰 Current Events</a>
+    <button class="popup-button" onclick="openLoginPopup()">🔑 Login</button>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+</div>
 
-    <div class="controls">
-        <button class="up" onclick="moveForward()"><i class="fas fa-arrow-up"></i></button>
-        <button class="left" onclick="moveLeft()"><i class="fas fa-arrow-left"></i></button>
-        <button class="down" onclick="moveBackward()"><i class="fas fa-arrow-down"></i></button>
-        <button class="right" onclick="moveRight()"><i class="fas fa-arrow-right"></i></button>
-    </div>
-
-    <div id="login-popup" class="popup">
-        <h3>Login</h3>
-        <form onsubmit="event.preventDefault(); login();">
-            <input type="text" id="username" placeholder="Username" autocomplete="username" />
-            <input type="password" id="password" placeholder="Password" autocomplete="current-password" />
-            <button type="submit">Login</button>
-            <button type="button" onclick="closeLoginPopup()">Cancel</button>
-        </form>
-        <div id="login-message" style="margin-top: 10px;"></div>
-    </div>
-
-    <footer>
-        <span>&copy; 2025 Justin's Campsite Hub. All rights reserved.</span>
-    </footer>
-
-    <script type="module">
-        import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.168.0/build/three.module.js';
-        import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.168.0/examples/jsm/controls/OrbitControls.js';
-        import * as TWEEN from 'https://cdn.jsdelivr.net/npm/@tweenjs/tween.js@23.1.3/dist/tween.esm.js';
-
-        // Scene setup
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const canvas = document.getElementById('webgl-canvas');
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-        // Lights
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        scene.add(ambientLight);
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(5, 10, 5);
-        directionalLight.castShadow = true;
-        scene.add(directionalLight);
-
-        // Materials
-        const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 });
-        const skyMaterial = new THREE.MeshBasicMaterial({ color: 0x87ceeb, side: THREE.BackSide });
-        const woodMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
-        const boardMaterial = new THREE.MeshStandardMaterial({ color: 0x4682b4 });
-        const tentBaseMaterial = new THREE.MeshStandardMaterial({ color: 0x2f4f4f });
-        const tentRoofMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff88 });
-        const logMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
-        const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
-        const foliageMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 });
-
-        // Ground
-        const groundGeometry = new THREE.PlaneGeometry(100, 100);
-        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-        ground.rotation.x = -Math.PI / 2;
-        ground.receiveShadow = true;
-        scene.add(ground);
-
-        // Sky
-        const skyGeometry = new THREE.SphereGeometry(500, 32, 32);
-        const sky = new THREE.Mesh(skyGeometry, skyMaterial);
-        scene.add(sky);
-
-        // Fog
-        scene.fog = new THREE.FogExp2(0x0a0a23, 0.01);
-
-        // Tent
-        const tentGroup = new THREE.Group();
-        const tentBaseGeometry = new THREE.BoxGeometry(4, 2, 4);
-        const tentBase = new THREE.Mesh(tentBaseGeometry, tentBaseMaterial);
-        tentBase.position.y = 1;
-        tentBase.castShadow = true;
-        tentGroup.add(tentBase);
-        const tentRoofGeometry = new THREE.ConeGeometry(3, 3, 4);
-        const tentRoof = new THREE.Mesh(tentRoofGeometry, tentRoofMaterial);
-        tentRoof.position.y = 3.5;
-        tentRoof.rotation.y = Math.PI / 4;
-        tentGroup.add(tentRoof);
-        tentGroup.position.set(-10, 0, -5);
-        scene.add(tentGroup);
-
-        // Campfire
-        const campfireGroup = new THREE.Group();
-        for (let i = 0; i < 3; i++) {
-            const logGeometry = new THREE.CylinderGeometry(0.2, 0.2, 2, 8);
-            const log = new THREE.Mesh(logGeometry, logMaterial);
-            log.rotation.z = Math.PI / 2;
-            log.position.set(Math.sin(i * 2 * Math.PI / 3) * 0.5, 0.2, Math.cos(i * 2 * Math.PI / 3) * 0.5);
-            log.castShadow = true;
-            campfireGroup.add(log);
-        }
-        campfireGroup.position.set(0, 0, -5);
-        scene.add(campfireGroup);
-
-        // Fire
-        const fireGeometry = new THREE.PlaneGeometry(2, 4);
-        const fireMaterial = new THREE.MeshBasicMaterial({ 
-            color: 0xff4500, 
-            transparent: true, 
-            opacity: 0.8, 
-            blending: THREE.AdditiveBlending 
-        });
-        const fire = new THREE.Mesh(fireGeometry, fireMaterial);
-        fire.position.set(0, 1, -5);
-        scene.add(fire);
-
-        // Trees
-        for (let t = 0; t < 8; t++) {
-            const treeGroup = new THREE.Group();
-            const trunkGeometry = new THREE.CylinderGeometry(0.5, 0.5, 4, 8);
-            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
-            trunk.position.y = 2;
-            trunk.castShadow = true;
-            treeGroup.add(trunk);
-            for (let l = 0; l < 3; l++) {
-                const foliageGeometry = new THREE.SphereGeometry(1.5 - l * 0.3, 16, 16);
-                const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
-                foliage.position.y = 4 + l * 1.2;
-                foliage.castShadow = true;
-                treeGroup.add(foliage);
-            }
-            treeGroup.position.set((Math.random() - 0.5) * 50, 0, (Math.random() - 0.5) * 50);
-            scene.add(treeGroup);
-        }
-
-        // Signposts
-        const links = [
-            { text: 'Recipes', url: 'recipes/index.html' },
-            { text: 'Movies', url: 'movies/showtracker.html' },
-            { text: 'Game Library', url: 'useful/gaming.html' },
-            { text: 'Productivity Hub', url: 'productivityhub/index.html' },
-            { text: 'Camping', url: 'useful/camping.html' },
-            { text: 'Wood Working', url: 'woodworking/index.html' },
-            { text: 'Butthurt Report', url: 'prank/butthurt.html' },
-            { text: 'Current Events', url: 'currentevents.html' }
-        ];
-
-        const signs = [];
-        links.forEach((link, index) => {
-            const group = new THREE.Group();
-            const postGeometry = new THREE.CylinderGeometry(0.2, 0.2, 3, 8);
-            const post = new THREE.Mesh(postGeometry, woodMaterial);
-            post.position.y = 1.5;
-            group.add(post);
-
-            const boardGeometry = new THREE.BoxGeometry(3, 1.5, 0.2);
-            const board = new THREE.Mesh(boardGeometry, boardMaterial);
-            board.position.y = 2.75;
-            group.add(board);
-
-            const canvasEl = document.createElement('canvas');
-            const ctx = canvasEl.getContext('2d');
-            canvasEl.width = 512;
-            canvasEl.height = 256;
-            ctx.fillStyle = 'transparent';
-            ctx.fillRect(0, 0, 512, 256);
-            ctx.fillStyle = '#00ff88';
-            ctx.font = 'bold 60px Orbitron';
-            ctx.textAlign = 'center';
-            ctx.fillText(link.text, 256, 150);
-            const texture = new THREE.CanvasTexture(canvasEl);
-            const textMaterial = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
-            const textPlaneGeometry = new THREE.PlaneGeometry(2.8, 1.3);
-            const textPlane = new THREE.Mesh(textPlaneGeometry, textMaterial);
-            textPlane.position.y = 2.75;
-            textPlane.position.z = 0.11;
-            group.add(textPlane);
-
-            group.userData = { url: link.url, text: link.text };
-            const angle = index * 2 * Math.PI / links.length;
-            group.position.set(Math.cos(angle) * 10, 0, Math.sin(angle) * 10);
-            group.rotation.y = -angle;
-            scene.add(group);
-            signs.push(group);
-        });
-
-        // Camera
-        camera.position.set(0, 5, 15);
-        camera.lookAt(0, 0, 0);
-
-        // Orbit Controls
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.minDistance = 5;
-        controls.maxDistance = 50;
-
-        // Click interaction
-        let focusedObject = null;
-        function onClick(event) {
-            event.preventDefault();
-            const raycaster = new THREE.Raycaster();
-            const mouse = new THREE.Vector2(
-                (event.clientX / window.innerWidth) * 2 - 1, 
-                -(event.clientY / window.innerHeight) * 2 + 1
-            );
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(signs, true);
+<!-- Login Popup -->
+<div id="login-popup" class="popup" style="display:none;">
+    <div class="popup-content-wrapper">
+        <div class="popup-inner-content">
+            <div class="fingerprint-icon">🔐</div>
+            <h3>Welcome Back</h3>
+            <p class="popup-subtitle">Enter your credentials to access your account</p>
             
-            if (intersects.length > 0) {
-                const obj = intersects[0].object.parent;
-                if (focusedObject === obj) {
-                    window.location.href = obj.userData.url;
-                } else {
-                    const targetPos = obj.position.clone().add(new THREE.Vector3(0, 2, 4));
-                    new TWEEN.Tween(camera.position)
-                        .to(targetPos, 1000)
-                        .easing(TWEEN.Easing.Quadratic.InOut)
-                        .onUpdate(() => {
-                            camera.lookAt(obj.position);
-                        })
-                        .start();
-                    focusedObject = obj;
+            <div class="popup-input-group">
+                <input type="text" id="username" placeholder="Username" />
+                <span class="popup-input-icon">👤</span>
+            </div>
+            
+            <div class="popup-input-group">
+                <input type="password" id="password" placeholder="Password" />
+                <span class="popup-input-icon">🔒</span>
+            </div>
+            
+            <div class="popup-button-group">
+                <button onclick="login()">Login</button>
+                <button onclick="closeLoginPopup()">Cancel</button>
+            </div>
+            
+            <div id="login-message" style="margin-top: 10px;"></div>
+        </div>
+    </div>
+</div>
+
+<footer> 
+    <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+</footer> 
+
+<script>
+// Your global utility functions and page-specific functions first
+
+function navigateTo(url) {
+    window.location.href = url;
+}
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('open');
+}
+
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    const menuButton = document.querySelector('.menu-btn');
+    if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+        sidebar.classList.remove('open');
+    }
+});
+
+function updateClock() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString();
+    document.getElementById('clock').textContent = timeString;
+}
+
+fetch('navbar.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('main-container').innerHTML += data;
+                // Fire event for login.js to react to
+        document.dispatchEvent(new Event('navbarLoaded'));
+    });
+
+setInterval(updateClock, 1000);
+updateClock();
+
+function filterCards() {
+    const searchTerm = document.getElementById('search-bar').value.toLowerCase();
+    const cards = Array.from(document.querySelectorAll('.nav-card'));
+
+    cards.forEach(card => {
+        const cardText = card.textContent.toLowerCase();
+        card.style.display = cardText.includes(searchTerm) ? 'block' : 'none';
+    });
+}
+
+function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+}
+
+window.onload = function () {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+    } else {
+        document.body.classList.remove('light-mode');
+    }
+}
+
+function openLoginPopup() {
+    document.getElementById("login-popup").style.display = "flex";
+}
+
+function closeLoginPopup() {
+    document.getElementById("login-popup").style.display = "none";
+}
+
+async function login() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const messageBox = document.getElementById("login-message");
+
+    if (!username || !password) {
+        messageBox.textContent = "Please fill in both fields.";
+        messageBox.style.color = "red";
+        return;
+    }
+
+    try {
+        const response = await fetch("https://jkelley86.github.io/DoItAllBears/users.json");
+        if (!response.ok) throw new Error("Failed to fetch user data.");
+
+        const users = await response.json();
+
+        if (users[username] && users[username] === password) {
+            localStorage.setItem("loggedInUser", username);
+            messageBox.textContent = "Login successful!";
+            messageBox.style.color = "green";
+            setTimeout(() => {
+                closeLoginPopup();
+                location.reload(); // Let login.js handle sidebar updates
+            }, 1000);
+        } else {
+            messageBox.textContent = "Invalid username or password.";
+            messageBox.style.color = "red";
+        }
+    } catch (error) {
+        console.error(error);
+        messageBox.textContent = "Error logging in. Try again.";
+        messageBox.style.color = "red";
+    }
+}
+
+function logout() {
+    localStorage.removeItem("loggedInUser");
+    location.reload();
+}
+
+// Add enter key support for login popup
+document.addEventListener('DOMContentLoaded', () => {
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    
+    if (usernameInput && passwordInput) {
+        [usernameInput, passwordInput].forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    login();
                 }
-            } else {
-                focusedObject = null;
-                new TWEEN.Tween(camera.position)
-                    .to(new THREE.Vector3(0, 5, 15), 1000)
-                    .easing(TWEEN.Easing.Quadratic.InOut)
-                    .onUpdate(() => {
-                        camera.lookAt(0, 0, 0);
-                    })
-                    .start();
-            }
-        }
-        renderer.domElement.addEventListener('click', onClick);
-
-        // Movement controls
-        const moveSpeed = 1;
-        window.moveForward = function() {
-            const direction = new THREE.Vector3();
-            camera.getWorldDirection(direction);
-            direction.y = 0;
-            direction.normalize();
-            new TWEEN.Tween(camera.position)
-                .to(camera.position.clone().add(direction.multiplyScalar(moveSpeed)), 500)
-                .easing(TWEEN.Easing.Quadratic.InOut)
-                .start();
-        };
-
-        window.moveBackward = function() {
-            const direction = new THREE.Vector3();
-            camera.getWorldDirection(direction);
-            direction.y = 0;
-            direction.normalize();
-            new TWEEN.Tween(camera.position)
-                .to(camera.position.clone().sub(direction.multiplyScalar(moveSpeed)), 500)
-                .easing(TWEEN.Easing.Quadratic.InOut)
-                .start();
-        };
-
-        window.moveLeft = function() {
-            const direction = new THREE.Vector3();
-            camera.getWorldDirection(direction);
-            direction.y = 0;
-            direction.normalize();
-            const left = direction.clone().cross(camera.up).normalize();
-            new TWEEN.Tween(camera.position)
-                .to(camera.position.clone().add(left.multiplyScalar(moveSpeed)), 500)
-                .easing(TWEEN.Easing.Quadratic.InOut)
-                .start();
-        };
-
-        window.moveRight = function() {
-            const direction = new THREE.Vector3();
-            camera.getWorldDirection(direction);
-            direction.y = 0;
-            direction.normalize();
-            const right = direction.clone().cross(camera.up).normalize().negate();
-            new TWEEN.Tween(camera.position)
-                .to(camera.position.clone().add(right.multiplyScalar(moveSpeed)), 500)
-                .easing(TWEEN.Easing.Quadratic.InOut)
-                .start();
-        };
-
-        // Animation loop
-        function animate() {
-            requestAnimationFrame(animate);
-            fire.rotation.y += 0.01;
-            TWEEN.update();
-            controls.update();
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        // Resize
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        // Theme update
-        function updateTheme(isLight) {
-            scene.fog.color.setHex(isLight ? 0xe6e6fa : 0x0a0a23);
-            ambientLight.color.setHex(isLight ? 0xffffff : 0xaaaaaa);
-            directionalLight.color.setHex(isLight ? 0xffffff : 0xffddaa);
-            woodMaterial.color.setHex(isLight ? 0x5c4033 : 0x8b4513);
-            tentBaseMaterial.color.setHex(isLight ? 0x4a6262 : 0x2f4f4f);
-            logMaterial.color.setHex(isLight ? 0x5c4033 : 0x8b4513);
-            trunkMaterial.color.setHex(isLight ? 0x5c4033 : 0x8b4513);
-            foliageMaterial.color.setHex(isLight ? 0x90ee90 : 0x228b22);
-            groundMaterial.color.setHex(isLight ? 0x90ee90 : 0x228b22);
-            skyMaterial.color.setHex(isLight ? 0xb0e0e6 : 0x87ceeb);
-            tentRoofMaterial.color.setHex(isLight ? 0x98fb98 : 0x00ff88);
-            boardMaterial.color.setHex(isLight ? 0x87cefa : 0x4682b4);
-        }
-
-        // Global functions
-        window.navigateTo = function(url) {
-            window.location.href = url;
-        };
-
-        window.toggleSidebar = function() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('open');
-        };
-
-        document.addEventListener('click', function(event) {
-            const sidebar = document.getElementById('sidebar');
-            const menuButton = document.querySelector('.menu-btn');
-            const canvasElement = document.getElementById('webgl-canvas');
-            if (!sidebar.contains(event.target) && !menuButton.contains(event.target) && event.target !== canvasElement) {
-                sidebar.classList.remove('open');
-            }
-        });
-
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString();
-            document.getElementById('clock').textContent = timeString;
-        }
-
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        window.filterSigns = function() {
-            const searchTerm = document.getElementById('search-bar').value.toLowerCase();
-            signs.forEach(sign => {
-                sign.visible = sign.userData.text.toLowerCase().includes(searchTerm);
             });
-        };
+        });
+    }
+});
+    
+</script>
 
-        window.toggleTheme = function() {
-            document.body.classList.toggle('light-mode');
-            localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-            updateTheme(document.body.classList.contains('light-mode'));
-        };
-
-        window.openLoginPopup = function() {
-            document.getElementById("login-popup").classList.add('show');
-        };
-
-        window.closeLoginPopup =
+<!-- Load login.js AFTER navigateTo is defined -->
+<script src="login.js"></script>
+</body>
+</html>
