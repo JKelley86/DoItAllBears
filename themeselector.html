@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Selector</title>
+    <style>
+
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .theme-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.light-mode .theme-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-card.selected {
+            border-color: #667eea;
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .theme-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .theme-card p {
+            opacity: 0.7;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .theme-preview {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .preview-mode {
+            flex: 1;
+            height: 120px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .preview-mode:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Classic Theme Previews */
+        .classic-dark {
+            background: #121212;
+            color: #fff;
+        }
+
+        .classic-light {
+            background: #f4f4f4;
+            color: #121212;
+        }
+
+        /* Modern Theme Previews */
+        .modern-dark {
+            background: linear-gradient(135deg, #0f0c29, #302b63);
+            color: #fff;
+        }
+
+        .modern-light {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            color: #1a1a1a;
+        }
+
+        /* Neon Theme Previews */
+        .neon-dark {
+            background: #000;
+            color: #0ff;
+            text-shadow: 0 0 10px #0ff;
+        }
+
+        .neon-light {
+            background: #1a1a2e;
+            color: #00ff88;
+            text-shadow: 0 0 10px #00ff88;
+        }
+
+        /* Ocean Theme Previews */
+        .ocean-dark {
+            background: linear-gradient(135deg, #0a2342, #1e5f74);
+            color: #9ed8db;
+        }
+
+        .ocean-light {
+            background: linear-gradient(135deg, #a8dadc, #f1faee);
+            color: #1d3557;
+        }
+
+        /* Sunset Theme Previews */
+        .sunset-dark {
+            background: linear-gradient(135deg, #1a0b2e, #3d1766);
+            color: #ffa07a;
+        }
+
+        .sunset-light {
+            background: linear-gradient(135deg, #ffe5b4, #ffb6c1);
+            color: #5c2e7e;
+        }
+
+        /* Forest Theme Previews */
+        .forest-dark {
+            background: linear-gradient(135deg, #0d1b2a, #1b4332);
+            color: #95d5b2;
+        }
+
+        .forest-light {
+            background: linear-gradient(135deg, #d8f3dc, #b7e4c7);
+            color: #1b4332;
+        }
+
+        .select-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .select-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .selected-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .theme-card.selected .selected-badge {
+            display: block;
+        }
+
+        .current-theme {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+        }
+
+        .current-theme h3 {
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">← Back to Home</a>
+
+    <div class="container">
+        <h1>🎨 Theme Selector</h1>
+        <p class="subtitle">Choose your preferred theme style for the entire website</p>
+
+        <div class="current-theme">
+            <h3>Current Theme</h3>
+            <p id="current-theme-display">Loading...</p>
+        </div>
+
+        <div class="theme-grid">
+            <!-- Classic Theme -->
+            <div class="theme-card" data-theme="classic">
+                <span class="selected-badge">✓ Active</span>
+                <h2>🎯 Classic</h2>
+                <p>The original clean and simple design with solid colors</p>
+                <div class="theme-preview">
+                    <div class="preview-mode classic-dark">
+                        <span>Dark Mode</span>
+                    </div>
+                    <div class="preview-mode classic-light">
+                        <span>Light Mode</span>
+                    </div>
+                </div>
+                <button class="select-btn" onclick="selectTheme('classic')">Select Classic</button>
+            </div>
+
+            <!-- Modern Theme -->
+            <div class="theme-card" data-theme="modern">
+                <span class="selected-badge">✓ Active</span>
+                <h2>✨ Modern</h2>
+                <p>Glassmorphic design with gradients and smooth animations</p>
+                <div class="theme-preview">
+                    <div class="preview-mode modern-dark">
+                        <span>Dark Mode</span>
+                    </div>
+                    <div class="preview-mode modern-light">
+                        <span>Light Mode</span>
+                    </div>
+                </div>
+                <button class="select-btn" onclick="selectTheme('modern')">Select Modern</button>
+            </div>
+
+            <!-- Neon Theme -->
+            <div class="theme-card" data-theme="neon">
+                <span class="selected-badge">✓ Active</span>
+                <h2>💫 Neon</h2>
+                <p>Vibrant cyberpunk-inspired theme with glowing effects</p>
+                <div class="theme-preview">
+                    <div class="preview-mode neon-dark">
+                        <span>Dark Mode</span>
+                    </div>
+                    <div class="preview-mode neon-light">
+                        <span>Light Mode</span>
+                    </div>
+                </div>
+                <button class="select-btn" onclick="selectTheme('neon')">Select Neon</button>
+            </div>
+
+            <!-- Ocean Theme -->
+            <div class="theme-card" data-theme="ocean">
+                <span class="selected-badge">✓ Active</span>
+                <h2>🌊 Ocean</h2>
+                <p>Calm and refreshing blue tones inspired by the sea</p>
+                <div class="theme-preview">
+                    <div class="preview-mode ocean-dark">
+                        <span>Dark Mode</span>
+                    </div>
+                    <div class="preview-mode ocean-light">
+                        <span>Light Mode</span>
+                    </div>
+                </div>
+                <button class="select-btn" onclick="selectTheme('ocean')">Select Ocean</button>
+            </div>
+
+            <!-- Sunset Theme -->
+            <div class="theme-card" data-theme="sunset">
+                <span class="selected-badge">✓ Active</span>
+                <h2>🌅 Sunset</h2>
+                <p>Warm and cozy with purple, pink, and orange hues</p>
+                <div class="theme-preview">
+                    <div class="preview-mode sunset-dark">
+                        <span>Dark Mode</span>
+                    </div>
+                    <div class="preview-mode sunset-light">
+                        <span>Light Mode</span>
+                    </div>
+                </div>
+                <button class="select-btn" onclick="selectTheme('sunset')">Select Sunset</button>
+            </div>
+
+            <!-- Forest Theme -->
+            <div class="theme-card" data-theme="forest">
+                <span class="selected-badge">✓ Active</span>
+                <h2>🌲 Forest</h2>
+                <p>Natural green tones creating a peaceful environment</p>
+                <div class="theme-preview">
+                    <div class="preview-mode forest-dark">
+                        <span>Dark Mode</span>
+                    </div>
+                    <div class="preview-mode forest-light">
+                        <span>Light Mode</span>
+                    </div>
+                </div>
+                <button class="select-btn" onclick="selectTheme('forest')">Select Forest</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load current theme on page load
+        window.onload = function() {
+            const currentTheme = localStorage.getItem('selectedTheme') || 'classic';
+            const lightMode = localStorage.getItem('theme') === 'light';
+            
+            // Apply light mode if needed
+            if (lightMode) {
+                document.body.classList.add('light-mode');
+            }
+            
+            // Mark selected theme
+            updateSelectedTheme(currentTheme);
+            
+            // Display current theme
+            const themeNames = {
+                'classic': 'Classic',
+                'modern': 'Modern',
+                'neon': 'Neon',
+                'ocean': 'Ocean',
+                'sunset': 'Sunset',
+                'forest': 'Forest'
+            };
+            const mode = lightMode ? 'Light' : 'Dark';
+            document.getElementById('current-theme-display').textContent = 
+                `${themeNames[currentTheme]} (${mode} Mode)`;
+        };
+
+        function selectTheme(themeName) {
+            // Save the selected theme
+            localStorage.setItem('selectedTheme', themeName);
+            
+            // Update visual selection
+            updateSelectedTheme(themeName);
+            
+            // Show confirmation
+            const themeNames = {
+                'classic': 'Classic',
+                'modern': 'Modern',
+                'neon': 'Neon',
+                'ocean': 'Ocean',
+                'sunset': 'Sunset',
+                'forest': 'Forest'
+            };
+            const lightMode = localStorage.getItem('theme') === 'light';
+            const mode = lightMode ? 'Light' : 'Dark';
+            document.getElementById('current-theme-display').textContent = 
+                `${themeNames[themeName]} (${mode} Mode)`;
+            
+            // Optionally redirect back to home after a short delay
+            setTimeout(() => {
+                alert(`Theme changed to ${themeNames[themeName]}! The new theme will be applied across all pages.`);
+            }, 100);
+        }
+
+        function updateSelectedTheme(themeName) {
+            // Remove selected class from all cards
+            document.querySelectorAll('.theme-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selected class to the chosen theme
+            const selectedCard = document.querySelector(`[data-theme="${themeName}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+            }
+        }
+
+// Theme Loader System
+// Add this script to the <head> of every page BEFORE theme.css
+
+(function() {
+    // Get selected theme from localStorage (default to 'classic')
+    const selectedTheme = localStorage.getItem('selectedTheme') || 'classic';
+    
+    // Map of theme names to CSS files
+    const themeFiles = {
+        'classic': 'theme-classic.css',
+        'modern': 'theme-modern.css',
+        'neon': 'theme-neon.css',
+        'ocean': 'theme-ocean.css',
+        'sunset': 'theme-sunset.css',
+        'forest': 'theme-forest.css'
+    };
+    
+    // Get the CSS file for the selected theme
+    const cssFile = themeFiles[selectedTheme] || themeFiles['classic'];
+    
+    // Create and inject the link element
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = cssFile;
+    link.id = 'theme-stylesheet';
+    
+    // Insert before any existing stylesheets
+    const head = document.head || document.getElementsByTagName('head')[0];
+    const firstLink = head.querySelector('link[rel="stylesheet"]');
+    
+    if (firstLink) {
+        head.insertBefore(link, firstLink);
+    } else {
+        head.appendChild(link);
+    }
+    
+    // Apply light/dark mode from localStorage
+    window.addEventListener('DOMContentLoaded', function() {
+        const lightMode = localStorage.getItem('theme') === 'light';
+        if (lightMode) {
+            document.body.classList.add('light-mode');
+        }
+    });
+})();
+      
+    </script>
+</body>
+</html>
