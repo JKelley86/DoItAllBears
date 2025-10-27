@@ -13,7 +13,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
@@ -21,6 +21,10 @@
             z-index: 10000;
             animation: popupFadeIn 0.3s ease-out;
             pointer-events: auto;
+        }
+
+        body.light-mode .popup {
+            background: rgba(0, 0, 0, 0.4);
         }
 
         .popup::before {
