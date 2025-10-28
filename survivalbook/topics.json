@@ -1,18 +1,23 @@
 [
   {
     "title": "Fire Building",
-    "content": "Learn to build a fire using wood, tinder, and kindling. Always keep water nearby for safety."
+    "summary": "Learn to build a fire using wood, tinder, and kindling.",
+    "details": [
+      "Step 1: Collect dry wood and tinder.",
+      "Step 2: Build a small tinder nest.",
+      "Step 3: Use matches, lighter, or flint to ignite tinder.",
+      "Step 4: Gradually add kindling and then larger logs.",
+      "Step 5: Always keep water nearby for safety."
+    ]
   },
   {
     "title": "Finding Water",
-    "content": "Locate water sources such as streams, ponds, or rainwater. Purify before drinking using boiling or filters."
+    "summary": "Locate water sources such as streams, ponds, or rainwater.",
+    "details": [
+      "Step 1: Look for flowing water, not stagnant pools.",
+      "Step 2: Collect rainwater if possible.",
+      "Step 3: Purify water by boiling or using a portable filter.",
+      "Step 4: Store in clean containers."
+    ]
   },
-  {
-    "title": "Shelter Building",
-    "content": "Construct a simple shelter using branches, leaves, and tarps to protect from weather."
-  },
-  {
-    "title": "Basic First Aid",
-    "content": "Treat minor injuries with antiseptics and bandages. Always clean wounds thoroughly."
-  }
 ]
