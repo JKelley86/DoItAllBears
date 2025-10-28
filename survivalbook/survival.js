@@ -56,3 +56,4 @@ document.getElementById('searchBox').addEventListener('input', e => {
 document.getElementById('emergencyToggle').addEventListener('click', () => {
   document.body.classList.toggle('emergency');
 });
+
