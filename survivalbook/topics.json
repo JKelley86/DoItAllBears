@@ -1,23 +1,795 @@
 [
   {
-    "title": "Fire Building",
-    "summary": "Learn to build a fire using wood, tinder, and kindling.",
+    "title": "Fire Building – Matches",
+    "summary": "Start a fire quickly using matches.",
     "details": [
-      "Step 1: Collect dry wood and tinder.",
-      "Step 2: Build a small tinder nest.",
-      "Step 3: Use matches, lighter, or flint to ignite tinder.",
-      "Step 4: Gradually add kindling and then larger logs.",
-      "Step 5: Always keep water nearby for safety."
+      "Step 1: Gather dry tinder such as leaves, bark fibers, or grass.",
+      "Step 2: Collect kindling and larger logs for sustaining the fire.",
+      "Step 3: Strike the match carefully and light the tinder bundle.",
+      "Step 4: Gently blow on the tinder until it catches.",
+      "Step 5: Gradually add kindling, then larger logs to maintain the fire.",
+      "Safety Tip: Keep water or soil nearby to prevent accidental spread."
     ]
   },
   {
-    "title": "Finding Water",
-    "summary": "Locate water sources such as streams, ponds, or rainwater.",
+    "title": "Fire Building – Flint & Steel",
+    "summary": "Ignite a fire using flint and steel.",
     "details": [
-      "Step 1: Look for flowing water, not stagnant pools.",
-      "Step 2: Collect rainwater if possible.",
-      "Step 3: Purify water by boiling or using a portable filter.",
-      "Step 4: Store in clean containers."
+      "Step 1: Gather dry tinder such as cotton balls, bark fibers, or dry leaves.",
+      "Step 2: Hold the flint in one hand and the steel striker in the other.",
+      "Step 3: Strike the steel against the flint at a 45-degree angle to create sparks.",
+      "Step 4: Direct sparks into the tinder bundle and blow gently to ignite.",
+      "Step 5: Add kindling and larger logs as the flame grows.",
+      "Safety Tip: Perform this away from flammable debris."
+    ]
+  },
+  {
+    "title": "Fire Building – Bow Drill",
+    "summary": "Build a fire using a friction bow drill.",
+    "details": [
+      "Step 1: Collect dry wood for the spindle and hearth board.",
+      "Step 2: Prepare dry tinder for ember transfer.",
+      "Step 3: Set up the bow string around the spindle and position on the hearth board.",
+      "Step 4: Move the bow back and forth to generate friction and hot ember dust.",
+      "Step 5: Transfer the ember into the tinder bundle and blow gently to ignite.",
+      "Step 6: Add kindling and larger logs gradually.",
+      "Safety Tip: Always have water nearby in case of fire spreading."
+    ]
+  },
+  {
+    "title": "Fire Building – Hand Drill",
+    "summary": "Use a simple hand drill to start a fire.",
+    "details": [
+      "Step 1: Select a dry, soft wood for the spindle and a slightly harder wood for the hearth board.",
+      "Step 2: Place the spindle in a small notch on the hearth board.",
+      "Step 3: Spin the spindle rapidly between your palms to create friction and hot dust.",
+      "Step 4: Transfer the ember into your tinder bundle and blow gently to ignite.",
+      "Step 5: Gradually add kindling and then larger logs.",
+      "Safety Tip: Clear surrounding area of flammable material."
+    ]
+  },
+  {
+    "title": "Fire Safety in the Wild",
+    "summary": "Prevent fire hazards while camping or surviving.",
+    "details": [
+      "Step 1: Always build fires in clear areas away from dry grass and overhanging branches.",
+      "Step 2: Surround the fire with rocks or dig a shallow pit.",
+      "Step 3: Keep water or soil nearby to extinguish the fire.",
+      "Step 4: Never leave a fire unattended.",
+      "Step 5: Fully extinguish fires before sleeping or leaving the site."
+    ]
+  },
+  {
+    "title": "Survival Stove Techniques",
+    "summary": "Use portable stoves efficiently.",
+    "details": [
+      "Step 1: Set up stove on flat, stable surface away from flammable debris.",
+      "Step 2: Check fuel supply and connections.",
+      "Step 3: Ignite stove according to manufacturer instructions.",
+      "Step 4: Cook using low heat to conserve fuel and prevent spills.",
+      "Step 5: Extinguish stove completely after use."
+    ]
+  },
+  {
+    "title": "Fire in Wet Conditions",
+    "summary": "Start a fire even when wood is damp or raining.",
+    "details": [
+      "Step 1: Look for dry inner sections of logs or branches.",
+      "Step 2: Use waterproof tinder like cotton balls soaked in petroleum jelly.",
+      "Step 3: Build a teepee or platform to lift fire off wet ground.",
+      "Step 4: Shield fire from rain using large leaves or a tarp.",
+      "Step 5: Blow gently and add small dry twigs gradually."
+    ]
+  },
+  {
+    "title": "Signal Fires",
+    "summary": "Use fire to signal for help.",
+    "details": [
+      "Step 1: Gather green vegetation to produce smoke.",
+      "Step 2: Build a base fire using dry tinder and kindling.",
+      "Step 3: Place green leaves or moss on top to create dense smoke.",
+      "Step 4: Maintain three fires in a triangle pattern for international distress signal.",
+      "Step 5: Monitor fire to ensure safety and visibility."
+    ]
+  },
+  {
+    "title": "Tarp Shelter",
+    "summary": "Quickly create a shelter using a tarp.",
+    "details": [
+      "Step 1: Find a flat, dry area protected from wind if possible.",
+      "Step 2: Tie the tarp between two anchor points (trees or poles) to form an A-frame.",
+      "Step 3: Secure edges to the ground using rocks, stakes, or logs.",
+      "Step 4: Add insulating materials such as leaves or pine boughs on the floor.",
+      "Step 5: Ensure proper ventilation to avoid condensation."
+    ]
+  },
+  {
+    "title": "Debris Hut",
+    "summary": "Construct a shelter using natural debris.",
+    "details": [
+      "Step 1: Choose a sheltered spot protected from wind.",
+      "Step 2: Lay a ridge pole between two supports.",
+      "Step 3: Lean branches against the ridge pole to form a triangular frame.",
+      "Step 4: Cover the frame with leaves, moss, and other debris for insulation.",
+      "Step 5: Make the entrance small to conserve heat."
+    ]
+  },
+  {
+    "title": "Lean-To Shelter",
+    "summary": "Build a simple lean-to using natural materials.",
+    "details": [
+      "Step 1: Find a solid support structure or tree to lean materials against.",
+      "Step 2: Place long branches at an angle against the support.",
+      "Step 3: Layer leaves, moss, and bark to insulate and block wind.",
+      "Step 4: Create a low entrance facing away from the wind.",
+      "Step 5: Add a fire nearby for warmth if safe."
+    ]
+  },
+  {
+    "title": "Snow Shelter",
+    "summary": "Construct a shelter in snow to retain body heat.",
+    "details": [
+      "Step 1: Identify a location with deep, firm snow.",
+      "Step 2: Dig a trench or igloo-shaped cavity.",
+      "Step 3: Compact snow walls for stability and insulation.",
+      "Step 4: Create a small entrance and ventilation hole.",
+      "Step 5: Line floor with pine boughs or clothing to insulate from cold."
+    ]
+  },
+  {
+    "title": "Cave Shelter Tips",
+    "summary": "Use natural caves safely for shelter.",
+    "details": [
+      "Step 1: Inspect the cave for wildlife before entering.",
+      "Step 2: Check for loose rocks or debris.",
+      "Step 3: Ensure there is a drainage path to avoid flooding.",
+      "Step 4: Block drafts using branches or debris.",
+      "Step 5: Keep fire at a safe distance if used."
+    ]
+  },
+  {
+    "title": "Insulation Techniques",
+    "summary": "Keep warm in cold environments.",
+    "details": [
+      "Step 1: Layer clothing to trap heat.",
+      "Step 2: Use leaves, moss, or pine boughs as insulation in shelters.",
+      "Step 3: Avoid direct contact with snow or cold ground.",
+      "Step 4: Keep moving periodically to maintain circulation.",
+      "Step 5: Stay dry to prevent hypothermia."
+    ]
+  },
+  {
+    "title": "Wind & Rain Protection",
+    "summary": "Shield yourself from harsh weather.",
+    "details": [
+      "Step 1: Build shelter with windbreaks using trees, rocks, or debris.",
+      "Step 2: Cover roof with waterproof materials.",
+      "Step 3: Elevate sleeping area off the ground.",
+      "Step 4: Keep clothing dry and wear layers.",
+      "Step 5: Maintain ventilation to prevent condensation."
+    ]
+  },
+  {
+    "title": "Finding Streams & Ponds",
+    "summary": "Locate water sources in the wild.",
+    "details": [
+      "Step 1: Look for flowing water first; stagnant pools may be unsafe.",
+      "Step 2: Observe animal tracks and birds to locate water.",
+      "Step 3: Collect water in clean containers.",
+      "Step 4: Purify water by boiling, filtering, or chemical treatment.",
+      "Step 5: Avoid water with dead animals, algae blooms, or chemical runoff."
+    ]
+  },
+  {
+    "title": "Collecting Rainwater",
+    "summary": "Harvest rainwater safely.",
+    "details": [
+      "Step 1: Use clean containers or tarps to catch rainwater.",
+      "Step 2: Filter debris using cloth or mesh.",
+      "Step 3: Boil water if possible to remove pathogens.",
+      "Step 4: Store in sealed containers away from sunlight.",
+      "Step 5: Rotate stored water regularly."
+    ]
+  },
+  {
+    "title": "Solar Still Water Collection",
+    "summary": "Collect water using solar evaporation.",
+    "details": [
+      "Step 1: Dig a small pit and place a container at the center.",
+      "Step 2: Cover the pit with clear plastic and weigh down edges with rocks.",
+      "Step 3: Place a small rock in the center to create a low point over the container.",
+      "Step 4: Sunlight will evaporate moisture which condenses on the plastic and drips into the container.",
+      "Step 5: Use collected water for drinking; purify if unsure."
+    ]
+  },
+  {
+    "title": "Water Filtration Methods",
+    "summary": "Remove particles and contaminants from water.",
+    "details": [
+      "Step 1: Pour water through a cloth or coffee filter to remove large debris.",
+      "Step 2: Use sand and charcoal layers in a container for additional filtration.",
+      "Step 3: Boil filtered water to kill pathogens.",
+      "Step 4: Store in clean containers for use.",
+      "Tip: Always filter before chemical treatment or boiling."
+    ]
+  },
+  {
+    "title": "Water Purification – Boiling",
+    "summary": "Make water safe to drink by boiling.",
+    "details": [
+      "Step 1: Bring water to a rolling boil for at least 5 minutes.",
+      "Step 2: Allow to cool before drinking.",
+      "Step 3: Store boiled water in a clean container.",
+      "Step 4: Use boiling in combination with filtering if water is murky.",
+      "Safety Tip: Avoid boiling near flammable materials."
+    ]
+  },
+  {
+    "title": "Water Purification – Chemical Tablets",
+    "summary": "Purify water using chemicals.",
+    "details": [
+      "Step 1: Follow manufacturer instructions for dosage.",
+      "Step 2: Stir water after adding tablets.",
+      "Step 3: Wait the recommended time for disinfection.",
+      "Step 4: Store treated water in clean containers.",
+      "Tip: Combine with filtration if water is cloudy."
+    ]
+  },
+  {
+    "title": "Water Purification – Cloth & Sand Filtering",
+    "summary": "Remove debris and sediment using layered filtering.",
+    "details": [
+      "Step 1: Layer fine sand, charcoal, and gravel in a container.",
+      "Step 2: Pour water through the filter slowly.",
+      "Step 3: Collect filtered water in a clean container.",
+      "Step 4: Boil or chemically treat water after filtration.",
+      "Tip: Replace filtering layers if heavily used."
+    ]
+  },
+  {
+    "title": "Recognizing Safe Water Sources",
+    "summary": "Identify water that is safer to drink.",
+    "details": [
+      "Step 1: Flowing water is generally safer than stagnant pools.",
+      "Step 2: Avoid water with strong odors, discoloration, or surface scum.",
+      "Step 3: Observe animal behavior; they often locate safe water.",
+      "Step 4: Purify all collected water before drinking.",
+      "Tip: If unsure, prioritize water that can be boiled or filtered."
+    ]
+  },
+  {
+    "title": "Edible Plants – Identification",
+    "summary": "Safely identify edible wild plants.",
+    "details": [
+      "Step 1: Learn local plant species before going into the wild.",
+      "Step 2: Examine leaves, stems, flowers, and seeds carefully.",
+      "Step 3: Avoid plants with milky sap or strong odors unless known safe.",
+      "Step 4: Test small amounts before consuming larger portions.",
+      "Step 5: Cook or dry plants to reduce toxicity if necessary."
+    ]
+  },
+  {
+    "title": "Edible Mushrooms – Safety",
+    "summary": "Identify safe mushrooms for consumption.",
+    "details": [
+      "Step 1: Learn to recognize common edible mushrooms in your region.",
+      "Step 2: Avoid mushrooms with white gills, a ring around the stem, or a volva at the base unless you are certain they are safe.",
+      "Step 3: Never consume raw wild mushrooms; cook them thoroughly.",
+      "Step 4: Test a small portion first and wait several hours for reactions.",
+      "Tip: Use a reliable mushroom field guide."
+    ]
+  },
+  {
+    "title": "Insect Foraging",
+    "summary": "Collect insects for protein safely.",
+    "details": [
+      "Step 1: Look for beetles, crickets, grasshoppers, and ants.",
+      "Step 2: Avoid brightly colored insects as they may be toxic.",
+      "Step 3: Remove wings, legs, and stingers if possible.",
+      "Step 4: Cook insects over fire to kill parasites and bacteria.",
+      "Tip: Insects are high-protein and widely available."
+    ]
+  },
+  {
+    "title": "Fishing Techniques",
+    "summary": "Catch fish using minimal equipment.",
+    "details": [
+      "Step 1: Use a hook and line, net, or improvised spear.",
+      "Step 2: Observe fish movement in shallow waters.",
+      "Step 3: Use bait such as worms, insects, or small fish.",
+      "Step 4: Cook fish thoroughly before eating.",
+      "Tip: Freshwater fish are easier to catch near rocks or vegetation."
+    ]
+  },
+  {
+    "title": "Improvised Traps for Small Game",
+    "summary": "Catch small animals for food using traps.",
+    "details": [
+      "Step 1: Identify animal paths or signs like tracks.",
+      "Step 2: Use snare traps with cord, rope, or wire.",
+      "Step 3: Camouflage traps with leaves and branches.",
+      "Step 4: Check traps frequently and handle captured animals safely.",
+      "Safety Tip: Avoid traps that may harm humans or pets."
+    ]
+  },
+  {
+    "title": "Hunting with Improvised Tools",
+    "summary": "Use simple tools to hunt when firearms are unavailable.",
+    "details": [
+      "Step 1: Make spears or bows using strong branches and sharpened tips.",
+      "Step 2: Identify animal behavior and feeding areas.",
+      "Step 3: Use patience and stealth when approaching prey.",
+      "Step 4: Clean and cook hunted animals thoroughly.",
+      "Tip: Small game like rabbits and birds are easier to catch."
+    ]
+  },
+  {
+    "title": "Field Dressing Game",
+    "summary": "Prepare hunted animals safely in the field.",
+    "details": [
+      "Step 1: Lay the animal on a clean, stable surface.",
+      "Step 2: Make a small incision and carefully remove internal organs.",
+      "Step 3: Keep meat clean and avoid contamination.",
+      "Step 4: Cool or preserve meat as soon as possible.",
+      "Safety Tip: Use gloves if available and wash hands after handling."
+    ]
+  },
+  {
+    "title": "Preservation – Smoking Meat",
+    "summary": "Extend meat shelf-life using smoke.",
+    "details": [
+      "Step 1: Cut meat into thin strips for faster smoking.",
+      "Step 2: Hang meat above a low, smoky fire.",
+      "Step 3: Maintain smoke for several hours until meat dries.",
+      "Step 4: Store in airtight containers if possible.",
+      "Tip: Combine smoking with salting for longer preservation."
+    ]
+  },
+  {
+    "title": "Preservation – Drying & Dehydrating",
+    "summary": "Remove moisture to prevent spoilage.",
+    "details": [
+      "Step 1: Slice food into thin, uniform pieces.",
+      "Step 2: Use sun, fire, or an improvised dehydrator to remove moisture.",
+      "Step 3: Rotate food periodically for even drying.",
+      "Step 4: Store dried food in airtight containers.",
+      "Tip: Ensure food is fully dry before storing to prevent mold."
+    ]
+  },
+  {
+    "title": "Preservation – Salting & Curing",
+    "summary": "Use salt to preserve meat and fish.",
+    "details": [
+      "Step 1: Rub salt thoroughly on all surfaces of meat or fish.",
+      "Step 2: Layer salted food with additional salt in containers.",
+      "Step 3: Store in a cool, dry place.",
+      "Step 4: Rehydrate or rinse before consumption.",
+      "Safety Tip: Avoid excessive salt for long-term health."
+    ]
+  },
+  {
+    "title": "Using a Compass",
+    "summary": "Navigate safely using a magnetic compass.",
+    "details": [
+      "Step 1: Identify the north direction with the compass needle.",
+      "Step 2: Orient your map according to magnetic north.",
+      "Step 3: Plot bearings to your destination.",
+      "Step 4: Adjust for declination if necessary.",
+      "Tip: Keep compass level and away from metal objects to avoid interference."
+    ]
+  },
+  {
+    "title": "Navigating by Stars",
+    "summary": "Use celestial navigation at night.",
+    "details": [
+      "Step 1: Locate the North Star in the Northern Hemisphere.",
+      "Step 2: Use constellation patterns to approximate direction.",
+      "Step 3: Combine with landmarks for more accurate navigation.",
+      "Step 4: Note moon phases as an additional time reference.",
+      "Tip: Practice star navigation before needing it in emergencies."
+    ]
+  },
+  {
+    "title": "Navigating by Sun & Shadows",
+    "summary": "Determine direction during daylight.",
+    "details": [
+      "Step 1: Observe the sun’s position (rises in the east, sets in the west).",
+      "Step 2: Use a stick in the ground to cast a shadow and mark movement.",
+      "Step 3: Track shadow tip after 15–30 minutes to approximate east-west line.",
+      "Tip: Combine with landmarks or compass for better accuracy."
+    ]
+  },
+  {
+    "title": "Using Landmarks",
+    "summary": "Navigate using natural and man-made features.",
+    "details": [
+      "Step 1: Identify permanent landmarks like mountains, rivers, or towers.",
+      "Step 2: Note distances and bearings relative to these landmarks.",
+      "Step 3: Adjust route if landmarks appear inconsistent with your map.",
+      "Tip: Avoid relying solely on landmarks in unfamiliar terrain."
+    ]
+  },
+  {
+    "title": "Reading Maps",
+    "summary": "Use topographic and navigation maps effectively.",
+    "details": [
+      "Step 1: Identify symbols and scale on the map.",
+      "Step 2: Determine your current location using landmarks.",
+      "Step 3: Plot your route considering terrain and elevation.",
+      "Step 4: Re-check position regularly to avoid getting lost.",
+      "Tip: Keep maps dry and protected from wind."
+    ]
+  },
+  {
+    "title": "Knot Tying – Basic",
+    "summary": "Essential knots for survival tasks.",
+    "details": [
+      "Step 1: Learn the square knot for joining two ropes.",
+      "Step 2: Learn the bowline for creating a fixed loop.",
+      "Step 3: Learn the clove hitch for temporary attachment to poles.",
+      "Step 4: Practice tying knots until proficient.",
+      "Tip: Knots should be secure but easy to untie when needed."
+    ]
+  },
+  {
+    "title": "Knot Tying – Advanced",
+    "summary": "Specialized knots for complex tasks.",
+    "details": [
+      "Step 1: Learn the taut-line hitch for adjustable tension.",
+      "Step 2: Learn the sheet bend for joining ropes of different sizes.",
+      "Step 3: Learn the double fisherman's knot for climbing or cordage.",
+      "Step 4: Test knots under load before relying on them.",
+      "Tip: Strong knots prevent gear loss and accidents."
+    ]
+  },
+  {
+    "title": "Rope Making from Natural Fibers",
+    "summary": "Create cordage using plants and bark.",
+    "details": [
+      "Step 1: Collect fibrous plants, bark, or vines.",
+      "Step 2: Dry and separate fibers.",
+      "Step 3: Twist fibers together to form strands, then twist strands into rope.",
+      "Step 4: Test strength before using for load-bearing tasks.",
+      "Tip: Braiding multiple strands increases durability."
+    ]
+  },
+  {
+    "title": "Knife Maintenance",
+    "summary": "Keep knives sharp and functional.",
+    "details": [
+      "Step 1: Clean blade after each use to prevent rust.",
+      "Step 2: Sharpen regularly using a whetstone or improvised stone.",
+      "Step 3: Oil blade lightly to reduce corrosion.",
+      "Step 4: Store in a sheath or protective wrap.",
+      "Tip: Never use a knife for unintended tasks like prying rocks."
+    ]
+  },
+  {
+    "title": "Axe Safety & Techniques",
+    "summary": "Use an axe safely for chopping and splitting.",
+    "details": [
+      "Step 1: Always wear gloves and eye protection.",
+      "Step 2: Ensure a firm stance with feet shoulder-width apart.",
+      "Step 3: Swing in a controlled motion, away from body and others.",
+      "Step 4: Inspect axe for cracks or loose head before use.",
+      "Tip: Keep blade sharp for safer, easier cutting."
+    ]
+  },
+  {
+    "title": "Tool Crafting – Spear",
+    "summary": "Create a basic spear for hunting or defense.",
+    "details": [
+      "Step 1: Select a straight, strong branch about 6–8 feet long.",
+      "Step 2: Sharpen one end to a point using a knife or stone.",
+      "Step 3: Optionally, harden the tip by fire treating it briefly.",
+      "Step 4: Test balance and grip before relying on it.",
+      "Tip: Use caution when handling sharp points."
+    ]
+  },
+  {
+    "title": "Tool Crafting – Bow",
+    "summary": "Build a simple bow for hunting or signaling.",
+    "details": [
+      "Step 1: Select a flexible, strong branch approximately 5–6 feet long.",
+      "Step 2: Carve a notch at each end for string attachment.",
+      "Step 3: Use cordage from natural fibers or rope for the string.",
+      "Step 4: Test tension and elasticity before attempting to shoot.",
+      "Tip: Practice safely to avoid injury."
+    ]
+  },
+  {
+    "title": "Signal Mirrors",
+    "summary": "Use mirrors to attract attention from rescuers.",
+    "details": [
+      "Step 1: Hold mirror in bright sunlight.",
+      "Step 2: Aim reflection toward distant objects or aircraft.",
+      "Step 3: Flash in a repeating pattern (e.g., three flashes for SOS).",
+      "Step 4: Ensure background contrast for visibility.",
+      "Tip: Practice angling mirror for maximum range."
+    ]
+  },
+  {
+    "title": "Smoke Signals",
+    "summary": "Create visual signals using smoke.",
+    "details": [
+      "Step 1: Build a small fire using dry wood.",
+      "Step 2: Add green leaves or moss to produce dense smoke.",
+      "Step 3: Repeat in patterns (three puffs = SOS).",
+      "Step 4: Maintain fire to keep smoke visible.",
+      "Safety Tip: Keep fire controlled and away from flammable debris."
+    ]
+  },
+  {
+    "title": "Whistle Signals",
+    "summary": "Use sound signals for help or communication.",
+    "details": [
+      "Step 1: Use a whistle or improvise by cupping hands to the mouth.",
+      "Step 2: Use repeating patterns like three short blasts (SOS).",
+      "Step 3: Use at intervals to conserve energy and attract attention.",
+      "Tip: Whistles carry farther than shouts and conserve your voice."
+    ]
+  },
+  {
+    "title": "Flag & Marker Signals",
+    "summary": "Use visual markers to indicate position or danger.",
+    "details": [
+      "Step 1: Create bright markers with clothing or natural materials.",
+      "Step 2: Place in visible locations (clearing, hilltop, water edge).",
+      "Step 3: Repeat pattern or shape for specific messages.",
+      "Tip: Use universally recognized shapes or colors when possible."
+    ]
+  },
+  {
+    "title": "Emergency Radio Use",
+    "summary": "Communicate via radio during emergencies.",
+    "details": [
+      "Step 1: Learn local emergency frequencies in advance.",
+      "Step 2: Keep batteries charged and spare batteries available.",
+      "Step 3: Follow proper radio etiquette: identify yourself and location.",
+      "Step 4: Conserve transmission time and speak clearly.",
+      "Tip: Check radio periodically to stay informed of emergency updates."
+    ]
+  },
+  {
+    "title": "Ammo Reloading Basics",
+    "summary": "Reload ammunition safely for firearms.",
+    "details": [
+      "Step 1: Use proper dies and equipment for your caliber.",
+      "Step 2: Follow step-by-step instructions from a trusted manual.",
+      "Step 3: Inspect all components (primers, powder, casing) before use.",
+      "Step 4: Keep work area clean, organized, and away from ignition sources.",
+      "Safety Tip: Never exceed recommended powder loads and wear eye protection."
+    ]
+  },
+  {
+    "title": "Firearm Maintenance",
+    "summary": "Keep firearms safe and functional.",
+    "details": [
+      "Step 1: Disassemble firearm according to manufacturer instructions.",
+      "Step 2: Clean barrel, chamber, and moving parts thoroughly.",
+      "Step 3: Lubricate components lightly with appropriate oil.",
+      "Step 4: Reassemble and function-check safely.",
+      "Tip: Store firearms unloaded and in secure cases."
+    ]
+  },
+  {
+    "title": "Bug-Out Bag Packing",
+    "summary": "Prepare an emergency bag for rapid evacuation.",
+    "details": [
+      "Step 1: Include essentials: water, food, first aid, fire-starting tools, clothing, and shelter.",
+      "Step 2: Include communication devices, navigation tools, and personal documents.",
+      "Step 3: Distribute weight evenly and keep bag comfortable to carry.",
+      "Step 4: Review and update contents periodically.",
+      "Tip: Tailor contents to your environment and needs."
+    ]
+  },
+  {
+    "title": "Survival Gardening",
+    "summary": "Grow food in off-grid conditions.",
+    "details": [
+      "Step 1: Choose hardy, fast-growing crops suitable for your climate.",
+      "Step 2: Prepare soil using compost or organic matter.",
+      "Step 3: Plant in rows or containers to maximize space.",
+      "Step 4: Water, mulch, and protect crops from pests.",
+      "Tip: Rotate crops and save seeds for sustainability."
+    ]
+  },
+  {
+    "title": "Cold Weather Survival",
+    "summary": "Stay safe and warm in freezing conditions.",
+    "details": [
+      "Step 1: Layer clothing to trap heat.",
+      "Step 2: Build insulated shelter and avoid wind exposure.",
+      "Step 3: Keep dry to prevent hypothermia.",
+      "Step 4: Consume high-calorie foods and stay hydrated.",
+      "Tip: Monitor for frostbite and shivering as warning signs."
+    ]
+  },
+  {
+    "title": "Hot Weather Survival",
+    "summary": "Prevent heatstroke and dehydration.",
+    "details": [
+      "Step 1: Wear light, breathable clothing and a hat.",
+      "Step 2: Stay hydrated and seek shade during peak heat.",
+      "Step 3: Limit strenuous activity in hottest hours.",
+      "Step 4: Use damp cloths on skin to reduce temperature.",
+      "Tip: Recognize early signs of heat exhaustion (dizziness, nausea)."
+    ]
+  },
+  {
+    "title": "Flood Survival",
+    "summary": "Stay safe during rising water events.",
+    "details": [
+      "Step 1: Move to higher ground immediately.",
+      "Step 2: Avoid walking or driving through floodwaters.",
+      "Step 3: Secure belongings if time allows.",
+      "Step 4: Use ropes or floating devices if trapped in water.",
+      "Tip: Monitor weather and emergency alerts continuously."
+    ]
+  },
+  {
+    "title": "Earthquake Survival",
+    "summary": "Protect yourself during seismic activity.",
+    "details": [
+      "Step 1: Drop, cover, and hold on under a sturdy structure.",
+      "Step 2: Stay away from windows, heavy objects, and walls.",
+      "Step 3: After shaking, check for injuries and hazards.",
+      "Step 4: Move outside carefully avoiding debris.",
+      "Tip: Have an emergency plan and supplies ready."
+    ]
+  },
+  {
+    "title": "Storm & Lightning Survival",
+    "summary": "Minimize risk during storms and lightning.",
+    "details": [
+      "Step 1: Seek shelter in sturdy buildings or low areas.",
+      "Step 2: Avoid open fields, tall trees, and metal objects.",
+      "Step 3: If outside, crouch low with feet together; do not lie flat.",
+      "Step 4: Disconnect electrical devices indoors.",
+      "Tip: Wait 30 minutes after last thunder before resuming outdoor activity."
+    ]
+  },
+  {
+    "title": "Avalanche Awareness",
+    "summary": "Recognize and survive avalanche-prone areas.",
+    "details": [
+      "Step 1: Check avalanche forecasts before travel.",
+      "Step 2: Avoid steep, snow-loaded slopes if possible.",
+      "Step 3: Carry avalanche safety gear (beacon, probe, shovel).",
+      "Step 4: Move diagonally to escape if avalanche starts.",
+      "Tip: Seek immediate help if buried; shout and use beacon to locate victims."
+    ]
+  },
+  {
+    "title": "Treating Cuts & Scrapes",
+    "summary": "Stop bleeding and prevent infection.",
+    "details": [
+      "Step 1: Clean wound with clean water and remove debris.",
+      "Step 2: Apply antiseptic if available.",
+      "Step 3: Cover with sterile dressing or clean cloth.",
+      "Step 4: Apply pressure to stop bleeding if necessary.",
+      "Tip: Change dressing regularly and monitor for infection."
+    ]
+  },
+  {
+    "title": "Treating Burns",
+    "summary": "Manage minor and major burns safely.",
+    "details": [
+      "Step 1: Cool burn with running water for 10–20 minutes.",
+      "Step 2: Remove constrictive items (rings, bracelets) before swelling.",
+      "Step 3: Cover with sterile, non-stick dressing.",
+      "Step 4: Avoid applying creams or butter.",
+      "Tip: Seek medical attention for severe burns."
+    ]
+  },
+  {
+    "title": "Treating Broken Bones",
+    "summary": "Immobilize fractures to prevent further injury.",
+    "details": [
+      "Step 1: Keep injured limb still and support with splints or padding.",
+      "Step 2: Apply a splint from joints above and below the fracture.",
+      "Step 3: Secure splint but avoid cutting off circulation.",
+      "Step 4: Seek medical help as soon as possible.",
+      "Tip: Do not try to straighten severely deformed bones."
+    ]
+  },
+  {
+    "title": "Snake Bite First Aid",
+    "summary": "Respond safely to venomous bites.",
+    "details": [
+      "Step 1: Keep victim calm and still to slow venom spread.",
+      "Step 2: Immobilize bitten limb and keep below heart level if possible.",
+      "Step 3: Do not cut, suck, or apply tourniquet.",
+      "Step 4: Seek emergency medical attention immediately.",
+      "Tip: Note snake appearance to inform medical professionals."
+    ]
+  },
+  {
+    "title": "Insect Bite & Sting Treatment",
+    "summary": "Reduce pain, swelling, and risk of infection.",
+    "details": [
+      "Step 1: Remove stingers carefully if present.",
+      "Step 2: Clean area with soap and water.",
+      "Step 3: Apply cold compress to reduce swelling.",
+      "Step 4: Use antihistamines or topical creams if available.",
+      "Tip: Monitor for allergic reactions; seek medical help for severe symptoms."
+    ]
+  },
+  {
+    "title": "Preventing Infection",
+    "summary": "Maintain hygiene and wound care in the wild.",
+    "details": [
+      "Step 1: Wash hands and tools before handling wounds or food.",
+      "Step 2: Clean cuts and scrapes immediately.",
+      "Step 3: Cover wounds and change dressings regularly.",
+      "Step 4: Boil or filter water before drinking.",
+      "Tip: Avoid contact with contaminated soil or water."
+    ]
+  },
+  {
+    "title": "Heat Stroke Recognition & Treatment",
+    "summary": "Respond quickly to life-threatening heat exposure.",
+    "details": [
+      "Step 1: Move victim to shade or cool area immediately.",
+      "Step 2: Remove excess clothing and cool with water or fanning.",
+      "Step 3: Offer small sips of water if conscious.",
+      "Step 4: Monitor vital signs and seek medical help urgently.",
+      "Tip: Early recognition prevents serious complications."
+    ]
+  },
+  {
+    "title": "Hypothermia Recognition & Treatment",
+    "summary": "Prevent and manage dangerous body cooling.",
+    "details": [
+      "Step 1: Move victim to a warm, dry location.",
+      "Step 2: Remove wet clothing and wrap in blankets.",
+      "Step 3: Provide warm liquids if conscious.",
+      "Step 4: Avoid rapid warming or vigorous movement.",
+      "Tip: Monitor breathing and heart rate; seek emergency help."
+    ]
+  },
+  {
+    "title": "Situational Awareness",
+    "summary": "Recognize and respond to potential dangers.",
+    "details": [
+      "Step 1: Scan surroundings frequently for hazards.",
+      "Step 2: Listen for unusual sounds and observe movement.",
+      "Step 3: Plan escape routes and safe locations.",
+      "Step 4: Trust instincts and take preventive actions.",
+      "Tip: Awareness reduces risk of accidents and attacks."
+    ]
+  },
+  {
+    "title": "Defensive Positioning",
+    "summary": "Protect yourself in dangerous situations.",
+    "details": [
+      "Step 1: Position yourself with a barrier between you and threats.",
+      "Step 2: Keep exits clear for escape.",
+      "Step 3: Use natural cover like rocks or trees.",
+      "Step 4: Maintain low profile and observe potential threats.",
+      "Tip: Avoid confrontation if possible; prioritize safety."
+    ]
+  },
+  {
+    "title": "Stress Management in Isolation",
+    "summary": "Maintain mental health in survival situations.",
+    "details": [
+      "Step 1: Establish routine and goals to maintain structure.",
+      "Step 2: Practice breathing exercises and meditation.",
+      "Step 3: Stay active with physical tasks or exercise.",
+      "Step 4: Record thoughts or journal to reduce mental strain.",
+      "Tip: Focus on what you can control to reduce anxiety."
+    ]
+  },
+  {
+    "title": "Night Navigation",
+    "summary": "Move safely and effectively at night.",
+    "details": [
+      "Step 1: Use moonlight, stars, or a flashlight for guidance.",
+      "Step 2: Move slowly to avoid obstacles and hazards.",
+      "Step 3: Mark trails or use landmarks to prevent getting lost.",
+      "Step 4: Travel in pairs if possible for safety.",
+      "Tip: Avoid risky terrain at night; wait for daylight when feasible."
     ]
   }
 ]
