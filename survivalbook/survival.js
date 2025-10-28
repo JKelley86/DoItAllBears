@@ -10,11 +10,36 @@ fetch('topics.json')
 function displayTopics(list) {
   const container = document.getElementById('topicsContainer');
   container.innerHTML = '';
-  list.forEach(topic => {
+  list.forEach((topic, index) => {
     const div = document.createElement('div');
     div.className = 'topic';
-    div.innerHTML = `<h2>${topic.title}</h2><p>${topic.content}</p>`;
+    
+    div.innerHTML = `
+      <h2>${topic.title}</h2>
+      <p>${topic.summary}</p>
+      <button class="expand-btn" data-index="${index}">Read More ▼</button>
+      <div class="details" id="details-${index}" style="display:none;">
+        ${topic.details.map(d => `<p>${d}</p>`).join('')}
+      </div>
+    `;
+    
     container.appendChild(div);
+  });
+
+  // Add event listeners for expand buttons
+  const expandButtons = document.querySelectorAll('.expand-btn');
+  expandButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = btn.dataset.index;
+      const detailDiv = document.getElementById(`details-${idx}`);
+      if (detailDiv.style.display === 'none') {
+        detailDiv.style.display = 'block';
+        btn.textContent = 'Collapse ▲';
+      } else {
+        detailDiv.style.display = 'none';
+        btn.textContent = 'Read More ▼';
+      }
+    });
   });
 }
 
