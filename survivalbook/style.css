@@ -1,0 +1,84 @@
+body {
+  font-family: 'Arial', sans-serif;
+  background: url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80') no-repeat center center fixed;
+  background-size: cover;
+  color: #f0f0f0;
+  margin: 0;
+  padding: 0;
+}
+
+.home-btn {
+  display: inline-block;
+  margin: 10px;
+  padding: 8px 12px;
+  background: #2f7a2f;
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 4px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: rgba(47, 122, 47, 0.9);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2em;
+}
+
+header button {
+  padding: 6px 12px;
+  font-size: 1em;
+  border: none;
+  border-radius: 4px;
+  background-color: #f0a500;
+  cursor: pointer;
+}
+
+.search-section {
+  padding: 10px 20px;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.search-section input {
+  width: 100%;
+  padding: 8px;
+  font-size: 1em;
+  border-radius: 4px;
+  border: none;
+}
+
+main {
+  padding: 20px;
+}
+
+.topic {
+  background-color: rgba(47, 122, 47, 0.8);
+  margin: 10px 0;
+  padding: 15px;
+  border-radius: 6px;
+}
+
+.topic h2 {
+  margin-top: 0;
+}
+
+/* Emergency Mode */
+body.emergency {
+  background: #000 !important;
+  color: #0f0 !important;
+}
+
+body.emergency .topic {
+  background: #000 !important;
+  border: 1px solid #0f0;
+}
+
+body.emergency img {
+  display: none !important;
+}
