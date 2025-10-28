@@ -47,7 +47,9 @@ function displayTopics(list) {
 document.getElementById('searchBox').addEventListener('input', e => {
   const query = e.target.value.toLowerCase();
   const filtered = topics.filter(t =>
-    t.title.toLowerCase().includes(query) || t.content.toLowerCase().includes(query)
+    t.title.toLowerCase().includes(query) ||
+    t.summary.toLowerCase().includes(query) ||
+    t.details.some(d => d.toLowerCase().includes(query))
   );
   displayTopics(filtered);
 });
