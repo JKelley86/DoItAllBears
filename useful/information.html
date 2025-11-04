@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Information Hub</title>
+  <link rel="stylesheet" href="theme.css" />
+  <style>
+    /* --- Extra Styles for Popup and Layout --- */
+    .category-list {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      gap: 10px;
+      max-width: 600px;
+    }
+
+    .category-button {
+      background: var(--card-bg);
+      color: var(--text-color);
+      padding: 15px;
+      border-radius: 15px;
+      width: 100%;
+      text-align: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+      border: 2px solid transparent;
+    }
+
+    .category-button:hover {
+      background: var(--accent-color);
+      transform: scale(1.05);
+    }
+
+    /* Popup (modal) overlay */
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .popup-box {
+      background: var(--card-bg);
+      color: var(--text-color);
+      padding: 30px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 600px;
+      text-align: left;
+      position: relative;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    .popup-box h2 {
+      margin-top: 0;
+      text-align: center;
+      font-size: 2rem;
+    }
+
+    .popup-close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-color);
+    }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Information Hub</h1>
+    <div class="search-bar-container">
+      <input type="text" id="searchInput" class="search-bar" placeholder="Search topics..." />
+    </div>
+
+    <div class="category-list" id="categoryList">
+      <!-- Dynamic Category Buttons Injected Here -->
+    </div>
+  </div>
+
+  <!-- Popup Overlay -->
+  <div id="popupOverlay" class="popup-overlay">
+    <div class="popup-box">
+      <span class="popup-close" id="popupClose">&times;</span>
+      <h2 id="popupTitle"></h2>
+      <p id="popupContent"></p>
+    </div>
+  </div>
+
+  <script>
+    // Sample data: You can replace or expand this dynamically
+    const infoData = [
+      {
+        title: "Health Insurance",
+        content: "Health insurance helps cover medical costs. You typically pay premiums monthly and the plan covers part of doctor visits, hospital stays, and prescriptions. Check your deductible and out-of-pocket maximum to know your total potential cost."
+      },
+      {
+        title: "HSA (Health Savings Account)",
+        content: "An HSA is a savings account you can use for medical expenses. It’s tax-free, and you can keep unused funds year to year. To qualify, you must have a high-deductible health plan (HDHP)."
+      },
+      {
+        title: "Deductible",
+        content: "The deductible is the amount you pay out of pocket before your insurance starts covering costs. For example, if your deductible is $1,000, you pay that amount first before coverage begins."
+      },
+      {
+        title: "Out-of-Pocket Maximum",
+        content: "This is the most you’ll pay during a policy period (usually a year). After reaching this limit, insurance pays 100% of covered services."
+      }
+    ];
+
+    const categoryList = document.getElementById('categoryList');
+    const searchInput = document.getElementById('searchInput');
+    const popupOverlay = document.getElementById('popupOverlay');
+    const popupTitle = document.getElementById('popupTitle');
+    const popupContent = document.getElementById('popupContent');
+    const popupClose = document.getElementById('popupClose');
+
+    // Populate category buttons
+    function renderCategories(filteredData = infoData) {
+      categoryList.innerHTML = "";
+      filteredData.forEach(item => {
+        const btn = document.createElement('div');
+        btn.className = 'category-button';
+        btn.textContent = item.title;
+        btn.onclick = () => showPopup(item.title, item.content);
+        categoryList.appendChild(btn);
+      });
+    }
+
+    // Popup open
+    function showPopup(title, content) {
+      popupTitle.textContent = title;
+      popupContent.textContent = content;
+      popupOverlay.style.display = 'flex';
+    }
+
+    // Popup close
+    popupClose.onclick = () => popupOverlay.style.display = 'none';
+    popupOverlay.onclick = (e) => {
+      if (e.target === popupOverlay) popupOverlay.style.display = 'none';
+    };
+
+    // Search
+    searchInput.addEventListener('input', e => {
+      const term = e.target.value.toLowerCase();
+      const filtered = infoData.filter(item => item.title.toLowerCase().includes(term));
+      renderCategories(filtered);
+    });
+
+    // Initialize
+    renderCategories();
+  </script>
+</body>
+</html>
