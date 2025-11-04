@@ -104,11 +104,26 @@
     const infoData = [
       {
         title: "Health Insurance",
-        content: "Health insurance helps cover medical costs. You typically pay premiums monthly and the plan covers part of doctor visits, hospital stays, and prescriptions. Check your deductible and out-of-pocket maximum to know your total potential cost."
+        content: `
+          <p>Health insurance helps cover medical costs. Common things to understand:</p>
+          <ul>
+            <li>Premium: Monthly cost of your insurance plan.</li>
+            <li>Deductible: What you pay before insurance starts helping.</li>
+            <li>Copay: Small fee for visits or prescriptions.</li>
+            <li>Out-of-pocket maximum: Your spending cap for the year.</li>
+          </ul>
+        `
       },
       {
         title: "HSA (Health Savings Account)",
-        content: "An HSA is a savings account you can use for medical expenses. It’s tax-free, and you can keep unused funds year to year. To qualify, you must have a high-deductible health plan (HDHP)."
+        content: `
+          <p>Key benefits of an HSA:</p>
+          <ol>
+            <li>Tax-free contributions</li>
+            <li>Funds roll over year-to-year</li>
+            <li>You can invest your balance</li>
+          </ol>
+        `
       },
       {
         title: "Deductible",
@@ -142,7 +157,7 @@
     // Popup open
     function showPopup(title, content) {
       popupTitle.textContent = title;
-      popupContent.textContent = content;
+      popupContent.innerHTML = content;
       popupOverlay.style.display = 'flex';
     }
 
