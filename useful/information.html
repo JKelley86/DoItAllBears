@@ -105,7 +105,7 @@
       {
         title: "Health Insurance",
         content: `
-          <p>Health insurance helps cover medical costs. Common things to understand:</p>
+          <p>Health insurance is a contract between you and an insurance company. You pay a monthly premium (like a subscription), and in return, the insurance helps pay for your medical costs — doctor visits, prescriptions, hospital stays, surgeries, etc.</p>
           <ul>
             <li>Premium: Monthly cost of your insurance plan.</li>
             <li>Deductible: What you pay before insurance starts helping.</li>
@@ -115,23 +115,80 @@
         `
       },
       {
+        title: "Premium",
+        content: `
+          <p>Monthly payment for insurance</p>
+          <ul>
+            <li>What you pay every month for your health insurance plan (whether or not you use it)</li>
+            <li>Think of it like the cost to have coverage</li>
+            <li>Example: You pay $200/month = $2,400 per year just to have the plan</li>
+          </ul>
+        `
+      },
+      {
         title: "HSA (Health Savings Account)",
         content: `
-          <p>Key benefits of an HSA:</p>
-          <ol>
-            <li>Tax-free contributions</li>
-            <li>Funds roll over year-to-year</li>
-            <li>You can invest your balance</li>
-          </ol>
+          <p>An HSA is a special savings account that helps you pay for medical expenses tax-free. It’s only available if you have a High-Deductible Health Plan (HDHP).</p>
+          <ul>
+            <li>Tax-free contributions — money you put in isn’t taxed</li>
+            <li>Tax-free growth — if you invest it, your gains aren’t taxed</li>
+            <li>Tax-free withdrawals — when used for qualified medical expenses</li>
+          </ul>
         `
       },
       {
         title: "Deductible",
-        content: "The deductible is the amount you pay out of pocket before your insurance starts covering costs. For example, if your deductible is $1,000, you pay that amount first before coverage begins."
+        content: `
+          <p>What you pay before insurance kicks in.</p>
+          <ul>
+            <li>The amount you pay out of your own pocket before insurance starts paying a share</li>
+            <li>Until you hit your deductible, you pay for most medical expenses yourself</li>
+            <li>Example: Your deductible = $2,000 If you go to the ER and the bill is $2,500 → You pay $2,000 (deductible), and insurance starts helping with the rest after that.</li>
+          </ul>
+        `
+      },
+      {
+        title: "Copay",
+        content: `
+          <p>What you pay before insurance kicks in.</p>
+          <ul>
+            <li>A fixed amount you pay for certain services, like a doctor visit or prescription</li>
+            <li>Example: $25 for a primary care visit, $10 for generic prescriptions</li>
+            <li>Copays often apply even before your deductible is met — depends on the plan.</li>
+          </ul>
+        `
       },
       {
         title: "Out-of-Pocket Maximum",
-        content: "This is the most you’ll pay during a policy period (usually a year). After reaching this limit, insurance pays 100% of covered services."
+        content: `
+          <p>This is the most you’ll pay during a policy period (usually a year). After reaching this limit, insurance pays 100% of covered services.</p>
+          <ul>
+            <li>The most you’ll pay in one year for covered medical expenses</li>
+            <li>Once you hit this limit, your insurance covers 100% of covered costs for the rest of the year</li>
+            <li>Example: Your out-of-pocket max = $6,000 That includes your deductible, copays, and coinsurance. If you reach $6,000 total out of your pocket, everything else is fully covered that year.</li>
+          </ul>
+        `
+      },
+      {
+        title: "Coinsurance",
+        content: `
+          <p>Your share of the bill after deductible.</p>
+          <ul>
+            <li>After your deductible is met, you pay a percentage of the bill, and insurance pays the rest</li>
+            <li>Example: 20% coinsurance You’ve hit your deductible. Now your MRI costs $1,000 → You pay $200 (20%), insurance pays $800 (80%).</li>
+          </ul>
+        `
+      },
+      {
+        title: "FSA (Flexible Spending Account)",
+        content: `
+          <p>An FSA (Flexible Spending Account) is an employer-sponsored account that lets you set aside pre-tax money from your paycheck to pay for certain out-of-pocket healthcare expenses. So instead of paying for things like copays, prescriptions, glasses, or dental care with after-tax dollars, you use tax-free money — which saves you about 20–30% depending on your tax rate.</p>
+          <ul>
+            <li>Let’s say you earn $50,000/year and decide to put $3,000 into your FSA. That $3,000 isn’t taxed — so you save about $600–$900 in taxes (depending on your bracket). You can then use that $3,000 throughout the year to pay for eligible medical expenses.</li>
+            <li>You decide how much to contribute for the year during open enrollment (before the year starts).</li>
+            <li>The full annual amount is available immediately at the start of the year — even if you haven’t contributed it all yet.</li>
+          </ul>
+        `
       }
     ];
 
