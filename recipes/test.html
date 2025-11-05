@@ -214,8 +214,10 @@
             text-align: center;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            overflow: hidden;
+            overflow: visible;
             border: 3px solid transparent;
+            display: flex;
+            flex-direction: column;
         }
 
         .recipe-list li::before {
@@ -228,6 +230,7 @@
             background: linear-gradient(90deg, var(--accent-color) 0%, var(--accent-secondary) 100%);
             transform: scaleX(0);
             transition: transform 0.3s ease;
+            border-radius: 20px 20px 0 0;
         }
 
         .recipe-list li:hover::before {
@@ -255,26 +258,22 @@
             color: var(--accent-color);
         }
 
+        .badge-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0 12px;
+            min-height: 35px;
+        }
+
         .paw-icon,
         .cabin-icon {
-            position: absolute;
-            top: 10px;
             font-size: 1.5rem;
             animation: bounce 2s ease-in-out infinite;
         }
 
-        .paw-icon {
-            right: 50px;
-        }
-
-        .cabin-icon {
-            right: 15px;
-        }
-
         .recipe-list li img {
-            position: absolute;
-            top: 10px;
-            left: 15px;
             width: 25px;
             height: 25px;
             animation: bounce 2s ease-in-out infinite 0.5s;
@@ -565,31 +564,34 @@
                 const a = document.createElement('a');
                 a.href = recipe.link;
                 a.textContent = recipe.name;
+                li.appendChild(a);
+
+                // Create badge container
+                const badgeContainer = document.createElement('div');
+                badgeContainer.classList.add('badge-container');
+
+                if (recipe.aubrie) {
+                    const mickey = document.createElement('img');
+                    mickey.src = "https://static.wikia.nocookie.net/disneyemojiblitz/images/5/57/EmojiBlitzMickey1.png";
+                    mickey.alt = "Mickey";
+                    badgeContainer.appendChild(mickey);
+                }
 
                 if (recipe.approved) {
-                const paw = document.createElement('span');
-                paw.classList.add('paw-icon');
-                paw.textContent = "🐾";
-                li.appendChild(paw);
+                    const paw = document.createElement('span');
+                    paw.classList.add('paw-icon');
+                    paw.textContent = "🐾";
+                    badgeContainer.appendChild(paw);
                 }
 
                 if (recipe.grandma) {
-                const cabin = document.createElement('span');
-                cabin.classList.add('cabin-icon');
-                cabin.textContent = "🏕️";
-                li.appendChild(cabin);
+                    const cabin = document.createElement('span');
+                    cabin.classList.add('cabin-icon');
+                    cabin.textContent = "🏕️";
+                    badgeContainer.appendChild(cabin);
                 }
-		    
-		if (recipe.aubrie) {
-    		    const mickey = document.createElement('img');
-    		    mickey.src = "https://static.wikia.nocookie.net/disneyemojiblitz/images/5/57/EmojiBlitzMickey1.png";
-    	  	    mickey.alt = "Mickey";
-    		    mickey.style.width = "25px";
-    		    mickey.style.height = "25px";
-    		    li.appendChild(mickey);
-		}
-                
-                li.appendChild(a);
+
+                li.appendChild(badgeContainer);
                 list.appendChild(li);
             });
         }
