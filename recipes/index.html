@@ -5,259 +5,490 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Cookbook</title>
     <style>
-:root {
-    --bg-color: #121212;
-    --text-color: #fff;
-    --card-bg: #000;
-    --accent-color: #ff6347;
-}
-
-/* Light Mode */
-body.light-mode {
-    --bg-color: #f4f4f4;
-    --text-color: #121212;
-    --card-bg: #fff;
-}
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: var(--bg-color);
+        * {
             margin: 0;
             padding: 0;
-            color: black;
+            box-sizing: border-box;
         }
+
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #fff;
+            --card-bg: #2a2a2a;
+            --accent-color: #ff6b6b;
+            --accent-secondary: #ffa500;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        body.light-mode {
+            --bg-color: #fef9f3;
+            --text-color: #2c2c2c;
+            --card-bg: #fff;
+            --accent-color: #e74c3c;
+            --accent-secondary: #f39c12;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Georgia', 'Garamond', serif;
+            background: var(--bg-color);
+            background-image: 
+                repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(0,0,0,0.02) 50px, rgba(0,0,0,0.02) 51px),
+                repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(0,0,0,0.02) 50px, rgba(0,0,0,0.02) 51px);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode {
+            background-image: 
+                repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(139,69,19,0.03) 50px, rgba(139,69,19,0.03) 51px),
+                repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(139,69,19,0.03) 50px, rgba(139,69,19,0.03) 51px);
+        }
+
         header {
-            background-color: #6c757d;
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-secondary) 100%);
             color: white;
-            padding: 15px;
+            padding: 40px 20px;
             text-align: center;
-            font-size: 24px;
+            font-size: 3rem;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 30px rgba(255, 107, 107, 0.3);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Brush Script MT', cursive;
+            letter-spacing: 2px;
         }
+
+        header::before {
+            content: '🍳';
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 2.5rem;
+            opacity: 0.7;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        header::after {
+            content: '👨‍🍳';
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 2.5rem;
+            opacity: 0.7;
+            animation: float 3s ease-in-out infinite 1.5s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
         .tabs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            justify-content: flex-start;
             overflow-x: auto;
+            overflow-y: visible;
             -webkit-overflow-scrolling: touch;
-            padding-bottom: 10px;
-            color: white;
-            font-weight: bold;
+            padding: 0 20px 20px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) transparent;
         }
+
+        @media (min-width: 769px) {
+            .tabs {
+                justify-content: center;
+            }
+        }
+
+        .tabs::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .tabs::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .tabs::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 10px;
+        }
+
         .tab {
-            padding: 10px 15px;
-            background: #ddd;
+            padding: 14px 28px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 2px solid transparent;
             cursor: pointer;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: background 0.3s, transform 0.2s;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-color);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
         }
-        .tab:hover { 
-            background: #bbb; 
-            transform: scale(1.05);
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 107, 107, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+            z-index: 0;
         }
-        .tab.active { 
-            background: #6c757d; 
-            color: white; 
+
+        .tab * {
+            position: relative;
+            z-index: 1;
         }
-        .search { 
-            width: 80%; 
-            padding: 10px; 
-	    margin: 0 auto;
-            margin-bottom: 20px; 
-	    display: block;
-            border: 1px solid #ccc; 
-            border-radius: 5px; 
-            font-size: 16px;
-	    
+
+        .tab:hover::before {
+            width: 300px;
+            height: 300px;
         }
+
+        .tab:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px var(--shadow-color);
+            border-color: var(--accent-color);
+            z-index: 10;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-secondary) 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+            transform: translateY(-2px);
+            z-index: 10;
+        }
+
+        .search {
+            width: 80%;
+            max-width: 700px;
+            padding: 18px 28px;
+            margin: 0 auto 40px;
+            display: block;
+            border: 3px solid transparent;
+            background: var(--card-bg);
+            border-radius: 50px;
+            font-size: 17px;
+            color: var(--text-color);
+            box-shadow: 0 8px 30px var(--shadow-color);
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+        }
+
+        .search::placeholder {
+            color: var(--text-color);
+            opacity: 0.6;
+            font-style: italic;
+        }
+
+        .search:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 12px 40px rgba(255, 107, 107, 0.3);
+            transform: translateY(-2px);
+        }
+
         .recipe-list {
             list-style: none;
-            padding: 0;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            padding: 15px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            border-radius: 8px;
-            text-align: center;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
         }
+
         .recipe-list li {
             font-size: 18px;
-            padding: 15px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 0;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px var(--shadow-color);
             text-align: center;
-            transition: transform 0.2s;
-        }
-        .recipe-list li:hover {
-            transform: scale(1.05);
-        }
-        .recipe-list a { 
-            color: #6c757d; 
-            text-decoration: none; 
-            font-weight: bold;
-            display: block;
-            padding: 10px;
-        }
-        .recipe-list a:hover { 
-            text-decoration: underline; 
-        }
-	    
-        .chat-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: visible;
+            border: 3px solid transparent;
             display: flex;
             flex-direction: column;
+        }
+
+        .recipe-list li::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent-color) 0%, var(--accent-secondary) 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .recipe-list li:hover::before {
+            transform: scaleX(1);
+        }
+
+        .recipe-list li:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(255, 107, 107, 0.3);
+            border-color: var(--accent-color);
+        }
+
+        .recipe-list a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 600;
+            display: block;
+            padding: 25px 20px;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            position: relative;
+        }
+
+        .recipe-list a:hover {
+            color: var(--accent-color);
+        }
+
+        .badge-container {
+            display: flex;
+            justify-content: center;
             align-items: center;
+            gap: 8px;
+            padding: 8px 0 12px;
+            min-height: 35px;
         }
-        .chat-text {
-            background-color: white;
-            padding: 5px 10px;
-            border-radius: 10px;
-            font-size: 14px;
-            margin-bottom: 5px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-            text-align: center;
+
+        .paw-icon,
+        .cabin-icon {
+            font-size: 1.5rem;
+            animation: bounce 2s ease-in-out infinite;
         }
-	    
-        .chat-bubble {
-            background-color: #28a745;
+
+        .recipe-list li img {
+            width: 25px;
+            height: 25px;
+            animation: bounce 2s ease-in-out infinite 0.5s;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .sidebar {
+            position: fixed;
+            left: -400px;
+            top: 0;
+            width: 320px;
+            height: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            box-shadow: 5px 0 30px var(--shadow-color);
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            overflow-y: auto;
+            border-right: 3px solid var(--accent-color);
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar a {
+            color: var(--text-color);
+            padding: 18px 20px;
+            text-decoration: none;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 2px solid transparent;
+        }
+
+        .sidebar a:hover {
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-secondary) 100%);
             color: white;
-            padding: 15px;
-            border-radius: 50%;
+            padding-left: 30px;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-secondary) 100%);
+            color: white;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
             cursor: pointer;
-            font-size: 20px;
+            z-index: 1100;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.5);
+        }
+
+        .theme-toggle {
+            margin-top: auto;
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-secondary) 100%);
+            color: white;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+        }
+
+        .clock {
+            margin-top: 20px;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+            color: var(--text-color);
             text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-secondary) 100%);
+            border-radius: 15px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        footer {
+            background: var(--card-bg);
+            padding: 30px 20px;
+            font-size: 16px;
+            width: 100%;
+            text-align: center;
+            margin-top: 60px;
+            color: var(--text-color);
+            border-top: 3px solid var(--accent-color);
+            box-shadow: 0 -8px 30px var(--shadow-color);
+        }
+
+        footer span {
+            display: block;
+            margin: 8px 0;
+            font-size: 1.1rem;
+        }
+
+        footer img {
+            vertical-align: middle;
             width: 20px;
             height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-	    bottom: 20px;
-            right: 20px;
         }
 
-.sidebar {
-    position: fixed;
-    left: -400px;
-    top: 0;
-    width: 300px;
-    height: 100%;
-    background: var(--card-bg);
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
-    transition: left 0.3s ease;
-    z-index: 1000;
-    overflow-y: auto; /* Adds vertical scrolling if content overflows */
-}
+        /* Cookbook-style decorative elements */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, rgba(255, 107, 107, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(255, 165, 0, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
 
-.sidebar.open {
-    left: 0;
-}
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
 
-.sidebar a {
-    color: var(--text-color);
-    padding: 20px 0;
-    text-decoration: none;
-    font-size: 20px;
-    transition: background 0.3s ease, padding-left 0.3s ease;
-}
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
 
-.sidebar a:hover {
-    background: var(--accent-color);
-    padding-left: 10px;
-}
-.sidebar-card {
-    color: var(--text-color);
-    padding: 20px 0;
-    text-decoration: none;
-    font-size: 20px;
-    transition: background 0.3s ease, padding-left 0.3s ease;
-}
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-secondary) 100%);
+            border-radius: 10px;
+        }
 
-/* Hover effect for sidebar cards */
-.sidebar-card:hover {
-    background: var(--accent-color);
-    padding-left: 10px;
-}
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--accent-secondary) 0%, var(--accent-color) 100%);
+        }
 
-/* Menu Button */
-.menu-btn {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    background: var(--text-color);
-    color: var(--bg-color);
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    z-index: 1100;
-}
+        /* Responsive design */
+        @media (max-width: 768px) {
+            header {
+                font-size: 2rem;
+                padding: 30px 15px;
+            }
 
-/* Theme Toggle Button */
-.theme-toggle {
-    margin-top: auto;
-    background: var(--text-color);
-    color: var(--bg-color);
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 60px;
-}
+            header::before,
+            header::after {
+                font-size: 1.8rem;
+            }
 
-/* Search Bar */
-.header {
-    width: 100%;
-    text-align: center;
-    margin: 50px 0;
-}
+            .recipe-list {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+                padding: 15px;
+            }
 
-.search-bar-container {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
+            .search {
+                width: 90%;
+                font-size: 16px;
+            }
 
-.search-bar {
-    width: 100%;
-    max-width: 600px;
-    padding: 15px;
-    font-size: 18px;
-    border-radius: 25px;
-    border: none;
-}
+            .tab {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
 
-/* Clock */
-.clock {
-    margin-top: 60px;
-    font-size: 1.5rem;
-    color: var(--text-color);
-}
-
-/* Footer */
-footer {
-    background: var(--card-bg);
-    padding: 10px;
-    font-size: 16px;
-    width: 100%;
-    text-align: center;
-    margin-top: auto;
-    color: var(--text-color);
-}
-	    
+            .tabs {
+                gap: 8px;
+                padding: 0 15px 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -279,27 +510,16 @@ footer {
         <div class="tab" data-diet="Carnivore" onclick="filterDiet('Carnivore')">Carnivore</div>
         <div class="tab" data-diet="General" onclick="filterDiet('General')">General</div>
     </div>
-
-    <!-- <div class="chat-container">
-        <div class="chat-text">Find Recipes Based on ingredients</div>
-    	<div class="chat-bubble" onclick="window.location.href='ai.html'">💬</div>
-    </div> -->
 	
     <input type="text" class="search" placeholder="Search recipes..." oninput="searchRecipes()">
-    <ul class="recipe-list" id="recipe-list"></ul> 
-      <!--   <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
-    <div class="sidebar" id="sidebar">
-        <div class="clock" id="clock"></div>
-        <a href="../index.html">Main Page</a>
-        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
-    </div> -->
+    <ul class="recipe-list" id="recipe-list"></ul>
+
 <footer> 
-    <span>🐾 = Justin & Bridget's Favorites!</span><br>
-    <span>🏕️ = Grandma's Recipe!</span><br>
+    <span>🐾 = Justin & Bridget's Favorites!</span>
+    <span>🏕️ = Grandma's Recipe!</span>
     <span>
         <img src="https://static.wikia.nocookie.net/disneyemojiblitz/images/5/57/EmojiBlitzMickey1.png" 
-             alt="Mickey Mouse" 
-             style="width: 16px; height: 16px; vertical-align: middle;">
+             alt="Mickey Mouse">
         = Aubrie's Grandma's Recipe!
     </span>
 </footer> 
@@ -375,32 +595,34 @@ footer {
                 const a = document.createElement('a');
                 a.href = recipe.link;
                 a.textContent = recipe.name;
+                li.appendChild(a);
+
+                // Create badge container
+                const badgeContainer = document.createElement('div');
+                badgeContainer.classList.add('badge-container');
+
+                if (recipe.aubrie) {
+                    const mickey = document.createElement('img');
+                    mickey.src = "https://static.wikia.nocookie.net/disneyemojiblitz/images/5/57/EmojiBlitzMickey1.png";
+                    mickey.alt = "Mickey";
+                    badgeContainer.appendChild(mickey);
+                }
 
                 if (recipe.approved) {
-                const paw = document.createElement('span');
-                paw.classList.add('paw-icon');
-                paw.textContent = " 🐾";
-                li.appendChild(paw);
+                    const paw = document.createElement('span');
+                    paw.classList.add('paw-icon');
+                    paw.textContent = "🐾";
+                    badgeContainer.appendChild(paw);
                 }
 
                 if (recipe.grandma) {
-                const cabin = document.createElement('span');
-                cabin.classList.add('cabin-icon');
-                cabin.textContent = " 🏕️";
-                li.appendChild(cabin);
+                    const cabin = document.createElement('span');
+                    cabin.classList.add('cabin-icon');
+                    cabin.textContent = "🏕️";
+                    badgeContainer.appendChild(cabin);
                 }
-		    
-		if (recipe.aubrie) {
-    		    const mickey = document.createElement('img');
-    		    mickey.src = "https://static.wikia.nocookie.net/disneyemojiblitz/images/5/57/EmojiBlitzMickey1.png"; // or use an external URL
-    	  	    mickey.alt = "Mickey";
-    		    mickey.style.width = "20px";
-    		    mickey.style.height = "20px";
-    		    mickey.style.marginRight = "5px"; // Optional spacing
-    		    li.appendChild(mickey);
-		}
-                
-                li.appendChild(a);
+
+                li.appendChild(badgeContainer);
                 list.appendChild(li);
             });
         }
@@ -414,8 +636,8 @@ footer {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('open');
         }
-                // Close sidebar if clicked outside of it
-                document.addEventListener('click', function(event) {
+
+        document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const menuButton = document.querySelector('.menu-btn');
             if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
@@ -429,7 +651,6 @@ footer {
             document.getElementById('clock').textContent = timeString;
         }
 
-        // Function to toggle the theme
         function toggleTheme() {
             document.body.classList.toggle('light-mode');
             localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
