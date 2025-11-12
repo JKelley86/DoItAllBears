@@ -11,6 +11,12 @@
     <h1>Welcome To The Home Page Of Useful Items</h1>
     <p>This is a one-stop shop for anything you may need!</p>
     <h6>Please note this website is a work in progress. Some things may not work as expected.</h6>
+    <!-- Random Bible Verse Section -->
+<div id="bible-verse-box">
+    <h3>📖 Daily Inspiration</h3>
+      <p id="bible-verse">Loading verse...</p>
+      <button id="new-verse-btn">Get Random Verse</button>
+</div>
 </div>
 
 <!-- Weather Button -->
@@ -246,6 +252,34 @@ async function fetchWeather(position) {
 function closeWeatherPopup() {
     weatherPopup.style.display = 'none';
 }
+
+// RANDOM BIBLE VERSE FEATURE
+const verseBox = document.getElementById("bible-verse");
+const newVerseBtn = document.getElementById("new-verse-btn");
+
+async function getRandomVerse() {
+    verseBox.textContent = "Fetching verse...";
+    try {
+        const response = await fetch("https://bible-api.com/?random=verse");
+        const data = await response.json();
+
+        if (data.text && data.reference) {
+            verseBox.innerHTML = `"${data.text.trim()}"<br><br><strong>- ${data.reference}</strong>`;
+        } else {
+            verseBox.textContent = "Couldn't load verse. Try again.";
+        }
+    } catch (error) {
+        console.error(error);
+        verseBox.textContent = "Error fetching verse. Please try again.";
+    }
+}
+
+// Event listener for refresh button
+newVerseBtn.addEventListener("click", getRandomVerse);
+
+// Load one verse on page load
+getRandomVerse();
+
     
 </script>
 
