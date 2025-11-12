@@ -13,6 +13,18 @@
     <h6>Please note this website is a work in progress. Some things may not work as expected.</h6>
 </div>
 
+<!-- Weather Button -->
+<div id="weather-icon" title="Check Weather">☀️</div>
+
+<!-- Weather Popup -->
+<div id="weather-popup" class="popup" style="display:none;">
+  <div class="weather-content">
+    <h3>Current Weather</h3>
+    <div id="weather-info">Loading...</div>
+    <button onclick="closeWeatherPopup()">Close</button>
+  </div>
+</div>
+    
 <div class="search-bar-container">
     <input type="text" class="search-bar" id="search-bar" placeholder="Search..." oninput="filterCards()" />
 </div>
@@ -157,6 +169,82 @@ async function login() {
 function logout() {
     localStorage.removeItem("loggedInUser");
     location.reload();
+}
+// WEATHER FUNCTIONALITY
+const weatherIcon = document.getElementById('weather-icon');
+const weatherPopup = document.getElementById('weather-popup');
+const weatherInfo = document.getElementById('weather-info');
+const apiKey = "de00d344e2084f4188726b530a5cf2a4";
+
+weatherIcon.addEventListener('click', async () => {
+    // Animate icon
+    weatherIcon.style.transform = 'rotate(360deg)';
+    setTimeout(() => weatherIcon.style.transform = '', 400);
+
+    // Try to get geolocation
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(fetchWeather, showError);
+    } else {
+        weatherInfo.textContent = "Geolocation not supported by your browser.";
+        weatherPopup.style.display = 'flex';
+    }
+});
+
+function showError() {
+    weatherInfo.textContent = "Unable to retrieve location.";
+    weatherPopup.style.display = 'flex';
+}
+
+async function fetchWeather(position) {
+    const { latitude, longitude } = position.coords;
+    const url = `https://api.weatherstack.com/current?access_key=${apiKey}&query=${latitude},${longitude}`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.error) {
+            weatherInfo.innerHTML = `<p>Error: ${data.error.info}</p>`;
+        } else {
+            const w = data.current;
+            const loc = data.location;
+
+            // 🌤️ Choose an emoji icon dynamically based on description
+            const description = w.weather_descriptions[0].toLowerCase();
+            let emoji = "☀️"; // default
+
+            if (description.includes("rain") || description.includes("drizzle")) emoji = "🌧️";
+            else if (description.includes("snow")) emoji = "❄️";
+            else if (description.includes("thunder")) emoji = "⛈️";
+            else if (description.includes("cloud")) emoji = "☁️";
+            else if (description.includes("fog") || description.includes("mist") || description.includes("haze")) emoji = "🌫️";
+            else if (description.includes("clear")) emoji = "☀️";
+            else if (description.includes("wind")) emoji = "🌬️";
+
+            // Update the main icon in the corner dynamically
+            weatherIcon.textContent = emoji;
+
+            // Populate popup info
+            weatherInfo.innerHTML = `
+                <p><strong>${loc.name}, ${loc.region}</strong></p>
+                <p>${w.weather_descriptions[0]}</p>
+                <p>🌡️ ${w.temperature}°C / ${((w.temperature * 9/5) + 32).toFixed(1)}°F</p>
+                <p>💨 ${w.wind_speed} km/h wind</p>
+                <p>💧 ${w.humidity}% humidity</p>
+                <img src="${w.weather_icons[0]}" alt="icon" style="width:64px; margin-top:10px;">
+            `;
+        }
+
+        weatherPopup.style.display = 'flex';
+    } catch (err) {
+        console.error(err);
+        weatherInfo.textContent = "Failed to fetch weather data.";
+        weatherPopup.style.display = 'flex';
+    }
+}
+
+function closeWeatherPopup() {
+    weatherPopup.style.display = 'none';
 }
     
 </script>
