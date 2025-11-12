@@ -459,3 +459,66 @@ footer {
         #cancel-button:hover {
             background-color: #c9302c;
         }
+		/* Weather icon in top-right corner */
+		#weather-icon {
+  			position: fixed;
+  			top: 15px;
+  			right: 20px;
+  			font-size: 1.8em;
+  			cursor: pointer;
+  			transition: transform 0.4s ease, color 0.3s ease;
+  			z-index: 2000;
+		}
+		#weather-icon:hover {
+  			transform: rotate(15deg) scale(1.2);
+  			color: var(--accent-color, gold);
+		}
+
+		/* Popup styling */
+		#weather-popup {
+  			position: fixed;
+  			top: 0;
+  			left: 0;
+  			width: 100%;
+  			height: 100%;
+ 			background: rgba(0, 0, 0, 0.65);
+  			display: flex;
+  			justify-content: center;
+  			align-items: center;
+ 			z-index: 3000;
+		}
+
+		.weather-content {
+  			background: #222;
+  			color: white;
+  			padding: 20px 25px;
+  			border-radius: 12px;
+  			box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  			text-align: center;
+  			min-width: 260px;
+  			animation: fadeIn 0.4s ease;
+		}
+
+		.light-mode .weather-content {
+  			background: #f5f5f5;
+  			color: #222;
+		}
+
+		@keyframes fadeIn {
+  			from { opacity: 0; transform: translateY(-10px); }
+  			to { opacity: 1; transform: translateY(0); }
+		}
+
+		.weather-content button {
+  			margin-top: 12px;
+  			background: var(--accent-color, #4caf50);
+  			color: white;
+  			border: none;
+  			border-radius: 6px;
+  			padding: 8px 16px;
+  			cursor: pointer;
+  			font-size: 1em;
+		}
+		.weather-content button:hover {
+  			opacity: 0.8;
+		}
