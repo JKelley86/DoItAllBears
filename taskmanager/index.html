@@ -1,0 +1,428 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Calendar, Clock, Play, Pause, X, GripVertical, Plus, Check, ChevronLeft, ChevronRight } from 'lucide-react';
+
+const FocusTaskManager = () => {
+  const [tasks, setTasks] = useState([
+    { id: 1, title: 'Review project proposal', time: 30, completed: false, date: new Date().toISOString().split('T')[0] },
+    { id: 2, title: 'Email client updates', time: 15, completed: false, date: new Date().toISOString().split('T')[0] },
+    { id: 3, title: 'Team meeting prep', time: 45, completed: false, date: new Date().toISOString().split('T')[0] }
+  ]);
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [newTaskTime, setNewTaskTime] = useState(30);
+  const [newTaskDate, setNewTaskDate] = useState(new Date().toISOString().split('T')[0]);
+  const [draggedTask, setDraggedTask] = useState(null);
+  const [view, setView] = useState('today');
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [focusMode, setFocusMode] = useState(null);
+  const [timerSeconds, setTimerSeconds] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    if (isTimerRunning && focusMode) {
+      timerRef.current = setInterval(() => {
+        setTimerSeconds(prev => {
+          if (prev >= focusMode.time * 60) {
+            setIsTimerRunning(false);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+    } else {
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isTimerRunning, focusMode]);
+
+  const addTask = () => {
+    if (newTaskTitle.trim()) {
+      setTasks([...tasks, {
+        id: Date.now(),
+        title: newTaskTitle,
+        time: newTaskTime,
+        completed: false,
+        date: newTaskDate
+      }]);
+      setNewTaskTitle('');
+      setNewTaskTime(30);
+    }
+  };
+
+  const completeTask = (id) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...task, completed: true } : task
+    ));
+  };
+
+  const deleteTask = (id) => {
+    setTasks(tasks.filter(task => task.id !== id));
+  };
+
+  const handleDragStart = (task) => {
+    setDraggedTask(task);
+  };
+
+  const handleDragOver = (e, targetTask) => {
+    e.preventDefault();
+    if (draggedTask && draggedTask.id !== targetTask.id) {
+      const draggedIdx = tasks.findIndex(t => t.id === draggedTask.id);
+      const targetIdx = tasks.findIndex(t => t.id === targetTask.id);
+      const newTasks = [...tasks];
+      newTasks.splice(draggedIdx, 1);
+      newTasks.splice(targetIdx, 0, draggedTask);
+      setTasks(newTasks);
+    }
+  };
+
+  const startFocusMode = (task) => {
+    setFocusMode(task);
+    setTimerSeconds(0);
+    setIsTimerRunning(true);
+    setIsMinimized(false);
+  };
+
+  const exitFocusMode = () => {
+    setFocusMode(null);
+    setTimerSeconds(0);
+    setIsTimerRunning(false);
+    setIsMinimized(false);
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const activeTasks = tasks.filter(t => !t.completed && t.date === (view === 'today' ? new Date().toISOString().split('T')[0] : selectedDate.toISOString().split('T')[0]));
+  const completedTasks = tasks.filter(t => t.completed && t.date === (view === 'today' ? new Date().toISOString().split('T')[0] : selectedDate.toISOString().split('T')[0]));
+
+  const getDaysInMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    
+    return { daysInMonth, startingDayOfWeek };
+  };
+
+  const changeMonth = (direction) => {
+    setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() + direction, 1));
+  };
+
+  const getTasksForDate = (date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return tasks.filter(t => t.date === dateStr).length;
+  };
+
+  if (focusMode && isMinimized) {
+    return (
+      <div className="fixed top-4 right-4 bg-gray-900 text-white rounded-lg shadow-2xl p-4 z-50" style={{ width: '200px' }}>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium truncate flex-1">{focusMode.title}</span>
+          <button onClick={() => setIsMinimized(false)} className="ml-2 hover:bg-gray-800 rounded p-1">
+            <ChevronLeft size={16} />
+          </button>
+        </div>
+        <div className="text-3xl font-bold text-center mb-2">
+          {formatTime(timerSeconds)}
+        </div>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setIsTimerRunning(!isTimerRunning)}
+            className="flex-1 bg-blue-600 hover:bg-blue-700 rounded py-2 flex items-center justify-center"
+          >
+            {isTimerRunning ? <Pause size={16} /> : <Play size={16} />}
+          </button>
+          <button 
+            onClick={exitFocusMode}
+            className="bg-red-600 hover:bg-red-700 rounded py-2 px-3"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (focusMode) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl p-12 max-w-2xl w-full">
+          <div className="flex justify-between items-start mb-8">
+            <h1 className="text-4xl font-bold text-gray-800">{focusMode.title}</h1>
+            <button onClick={() => setIsMinimized(true)} className="text-gray-400 hover:text-gray-600">
+              <ChevronRight size={24} />
+            </button>
+          </div>
+          
+          <div className="text-center mb-12">
+            <div className="text-8xl font-bold text-gray-800 mb-4">
+              {formatTime(timerSeconds)}
+            </div>
+            <div className="text-xl text-gray-500">
+              of {focusMode.time} minutes
+            </div>
+            <div className="mt-4 bg-gray-200 rounded-full h-3 overflow-hidden">
+              <div 
+                className="bg-blue-600 h-full transition-all duration-300"
+                style={{ width: `${Math.min((timerSeconds / (focusMode.time * 60)) * 100, 100)}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <button 
+              onClick={() => setIsTimerRunning(!isTimerRunning)}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-4 px-6 flex items-center justify-center gap-2 text-lg font-semibold transition"
+            >
+              {isTimerRunning ? (
+                <>
+                  <Pause size={24} />
+                  Pause
+                </>
+              ) : (
+                <>
+                  <Play size={24} />
+                  Start
+                </>
+              )}
+            </button>
+            <button 
+              onClick={() => completeTask(focusMode.id)}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-lg py-4 px-6 flex items-center justify-center gap-2 text-lg font-semibold transition"
+            >
+              <Check size={24} />
+              Complete
+            </button>
+            <button 
+              onClick={exitFocusMode}
+              className="bg-red-600 hover:bg-red-700 text-white rounded-lg py-4 px-6 flex items-center justify-center text-lg font-semibold transition"
+            >
+              <X size={24} />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+      <div className="max-w-7xl mx-auto">
+        <header className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">Focus Manager</h1>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => setView('today')}
+              className={`px-4 py-2 rounded-lg font-medium transition ${view === 'today' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+            >
+              Today
+            </button>
+            <button 
+              onClick={() => setView('calendar')}
+              className={`px-4 py-2 rounded-lg font-medium transition ${view === 'calendar' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+            >
+              <Calendar className="inline mr-2" size={18} />
+              Calendar
+            </button>
+          </div>
+        </header>
+
+        {view === 'calendar' && (
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-gray-100 rounded-lg">
+                <ChevronLeft size={20} />
+              </button>
+              <h2 className="text-xl font-bold">
+                {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              </h2>
+              <button onClick={() => changeMonth(1)} className="p-2 hover:bg-gray-100 rounded-lg">
+                <ChevronRight size={20} />
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-7 gap-2">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                <div key={day} className="text-center text-sm font-semibold text-gray-600 py-2">
+                  {day}
+                </div>
+              ))}
+              
+              {(() => {
+                const { daysInMonth, startingDayOfWeek } = getDaysInMonth(selectedDate);
+                const days = [];
+                
+                for (let i = 0; i < startingDayOfWeek; i++) {
+                  days.push(<div key={`empty-${i}`} />);
+                }
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                  const date = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), day);
+                  const taskCount = getTasksForDate(date);
+                  const isSelected = date.toISOString().split('T')[0] === selectedDate.toISOString().split('T')[0];
+                  
+                  days.push(
+                    <button
+                      key={day}
+                      onClick={() => setSelectedDate(date)}
+                      className={`aspect-square p-2 rounded-lg transition ${
+                        isSelected 
+                          ? 'bg-blue-600 text-white' 
+                          : 'hover:bg-gray-100'
+                      }`}
+                    >
+                      <div className="text-sm font-medium">{day}</div>
+                      {taskCount > 0 && (
+                        <div className={`text-xs mt-1 ${isSelected ? 'text-blue-200' : 'text-blue-600'}`}>
+                          {taskCount} task{taskCount !== 1 ? 's' : ''}
+                        </div>
+                      )}
+                    </button>
+                  );
+                }
+                
+                return days;
+              })()}
+            </div>
+          </div>
+        )}
+
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <h2 className="text-xl font-bold mb-4">Add New Task</h2>
+          <div className="flex gap-4 flex-wrap">
+            <input
+              type="text"
+              value={newTaskTitle}
+              onChange={(e) => setNewTaskTitle(e.target.value)}
+              placeholder="Task title..."
+              className="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onKeyPress={(e) => e.key === 'Enter' && addTask()}
+            />
+            <div className="flex items-center gap-2">
+              <Clock size={20} className="text-gray-500" />
+              <input
+                type="number"
+                value={newTaskTime}
+                onChange={(e) => setNewTaskTime(parseInt(e.target.value) || 0)}
+                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="text-gray-600">min</span>
+            </div>
+            <input
+              type="date"
+              value={newTaskDate}
+              onChange={(e) => setNewTaskDate(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              onClick={addTask}
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 py-2 flex items-center gap-2 font-medium transition"
+            >
+              <Plus size={20} />
+              Add
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white rounded-2xl shadow-lg p-6">
+            <h2 className="text-xl font-bold mb-4 text-gray-800">Active Tasks</h2>
+            {activeTasks.length === 0 ? (
+              <p className="text-gray-400 text-center py-8">No active tasks</p>
+            ) : (
+              <div className="space-y-3">
+                {activeTasks.map(task => (
+                  <div
+                    key={task.id}
+                    draggable
+                    onDragStart={() => handleDragStart(task)}
+                    onDragOver={(e) => handleDragOver(e, task)}
+                    className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 cursor-move hover:shadow-md transition"
+                  >
+                    <div className="flex items-start gap-3">
+                      <GripVertical className="text-gray-400 mt-1 flex-shrink-0" size={20} />
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-800 mb-2">{task.title}</h3>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Clock size={16} />
+                          <span>{task.time} minutes</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 flex-shrink-0">
+                        <button
+                          onClick={() => startFocusMode(task)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-2 transition"
+                          title="Focus"
+                        >
+                          <Play size={18} />
+                        </button>
+                        <button
+                          onClick={() => completeTask(task.id)}
+                          className="bg-green-600 hover:bg-green-700 text-white rounded-lg p-2 transition"
+                          title="Complete"
+                        >
+                          <Check size={18} />
+                        </button>
+                        <button
+                          onClick={() => deleteTask(task.id)}
+                          className="bg-red-600 hover:bg-red-700 text-white rounded-lg p-2 transition"
+                          title="Delete"
+                        >
+                          <X size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg p-6">
+            <h2 className="text-xl font-bold mb-4 text-gray-800">Completed</h2>
+            {completedTasks.length === 0 ? (
+              <p className="text-gray-400 text-center py-8">No completed tasks</p>
+            ) : (
+              <div className="space-y-3">
+                {completedTasks.map(task => (
+                  <div
+                    key={task.id}
+                    className="bg-green-50 border-2 border-green-200 rounded-xl p-4"
+                  >
+                    <div className="flex items-start gap-3">
+                      <Check className="text-green-600 mt-1 flex-shrink-0" size={20} />
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-800 mb-2 line-through">{task.title}</h3>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Clock size={16} />
+                          <span>{task.time} minutes</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => deleteTask(task.id)}
+                        className="bg-red-600 hover:bg-red-700 text-white rounded-lg p-2 transition flex-shrink-0"
+                        title="Delete"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default FocusTaskManager;
