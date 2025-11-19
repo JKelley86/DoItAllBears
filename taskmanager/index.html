@@ -15,12 +15,16 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Caveat:wght@400;500;600;700&display=swap');
         
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             -webkit-font-smoothing: antialiased;
             background-color: #0f172a;
+        }
+        
+        body.notebook-theme {
+            background-color: #2c2416;
         }
         
         .task-urgent { border-left: 6px solid #ef4444; }
@@ -34,6 +38,28 @@
         .blitz-shadow-lg {
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
         }
+        
+        .notebook-paper {
+            background-color: #f4e4c1;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 31px,
+                    #e8d4a8 31px,
+                    #e8d4a8 32px
+                );
+        }
+        
+        .notebook-border {
+            border-left: 3px solid #c94a4a;
+            padding-left: 1rem;
+            margin-left: 2rem;
+        }
+        
+        .notebook-handwriting {
+            font-family: 'Caveat', cursive;
+        }
     </style>
 </head>
 <body>
@@ -42,7 +68,6 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // REPLACE THESE WITH YOUR FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyDSVL3g2WINSdnT41O4QhkOhuh5CGRGEPs",
             authDomain: "task-manager-e9cd9.firebaseapp.com",
@@ -53,7 +78,6 @@
             appId: "1:38849678992:web:f39c4937951853fb29d215"
         };
 
-        // Initialize Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
@@ -73,6 +97,11 @@
         const ChevronRight = (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: props.size || 24, height: props.size || 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: props.className }, React.createElement('polyline', { points: "9 18 15 12 9 6" }));
         const LogOut = (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: props.size || 24, height: props.size || 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: props.className }, React.createElement('path', { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" }), React.createElement('polyline', { points: "16 17 21 12 16 7" }), React.createElement('line', { x1: "21", y1: "12", x2: "9", y2: "12" }));
         const AlertCircle = (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: props.size || 24, height: props.size || 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: props.className }, React.createElement('circle', { cx: "12", cy: "12", r: "10" }), React.createElement('line', { x1: "12", y1: "8", x2: "12", y2: "12" }), React.createElement('line', { x1: "12", y1: "16", x2: "12.01", y2: "16" }));
+        const Sun = (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: props.size || 24, height: props.size || 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: props.className }, React.createElement('circle', { cx: "12", cy: "12", r: "5" }), React.createElement('line', { x1: "12", y1: "1", x2: "12", y2: "3" }), React.createElement('line', { x1: "12", y1: "21", x2: "12", y2: "23" }), React.createElement('line', { x1: "4.22", y1: "4.22", x2: "5.64", y2: "5.64" }), React.createElement('line', { x1: "18.36", y1: "18.36", x2: "19.78", y2: "19.78" }), React.createElement('line', { x1: "1", y1: "12", x2: "3", y2: "12" }), React.createElement('line', { x1: "21", y1: "12", x2: "23", y2: "12" }), React.createElement('line', { x1: "4.22", y1: "19.78", x2: "5.64", y2: "18.36" }), React.createElement('line', { x1: "18.36", y1: "5.64", x2: "19.78", y2: "4.22" }));
+        const Moon = (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: props.size || 24, height: props.size || 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: props.className }, React.createElement('path', { d: "M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" }));
+        const Book = (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: props.size || 24, height: props.size || 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: props.className }, React.createElement('path', { d: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20" }), React.createElement('path', { d: "M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" }));
+        const ChevronUp = (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: props.size || 24, height: props.size || 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: props.className }, React.createElement('polyline', { points: "18 15 12 9 6 15" }));
+        const ChevronDown = (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: props.size || 24, height: props.size || 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: props.className }, React.createElement('polyline', { points: "6 9 12 15 18 9" }));
 
         const FocusTaskManager = () => {
             const [user, setUser] = useState(null);
@@ -83,7 +112,6 @@
             const [newTaskTime, setNewTaskTime] = useState(30);
             const [newTaskDate, setNewTaskDate] = useState(new Date().toISOString().split('T')[0]);
             const [newTaskUrgency, setNewTaskUrgency] = useState('not-urgent');
-            const [draggedTask, setDraggedTask] = useState(null);
             const [view, setView] = useState('today');
             const [selectedDate, setSelectedDate] = useState(new Date());
             const [focusMode, setFocusMode] = useState(null);
@@ -91,7 +119,14 @@
             const [isTimerRunning, setIsTimerRunning] = useState(false);
             const [isMinimized, setIsMinimized] = useState(false);
             const [loading, setLoading] = useState(true);
+            const [theme, setTheme] = useState('dark');
+            const [touchStartY, setTouchStartY] = useState(null);
+            const [touchedTask, setTouchedTask] = useState(null);
             const timerRef = useRef(null);
+
+            useEffect(() => {
+                document.body.className = theme === 'notebook' ? 'notebook-theme' : '';
+            }, [theme]);
 
             useEffect(() => {
                 const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -189,20 +224,68 @@
                 }
             };
 
-            const handleDragStart = (task) => {
-                setDraggedTask(task);
+            const handleTouchStart = (e, task) => {
+                setTouchStartY(e.touches[0].clientY);
+                setTouchedTask(task);
             };
 
-            const handleDragOver = (e, targetTask) => {
-                e.preventDefault();
-                if (draggedTask && draggedTask.id !== targetTask.id) {
-                    const draggedIdx = tasks.findIndex(t => t.id === draggedTask.id);
+            const handleTouchMove = (e) => {
+                if (touchStartY === null || touchedTask === null) return;
+                const touchEndY = e.touches[0].clientY;
+                const diff = touchStartY - touchEndY;
+                
+                if (Math.abs(diff) > 10) {
+                    e.preventDefault();
+                }
+            };
+
+            const handleTouchEnd = (e, targetTask) => {
+                if (touchStartY === null || touchedTask === null) return;
+                
+                const touchEndY = e.changedTouches[0].clientY;
+                const diff = touchStartY - touchEndY;
+                
+                if (Math.abs(diff) > 50 && touchedTask.id !== targetTask.id) {
+                    const draggedIdx = tasks.findIndex(t => t.id === touchedTask.id);
                     const targetIdx = tasks.findIndex(t => t.id === targetTask.id);
                     const newTasks = [...tasks];
                     newTasks.splice(draggedIdx, 1);
-                    newTasks.splice(targetIdx, 0, draggedTask);
+                    
+                    if (diff > 0) {
+                        newTasks.splice(targetIdx, 0, touchedTask);
+                    } else {
+                        newTasks.splice(targetIdx + 1, 0, touchedTask);
+                    }
+                    
                     setTasks(newTasks);
                 }
+                
+                setTouchStartY(null);
+                setTouchedTask(null);
+            };
+
+            const handleDragStart = (e, task) => {
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/html', e.target);
+                setTouchedTask(task);
+            };
+
+            const handleDragOver = (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            };
+
+            const handleDrop = (e, targetTask) => {
+                e.preventDefault();
+                if (touchedTask && touchedTask.id !== targetTask.id) {
+                    const draggedIdx = tasks.findIndex(t => t.id === touchedTask.id);
+                    const targetIdx = tasks.findIndex(t => t.id === targetTask.id);
+                    const newTasks = [...tasks];
+                    newTasks.splice(draggedIdx, 1);
+                    newTasks.splice(targetIdx, 0, touchedTask);
+                    setTasks(newTasks);
+                }
+                setTouchedTask(null);
             };
 
             const startFocusMode = (task) => {
@@ -243,16 +326,6 @@
                 }
             };
 
-            const getUrgencyBgColor = (urgency) => {
-                switch(urgency) {
-                    case 'urgent': return 'bg-red-500/10';
-                    case 'semi-urgent': return 'bg-amber-500/10';
-                    case 'not-urgent': return 'bg-green-500/10';
-                    default: return 'bg-green-500/10';
-                }
-            };
-
-            // AUTO CARRY-OVER: Show incomplete tasks from today OR past dates
             const todayStr = new Date().toISOString().split('T')[0];
             const activeTasks = view === 'today' 
                 ? tasks.filter(t => !t.completed && t.date <= todayStr)
@@ -285,33 +358,52 @@
                 return taskDate < todayStr;
             };
 
+            const toggleTheme = () => {
+                setTheme(theme === 'dark' ? 'notebook' : 'dark');
+            };
+
+            // Theme styles
+            const isDark = theme === 'dark';
+            const themeClasses = {
+                bg: isDark ? 'bg-slate-900' : 'bg-stone-100',
+                card: isDark ? 'bg-slate-800 border-slate-700' : 'notebook-paper border-stone-300',
+                text: isDark ? 'text-white' : 'text-stone-800',
+                textSecondary: isDark ? 'text-gray-400' : 'text-stone-600',
+                textTertiary: isDark ? 'text-gray-500' : 'text-stone-500',
+                input: isDark ? 'bg-slate-700 border-slate-600 text-white placeholder-gray-400' : 'bg-white border-stone-300 text-stone-800 placeholder-stone-400',
+                button: isDark ? 'bg-slate-800 text-gray-300 hover:bg-slate-700 border-slate-700' : 'bg-stone-200 text-stone-700 hover:bg-stone-300 border-stone-300',
+                buttonActive: isDark ? 'bg-blue-600 text-white' : 'bg-stone-700 text-white',
+                taskCard: isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-stone-200',
+                completedCard: isDark ? 'bg-slate-800/50 border-slate-700/50' : 'bg-stone-50 border-stone-200',
+            };
+
             if (loading) {
                 return (
-                    <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-                        <div className="text-gray-400 text-lg">Loading...</div>
+                    <div className={`min-h-screen ${themeClasses.bg} flex items-center justify-center`}>
+                        <div className={themeClasses.textSecondary + " text-lg"}>Loading...</div>
                     </div>
                 );
             }
 
             if (!user) {
                 return (
-                    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6">
-                        <div className="bg-slate-800 rounded-xl blitz-shadow-lg p-8 w-full max-w-md border border-slate-700">
-                            <h1 className="text-3xl font-bold text-white mb-2">Taskline</h1>
-                            <p className="text-gray-400 mb-6">Focus. Prioritize. Get things done.</p>
+                    <div className={`min-h-screen ${isDark ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-stone-200 to-stone-100'} flex items-center justify-center p-6`}>
+                        <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-stone-200'} rounded-xl blitz-shadow-lg p-8 w-full max-w-md border`}>
+                            <h1 className={`text-3xl font-bold ${themeClasses.text} mb-2`}>Taskline</h1>
+                            <p className={`${themeClasses.textSecondary} mb-6`}>Focus. Prioritize. Get things done.</p>
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="Email"
-                                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 text-white rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"
+                                className={`w-full px-4 py-3 ${themeClasses.input} border rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                             />
                             <input
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Password"
-                                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 text-white rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"
+                                className={`w-full px-4 py-3 ${themeClasses.input} border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                             />
                             <div className="flex gap-3">
                                 <button
@@ -322,14 +414,11 @@
                                 </button>
                                 <button
                                     onClick={signUp}
-                                    className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg py-3 transition"
+                                    className={`flex-1 ${themeClasses.button} font-medium rounded-lg py-3 transition border`}
                                 >
                                     Sign Up
                                 </button>
                             </div>
-                            <p className="text-xs text-gray-500 mt-4 text-center">
-                                Configure Firebase in the code to enable sync
-                            </p>
                         </div>
                     </div>
                 );
@@ -337,26 +426,26 @@
 
             if (focusMode && isMinimized) {
                 return (
-                    <div className="fixed top-4 right-4 bg-slate-800 text-white rounded-lg blitz-shadow-lg p-4 z-50 border border-slate-700" style={{ width: '220px' }}>
+                    <div className={`fixed top-4 right-4 ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-stone-300'} text-white rounded-lg blitz-shadow-lg p-4 z-50 border`} style={{ width: '220px' }}>
                         <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium truncate flex-1">{focusMode.title}</span>
-                            <button onClick={() => setIsMinimized(false)} className="ml-2 hover:bg-slate-700 rounded p-1">
-                                <ChevronLeft size={16} />
+                            <span className={`text-sm font-medium truncate flex-1 ${themeClasses.text}`}>{focusMode.title}</span>
+                            <button onClick={() => setIsMinimized(false)} className={`ml-2 ${isDark ? 'hover:bg-slate-700' : 'hover:bg-stone-100'} rounded p-1`}>
+                                <ChevronLeft size={16} className={themeClasses.text} />
                             </button>
                         </div>
-                        <div className="text-4xl font-bold text-center mb-3 tracking-tight">
+                        <div className={`text-4xl font-bold text-center mb-3 tracking-tight ${themeClasses.text}`}>
                             {formatTime(timerSeconds)}
                         </div>
                         <div className="flex gap-2">
                             <button 
                                 onClick={() => setIsTimerRunning(!isTimerRunning)}
-                                className="flex-1 bg-blue-600 hover:bg-blue-700 rounded-lg py-2 flex items-center justify-center transition"
+                                className="flex-1 bg-blue-600 hover:bg-blue-700 rounded-lg py-2 flex items-center justify-center transition text-white"
                             >
                                 {isTimerRunning ? <Pause size={16} /> : <Play size={16} />}
                             </button>
                             <button 
                                 onClick={exitFocusMode}
-                                className="bg-red-600 hover:bg-red-700 rounded-lg py-2 px-3 transition"
+                                className="bg-red-600 hover:bg-red-700 rounded-lg py-2 px-3 transition text-white"
                             >
                                 <X size={16} />
                             </button>
@@ -367,28 +456,28 @@
 
             if (focusMode) {
                 return (
-                    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
-                        <div className="bg-slate-800 rounded-2xl blitz-shadow-lg p-12 max-w-2xl w-full border border-slate-700">
+                    <div className={`min-h-screen ${themeClasses.bg} flex items-center justify-center p-6`}>
+                        <div className={`${themeClasses.card} rounded-2xl blitz-shadow-lg p-12 max-w-2xl w-full border`}>
                             <div className="flex justify-between items-start mb-10">
                                 <div>
-                                    <h1 className="text-4xl font-bold text-white mb-2">{focusMode.title}</h1>
+                                    <h1 className={`text-4xl font-bold ${themeClasses.text} mb-2`}>{focusMode.title}</h1>
                                     <div className={`inline-block ${getUrgencyColor(focusMode.urgency)} text-white text-xs font-medium px-3 py-1 rounded`}>
                                         {focusMode.urgency === 'urgent' ? '🔴 URGENT' : focusMode.urgency === 'semi-urgent' ? '🟡 SEMI-URGENT' : '🟢 NOT URGENT'}
                                     </div>
                                 </div>
-                                <button onClick={() => setIsMinimized(true)} className="text-gray-400 hover:text-gray-300 transition">
+                                <button onClick={() => setIsMinimized(true)} className={`${themeClasses.textSecondary} hover:${themeClasses.text} transition`}>
                                     <ChevronRight size={24} />
                                 </button>
                             </div>
                             
                             <div className="text-center mb-12">
-                                <div className="text-8xl font-bold text-white mb-4 tracking-tight">
+                                <div className={`text-8xl font-bold ${themeClasses.text} mb-4 tracking-tight`}>
                                     {formatTime(timerSeconds)}
                                 </div>
-                                <div className="text-lg text-gray-400">
+                                <div className={`text-lg ${themeClasses.textSecondary}`}>
                                     of {focusMode.time} minutes
                                 </div>
-                                <div className="mt-6 bg-slate-700 rounded-full h-2 overflow-hidden">
+                                <div className={`mt-6 ${isDark ? 'bg-slate-700' : 'bg-stone-200'} rounded-full h-2 overflow-hidden`}>
                                     <div 
                                         className="bg-blue-600 h-full transition-all duration-300"
                                         style={{ width: `${Math.min((timerSeconds / (focusMode.time * 60)) * 100, 100)}%` }}
@@ -422,7 +511,7 @@
                                 </button>
                                 <button 
                                     onClick={exitFocusMode}
-                                    className="bg-slate-700 hover:bg-slate-600 text-white rounded-xl py-4 px-6 flex items-center justify-center font-medium transition"
+                                    className={`${themeClasses.button} rounded-xl py-4 px-6 flex items-center justify-center font-medium transition border`}
                                 >
                                     <X size={20} />
                                 </button>
@@ -433,32 +522,41 @@
             }
 
             return (
-                <div className="min-h-screen bg-slate-900">
+                <div className={`min-h-screen ${themeClasses.bg}`}>
                     <div className="max-w-6xl mx-auto p-6">
                         <header className="mb-8 flex justify-between items-center">
                             <div>
-                                <h1 className="text-3xl font-bold text-white mb-1">Taskline</h1>
-                                <p className="text-sm text-gray-400">{user.email}</p>
+                                <h1 className={`text-3xl font-bold ${themeClasses.text} mb-1 ${!isDark ? 'notebook-handwriting text-4xl' : ''}`}>Taskline</h1>
+                                <p className={`text-sm ${themeClasses.textSecondary}`}>{user.email}</p>
                             </div>
-                            <button
-                                onClick={signOut}
-                                className="flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-white transition"
-                            >
-                                <LogOut size={18} />
-                                <span className="text-sm font-medium">Sign Out</span>
-                            </button>
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={toggleTheme}
+                                    className={`p-2 ${themeClasses.button} rounded-lg transition border`}
+                                    title={isDark ? "Switch to Notebook Theme" : "Switch to Dark Theme"}
+                                >
+                                    {isDark ? <Book size={18} /> : <Moon size={18} />}
+                                </button>
+                                <button
+                                    onClick={signOut}
+                                    className={`flex items-center gap-2 px-4 py-2 ${themeClasses.textSecondary} hover:${themeClasses.text} transition`}
+                                >
+                                    <LogOut size={18} />
+                                    <span className="text-sm font-medium">Sign Out</span>
+                                </button>
+                            </div>
                         </header>
 
                         <div className="flex gap-2 mb-6">
                             <button 
                                 onClick={() => setView('today')}
-                                className={`px-5 py-2.5 rounded-lg font-medium text-sm transition ${view === 'today' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 border border-slate-700'}`}
+                                className={`px-5 py-2.5 rounded-lg font-medium text-sm transition border ${view === 'today' ? themeClasses.buttonActive : themeClasses.button}`}
                             >
                                 Today
                             </button>
                             <button 
                                 onClick={() => setView('calendar')}
-                                className={`px-5 py-2.5 rounded-lg font-medium text-sm transition flex items-center gap-2 ${view === 'calendar' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 border border-slate-700'}`}
+                                className={`px-5 py-2.5 rounded-lg font-medium text-sm transition flex items-center gap-2 border ${view === 'calendar' ? themeClasses.buttonActive : themeClasses.button}`}
                             >
                                 <Calendar size={16} />
                                 <span>Calendar</span>
@@ -466,22 +564,22 @@
                         </div>
 
                         {view === 'calendar' && (
-                            <div className="bg-slate-800 rounded-xl blitz-shadow border border-slate-700 p-6 mb-6">
+                            <div className={`${themeClasses.card} rounded-xl blitz-shadow border p-6 mb-6`}>
                                 <div className="flex items-center justify-between mb-6">
-                                    <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-slate-700 rounded-lg transition text-gray-300">
-                                        <ChevronLeft size={20} />
+                                    <button onClick={() => changeMonth(-1)} className={`p-2 ${isDark ? 'hover:bg-slate-700' : 'hover:bg-stone-100'} rounded-lg transition`}>
+                                        <ChevronLeft size={20} className={themeClasses.text} />
                                     </button>
-                                    <h2 className="text-lg font-semibold text-white">
+                                    <h2 className={`text-lg font-semibold ${themeClasses.text} ${!isDark ? 'notebook-handwriting text-xl' : ''}`}>
                                         {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                                     </h2>
-                                    <button onClick={() => changeMonth(1)} className="p-2 hover:bg-slate-700 rounded-lg transition text-gray-300">
-                                        <ChevronRight size={20} />
+                                    <button onClick={() => changeMonth(1)} className={`p-2 ${isDark ? 'hover:bg-slate-700' : 'hover:bg-stone-100'} rounded-lg transition`}>
+                                        <ChevronRight size={20} className={themeClasses.text} />
                                     </button>
                                 </div>
                                 
                                 <div className="grid grid-cols-7 gap-2">
                                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                                        <div key={day} className="text-center text-xs font-semibold text-gray-500 py-2">
+                                        <div key={day} className={`text-center text-xs font-semibold ${themeClasses.textTertiary} py-2`}>
                                             {day}
                                         </div>
                                     ))}
@@ -506,12 +604,12 @@
                                                     className={`aspect-square p-2 rounded-lg text-sm transition ${
                                                         isSelected 
                                                             ? 'bg-blue-600 text-white' 
-                                                            : 'hover:bg-slate-700 text-gray-300'
+                                                            : `${isDark ? 'hover:bg-slate-700' : 'hover:bg-stone-200'} ${themeClasses.text}`
                                                     }`}
                                                 >
                                                     <div className="font-medium">{day}</div>
                                                     {taskCount > 0 && (
-                                                        <div className={`text-xs mt-1 ${isSelected ? 'text-blue-200' : 'text-blue-400'}`}>
+                                                        <div className={`text-xs mt-1 ${isSelected ? 'text-blue-200' : 'text-blue-600'}`}>
                                                             {taskCount}
                                                         </div>
                                                     )}
@@ -525,38 +623,38 @@
                             </div>
                         )}
 
-                        <div className="bg-slate-800 rounded-xl blitz-shadow border border-slate-700 p-6 mb-6">
-                            <h2 className="text-lg font-semibold text-white mb-4">Add New Task</h2>
+                        <div className={`${themeClasses.card} rounded-xl blitz-shadow border p-6 mb-6`}>
+                            <h2 className={`text-lg font-semibold ${themeClasses.text} mb-4 ${!isDark ? 'notebook-handwriting text-xl' : ''}`}>Add New Task</h2>
                             <div className="space-y-3">
                                 <input
                                     type="text"
                                     value={newTaskTitle}
                                     onChange={(e) => setNewTaskTitle(e.target.value)}
                                     placeholder="What needs to be done?"
-                                    className="w-full px-4 py-3 bg-slate-700 border border-slate-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm placeholder-gray-400"
+                                    className={`w-full px-4 py-3 ${themeClasses.input} border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${!isDark ? 'notebook-handwriting text-base' : ''}`}
                                     onKeyPress={(e) => e.key === 'Enter' && addTask()}
                                 />
                                 <div className="flex gap-3 flex-wrap">
                                     <div className="flex items-center gap-2">
-                                        <Clock size={18} className="text-gray-400" />
+                                        <Clock size={18} className={themeClasses.textSecondary} />
                                         <input
                                             type="number"
                                             value={newTaskTime}
                                             onChange={(e) => setNewTaskTime(parseInt(e.target.value) || 0)}
-                                            className="w-20 px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                            className={`w-20 px-3 py-2 ${themeClasses.input} border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm`}
                                         />
-                                        <span className="text-sm text-gray-400">min</span>
+                                        <span className={`text-sm ${themeClasses.textSecondary}`}>min</span>
                                     </div>
                                     <input
                                         type="date"
                                         value={newTaskDate}
                                         onChange={(e) => setNewTaskDate(e.target.value)}
-                                        className="px-4 py-2 bg-slate-700 border border-slate-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                        className={`px-4 py-2 ${themeClasses.input} border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm`}
                                     />
                                     <select
                                         value={newTaskUrgency}
                                         onChange={(e) => setNewTaskUrgency(e.target.value)}
-                                        className="px-4 py-2 bg-slate-700 border border-slate-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                        className={`px-4 py-2 ${themeClasses.input} border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm`}
                                     >
                                         <option value="urgent">🔴 Urgent</option>
                                         <option value="semi-urgent">🟡 Semi-Urgent</option>
@@ -575,10 +673,10 @@
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div>
-                                <h2 className="text-lg font-semibold text-white mb-4">Active Tasks</h2>
+                                <h2 className={`text-lg font-semibold ${themeClasses.text} mb-4 ${!isDark ? 'notebook-handwriting text-xl' : ''}`}>Active Tasks</h2>
                                 {activeTasks.length === 0 ? (
-                                    <div className="bg-slate-800 border border-slate-700 rounded-xl p-12 text-center">
-                                        <p className="text-gray-500">No active tasks</p>
+                                    <div className={`${themeClasses.card} border rounded-xl p-12 text-center`}>
+                                        <p className={themeClasses.textTertiary}>No active tasks</p>
                                     </div>
                                 ) : (
                                     <div className="space-y-3">
@@ -586,15 +684,19 @@
                                             <div
                                                 key={task.id}
                                                 draggable
-                                                onDragStart={() => handleDragStart(task)}
-                                                onDragOver={(e) => handleDragOver(e, task)}
-                                                className={`bg-slate-800 blitz-shadow border border-slate-700 rounded-xl p-4 cursor-move hover:shadow-lg transition ${getUrgencyClass(task.urgency)}`}
+                                                onDragStart={(e) => handleDragStart(e, task)}
+                                                onDragOver={handleDragOver}
+                                                onDrop={(e) => handleDrop(e, task)}
+                                                onTouchStart={(e) => handleTouchStart(e, task)}
+                                                onTouchMove={handleTouchMove}
+                                                onTouchEnd={(e) => handleTouchEnd(e, task)}
+                                                className={`${themeClasses.taskCard} blitz-shadow border rounded-xl p-4 cursor-move hover:shadow-lg transition ${getUrgencyClass(task.urgency)} ${touchedTask?.id === task.id ? 'opacity-50' : ''}`}
                                             >
                                                 <div className="flex items-start gap-3">
-                                                    <GripVertical className="text-gray-600 mt-1 flex-shrink-0" size={18} />
+                                                    <GripVertical className={`${isDark ? 'text-gray-600' : 'text-stone-400'} mt-1 flex-shrink-0`} size={18} />
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-start gap-2 mb-2">
-                                                            <h3 className="font-medium text-white flex-1">{task.title}</h3>
+                                                            <h3 className={`font-medium ${themeClasses.text} flex-1 ${!isDark ? 'notebook-handwriting text-lg' : ''}`}>{task.title}</h3>
                                                             {isOverdue(task.date) && (
                                                                 <span className="flex items-center gap-1 text-xs text-red-400 bg-red-500/10 px-2 py-1 rounded">
                                                                     <AlertCircle size={12} />
@@ -602,7 +704,7 @@
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        <div className="flex items-center gap-3 text-xs text-gray-400">
+                                                        <div className={`flex items-center gap-3 text-xs ${themeClasses.textSecondary}`}>
                                                             <div className="flex items-center gap-1">
                                                                 <Clock size={14} />
                                                                 <span>{task.time} min</span>
@@ -629,7 +731,7 @@
                                                         </button>
                                                         <button
                                                             onClick={() => deleteTask(task.id)}
-                                                            className="bg-slate-700 hover:bg-slate-600 text-gray-300 rounded-lg p-2 transition"
+                                                            className={`${themeClasses.button} rounded-lg p-2 transition border`}
                                                             title="Delete"
                                                         >
                                                             <X size={16} />
@@ -643,23 +745,23 @@
                             </div>
 
                             <div>
-                                <h2 className="text-lg font-semibold text-white mb-4">Completed</h2>
+                                <h2 className={`text-lg font-semibold ${themeClasses.text} mb-4 ${!isDark ? 'notebook-handwriting text-xl' : ''}`}>Completed</h2>
                                 {completedTasks.length === 0 ? (
-                                    <div className="bg-slate-800 border border-slate-700 rounded-xl p-12 text-center">
-                                        <p className="text-gray-500">No completed tasks</p>
+                                    <div className={`${themeClasses.card} border rounded-xl p-12 text-center`}>
+                                        <p className={themeClasses.textTertiary}>No completed tasks</p>
                                     </div>
                                 ) : (
                                     <div className="space-y-3">
                                         {completedTasks.map(task => (
                                             <div
                                                 key={task.id}
-                                                className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4"
+                                                className={`${themeClasses.completedCard} border rounded-xl p-4`}
                                             >
                                                 <div className="flex items-start gap-3">
                                                     <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
                                                     <div className="flex-1 min-w-0">
-                                                        <h3 className="font-medium text-gray-500 mb-2 line-through">{task.title}</h3>
-                                                        <div className="flex items-center gap-3 text-xs text-gray-600">
+                                                        <h3 className={`font-medium ${themeClasses.textSecondary} mb-2 line-through ${!isDark ? 'notebook-handwriting text-lg' : ''}`}>{task.title}</h3>
+                                                        <div className={`flex items-center gap-3 text-xs ${themeClasses.textTertiary}`}>
                                                             <div className="flex items-center gap-1">
                                                                 <Clock size={14} />
                                                                 <span>{task.time} min</span>
@@ -668,7 +770,7 @@
                                                     </div>
                                                     <button
                                                         onClick={() => deleteTask(task.id)}
-                                                        className="bg-slate-700 hover:bg-slate-600 text-gray-400 rounded-lg p-2 transition flex-shrink-0"
+                                                        className={`${themeClasses.button} rounded-lg p-2 transition flex-shrink-0 border`}
                                                         title="Delete"
                                                     >
                                                         <X size={16} />
