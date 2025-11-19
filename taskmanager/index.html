@@ -511,9 +511,152 @@
                                     value={newTaskTitle}
                                     onChange={(e) => setNewTaskTitle(e.target.value)}
                                     placeholder="What needs to be done?"
-                                    className="w-full px-4
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                    onKeyPress={(e) => e.key === 'Enter' && addTask()}
+                                />
+                                <div className="flex gap-3 flex-wrap">
+                                    <div className="flex items-center gap-2">
+                                        <Clock size={18} className="text-gray-400" />
+                                        <input
+                                            type="number"
+                                            value={newTaskTime}
+                                            onChange={(e) => setNewTaskTime(parseInt(e.target.value) || 0)}
+                                            className="w-20 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                        />
+                                        <span className="text-sm text-gray-600">min</span>
+                                    </div>
+                                    <input
+                                        type="date"
+                                        value={newTaskDate}
+                                        onChange={(e) => setNewTaskDate(e.target.value)}
+                                        className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    />
+                                    <select
+                                        value={newTaskUrgency}
+                                        onChange={(e) => setNewTaskUrgency(e.target.value)}
+                                        className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    >
+                                        <option value="urgent">🔴 Urgent</option>
+                                        <option value="semi-urgent">🟡 Semi-Urgent</option>
+                                        <option value="not-urgent">🟢 Not Urgent</option>
+                                    </select>
+                                    <button
+                                        onClick={addTask}
+                                        className="ml-auto bg-gray-900 hover:bg-gray-800 text-white rounded-lg px-6 py-2 flex items-center gap-2 font-medium text-sm transition"
+                                    >
+                                        <Plus size={18} />
+                                        <span>Add Task</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
 
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <h2 className="text-lg font-semibold text-gray-900 mb-4">Active Tasks</h2>
+                                {activeTasks.length === 0 ? (
+                                    <div className="bg-gray-50 rounded-xl p-12 text-center">
+                                        <p className="text-gray-400">No active tasks</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {activeTasks.map(task => (
+                                            <div
+                                                key={task.id}
+                                                draggable
+                                                onDragStart={() => handleDragStart(task)}
+                                                onDragOver={(e) => handleDragOver(e, task)}
+                                                className={`bg-white blitz-shadow border border-gray-100 rounded-xl p-4 cursor-move hover:shadow-md transition ${getUrgencyClass(task.urgency)}`}
+                                            >
+                                                <div className="flex items-start gap-3">
+                                                    <GripVertical className="text-gray-300 mt-1 flex-shrink-0" size={18} />
+                                                    <div className="flex-1 min-w-0">
+                                                        <h3 className="font-medium text-gray-900 mb-2">{task.title}</h3>
+                                                        <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                            <div className="flex items-center gap-1">
+                                                                <Clock size={14} />
+                                                                <span>{task.time} min</span>
+                                                            </div>
+                                                            <div className={`${getUrgencyColor(task.urgency)} text-white px-2 py-0.5 rounded`}>
+                                                                {task.urgency === 'urgent' ? '🔴' : task.urgency === 'semi-urgent' ? '🟡' : '🟢'}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex gap-2 flex-shrink-0">
+                                                        <button
+                                                            onClick={() => startFocusMode(task)}
+                                                            className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-2 transition"
+                                                            title="Focus"
+                                                        >
+                                                            <Play size={16} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => completeTask(task.id)}
+                                                            className="bg-green-600 hover:bg-green-700 text-white rounded-lg p-2 transition"
+                                                            title="Complete"
+                                                        >
+                                                            <Check size={16} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => deleteTask(task.id)}
+                                                            className="bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg p-2 transition"
+                                                            title="Delete"
+                                                        >
+                                                            <X size={16} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
 
-            </script>
-        </body>
+                            <div>
+                                <h2 className="text-lg font-semibold text-gray-900 mb-4">Completed</h2>
+                                {completedTasks.length === 0 ? (
+                                    <div className="bg-gray-50 rounded-xl p-12 text-center">
+                                        <p className="text-gray-400">No completed tasks</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {completedTasks.map(task => (
+                                            <div
+                                                key={task.id}
+                                                className="bg-gray-50 border border-gray-100 rounded-xl p-4"
+                                            >
+                                                <div className="flex items-start gap-3">
+                                                    <Check className="text-green-600 mt-1 flex-shrink-0" size={18} />
+                                                    <div className="flex-1 min-w-0">
+                                                        <h3 className="font-medium text-gray-500 mb-2 line-through">{task.title}</h3>
+                                                        <div className="flex items-center gap-3 text-xs text-gray-400">
+                                                            <div className="flex items-center gap-1">
+                                                                <Clock size={14} />
+                                                                <span>{task.time} min</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => deleteTask(task.id)}
+                                                        className="bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg p-2 transition flex-shrink-0"
+                                                        title="Delete"
+                                                    >
+                                                        <X size={16} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<FocusTaskManager />);
+    </script>
+</body>
 </html>
