@@ -124,7 +124,9 @@
             const [aiPrompt, setAiPrompt] = useState('');
             const [aiResponse, setAiResponse] = useState('');
             const [aiLoading, setAiLoading] = useState(false);
-            const [groqApiKey, setGroqApiKey] = useState(() => localStorage.getItem('groq-api-key') || '');
+            // HARDCODED API KEY - KEEP THIS FILE PRIVATE!
+            const HARDCODED_API_KEY = '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'; // Replace with your actual Groq API key
+            const [groqApiKey, setGroqApiKey] = useState(() => HARDCODED_API_KEY || localStorage.getItem('groq-api-key') || '');
             const [showApiKeyInput, setShowApiKeyInput] = useState(false);
             const timerRef = useRef(null);
 
@@ -926,61 +928,4 @@
         root.render(<FocusTaskManager />);
     </script>
 </body>
-</html>} />
-                                                                    <span>{task.time} min</span>
-                                                                </div>
-                                                                <div className={`${getUrgencyColor(task.urgency)} text-white px-2 py-1 rounded font-medium`}>
-                                                                    {task.urgency === 'urgent' ? '🔴 URGENT' : task.urgency === 'semi-urgent' ? '🟡 SEMI-URGENT' : '🟢 NOT URGENT'}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex gap-2 flex-shrink-0">
-                                                            <button
-                                                                onClick={() => startFocusMode(task)}
-                                                                className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-2 transition"
-                                                                title="Focus"
-                                                            >
-                                                                <Play size={16} />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => completeTask(task.id)}
-                                                                className="bg-green-600 hover:bg-green-700 text-white rounded-lg p-2 transition"
-                                                                title="Complete"
-                                                            >
-                                                                <Check size={16} />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => deleteTask(task.id)}
-                                                                className={`${themeClasses.button} rounded-lg p-2 transition border`}
-                                                                title="Delete"
-                                                            >
-                                                                <X size={16} />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <h2 className={`text-lg font-semibold ${themeClasses.text} mb-4 ${!isDark ? 'notebook-handwriting text-xl' : ''}`}>Completed</h2>
-                                    {completedTasks.length === 0 ? (
-                                        <div className={`${themeClasses.card} border rounded-xl p-12 text-center`}>
-                                            <p className={themeClasses.textTertiary}>No completed tasks</p>
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-3">
-                                            {completedTasks.map(task => (
-                                                <div
-                                                    key={task.id}
-                                                    className={`${themeClasses.completedCard} border rounded-xl p-4`}
-                                                >
-                                                    <div className="flex items-start gap-3">
-                                                        <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
-                                                        <div className="flex-1 min-w-0">
-                                                            <h3 className={`font-medium ${themeClasses.textSecondary} mb-2 line-through ${!isDark ? 'notebook-handwriting text-lg' : ''}`}>{task.title}</h3>
-                                                            <div className={`flex items-center gap-3 text-xs ${themeClasses.textTertiary}`}>
-                                                                <div className="flex items-center gap-1">
-                                                                    <Clock size={14
+</html>
