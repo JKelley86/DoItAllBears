@@ -343,7 +343,7 @@
             };
 
             const callAI = async () => {
-                if (!groqApiKey) {
+                if (!groqApiKey || groqApiKey === 'YOUR_API_KEY_HERE') {
                     alert('Please add your Groq API key first!');
                     setShowApiKeyInput(true);
                     return;
@@ -602,7 +602,7 @@
                                     </button>
                                 </div>
 
-                                {!groqApiKey || showApiKeyInput ? (
+                                {!groqApiKey || groqApiKey === 'YOUR_API_KEY_HERE' || showApiKeyInput ? (
                                     <div className="mb-4">
                                         <label className={`block text-sm font-medium ${themeClasses.text} mb-2`}>
                                             Groq API Key (100% FREE)
@@ -613,14 +613,14 @@
                                         <div className="flex gap-2">
                                             <input
                                                 type="password"
-                                                value={groqApiKey}
+                                                value={groqApiKey === 'YOUR_API_KEY_HERE' ? '' : groqApiKey}
                                                 onChange={(e) => setGroqApiKey(e.target.value)}
                                                 placeholder="gsk_..."
                                                 className={`flex-1 px-4 py-2 ${themeClasses.input} border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm`}
                                             />
                                             <button
                                                 onClick={saveApiKey}
-                                                disabled={!groqApiKey.trim()}
+                                                disabled={!groqApiKey.trim() || groqApiKey === 'YOUR_API_KEY_HERE'}
                                                 className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg font-medium transition"
                                             >
                                                 Save
@@ -898,6 +898,63 @@
                                                                 )}
                                                             </div>
                                                             <div className={`flex items-center gap-3 text-xs ${themeClasses.textSecondary}`}>
+                                                                <div className="flex items-center gap-1">
+                                                                    <Clock size={14} />
+                                                                    <span>{task.time} min</span>
+                                                                </div>
+                                                                <div className={`${getUrgencyColor(task.urgency)} text-white px-2 py-1 rounded font-medium`}>
+                                                                    {task.urgency === 'urgent' ? '🔴 URGENT' : task.urgency === 'semi-urgent' ? '🟡 SEMI-URGENT' : '🟢 NOT URGENT'}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex gap-2 flex-shrink-0">
+                                                            <button
+                                                                onClick={() => startFocusMode(task)}
+                                                                className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-2 transition"
+                                                                title="Focus"
+                                                            >
+                                                                <Play size={16} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => completeTask(task.id)}
+                                                                className="bg-green-600 hover:bg-green-700 text-white rounded-lg p-2 transition"
+                                                                title="Complete"
+                                                            >
+                                                                <Check size={16} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => deleteTask(task.id)}
+                                                                className={`${themeClasses.button} rounded-lg p-2 transition border`}
+                                                                title="Delete"
+                                                            >
+                                                                <X size={16} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <h2 className={`text-lg font-semibold ${themeClasses.text} mb-4 ${!isDark ? 'notebook-handwriting text-xl' : ''}`}>Completed</h2>
+                                    {completedTasks.length === 0 ? (
+                                        <div className={`${themeClasses.card} border rounded-xl p-12 text-center`}>
+                                            <p className={themeClasses.textTertiary}>No completed tasks</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            {completedTasks.map(task => (
+                                                <div
+                                                    key={task.id}
+                                                    className={`${themeClasses.completedCard} border rounded-xl p-4`}
+                                                >
+                                                    <div className="flex items-start gap-3">
+                                                        <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
+                                                        <div className="flex-1 min-w-0">
+                                                            <h3 className={`font-medium ${themeClasses.textSecondary} mb-2 line-through ${!isDark ? 'notebook-handwriting text-lg' : ''}`}>{task.title}</h3>
+                                                            <div className={`flex items-center gap-3 text-xs ${themeClasses.textTertiary}`}>
                                                                 <div className="flex items-center gap-1">
                                                                     <Clock size={14} />
                                                                     <span>{task.time} min</span>
