@@ -659,7 +659,7 @@
                 
                 const favoriteBtn = document.createElement('button');
                 favoriteBtn.classList.add('favorite-btn');
-                favoriteBtn.textContent = favorites.includes(recipe.name) ? '⭐' : '☆';
+                favoriteBtn.textContent = favorites.includes(recipe.name) ? '★' : '☆';
                 favoriteBtn.onclick = (e) => toggleFavorite(recipe.name, e);
                 li.appendChild(favoriteBtn);
 
