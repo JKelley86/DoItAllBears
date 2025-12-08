@@ -283,6 +283,27 @@
             min-height: 35px;
         }
 
+        .favorite-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            z-index: 10;
+            transition: transform 0.2s ease;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .favorite-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .favorite-btn:active {
+            transform: scale(0.9);
+        }
+
         .paw-icon,
         .cabin-icon {
             font-size: 1.5rem;
@@ -424,7 +445,6 @@
             height: 20px;
         }
 
-        /* Cookbook-style decorative elements */
         body::before {
             content: '';
             position: fixed;
@@ -438,7 +458,6 @@
             z-index: -1;
         }
 
-        /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: 12px;
         }
@@ -456,7 +475,6 @@
             background: linear-gradient(135deg, var(--accent-secondary) 0%, var(--accent-color) 100%);
         }
 
-        /* Responsive design */
         @media (max-width: 768px) {
             header {
                 font-size: 2rem;
@@ -509,6 +527,7 @@
         <div class="tab" data-diet="Vegetarian" onclick="filterDiet('Vegetarian')">Vegetarian</div>
         <div class="tab" data-diet="Carnivore" onclick="filterDiet('Carnivore')">Carnivore</div>
         <div class="tab" data-diet="General" onclick="filterDiet('General')">General</div>
+        <div class="tab" data-diet="Favorites" onclick="filterDiet('Favorites')">⭐ Favorites</div>
     </div>
 	
     <input type="text" class="search" placeholder="Search recipes..." oninput="searchRecipes()">
@@ -526,6 +545,7 @@
     <script>
         const recipes = [
             { name: "Biscuits And Gravy", category: "Breakfast", diet: "General", link: "biscuitsgravy.html",  approved: false, aubrie: false, grandma: false },
+			{ name: "French Toast Sticks", category: "Breakfast", diet: "General", link: "frenchtoaststicks.html",  approved: false, aubrie: false, grandma: false },
             
             { name: "Chicken Mozzarella Sticks", category: "Lunch", diet: "Carnivore", link: "chickenmozzsticks.html",  approved: false, aubrie: false, grandma: false },
             { name: "Mozzarella Sticks", category: "Lunch", diet: "General", link: "mozzarellasticks.html",  approved: false, aubrie: false, grandma: false },
@@ -539,6 +559,8 @@
 	    	{ name: "Nancy's Spaghetti Sauce", category: "Dinner", diet: "General", link: "nancysspaghettisauce.html",  approved: true, aubrie: false, grandma: true },
 	    	{ name: "Husband Never Leave Ya Enchilada", category: "Dinner", diet: "Carnivore", link: "enchilada.html",  approved: true, aubrie: false, grandma: false },
 		    { name: "Honey BBQ Chicken Mac & Cheese", category: "Dinner", diet: "General", link: "honeybbqchickenmac.html",  approved: false, aubrie: false, grandma: false },
+			{ name: "Crystal's Lemon Chicken", category: "Dinner", diet: "General", link: "cvlemonchicken.html",  approved: false, aubrie: false, grandma: false },
+			{ name: "Crystal's Cheesy Potatoes", category: "Dinner", diet: "General", link: "cvcheesypotatoes.html",  approved: false, aubrie: false, grandma: false },
 	
             { name: "Banana Cream Cool Whip Bars", category: "Dessert", diet: "General", link: "bananabars.html",  approved: false, aubrie: false, grandma: false },
             { name: "Chocolate Chip Cookies", category: "Dessert", diet: "Vegetarian", link: "chocolatechipcookie.html",  approved: false, aubrie: false, grandma: false },
@@ -562,6 +584,40 @@
 
         let currentCategory = "All";
         let currentDiet = "All";
+        let favorites = [];
+
+        async function loadFavorites() {
+            try {
+                const result = await window.storage.get('recipe-favorites');
+                favorites = result ? JSON.parse(result.value) : [];
+            } catch {
+                favorites = [];
+            }
+            displayRecipes();
+        }
+
+        async function saveFavorites() {
+            try {
+                await window.storage.set('recipe-favorites', JSON.stringify(favorites));
+            } catch (error) {
+                console.error('Failed to save favorites:', error);
+            }
+        }
+
+        async function toggleFavorite(recipeName, event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const index = favorites.indexOf(recipeName);
+            if (index > -1) {
+                favorites.splice(index, 1);
+            } else {
+                favorites.push(recipeName);
+            }
+            
+            await saveFavorites();
+            displayRecipes();
+        }
 
         function filterCategory(category) {
             currentCategory = category;
@@ -586,18 +642,32 @@
             const list = document.getElementById('recipe-list');
             list.innerHTML = "";
 
-            recipes.filter(recipe => 
+            let filteredRecipes = recipes.filter(recipe => 
                 recipe.name.toLowerCase().includes(searchTerm) && 
                 (currentCategory === 'All' || recipe.category === currentCategory) &&
-                (currentDiet === 'All' || recipe.diet === currentDiet)
-            ).forEach(recipe => {
+                (currentDiet === 'All' || currentDiet === 'Favorites' ? true : recipe.diet === currentDiet)
+            );
+
+            if (currentDiet === 'Favorites') {
+                filteredRecipes = filteredRecipes.filter(recipe => 
+                    favorites.includes(recipe.name)
+                );
+            }
+
+            filteredRecipes.forEach(recipe => {
                 const li = document.createElement('li');
+                
+                const favoriteBtn = document.createElement('button');
+                favoriteBtn.classList.add('favorite-btn');
+                favoriteBtn.textContent = favorites.includes(recipe.name) ? '⭐' : '☆';
+                favoriteBtn.onclick = (e) => toggleFavorite(recipe.name, e);
+                li.appendChild(favoriteBtn);
+
                 const a = document.createElement('a');
                 a.href = recipe.link;
                 a.textContent = recipe.name;
                 li.appendChild(a);
 
-                // Create badge container
                 const badgeContainer = document.createElement('div');
                 badgeContainer.classList.add('badge-container');
 
@@ -627,7 +697,8 @@
             });
         }
 
-        displayRecipes();
+        loadFavorites();
+
         function navigateTo(page) {
             window.location.href = page;
         }
@@ -640,7 +711,7 @@
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const menuButton = document.querySelector('.menu-btn');
-            if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+            if (sidebar && !sidebar.contains(event.target) && !menuButton.contains(event.target)) {
                 sidebar.classList.remove('open');
             }
         });
@@ -648,7 +719,8 @@
         function updateClock() {
             const now = new Date();
             const timeString = now.toLocaleTimeString();
-            document.getElementById('clock').textContent = timeString;
+            const clock = document.getElementById('clock');
+            if (clock) clock.textContent = timeString;
         }
 
         function toggleTheme() {
@@ -656,17 +728,4 @@
             localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
         }
 
-        window.onload = function() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'light') {
-                document.body.classList.add('light-mode');
-            } else if (savedTheme === 'dark') {
-                document.body.classList.remove('light-mode');
-            }
-        }
-
-        setInterval(updateClock, 1000);
-        updateClock();
-    </script> 
-</body>
-</html>
+        window.onloa
