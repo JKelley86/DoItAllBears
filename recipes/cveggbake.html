@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Crystal's Egg Bake</title>
+    <!-- Add Font Awesome CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+                .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        width: 80%;
+        max-width: 400px;
+        text-align: center;
+        position: relative;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin: auto;
+    }
+
+    .close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+        cursor: pointer;
+    }
+    .nutrition-facts {
+    margin-top: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.nutrition-facts h2 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.nutrition-facts table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.nutrition-facts table td {
+    padding: 5px;
+    font-size: 16px;
+}
+
+.nutrition-facts table td:first-child {
+    width: 60%;
+    font-weight: bold;
+}
+
+.nutrition-facts table td:last-child {
+    text-align: right;
+}
+
+.nutrition-facts p {
+    font-size: 16px;
+    margin: 10px 0;
+}
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Crystal's Egg Bake</h1>
+        <div class="button-container">
+            <button class="print-button" onclick="window.print()"><i class="fas fa-print"></i></button>
+            <button class="share-button" onclick="shareRecipe()"><i class="fas fa-share-alt"></i></button>
+            <!--<button class="info-button" onclick="toggleInfo()"><i class="fas fa-info-circle"></i></button>-->
+        </div>
+    </header>
+    <section id="recipe-details">
+        <h2>Recipe Details</h2>
+        <p><strong>Prep Time:</strong> 20 minutes</p>
+        <p><strong>Cook Time:</strong> 30 minutes</p>
+        <p><strong>Total Time:</strong> 50 minutes</p>
+    </section>
+
+    <section id="ingredients">
+        <h2>Ingredients</h2>
+        <ul>
+            <li>2 Pounds jimmy dean sausage</li>
+            <li>1 1/2 Bags of simply potatoes</li>
+            <li>A little bit of milk</li>
+            <li>8-12 Eggs</li>
+            <li>Cheddar cheese</li>
+        </ul>
+    </section>
+
+    <section id="instructions">
+        <h2>Instructions</h2>
+        <ol>
+            <li>Lay the sausage down on the bottom of a 9X13 baking pan.</li>
+            <li>In a bowl, mix potatoes, milk, pepper, and eggs.</li>
+            <li>Place egg mixture on top of sausage.</li>
+            <li>Top with cheese.</li>
+            <li>Bake for 350°F for an hour.</li>
+        </ol>
+    </section>
+<div id="nutrition-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="toggleInfo()">&times;</span>
+        <h2>Nutrition Facts</h2>
+        <div class="nutrition-facts">
+            <p><strong>Serving Size:</strong> 1 slice</p>
+            <p><strong>Servings:</strong> 8</p>
+            <table>
+                <tr>
+                    <td><strong>Calories</strong></td>
+                    <td>250</td>
+                </tr>
+                <tr>
+                    <td><strong>Protein</strong></td>
+                    <td>5g</td>
+                </tr>
+                <tr>
+                    <td><strong>Carbs</strong></td>
+                    <td>35g</td>
+                </tr>
+                <tr>
+                    <td><strong>Fat</strong></td>
+                    <td>10g</td>
+                </tr>
+                <tr>
+                    <td><strong>Sodium</strong></td>
+                    <td>150mg</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+    <footer>
+        <p>&copy; 2024 Bear Book. All rights reserved.</p>
+    </footer>
+
+<script src="script.js"></script>
+<script>
+    window.onload = function() {
+    const modal = document.getElementById('nutrition-modal');
+    modal.style.display = 'none'; // Ensure modal is hidden on page load
+}
+
+function toggleInfo() {
+    const modal = document.getElementById('nutrition-modal');
+    if (modal.style.display === 'none' || modal.style.display === '') {
+        modal.style.display = 'flex';
+    } else {
+        modal.style.display = 'none';
+    }
+}
+</script>
+</body>
+</html>
