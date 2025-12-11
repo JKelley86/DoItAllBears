@@ -1,1121 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tactical Portal</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --od-green: #4a5d3e;
-            --od-green-dark: #3a4d2e;
-            --od-green-light: #5a6d4e;
-            --od-accent: #7a8d6e;
-            --sand: #d4c5a9;
-            --dark-bg: #2a2a2a;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, var(--od-green-dark) 0%, var(--od-green) 50%, var(--od-green-light) 100%);
-            min-height: 100vh;
-            color: #333;
-        }
-
-        /* LOGIN STYLES */
-        .login-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .login-box {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-            overflow: hidden;
-            max-width: 440px;
-            width: 100%;
-            animation: slideUp 0.5s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .login-form {
-            padding: 48px 40px;
-        }
-
-        .logo {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, var(--od-green) 0%, var(--od-green-dark) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 24px;
-            font-size: 32px;
-            box-shadow: 0 8px 20px rgba(74, 93, 62, 0.3);
-        }
-
-        h1 {
-            text-align: center;
-            color: var(--od-green-dark);
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #718096;
-            font-size: 15px;
-            margin-bottom: 32px;
-        }
-
-        .input-group {
-            margin-bottom: 24px;
-        }
-
-        label {
-            display: block;
-            color: var(--od-green-dark);
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            outline: none;
-        }
-
-        input:focus {
-            border-color: var(--od-green);
-            box-shadow: 0 0 0 3px rgba(74, 93, 62, 0.1);
-        }
-
-        .error-message {
-            color: #e53e3e;
-            font-size: 13px;
-            margin-top: 8px;
-            display: none;
-            animation: shake 0.4s ease;
-        }
-
-        .error-message.show {
-            display: block;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--od-green) 0%, var(--od-green-dark) 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 8px;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(74, 93, 62, 0.4);
-        }
-
-        /* MAIN APP STYLES */
-        .app-container {
-            display: none;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .app-container.show {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* SIDEBAR */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 260px;
-            background: var(--od-green-dark);
-            color: white;
-            padding: 24px 0;
-            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
-            overflow-y: auto;
-            transition: transform 0.3s ease;
-            z-index: 1000;
-        }
-
-        .sidebar-header {
-            padding: 0 24px 24px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--sand);
-        }
-
-        .sidebar-logo-icon {
-            width: 40px;
-            height: 40px;
-            background: rgba(212, 197, 169, 0.2);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .nav-menu {
-            padding: 24px 0;
-        }
-
-        .nav-item {
-            padding: 12px 24px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 500;
-        }
-
-        .nav-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-
-        .nav-item.active {
-            background: rgba(212, 197, 169, 0.2);
-            color: var(--sand);
-            border-left: 3px solid var(--sand);
-        }
-
-        .nav-icon {
-            font-size: 20px;
-            width: 24px;
-            text-align: center;
-        }
-
-        .user-section {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 20px 24px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.2);
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: var(--sand);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: var(--od-green-dark);
-        }
-
-        .logout-btn {
-            width: 100%;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        /* MAIN CONTENT */
-        .main-content {
-            margin-left: 260px;
-            padding: 32px;
-            min-height: 100vh;
-        }
-
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .page-header {
-            margin-bottom: 32px;
-        }
-
-        .page-title {
-            font-size: 32px;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 8px;
-        }
-
-        .page-description {
-            color: var(--sand);
-            font-size: 16px;
-        }
-
-        /* DASHBOARD GRID */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-        }
-
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--od-green) 0%, var(--od-green-dark) 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-        }
-
-        .stat-value {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--od-green-dark);
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            color: #718096;
-            font-size: 14px;
-        }
-
-        /* FEATURE CARDS */
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 24px;
-        }
-
-        .feature-card {
-            background: white;
-            border-radius: 12px;
-            padding: 28px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .feature-card h3 {
-            color: var(--od-green-dark);
-            font-size: 20px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .feature-card p {
-            color: #718096;
-            line-height: 1.6;
-            margin-bottom: 16px;
-        }
-
-        .feature-btn {
-            padding: 10px 20px;
-            background: var(--od-green);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-
-        .feature-btn:hover {
-            background: var(--od-green-dark);
-            transform: translateY(-2px);
-        }
-
-        /* TIMER */
-        .timer-display {
-            font-size: 72px;
-            font-weight: 700;
-            color: var(--od-green-dark);
-            text-align: center;
-            font-family: 'Courier New', monospace;
-            margin: 24px 0;
-        }
-
-        .timer-controls {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-
-        /* CALCULATOR */
-        .calculator {
-            background: #f7fafc;
-            border-radius: 12px;
-            padding: 20px;
-            max-width: 320px;
-        }
-
-        .calc-display {
-            background: var(--od-green-dark);
-            color: var(--sand);
-            padding: 20px;
-            border-radius: 8px;
-            text-align: right;
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            min-height: 60px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .calc-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-        }
-
-        .calc-btn {
-            padding: 20px;
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .calc-btn:hover {
-            background: var(--od-accent);
-            color: white;
-            border-color: var(--od-accent);
-        }
-
-        .calc-btn.operator {
-            background: var(--od-green);
-            color: white;
-            border-color: var(--od-green);
-        }
-
-        .calc-btn.operator:hover {
-            background: var(--od-green-dark);
-        }
-
-        /* NOTES */
-        .notes-container {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .notes-input {
-            width: 100%;
-            min-height: 200px;
-            padding: 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 15px;
-            resize: vertical;
-            font-family: inherit;
-        }
-
-        .note-item {
-            background: #f7fafc;
-            padding: 16px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            border-left: 4px solid var(--od-green);
-        }
-
-        .note-time {
-            color: #718096;
-            font-size: 12px;
-            margin-bottom: 8px;
-        }
-
-        /* WEATHER WIDGET */
-        .weather-widget {
-            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-            color: white;
-            padding: 28px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .weather-temp {
-            font-size: 64px;
-            font-weight: 700;
-            margin: 16px 0;
-        }
-
-        .weather-location {
-            font-size: 20px;
-            opacity: 0.9;
-        }
-
-        /* QUICK LINKS */
-        .quick-links {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 16px;
-        }
-
-        .quick-link {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .quick-link:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-        }
-
-        .quick-link-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .quick-link-label {
-            font-weight: 600;
-            color: var(--od-green-dark);
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.mobile-open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tactical Portal v2.0</title>
+<style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f2f5; }
+    .nav { display: flex; background: #2d3748; color: white; }
+    .nav-item { flex: 1; text-align: center; padding: 16px; cursor: pointer; }
+    .nav-item.active { background: #4fd1c5; color: #2d3748; }
+    .page { display: none; padding: 20px; }
+    .page.active { display: block; }
+    .feature-card { background: white; border-radius: 8px; padding: 16px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .feature-btn { padding: 10px 20px; margin-top: 10px; border: none; border-radius: 6px; background: #4fd1c5; color: #2d3748; cursor: pointer; }
+    .feature-btn:hover { background: #38b2ac; }
+    .notes-input { width: 100%; height: 100px; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e0; }
+    .note-item { border-bottom: 1px solid #e2e8f0; padding: 8px 0; }
+    .note-time { font-size: 12px; color: #718096; }
+</style>
 </head>
 <body>
-    <!-- LOGIN SCREEN -->
-    <div class="login-container" id="loginContainer">
-        <div class="login-box">
-            <div class="login-form">
-                <div class="logo">⚡</div>
-                <h1>Tactical Portal</h1>
-                <p class="subtitle">Enter access code to continue</p>
-                
-                <form onsubmit="handleLogin(event)">
-                    <div class="input-group">
-                        <label for="password">Access Code</label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            placeholder="Enter your code"
-                            autocomplete="current-password"
-                        >
-                        <div class="error-message" id="errorMessage">
-                            Incorrect code. Please try again.
-                        </div>
-                    </div>
-                    <button type="submit" class="login-btn">Access Portal</button>
-                </form>
-            </div>
-        </div>
+
+<div class="nav">
+    <div class="nav-item active" onclick="navigateTo('tools', event)">Tools</div>
+    <div class="nav-item" onclick="navigateTo('analytics', event)">Analytics</div>
+    <div class="nav-item" onclick="navigateTo('notes', event)">Notes</div>
+    <div class="nav-item" onclick="navigateTo('settings', event)">Settings</div>
+</div>
+
+<!-- TOOLS PAGE -->
+<div class="page active" id="tools">
+    <div class="feature-card">
+        <h3>⏱️ Mission Timer</h3>
+        <div id="timerDisplay" style="font-size: 32px;">00:00</div>
+        <button class="feature-btn" onclick="startTimer()">Start</button>
+        <button class="feature-btn" onclick="stopTimer()">Stop</button>
+        <button class="feature-btn" onclick="resetTimer()">Reset</button>
     </div>
 
-    <!-- MAIN APP -->
-    <div class="app-container" id="appContainer">
-        <!-- SIDEBAR -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-logo">
-                    <div class="sidebar-logo-icon">⚡</div>
-                    <span>Portal</span>
-                </div>
-            </div>
-
-            <nav class="nav-menu">
-                <div class="nav-item active" onclick="navigateTo('dashboard')">
-                    <span class="nav-icon">🏠</span>
-                    <span>Dashboard</span>
-                </div>
-                <div class="nav-item" onclick="navigateTo('tools')">
-                    <span class="nav-icon">🛠️</span>
-                    <span>Tools</span>
-                </div>
-                <div class="nav-item" onclick="navigateTo('analytics')">
-                    <span class="nav-icon">📊</span>
-                    <span>Analytics</span>
-                </div>
-                <div class="nav-item" onclick="navigateTo('notes')">
-                    <span class="nav-icon">📝</span>
-                    <span>Notes</span>
-                </div>
-                <div class="nav-item" onclick="navigateTo('settings')">
-                    <span class="nav-icon">⚙️</span>
-                    <span>Settings</span>
-                </div>
-            </nav>
-
-            <div class="user-section">
-                <div class="user-info">
-                    <div class="user-avatar">OP</div>
-                    <div>
-                        <div style="font-weight: 600;">Operator</div>
-                        <div style="font-size: 12px; opacity: 0.7;">Active</div>
-                    </div>
-                </div>
-                <button class="logout-btn" onclick="handleLogout()">Logout</button>
-            </div>
+    <div class="feature-card">
+        <h3>🧮 Calculator</h3>
+        <div id="calcDisplay" style="font-size: 24px; margin-bottom: 10px;">0</div>
+        <div>
+            <button class="feature-btn" onclick="calcInput('7')">7</button>
+            <button class="feature-btn" onclick="calcInput('8')">8</button>
+            <button class="feature-btn" onclick="calcInput('9')">9</button>
+            <button class="feature-btn" onclick="calcInput('/')">÷</button>
         </div>
-
-        <!-- MAIN CONTENT -->
-        <div class="main-content">
-            <!-- DASHBOARD PAGE -->
-            <div class="page active" id="dashboard">
-                <div class="page-header">
-                    <h2 class="page-title">Mission Control</h2>
-                    <p class="page-description">Welcome back, Operator. Your command center awaits.</p>
-                </div>
-
-                <div class="dashboard-grid">
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-icon">📈</div>
-                        </div>
-                        <div class="stat-value" id="statValue1">1,284</div>
-                        <div class="stat-label">Total Operations</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-icon">⚡</div>
-                        </div>
-                        <div class="stat-value" id="statValue2">98%</div>
-                        <div class="stat-label">Success Rate</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-icon">🎯</div>
-                        </div>
-                        <div class="stat-value" id="statValue3">47</div>
-                        <div class="stat-label">Active Missions</div>
-                    </div>
-                </div>
-
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <h3>🌤️ Weather Intel</h3>
-                        <div class="weather-widget" style="margin-top: 16px;">
-                            <div class="weather-location">Shoreview, MN</div>
-                            <div class="weather-temp" id="weatherTemp">--°</div>
-                            <div id="weatherCondition">Loading...</div>
-                        </div>
-                    </div>
-
-                    <div class="feature-card">
-                        <h3>⏱️ Mission Timer</h3>
-                        <div class="timer-display" id="timerDisplay">00:00</div>
-                        <div class="timer-controls">
-                            <button class="feature-btn" onclick="startTimer()">Start</button>
-                            <button class="feature-btn" onclick="stopTimer()">Stop</button>
-                            <button class="feature-btn" onclick="resetTimer()">Reset</button>
-                        </div>
-                    </div>
-
-                    <div class="feature-card">
-                        <h3>🔗 Quick Access</h3>
-                        <p>Frequently used resources and links</p>
-                        <div class="quick-links">
-                            <a class="quick-link" href="#" onclick="alert('Link 1'); return false;">
-                                <div class="quick-link-icon">📧</div>
-                                <div class="quick-link-label">Mail</div>
-                            </a>
-                            <a class="quick-link" href="#" onclick="alert('Link 2'); return false;">
-                                <div class="quick-link-icon">📅</div>
-                                <div class="quick-link-label">Calendar</div>
-                            </a>
-                            <a class="quick-link" href="#" onclick="alert('Link 3'); return false;">
-                                <div class="quick-link-icon">💼</div>
-                                <div class="quick-link-label">Tasks</div>
-                            </a>
-                            <a class="quick-link" href="#" onclick="alert('Link 4'); return false;">
-                                <div class="quick-link-icon">📁</div>
-                                <div class="quick-link-label">Files</div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TOOLS PAGE -->
-            <div class="page" id="tools">
-                <div class="page-header">
-                    <h2 class="page-title">Tactical Tools</h2>
-                    <p class="page-description">Essential utilities for mission success</p>
-                </div>
-
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <h3>🧮 Calculator</h3>
-                        <div class="calculator">
-                            <div class="calc-display" id="calcDisplay">0</div>
-                            <div class="calc-buttons">
-                                <button class="calc-btn" onclick="calcInput('7')">7</button>
-                                <button class="calc-btn" onclick="calcInput('8')">8</button>
-                                <button class="calc-btn" onclick="calcInput('9')">9</button>
-                                <button class="calc-btn operator" onclick="calcInput('/')">÷</button>
-                                <button class="calc-btn" onclick="calcInput('4')">4</button>
-                                <button class="calc-btn" onclick="calcInput('5')">5</button>
-                                <button class="calc-btn" onclick="calcInput('6')">6</button>
-                                <button class="calc-btn operator" onclick="calcInput('*')">×</button>
-                                <button class="calc-btn" onclick="calcInput('1')">1</button>
-                                <button class="calc-btn" onclick="calcInput('2')">2</button>
-                                <button class="calc-btn" onclick="calcInput('3')">3</button>
-                                <button class="calc-btn operator" onclick="calcInput('-')">−</button>
-                                <button class="calc-btn" onclick="calcInput('0')">0</button>
-                                <button class="calc-btn" onclick="calcInput('.')">.</button>
-                                <button class="calc-btn operator" onclick="calcEquals()">=</button>
-                                <button class="calc-btn operator" onclick="calcInput('+')">+</button>
-                                <button class="calc-btn operator" onclick="calcClear()" style="grid-column: span 4;">Clear</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="feature-card">
-                        <h3>🎲 Random Generator</h3>
-                        <p>Generate random numbers for decisions</p>
-                        <div style="margin: 20px 0;">
-                            <label style="display: block; margin-bottom: 8px;">Range: 1 to</label>
-                            <input type="number" id="randomMax" value="100" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px;">
-                        </div>
-                        <div style="text-align: center; font-size: 48px; font-weight: 700; color: var(--od-green-dark); margin: 20px 0;" id="randomResult">?</div>
-                        <button class="feature-btn" onclick="generateRandom()" style="width: 100%;">Generate</button>
-                    </div>
-
-                    <div class="feature-card">
-                        <h3>📏 Unit Converter</h3>
-                        <p>Quick conversions for field operations</p>
-                        <div style="margin: 20px 0;">
-                            <input type="number" id="convertValue" placeholder="Enter value" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
-                            <select id="convertType" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
-                                <option value="km-mi">Kilometers to Miles</option>
-                                <option value="mi-km">Miles to Kilometers</option>
-                                <option value="kg-lb">Kilograms to Pounds</option>
-                                <option value="lb-kg">Pounds to Kilograms</option>
-                                <option value="c-f">Celsius to Fahrenheit</option>
-                                <option value="f-c">Fahrenheit to Celsius</option>
-                            </select>
-                            <button class="feature-btn" onclick="convertUnit()" style="width: 100%;">Convert</button>
-                        </div>
-                        <div id="convertResult" style="text-align: center; font-size: 24px; font-weight: 700; color: var(--od-green-dark);"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ANALYTICS PAGE -->
-            <div class="page" id="analytics">
-                <div class="page-header">
-                    <h2 class="page-title">Mission Analytics</h2>
-                    <p class="page-description">Performance metrics and insights</p>
-                </div>
-
-                <div class="dashboard-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">📊</div>
-                        <div class="stat-value">89.3%</div>
-                        <div class="stat-label">Efficiency Rating</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">⏱️</div>
-                        <div class="stat-value">2.4h</div>
-                        <div class="stat-label">Avg. Mission Time</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">🏆</div>
-                        <div class="stat-value">156</div>
-                        <div class="stat-label">Achievements</div>
-                    </div>
-                </div>
-
-                <div class="feature-card" style="margin-top: 24px;">
-                    <h3>📈 Performance Overview</h3>
-                    <p>Your activity has been consistently strong this month. Operations completed are up 23% compared to last period. Keep up the excellent work!</p>
-                    <div style="margin-top: 20px; padding: 20px; background: #f7fafc; border-radius: 8px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                            <span>Completed Missions</span>
-                            <span style="font-weight: 700;">92%</span>
-                        </div>
-                        <div style="height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
-                            <div style="width: 92%; height: 100%; background: linear-gradient(90deg, var(--od-green) 0%, var(--od-green-dark) 100%);"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- NOTES PAGE -->
-    <div class="notes-container">
-                <textarea 
-                    class="notes-input" 
-                    id="noteInput" 
-                    placeholder="Write your notes here..."></textarea>
-                <button class="feature-btn" onclick="saveNote()" style="margin-top: 16px;">Save Note</button>
-                
-                <div style="margin-top: 32px;">
-                    <h3 style="color: var(--od-green-dark); margin-bottom: 16px;">Recent Notes</h3>
-                    <div id="notesList"></div>
-                </div>
-            </div>
+        <div>
+            <button class="feature-btn" onclick="calcInput('4')">4</button>
+            <button class="feature-btn" onclick="calcInput('5')">5</button>
+            <button class="feature-btn" onclick="calcInput('6')">6</button>
+            <button class="feature-btn" onclick="calcInput('*')">×</button>
         </div>
-
-        <!-- SETTINGS PAGE -->
-        <div class="page" id="settings">
-            <div class="page-header">
-                <h2 class="page-title">Configuration</h2>
-                <p class="page-description">Customize your portal experience</p>
-            </div>
-
-            <div class="feature-card">
-                <h3>⚙️ General Settings</h3>
-                <div style="margin-top: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #e2e8f0;">
-                        <div>
-                            <div style="font-weight: 600; color: var(--od-green-dark);">Notifications</div>
-                            <div style="font-size: 14px; color: #718096;">Enable system notifications</div>
-                        </div>
-                        <label style="position: relative; display: inline-block; width: 50px; height: 24px;">
-                            <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
-                            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: var(--od-green); border-radius: 24px; transition: 0.3s;"></span>
-                        </label>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #e2e8f0;">
-                        <div>
-                            <div style="font-weight: 600; color: var(--od-green-dark);">Auto-save</div>
-                            <div style="font-size: 14px; color: #718096;">Automatically save your work</div>
-                        </div>
-                        <label style="position: relative; display: inline-block; width: 50px; height: 24px;">
-                            <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
-                            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: var(--od-green); border-radius: 24px; transition: 0.3s;"></span>
-                        </label>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0;">
-                        <div>
-                            <div style="font-weight: 600; color: var(--od-green-dark);">Theme</div>
-                            <div style="font-size: 14px; color: #718096;">OD Green (Active)</div>
-                        </div>
-                        <button class="feature-btn">Change</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="feature-card" style="margin-top: 24px;">
-                <h3>🔒 Security</h3>
-                <p>Your session is secure and encrypted</p>
-                <button class="feature-btn" style="margin-top: 16px;">Change Password</button>
-            </div>
-
-            <div class="feature-card" style="margin-top: 24px;">
-                <h3>ℹ️ About</h3>
-                <p>Tactical Portal v2.0</p>
-                <p style="font-size: 14px; color: #718096; margin-top: 8px;">Built for mission-critical operations</p>
-            </div>
+        <div>
+            <button class="feature-btn" onclick="calcInput('1')">1</button>
+            <button class="feature-btn" onclick="calcInput('2')">2</button>
+            <button class="feature-btn" onclick="calcInput('3')">3</button>
+            <button class="feature-btn" onclick="calcInput('-')">−</button>
         </div>
+        <div>
+            <button class="feature-btn" onclick="calcInput('0')">0</button>
+            <button class="feature-btn" onclick="calcInput('.')">.</button>
+            <button class="feature-btn" onclick="calcEquals()">=</button>
+            <button class="feature-btn" onclick="calcInput('+')">+</button>
+        </div>
+        <button class="feature-btn" onclick="calcClear()" style="width: 100%; margin-top: 10px;">Clear</button>
+    </div>
+
+    <div class="feature-card">
+        <h3>🎲 Random Number Generator</h3>
+        <input type="number" id="randomMax" placeholder="Max value" style="width: 100%; padding: 10px; margin-bottom: 10px;">
+        <div id="randomResult" style="font-size: 32px; margin: 10px 0;">?</div>
+        <button class="feature-btn" onclick="generateRandom()">Generate</button>
+    </div>
+
+    <div class="feature-card">
+        <h3>📏 Unit Converter</h3>
+        <input type="number" id="convertValue" placeholder="Enter value" style="width: 100%; padding: 10px; margin-bottom: 10px;">
+        <select id="convertType" style="width: 100%; padding: 10px; margin-bottom: 10px;">
+            <option value="km-mi">Kilometers → Miles</option>
+            <option value="mi-km">Miles → Kilometers</option>
+            <option value="kg-lb">Kilograms → Pounds</option>
+            <option value="lb-kg">Pounds → Kilograms</option>
+            <option value="c-f">Celsius → Fahrenheit</option>
+            <option value="f-c">Fahrenheit → Celsius</option>
+        </select>
+        <div id="convertResult" style="font-size: 24px; font-weight: bold;"></div>
+        <button class="feature-btn" onclick="convertUnit()">Convert</button>
+    </div>
+
+    <div class="feature-card">
+        <h3>☀️ Weather</h3>
+        <div id="weatherTemp">--°</div>
+        <div id="weatherCondition">Loading...</div>
+    </div>
+</div>
+
+<!-- ANALYTICS PAGE -->
+<div class="page" id="analytics">
+    <div class="feature-card">
+        <h3>📊 Analytics Dashboard</h3>
+        <p>Coming soon...</p>
+    </div>
+</div>
+
+<!-- NOTES PAGE -->
+<div class="page" id="notes">
+    <textarea class="notes-input" id="noteInput" placeholder="Write your notes here..."></textarea>
+    <button class="feature-btn" onclick="saveNote()">Save Note</button>
+    <div id="notesList" style="margin-top: 20px;"></div>
+</div>
+
+<!-- SETTINGS PAGE -->
+<div class="page" id="settings">
+    <div class="feature-card">
+        <h3>⚙️ Settings</h3>
+        <p>Coming soon...</p>
     </div>
 </div>
 
 <script>
-    const CORRECT_PASSWORD = '6552';
-    let isAuthenticated = false;
-    let timerInterval = null;
-    let timerSeconds = 0;
-    let calcCurrent = '0';
-    let calcPrevious = '';
-    let calcOperation = '';
-    let notes = [];
+let timerInterval = null;
+let timerSeconds = 0;
 
-    // Login handler
-    function handleLogin(event) {
-        event.preventDefault();
-        const passwordInput = document.getElementById('password');
-        const errorMessage = document.getElementById('errorMessage');
-        
-        if (passwordInput.value === CORRECT_PASSWORD) {
-            isAuthenticated = true;
-            errorMessage.classList.remove('show');
-            document.getElementById('loginContainer').style.display = 'none';
-            document.getElementById('appContainer').classList.add('show');
-            initApp();
-        } else {
-            errorMessage.classList.add('show');
-            passwordInput.value = '';
-            passwordInput.focus();
-        }
-    }
+// Navigation
+function navigateTo(page, event) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(page).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
 
-    // Logout handler
-    function handleLogout() {
-        isAuthenticated = false;
-        document.getElementById('appContainer').classList.remove('show');
-        document.getElementById('loginContainer').style.display = 'flex';
-        document.getElementById('password').value = '';
-        stopTimer();
-    }
-
-    // Navigation
-    function navigateTo(page) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        
-        document.getElementById(page).classList.add('active');
-        event.target.closest('.nav-item').classList.add('active');
-    }
-
-    // Timer functions
-    function startTimer() {
-        if (timerInterval) return;
-        timerInterval = setInterval(() => {
-            timerSeconds++;
-            updateTimerDisplay();
-        }, 1000);
-    }
-
-    function stopTimer() {
-        if (timerInterval) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-        }
-    }
-
-    function resetTimer() {
-        stopTimer();
-        timerSeconds = 0;
+// Timer functions
+function startTimer() {
+    if(timerInterval) return;
+    timerInterval = setInterval(() => {
+        timerSeconds++;
         updateTimerDisplay();
-    }
+    }, 1000);
+}
+function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
+function resetTimer() { stopTimer(); timerSeconds = 0; updateTimerDisplay(); }
+function updateTimerDisplay() {
+    const minutes = Math.floor(timerSeconds/60);
+    const seconds = timerSeconds % 60;
+    document.getElementById('timerDisplay').textContent = `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+}
 
-    function updateTimerDisplay() {
-        const minutes = Math.floor(timerSeconds / 60);
-        const seconds = timerSeconds % 60;
-        document.getElementById('timerDisplay').textContent = 
-            `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
-
-    // Calculator functions
-    function calcInput(value) {
-        if (value === '/' || value === '*' || value === '-' || value === '+') {
-            calcPrevious = calcCurrent;
-            calcOperation = value;
-            calcCurrent = '0';
-        } else {
-            if (calcCurrent === '0') {
-                calcCurrent = value;
-            } else {
-                calcCurrent += value;
-            }
-        }
-        document.getElementById('calcDisplay').textContent = calcCurrent;
-    }
-
-    function calcEquals() {
-        let result = 0;
-        const prev = parseFloat(calcPrevious);
-        const curr = parseFloat(calcCurrent);
-        
-        switch(calcOperation) {
-            case '+': result = prev + curr; break;
-            case '-': result = prev - curr; break;
-            case '*': result = prev * curr; break;
-            case '/': result = prev / curr; break;
-        }
-        
-        calcCurrent = String(result);
-        calcPrevious = '';
-        calcOperation = '';
-        document.getElementById('calcDisplay').textContent = calcCurrent;
-    }
-
-    function calcClear() {
+// Calculator
+let calcCurrent = '0', calcPrevious = '', calcOperation = '';
+function calcInput(val) {
+    if(['+','-','*','/'].includes(val)){
+        calcPrevious = calcCurrent;
+        calcOperation = val;
         calcCurrent = '0';
-        calcPrevious = '';
-        calcOperation = '';
-        document.getElementById('calcDisplay').textContent = '0';
+    } else {
+        calcCurrent = calcCurrent === '0' ? val : calcCurrent+val;
     }
-
-    // Random generator
-    function generateRandom() {
-        const max = parseInt(document.getElementById('randomMax').value) || 100;
-        const random = Math.floor(Math.random() * max) + 1;
-        document.getElementById('randomResult').textContent = random;
-    }
-
-    // Unit converter
-    function convertUnit() {
-        const value = parseFloat(document.getElementById('convertValue').value);
-        const type = document.getElementById('convertType').value;
-        let result = 0;
-        let unit = '';
-
-        if (isNaN(value)) {
-            document.getElementById('convertResult').textContent = 'Enter a valid number';
-            return;
+    document.getElementById('calcDisplay').textContent = calcCurrent;
+}
+function calcEquals() {
+    let prev = parseFloat(calcPrevious), curr = parseFloat(calcCurrent), result = 0;
+    if(calcOperation === '/' && curr === 0){ result='Error'; }
+    else{
+        switch(calcOperation){
+            case '+': result = prev+curr; break;
+            case '-': result = prev-curr; break;
+            case '*': result = prev*curr; break;
+            case '/': result = prev/curr; break;
         }
-
-        switch(type) {
-            case 'km-mi': result = value * 0.621371; unit = 'miles'; break;
-            case 'mi-km': result = value * 1.60934; unit = 'km'; break;
-            case 'kg-lb': result = value * 2.20462; unit = 'lbs'; break;
-            case 'lb-kg': result = value * 0.453592; unit = 'kg'; break;
-            case 'c-f': result = (value * 9/5) + 32; unit = '°F'; break;
-            case 'f-c': result = (value - 32) * 5/9; unit = '°C'; break;
-        }
-
-        document.getElementById('convertResult').textContent = 
-            `${result.toFixed(2)} ${unit}`;
     }
+    calcCurrent = String(result);
+    calcPrevious = '';
+    calcOperation = '';
+    document.getElementById('calcDisplay').textContent = calcCurrent;
+}
+function calcClear(){ calcCurrent='0'; calcPrevious=''; calcOperation=''; document.getElementById('calcDisplay').textContent='0'; }
 
-    // Notes functions
-    function saveNote() {
-        const noteText = document.getElementById('noteInput').value.trim();
-        if (!noteText) return;
+// Random generator
+function generateRandom(){
+    const max = parseInt(document.getElementById('randomMax').value)||100;
+    document.getElementById('randomResult').textContent = Math.floor(Math.random()*max)+1;
+}
 
-        const note = {
-            text: noteText,
-            time: new Date().toLocaleString()
-        };
-        notes.unshift(note);
-        document.getElementById('noteInput').value = '';
-        displayNotes();
+// Unit converter
+function convertUnit(){
+    const value = parseFloat(document.getElementById('convertValue').value);
+    const type = document.getElementById('convertType').value;
+    if(isNaN(value)){ document.getElementById('convertResult').textContent='Enter valid number'; return; }
+    let result=0, unit='';
+    switch(type){
+        case 'km-mi': result=value*0.621371; unit='miles'; break;
+        case 'mi-km': result=value*1.60934; unit='km'; break;
+        case 'kg-lb': result=value*2.20462; unit='lbs'; break;
+        case 'lb-kg': result=value*0.453592; unit='kg'; break;
+        case 'c-f': result=(value*9/5)+32; unit='°F'; break;
+        case 'f-c': result=(value-32)*5/9; unit='°C'; break;
     }
+    document.getElementById('convertResult').textContent = `${result.toFixed(2)} ${unit}`;
+}
 
-    function displayNotes() {
-        const notesList = document.getElementById('notesList');
-        if (notes.length === 0) {
-            notesList.innerHTML = '<p style="color: #718096; text-align: center;">No notes yet</p>';
-            return;
-        }
+// Notes
+let notes = JSON.parse(localStorage.getItem('notes')||'[]');
+function saveNote(){
+    const noteText = document.getElementById('noteInput').value.trim();
+    if(!noteText) return;
+    notes.unshift({text: noteText, time: new Date().toLocaleString()});
+    localStorage.setItem('notes', JSON.stringify(notes));
+    document.getElementById('noteInput').value='';
+    displayNotes();
+}
+function displayNotes(){
+    const notesList = document.getElementById('notesList');
+    if(notes.length===0){ notesList.innerHTML='<p style="color:#718096;text-align:center;">No notes yet</p>'; return; }
+    notesList.innerHTML = notes.map(n=>`<div class="note-item"><div class="note-time">${n.time}</div><div>${n.text}</div></div>`).join('');
+}
+displayNotes();
 
-        notesList.innerHTML = notes.map(note => `
-            <div class="note-item">
-                <div class="note-time">${note.time}</div>
-                <div>${note.text}</div>
-            </div>
-        `).join('');
+// Weather
+async function fetchWeather(){
+    try{
+        const apiKey = 'YOUR_OPENWEATHER_API_KEY';
+        const city = 'Minneapolis';
+        const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`);
+        const data = await res.json();
+        document.getElementById('weatherTemp').textContent = `${Math.round(data.main.temp)}°`;
+        document.getElementById('weatherCondition').textContent = data.weather[0].description;
+    }catch(e){
+        document.getElementById('weatherCondition').textContent='Error fetching weather';
     }
+}
+fetchWeather();
+</script>
 
-    // Animate stats
-    function animateValue(id, start, end, duration) {
-        const element = document.getElementById(id);
-        const range = end - start;
-        const increment = range / (duration / 16);
-        let current = start;
-
-        const timer = setInterval(() => {
-            current += increment;
-            if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
-                current = end;
-                clearInterval(timer);
-            }
-            element.textContent = Math.floor(current).toLocaleString();
-        }, 16);
-    }
-
-    // Initialize app
-    function initApp() {
-        animateValue('statValue1', 0, 1284, 1000);
-        displayNotes();
-        
-        // Simulate
-      </script>
-   </body>
+</body>
 </html>
