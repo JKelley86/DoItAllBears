@@ -711,26 +711,26 @@
                 </div>
 
                 <div class="dashboard-grid">
-                    <div class="stat-card">
+                    <div class="stat-card" onclick="editStat('activeProjects')" style="cursor: pointer;">
                         <div class="stat-header">
                             <div class="stat-icon">📊</div>
                         </div>
                         <div class="stat-value" id="statValue1">12</div>
-                        <div class="stat-label">Active Projects</div>
+                        <div class="stat-label">Active Projects (click to edit)</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" onclick="editStat('tasksCompleted')" style="cursor: pointer;">
                         <div class="stat-header">
                             <div class="stat-icon">✅</div>
                         </div>
                         <div class="stat-value" id="statValue2">47</div>
-                        <div class="stat-label">Tasks Completed</div>
+                        <div class="stat-label">Tasks Completed (click to edit)</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" onclick="editStat('hoursLogged')" style="cursor: pointer;">
                         <div class="stat-header">
                             <div class="stat-icon">⏱️</div>
                         </div>
                         <div class="stat-value" id="statValue3">156</div>
-                        <div class="stat-label">Hours Logged</div>
+                        <div class="stat-label">Hours Logged (click to edit)</div>
                     </div>
                 </div>
 
@@ -795,64 +795,10 @@
                 </div>
 
                 <div class="feature-card" style="margin-bottom: 24px;">
-                    <button class="feature-btn" onclick="alert('Create new project functionality')">+ New Project</button>
+                    <button class="feature-btn" onclick="addProject()">+ New Project</button>
                 </div>
 
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-name">Structural Bridge Analysis</div>
-                        <div class="project-status status-active">Active</div>
-                    </div>
-                    <p style="color: #718096; font-size: 14px;">Load calculations and stress analysis for downtown bridge renovation</p>
-                    <div style="margin-top: 12px; font-size: 13px; color: #718096;">
-                        <strong>Due:</strong> Dec 20, 2025 • <strong>Progress:</strong> 65%
-                    </div>
-                    <div style="margin-top: 12px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
-                        <div style="width: 65%; height: 100%; background: var(--od-green);"></div>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-name">Industrial HVAC Design</div>
-                        <div class="project-status status-active">Active</div>
-                    </div>
-                    <p style="color: #718096; font-size: 14px;">Complete system design for 50,000 sq ft manufacturing facility</p>
-                    <div style="margin-top: 12px; font-size: 13px; color: #718096;">
-                        <strong>Due:</strong> Jan 15, 2026 • <strong>Progress:</strong> 42%
-                    </div>
-                    <div style="margin-top: 12px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
-                        <div style="width: 42%; height: 100%; background: var(--od-green);"></div>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-name">Circuit Board Prototype</div>
-                        <div class="project-status status-pending">Review</div>
-                    </div>
-                    <p style="color: #718096; font-size: 14px;">PCB design for IoT sensor module with wireless connectivity</p>
-                    <div style="margin-top: 12px; font-size: 13px; color: #718096;">
-                        <strong>Due:</strong> Dec 18, 2025 • <strong>Progress:</strong> 88%
-                    </div>
-                    <div style="margin-top: 12px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
-                        <div style="width: 88%; height: 100%; background: #e53e3e;"></div>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-name">Water Treatment Plant</div>
-                        <div class="project-status status-completed">Completed</div>
-                    </div>
-                    <p style="color: #718096; font-size: 14px;">Efficiency optimization and flow analysis</p>
-                    <div style="margin-top: 12px; font-size: 13px; color: #718096;">
-                        <strong>Completed:</strong> Nov 28, 2025 • <strong>Progress:</strong> 100%
-                    </div>
-                    <div style="margin-top: 12px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
-                        <div style="width: 100%; height: 100%; background: #4299e1;"></div>
-                    </div>
-                </div>
+                <div id="projectsContainer"></div>
             </div>
 
             <!-- TOOLS PAGE -->
@@ -1065,14 +1011,28 @@
         // CONFIGURATION
         const CORRECT_PASSWORD = 'engineer';
         
-        // STATE
-        let isAuthenticated = false;
+        // STATE (stored in memory, persists during session)
+        let sessionData = {
+            isAuthenticated: false,
+            timerSeconds: 0,
+            notes: [],
+            projects: [
+                { name: 'Structural Bridge Analysis', status: 'active', description: 'Load calculations and stress analysis for downtown bridge renovation', due: 'Dec 20, 2025', progress: 65 },
+                { name: 'Industrial HVAC Design', status: 'active', description: 'Complete system design for 50,000 sq ft manufacturing facility', due: 'Jan 15, 2026', progress: 42 },
+                { name: 'Circuit Board Prototype', status: 'pending', description: 'PCB design for IoT sensor module with wireless connectivity', due: 'Dec 18, 2025', progress: 88 },
+                { name: 'Water Treatment Plant', status: 'completed', description: 'Efficiency optimization and flow analysis', due: 'Nov 28, 2025', progress: 100 }
+            ],
+            stats: {
+                activeProjects: 12,
+                tasksCompleted: 47,
+                hoursLogged: 156
+            }
+        };
+        
         let timerInterval = null;
-        let timerSeconds = 0;
         let calcCurrent = '0';
         let calcPrevious = '';
         let calcOperation = '';
-        let notes = [];
 
         // LOGIN HANDLER
         function handleLogin(event) {
@@ -1081,7 +1041,7 @@
             const errorMessage = document.getElementById('errorMessage');
             
             if (passwordInput.value === CORRECT_PASSWORD) {
-                isAuthenticated = true;
+                sessionData.isAuthenticated = true;
                 errorMessage.classList.remove('show');
                 document.getElementById('loginContainer').style.display = 'none';
                 document.getElementById('appContainer').classList.add('show');
@@ -1095,7 +1055,7 @@
 
         // LOGOUT HANDLER
         function handleLogout() {
-            isAuthenticated = false;
+            sessionData.isAuthenticated = false;
             document.getElementById('appContainer').classList.remove('show');
             document.getElementById('loginContainer').style.display = 'flex';
             document.getElementById('password').value = '';
@@ -1115,7 +1075,7 @@
         function startTimer() {
             if (timerInterval) return;
             timerInterval = setInterval(() => {
-                timerSeconds++;
+                sessionData.timerSeconds++;
                 updateTimerDisplay();
             }, 1000);
         }
@@ -1129,14 +1089,14 @@
 
         function resetTimer() {
             stopTimer();
-            timerSeconds = 0;
+            sessionData.timerSeconds = 0;
             updateTimerDisplay();
         }
 
         function updateTimerDisplay() {
-            const hours = Math.floor(timerSeconds / 3600);
-            const minutes = Math.floor((timerSeconds % 3600) / 60);
-            const seconds = timerSeconds % 60;
+            const hours = Math.floor(sessionData.timerSeconds / 3600);
+            const minutes = Math.floor((sessionData.timerSeconds % 3600) / 60);
+            const seconds = sessionData.timerSeconds % 60;
             
             if (hours > 0) {
                 document.getElementById('timerDisplay').textContent = 
@@ -1339,24 +1299,30 @@
                 text: noteText,
                 time: new Date().toLocaleString()
             };
-            notes.unshift(note);
+            sessionData.notes.unshift(note);
             document.getElementById('noteInput').value = '';
             displayNotes();
         }
 
         function displayNotes() {
             const notesList = document.getElementById('notesList');
-            if (notes.length === 0) {
+            if (sessionData.notes.length === 0) {
                 notesList.innerHTML = '<p style="color: #718096; text-align: center;">No notes yet</p>';
                 return;
             }
 
-            notesList.innerHTML = notes.map(note => `
+            notesList.innerHTML = sessionData.notes.map((note, index) => `
                 <div class="note-item">
                     <div class="note-time">${note.time}</div>
                     <div>${note.text}</div>
+                    <button onclick="deleteNote(${index})" style="margin-top: 8px; padding: 6px 12px; background: #e53e3e; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Delete</button>
                 </div>
             `).join('');
+        }
+
+        function deleteNote(index) {
+            sessionData.notes.splice(index, 1);
+            displayNotes();
         }
 
         // ANIMATE STATS
@@ -1376,13 +1342,118 @@
             }, 16);
         }
 
+        // STATS EDITING
+        function editStat(statName) {
+            const newValue = prompt(`Enter new value for ${statName}:`, sessionData.stats[statName]);
+            if (newValue !== null && !isNaN(newValue)) {
+                sessionData.stats[statName] = parseInt(newValue);
+                updateStats();
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('statValue1').textContent = sessionData.stats.activeProjects;
+            document.getElementById('statValue2').textContent = sessionData.stats.tasksCompleted;
+            document.getElementById('statValue3').textContent = sessionData.stats.hoursLogged;
+        }
+
+        // PROJECT MANAGEMENT
+        function renderProjects() {
+            const projectsContainer = document.getElementById('projectsContainer');
+            projectsContainer.innerHTML = sessionData.projects.map((project, index) => {
+                const statusClass = project.status === 'active' ? 'status-active' : 
+                                   project.status === 'pending' ? 'status-pending' : 'status-completed';
+                const statusText = project.status.charAt(0).toUpperCase() + project.status.slice(1);
+                const progressColor = project.status === 'active' ? 'var(--od-green)' : 
+                                     project.status === 'pending' ? '#e53e3e' : '#4299e1';
+                
+                return `
+                    <div class="project-card">
+                        <div class="project-header">
+                            <div class="project-name">${project.name}</div>
+                            <div class="project-status ${statusClass}">${statusText}</div>
+                        </div>
+                        <p style="color: #718096; font-size: 14px;">${project.description}</p>
+                        <div style="margin-top: 12px; font-size: 13px; color: #718096;">
+                            <strong>Due:</strong> ${project.due} • <strong>Progress:</strong> ${project.progress}%
+                        </div>
+                        <div style="margin-top: 12px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                            <div style="width: ${project.progress}%; height: 100%; background: ${progressColor};"></div>
+                        </div>
+                        <div style="margin-top: 12px; display: flex; gap: 8px;">
+                            <button onclick="editProject(${index})" class="feature-btn" style="flex: 1; padding: 8px;">Edit</button>
+                            <button onclick="deleteProject(${index})" style="flex: 1; padding: 8px; background: #e53e3e; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addProject() {
+            const name = prompt('Project Name:');
+            if (!name) return;
+            
+            const description = prompt('Project Description:');
+            const due = prompt('Due Date (e.g., Jan 15, 2026):');
+            const progress = prompt('Progress (0-100):', '0');
+            
+            sessionData.projects.push({
+                name: name,
+                status: 'active',
+                description: description || '',
+                due: due || 'TBD',
+                progress: parseInt(progress) || 0
+            });
+            
+            renderProjects();
+            updateProjectCount();
+        }
+
+        function editProject(index) {
+            const project = sessionData.projects[index];
+            
+            const name = prompt('Project Name:', project.name);
+            if (name === null) return;
+            
+            const description = prompt('Description:', project.description);
+            const due = prompt('Due Date:', project.due);
+            const progress = prompt('Progress (0-100):', project.progress);
+            const status = prompt('Status (active/pending/completed):', project.status);
+            
+            sessionData.projects[index] = {
+                name: name || project.name,
+                description: description !== null ? description : project.description,
+                due: due !== null ? due : project.due,
+                progress: progress !== null ? parseInt(progress) : project.progress,
+                status: status !== null ? status : project.status
+            };
+            
+            renderProjects();
+            updateProjectCount();
+        }
+
+        function deleteProject(index) {
+            if (confirm('Are you sure you want to delete this project?')) {
+                sessionData.projects.splice(index, 1);
+                renderProjects();
+                updateProjectCount();
+            }
+        }
+
+        function updateProjectCount() {
+            const activeCount = sessionData.projects.filter(p => p.status === 'active').length;
+            sessionData.stats.activeProjects = activeCount;
+            updateStats();
+        }
+
         // INITIALIZE APP
         function initApp() {
-            animateValue('statValue1', 0, 12, 1000);
-            animateValue('statValue2', 0, 47, 1200);
-            animateValue('statValue3', 0, 156, 1400);
+            animateValue('statValue1', 0, sessionData.stats.activeProjects, 1000);
+            animateValue('statValue2', 0, sessionData.stats.tasksCompleted, 1200);
+            animateValue('statValue3', 0, sessionData.stats.hoursLogged, 1400);
             displayNotes();
             updateGeometryInputs();
+            renderProjects();
         }
     </script>
 </body>
