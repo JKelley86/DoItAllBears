@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tactical Portal</title>
+    <title>Engineering Portal</title>
     <style>
         * {
             margin: 0;
@@ -522,26 +522,6 @@
             margin-bottom: 8px;
         }
 
-        /* WEATHER WIDGET */
-        .weather-widget {
-            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-            color: white;
-            padding: 28px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .weather-temp {
-            font-size: 64px;
-            font-weight: 700;
-            margin: 16px 0;
-        }
-
-        .weather-location {
-            font-size: 20px;
-            opacity: 0.9;
-        }
-
         /* QUICK LINKS */
         .quick-links {
             display: grid;
@@ -558,11 +538,13 @@
             transition: all 0.2s ease;
             text-decoration: none;
             color: inherit;
+            border: 2px solid #e2e8f0;
         }
 
         .quick-link:hover {
             transform: translateY(-4px);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            border-color: var(--od-green);
         }
 
         .quick-link-icon {
@@ -573,6 +555,57 @@
         .quick-link-label {
             font-weight: 600;
             color: var(--od-green-dark);
+        }
+
+        /* PROJECT CARD */
+        .project-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--od-green);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .project-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .project-name {
+            font-weight: 700;
+            color: var(--od-green-dark);
+            font-size: 18px;
+        }
+
+        .project-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-pending {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .status-completed {
+            background: #bee3f8;
+            color: #2c5282;
         }
 
         @media (max-width: 768px) {
@@ -595,24 +628,24 @@
     <div class="login-container" id="loginContainer">
         <div class="login-box">
             <div class="login-form">
-                <div class="logo">⚡</div>
-                <h1>Tactical Portal</h1>
-                <p class="subtitle">Enter access code to continue</p>
+                <div class="logo">⚙️</div>
+                <h1>Engineering Portal</h1>
+                <p class="subtitle">Enter your password to continue</p>
                 
                 <form onsubmit="handleLogin(event)">
                     <div class="input-group">
-                        <label for="password">Access Code</label>
+                        <label for="password">Password</label>
                         <input 
                             type="password" 
                             id="password" 
-                            placeholder="Enter your code"
+                            placeholder="Enter your password"
                             autocomplete="current-password"
                         >
                         <div class="error-message" id="errorMessage">
-                            Incorrect code. Please try again.
+                            Incorrect password. Please try again.
                         </div>
                     </div>
-                    <button type="submit" class="login-btn">Access Portal</button>
+                    <button type="submit" class="login-btn">Sign In</button>
                 </form>
             </div>
         </div>
@@ -624,8 +657,8 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
-                    <div class="sidebar-logo-icon">⚡</div>
-                    <span>Portal</span>
+                    <div class="sidebar-logo-icon">⚙️</div>
+                    <span>Engineering</span>
                 </div>
             </div>
 
@@ -634,13 +667,17 @@
                     <span class="nav-icon">🏠</span>
                     <span>Dashboard</span>
                 </div>
+                <div class="nav-item" onclick="navigateTo('projects')">
+                    <span class="nav-icon">📁</span>
+                    <span>Projects</span>
+                </div>
                 <div class="nav-item" onclick="navigateTo('tools')">
                     <span class="nav-icon">🛠️</span>
                     <span>Tools</span>
                 </div>
-                <div class="nav-item" onclick="navigateTo('analytics')">
-                    <span class="nav-icon">📊</span>
-                    <span>Analytics</span>
+                <div class="nav-item" onclick="navigateTo('calculations')">
+                    <span class="nav-icon">🧮</span>
+                    <span>Calculations</span>
                 </div>
                 <div class="nav-item" onclick="navigateTo('notes')">
                     <span class="nav-icon">📝</span>
@@ -654,10 +691,10 @@
 
             <div class="user-section">
                 <div class="user-info">
-                    <div class="user-avatar">OP</div>
+                    <div class="user-avatar">EN</div>
                     <div>
-                        <div style="font-weight: 600;">Operator</div>
-                        <div style="font-size: 12px; opacity: 0.7;">Active</div>
+                        <div style="font-weight: 600;">Engineer</div>
+                        <div style="font-size: 12px; opacity: 0.7;">Online</div>
                     </div>
                 </div>
                 <button class="logout-btn" onclick="handleLogout()">Logout</button>
@@ -669,46 +706,38 @@
             <!-- DASHBOARD PAGE -->
             <div class="page active" id="dashboard">
                 <div class="page-header">
-                    <h2 class="page-title">Mission Control</h2>
-                    <p class="page-description">Welcome back, Operator. Your command center awaits.</p>
+                    <h2 class="page-title">Engineering Dashboard</h2>
+                    <p class="page-description">Welcome back! Here's an overview of your projects and metrics.</p>
                 </div>
 
                 <div class="dashboard-grid">
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-icon">📈</div>
+                            <div class="stat-icon">📊</div>
                         </div>
-                        <div class="stat-value" id="statValue1">1,284</div>
-                        <div class="stat-label">Total Operations</div>
+                        <div class="stat-value" id="statValue1">12</div>
+                        <div class="stat-label">Active Projects</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-icon">⚡</div>
+                            <div class="stat-icon">✅</div>
                         </div>
-                        <div class="stat-value" id="statValue2">98%</div>
-                        <div class="stat-label">Success Rate</div>
+                        <div class="stat-value" id="statValue2">47</div>
+                        <div class="stat-label">Tasks Completed</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-icon">🎯</div>
+                            <div class="stat-icon">⏱️</div>
                         </div>
-                        <div class="stat-value" id="statValue3">47</div>
-                        <div class="stat-label">Active Missions</div>
+                        <div class="stat-value" id="statValue3">156</div>
+                        <div class="stat-label">Hours Logged</div>
                     </div>
                 </div>
 
                 <div class="feature-grid">
                     <div class="feature-card">
-                        <h3>🌤️ Weather Intel</h3>
-                        <div class="weather-widget" style="margin-top: 16px;">
-                            <div class="weather-location">Minneapolis, MN</div>
-                            <div class="weather-temp" id="weatherTemp">72°</div>
-                            <div id="weatherCondition">Partly Cloudy</div>
-                        </div>
-                    </div>
-
-                    <div class="feature-card">
-                        <h3>⏱️ Mission Timer</h3>
+                        <h3>⏱️ Project Timer</h3>
+                        <p>Track time spent on current project</p>
                         <div class="timer-display" id="timerDisplay">00:00</div>
                         <div class="timer-controls">
                             <button class="feature-btn" onclick="startTimer()">Start</button>
@@ -718,26 +747,110 @@
                     </div>
 
                     <div class="feature-card">
-                        <h3>🔗 Quick Access</h3>
-                        <p>Frequently used resources and links</p>
+                        <h3>🔗 Quick Links</h3>
+                        <p>Frequently accessed resources</p>
                         <div class="quick-links">
-                            <a class="quick-link" href="#" onclick="alert('Mail accessed'); return false;">
-                                <div class="quick-link-icon">📧</div>
-                                <div class="quick-link-label">Mail</div>
+                            <a class="quick-link" href="#" onclick="alert('CAD Software'); return false;">
+                                <div class="quick-link-icon">📐</div>
+                                <div class="quick-link-label">CAD</div>
                             </a>
-                            <a class="quick-link" href="#" onclick="alert('Calendar opened'); return false;">
-                                <div class="quick-link-icon">📅</div>
-                                <div class="quick-link-label">Calendar</div>
+                            <a class="quick-link" href="#" onclick="alert('Specs'); return false;">
+                                <div class="quick-link-icon">📋</div>
+                                <div class="quick-link-label">Specs</div>
                             </a>
-                            <a class="quick-link" href="#" onclick="alert('Tasks loaded'); return false;">
-                                <div class="quick-link-icon">💼</div>
-                                <div class="quick-link-label">Tasks</div>
+                            <a class="quick-link" href="#" onclick="alert('Documentation'); return false;">
+                                <div class="quick-link-icon">📚</div>
+                                <div class="quick-link-label">Docs</div>
                             </a>
-                            <a class="quick-link" href="#" onclick="alert('Files accessed'); return false;">
-                                <div class="quick-link-icon">📁</div>
-                                <div class="quick-link-label">Files</div>
+                            <a class="quick-link" href="#" onclick="alert('Resources'); return false;">
+                                <div class="quick-link-icon">🔧</div>
+                                <div class="quick-link-label">Tools</div>
                             </a>
                         </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>📈 Recent Activity</h3>
+                        <p>Latest updates across your projects</p>
+                        <div style="margin-top: 16px; font-size: 14px; color: #718096;">
+                            <div style="padding: 12px; background: #f7fafc; border-radius: 6px; margin-bottom: 8px;">
+                                <strong>Bridge Design</strong> - Updated stress calculations
+                            </div>
+                            <div style="padding: 12px; background: #f7fafc; border-radius: 6px; margin-bottom: 8px;">
+                                <strong>HVAC System</strong> - Completed load analysis
+                            </div>
+                            <div style="padding: 12px; background: #f7fafc; border-radius: 6px;">
+                                <strong>Circuit Board</strong> - Finalized schematic
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROJECTS PAGE -->
+            <div class="page" id="projects">
+                <div class="page-header">
+                    <h2 class="page-title">Projects</h2>
+                    <p class="page-description">Manage and track all your engineering projects</p>
+                </div>
+
+                <div class="feature-card" style="margin-bottom: 24px;">
+                    <button class="feature-btn" onclick="alert('Create new project functionality')">+ New Project</button>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-name">Structural Bridge Analysis</div>
+                        <div class="project-status status-active">Active</div>
+                    </div>
+                    <p style="color: #718096; font-size: 14px;">Load calculations and stress analysis for downtown bridge renovation</p>
+                    <div style="margin-top: 12px; font-size: 13px; color: #718096;">
+                        <strong>Due:</strong> Dec 20, 2025 • <strong>Progress:</strong> 65%
+                    </div>
+                    <div style="margin-top: 12px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                        <div style="width: 65%; height: 100%; background: var(--od-green);"></div>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-name">Industrial HVAC Design</div>
+                        <div class="project-status status-active">Active</div>
+                    </div>
+                    <p style="color: #718096; font-size: 14px;">Complete system design for 50,000 sq ft manufacturing facility</p>
+                    <div style="margin-top: 12px; font-size: 13px; color: #718096;">
+                        <strong>Due:</strong> Jan 15, 2026 • <strong>Progress:</strong> 42%
+                    </div>
+                    <div style="margin-top: 12px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                        <div style="width: 42%; height: 100%; background: var(--od-green);"></div>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-name">Circuit Board Prototype</div>
+                        <div class="project-status status-pending">Review</div>
+                    </div>
+                    <p style="color: #718096; font-size: 14px;">PCB design for IoT sensor module with wireless connectivity</p>
+                    <div style="margin-top: 12px; font-size: 13px; color: #718096;">
+                        <strong>Due:</strong> Dec 18, 2025 • <strong>Progress:</strong> 88%
+                    </div>
+                    <div style="margin-top: 12px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                        <div style="width: 88%; height: 100%; background: #e53e3e;"></div>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-name">Water Treatment Plant</div>
+                        <div class="project-status status-completed">Completed</div>
+                    </div>
+                    <p style="color: #718096; font-size: 14px;">Efficiency optimization and flow analysis</p>
+                    <div style="margin-top: 12px; font-size: 13px; color: #718096;">
+                        <strong>Completed:</strong> Nov 28, 2025 • <strong>Progress:</strong> 100%
+                    </div>
+                    <div style="margin-top: 12px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                        <div style="width: 100%; height: 100%; background: #4299e1;"></div>
                     </div>
                 </div>
             </div>
@@ -745,13 +858,73 @@
             <!-- TOOLS PAGE -->
             <div class="page" id="tools">
                 <div class="page-header">
-                    <h2 class="page-title">Tactical Tools</h2>
-                    <p class="page-description">Essential utilities for mission success</p>
+                    <h2 class="page-title">Engineering Tools</h2>
+                    <p class="page-description">Quick access to calculation and conversion tools</p>
                 </div>
 
                 <div class="feature-grid">
                     <div class="feature-card">
-                        <h3>🧮 Calculator</h3>
+                        <h3>🎲 Random Number Generator</h3>
+                        <p>Generate random values for testing and simulation</p>
+                        <div style="margin: 20px 0;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--od-green-dark);">Range: 1 to</label>
+                            <input type="number" id="randomMax" value="100" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px;">
+                        </div>
+                        <div style="text-align: center; font-size: 48px; font-weight: 700; color: var(--od-green-dark); margin: 20px 0;" id="randomResult">?</div>
+                        <button class="feature-btn" onclick="generateRandom()" style="width: 100%;">Generate</button>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>📏 Unit Converter</h3>
+                        <p>Convert between engineering units</p>
+                        <div style="margin: 20px 0;">
+                            <input type="number" id="convertValue" placeholder="Enter value" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
+                            <select id="convertType" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
+                                <option value="km-mi">Kilometers to Miles</option>
+                                <option value="mi-km">Miles to Kilometers</option>
+                                <option value="m-ft">Meters to Feet</option>
+                                <option value="ft-m">Feet to Meters</option>
+                                <option value="kg-lb">Kilograms to Pounds</option>
+                                <option value="lb-kg">Pounds to Kilograms</option>
+                                <option value="c-f">Celsius to Fahrenheit</option>
+                                <option value="f-c">Fahrenheit to Celsius</option>
+                                <option value="kpa-psi">kPa to PSI</option>
+                                <option value="psi-kpa">PSI to kPa</option>
+                            </select>
+                            <button class="feature-btn" onclick="convertUnit()" style="width: 100%;">Convert</button>
+                        </div>
+                        <div id="convertResult" style="text-align: center; font-size: 24px; font-weight: 700; color: var(--od-green-dark);"></div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>📐 Geometry Calculator</h3>
+                        <p>Calculate area, volume, and perimeter</p>
+                        <div style="margin: 20px 0;">
+                            <select id="geometryShape" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;" onchange="updateGeometryInputs()">
+                                <option value="circle">Circle (Area)</option>
+                                <option value="rectangle">Rectangle (Area)</option>
+                                <option value="triangle">Triangle (Area)</option>
+                                <option value="cylinder">Cylinder (Volume)</option>
+                                <option value="sphere">Sphere (Volume)</option>
+                            </select>
+                            <div id="geometryInputs"></div>
+                            <button class="feature-btn" onclick="calculateGeometry()" style="width: 100%; margin-top: 12px;">Calculate</button>
+                        </div>
+                        <div id="geometryResult" style="text-align: center; font-size: 20px; font-weight: 700; color: var(--od-green-dark); margin-top: 16px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CALCULATIONS PAGE -->
+            <div class="page" id="calculations">
+                <div class="page-header">
+                    <h2 class="page-title">Engineering Calculations</h2>
+                    <p class="page-description">Advanced calculators and computation tools</p>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>🧮 Scientific Calculator</h3>
                         <div class="calculator">
                             <div class="calc-display" id="calcDisplay">0</div>
                             <div class="calc-buttons">
@@ -777,72 +950,39 @@
                     </div>
 
                     <div class="feature-card">
-                        <h3>🎲 Random Generator</h3>
-                        <p>Generate random numbers for decisions</p>
+                        <h3>⚡ Ohm's Law Calculator</h3>
+                        <p>Calculate Voltage, Current, or Resistance</p>
                         <div style="margin: 20px 0;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--od-green-dark);">Range: 1 to</label>
-                            <input type="number" id="randomMax" value="100" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Voltage (V)</label>
+                            <input type="number" id="voltage" placeholder="Volts" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
+                            
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Current (I)</label>
+                            <input type="number" id="current" placeholder="Amperes" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
+                            
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Resistance (R)</label>
+                            <input type="number" id="resistance" placeholder="Ohms" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
+                            
+                            <button class="feature-btn" onclick="calculateOhmsLaw()" style="width: 100%;">Calculate</button>
                         </div>
-                        <div style="text-align: center; font-size: 48px; font-weight: 700; color: var(--od-green-dark); margin: 20px 0;" id="randomResult">?</div>
-                        <button class="feature-btn" onclick="generateRandom()" style="width: 100%;">Generate</button>
+                        <div id="ohmsResult" style="text-align: center; font-size: 18px; font-weight: 700; color: var(--od-green-dark);"></div>
                     </div>
 
                     <div class="feature-card">
-                        <h3>📏 Unit Converter</h3>
-                        <p>Quick conversions for field operations</p>
+                        <h3>🏗️ Beam Calculator</h3>
+                        <p>Simple beam deflection and stress</p>
                         <div style="margin: 20px 0;">
-                            <input type="number" id="convertValue" placeholder="Enter value" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
-                            <select id="convertType" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
-                                <option value="km-mi">Kilometers to Miles</option>
-                                <option value="mi-km">Miles to Kilometers</option>
-                                <option value="kg-lb">Kilograms to Pounds</option>
-                                <option value="lb-kg">Pounds to Kilograms</option>
-                                <option value="c-f">Celsius to Fahrenheit</option>
-                                <option value="f-c">Fahrenheit to Celsius</option>
-                            </select>
-                            <button class="feature-btn" onclick="convertUnit()" style="width: 100%;">Convert</button>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Load (N)</label>
+                            <input type="number" id="beamLoad" placeholder="Force in Newtons" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
+                            
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Length (m)</label>
+                            <input type="number" id="beamLength" placeholder="Length in meters" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
+                            
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Moment of Inertia (m⁴)</label>
+                            <input type="number" id="beamInertia" placeholder="I value" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
+                            
+                            <button class="feature-btn" onclick="calculateBeam()" style="width: 100%;">Calculate Deflection</button>
                         </div>
-                        <div id="convertResult" style="text-align: center; font-size: 24px; font-weight: 700; color: var(--od-green-dark);"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ANALYTICS PAGE -->
-            <div class="page" id="analytics">
-                <div class="page-header">
-                    <h2 class="page-title">Mission Analytics</h2>
-                    <p class="page-description">Performance metrics and insights</p>
-                </div>
-
-                <div class="dashboard-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">📊</div>
-                        <div class="stat-value">89.3%</div>
-                        <div class="stat-label">Efficiency Rating</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">⏱️</div>
-                        <div class="stat-value">2.4h</div>
-                        <div class="stat-label">Avg. Mission Time</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">🏆</div>
-                        <div class="stat-value">156</div>
-                        <div class="stat-label">Achievements</div>
-                    </div>
-                </div>
-
-                <div class="feature-card" style="margin-top: 24px;">
-                    <h3>📈 Performance Overview</h3>
-                    <p>Your activity has been consistently strong this month. Operations completed are up 23% compared to last period. Keep up the excellent work!</p>
-                    <div style="margin-top: 20px; padding: 20px; background: #f7fafc; border-radius: 8px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                            <span>Completed Missions</span>
-                            <span style="font-weight: 700;">92%</span>
-                        </div>
-                        <div style="height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
-                            <div style="width: 92%; height: 100%; background: linear-gradient(90deg, var(--od-green) 0%, var(--od-green-dark) 100%);"></div>
-                        </div>
+                        <div id="beamResult" style="text-align: center; font-size: 18px; font-weight: 700; color: var(--od-green-dark);"></div>
                     </div>
                 </div>
             </div>
@@ -850,19 +990,19 @@
             <!-- NOTES PAGE -->
             <div class="page" id="notes">
                 <div class="page-header">
-                    <h2 class="page-title">Field Notes</h2>
-                    <p class="page-description">Document your missions and observations</p>
+                    <h2 class="page-title">Engineering Notes</h2>
+                    <p class="page-description">Document your calculations, ideas, and observations</p>
                 </div>
 
                 <div class="notes-container">
                     <textarea 
                         class="notes-input" 
                         id="noteInput" 
-                        placeholder="Write your notes here..."></textarea>
+                        placeholder="Write your engineering notes here..."></textarea>
                     <button class="feature-btn" onclick="saveNote()" style="margin-top: 16px;">Save Note</button>
                     
                     <div style="margin-top: 32px;">
-                        <h3 style="color: var(--od-green-dark); margin-bottom: 16px;">Recent Notes</h3>
+                        <h3 style="color: var(--od-green-dark); margin-bottom: 16px;">Saved Notes</h3>
                         <div id="notesList"></div>
                     </div>
                 </div>
@@ -871,8 +1011,8 @@
             <!-- SETTINGS PAGE -->
             <div class="page" id="settings">
                 <div class="page-header">
-                    <h2 class="page-title">Configuration</h2>
-                    <p class="page-description">Customize your portal experience</p>
+                    <h2 class="page-title">Settings</h2>
+                    <p class="page-description">Customize your engineering portal</p>
                 </div>
 
                 <div class="feature-card">
@@ -880,24 +1020,27 @@
                     <div style="margin-top: 20px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #e2e8f0;">
                             <div>
-                                <div style="font-weight: 600; color: var(--od-green-dark);">Notifications</div>
-                                <div style="font-size: 14px; color: #718096;">Enable system notifications</div>
+                                <div style="font-weight: 600; color: var(--od-green-dark);">Unit System</div>
+                                <div style="font-size: 14px; color: #718096;">Metric or Imperial</div>
                             </div>
-                            <div style="width: 50px; height: 24px; background: var(--od-green); border-radius: 24px;"></div>
+                            <select style="padding: 8px 16px; border: 2px solid #e2e8f0; border-radius: 6px;">
+                                <option>Metric</option>
+                                <option>Imperial</option>
+                            </select>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #e2e8f0;">
                             <div>
-                                <div style="font-weight: 600; color: var(--od-green-dark);">Auto-save</div>
+                                <div style="font-weight: 600; color: var(--od-green-dark);">Auto-save Notes</div>
                                 <div style="font-size: 14px; color: #718096;">Automatically save your work</div>
                             </div>
                             <div style="width: 50px; height: 24px; background: var(--od-green); border-radius: 24px;"></div>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0;">
                             <div>
-                                <div style="font-weight: 600; color: var(--od-green-dark);">Theme</div>
-                                <div style="font-size: 14px; color: #718096;">OD Green (Active)</div>
+                                <div style="font-weight: 600; color: var(--od-green-dark);">Decimal Places</div>
+                                <div style="font-size: 14px; color: #718096;">Precision for calculations</div>
                             </div>
-                            <button class="feature-btn">Change</button>
+                            <input type="number" value="2" min="0" max="10" style="width: 80px; padding: 8px; border: 2px solid #e2e8f0; border-radius: 6px;">
                         </div>
                     </div>
                 </div>
@@ -905,13 +1048,14 @@
                 <div class="feature-card" style="margin-top: 24px;">
                     <h3>🔒 Security</h3>
                     <p>Your session is secure and encrypted</p>
-                    <button class="feature-btn" style="margin-top: 16px;" onclick="alert('Password change feature coming soon!')">Change Password</button>
+                    <button class="feature-btn" style="margin-top: 16px;" onclick="alert('Password change feature - coming soon!')">Change Password</button>
                 </div>
 
                 <div class="feature-card" style="margin-top: 24px;">
                     <h3>ℹ️ About</h3>
-                    <p>Tactical Portal v2.0</p>
-                    <p style="font-size: 14px; color: #718096; margin-top: 8px;">Built for mission-critical operations</p>
+                    <p><strong>Engineering Portal v2.0</strong></p>
+                    <p style="font-size: 14px; color: #718096; margin-top: 8px;">Built for engineers, by engineers</p>
+                    <p style="font-size: 14px; color: #718096; margin-top: 4px;">© 2025 Engineering Portal</p>
                 </div>
             </div>
         </div>
@@ -919,7 +1063,7 @@
 
     <script>
         // CONFIGURATION
-        const CORRECT_PASSWORD = 'tactical';
+        const CORRECT_PASSWORD = 'engineer';
         
         // STATE
         let isAuthenticated = false;
@@ -990,10 +1134,17 @@
         }
 
         function updateTimerDisplay() {
-            const minutes = Math.floor(timerSeconds / 60);
+            const hours = Math.floor(timerSeconds / 3600);
+            const minutes = Math.floor((timerSeconds % 3600) / 60);
             const seconds = timerSeconds % 60;
-            document.getElementById('timerDisplay').textContent = 
-                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            if (hours > 0) {
+                document.getElementById('timerDisplay').textContent = 
+                    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            } else {
+                document.getElementById('timerDisplay').textContent = 
+                    `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
         }
 
         // CALCULATOR FUNCTIONS
@@ -1059,14 +1210,124 @@
             switch(type) {
                 case 'km-mi': result = value * 0.621371; unit = 'miles'; break;
                 case 'mi-km': result = value * 1.60934; unit = 'km'; break;
+                case 'm-ft': result = value * 3.28084; unit = 'feet'; break;
+                case 'ft-m': result = value * 0.3048; unit = 'meters'; break;
                 case 'kg-lb': result = value * 2.20462; unit = 'lbs'; break;
                 case 'lb-kg': result = value * 0.453592; unit = 'kg'; break;
                 case 'c-f': result = (value * 9/5) + 32; unit = '°F'; break;
                 case 'f-c': result = (value - 32) * 5/9; unit = '°C'; break;
+                case 'kpa-psi': result = value * 0.145038; unit = 'PSI'; break;
+                case 'psi-kpa': result = value * 6.89476; unit = 'kPa'; break;
             }
 
             document.getElementById('convertResult').textContent = 
-                `${result.toFixed(2)} ${unit}`;
+                `${result.toFixed(4)} ${unit}`;
+        }
+
+        // GEOMETRY CALCULATOR
+        function updateGeometryInputs() {
+            const shape = document.getElementById('geometryShape').value;
+            const container = document.getElementById('geometryInputs');
+            
+            let html = '';
+            switch(shape) {
+                case 'circle':
+                    html = '<input type="number" id="geoInput1" placeholder="Radius" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px;">';
+                    break;
+                case 'rectangle':
+                    html = '<input type="number" id="geoInput1" placeholder="Width" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 8px;"><input type="number" id="geoInput2" placeholder="Height" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px;">';
+                    break;
+                case 'triangle':
+                    html = '<input type="number" id="geoInput1" placeholder="Base" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 8px;"><input type="number" id="geoInput2" placeholder="Height" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px;">';
+                    break;
+                case 'cylinder':
+                    html = '<input type="number" id="geoInput1" placeholder="Radius" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 8px;"><input type="number" id="geoInput2" placeholder="Height" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px;">';
+                    break;
+                case 'sphere':
+                    html = '<input type="number" id="geoInput1" placeholder="Radius" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px;">';
+                    break;
+            }
+            container.innerHTML = html;
+        }
+
+        function calculateGeometry() {
+            const shape = document.getElementById('geometryShape').value;
+            const input1 = parseFloat(document.getElementById('geoInput1').value);
+            const input2 = document.getElementById('geoInput2') ? parseFloat(document.getElementById('geoInput2').value) : 0;
+            let result = 0;
+            let label = '';
+
+            if (isNaN(input1)) {
+                document.getElementById('geometryResult').textContent = 'Enter valid values';
+                return;
+            }
+
+            switch(shape) {
+                case 'circle':
+                    result = Math.PI * input1 * input1;
+                    label = 'Area';
+                    break;
+                case 'rectangle':
+                    result = input1 * input2;
+                    label = 'Area';
+                    break;
+                case 'triangle':
+                    result = 0.5 * input1 * input2;
+                    label = 'Area';
+                    break;
+                case 'cylinder':
+                    result = Math.PI * input1 * input1 * input2;
+                    label = 'Volume';
+                    break;
+                case 'sphere':
+                    result = (4/3) * Math.PI * Math.pow(input1, 3);
+                    label = 'Volume';
+                    break;
+            }
+
+            document.getElementById('geometryResult').textContent = 
+                `${label}: ${result.toFixed(4)}`;
+        }
+
+        // OHMS LAW CALCULATOR
+        function calculateOhmsLaw() {
+            const v = parseFloat(document.getElementById('voltage').value);
+            const i = parseFloat(document.getElementById('current').value);
+            const r = parseFloat(document.getElementById('resistance').value);
+            
+            let result = '';
+            
+            if (!isNaN(v) && !isNaN(i)) {
+                result = `Resistance: ${(v/i).toFixed(4)} Ω`;
+            } else if (!isNaN(v) && !isNaN(r)) {
+                result = `Current: ${(v/r).toFixed(4)} A`;
+            } else if (!isNaN(i) && !isNaN(r)) {
+                result = `Voltage: ${(i*r).toFixed(4)} V`;
+            } else {
+                result = 'Enter any two values';
+            }
+            
+            document.getElementById('ohmsResult').textContent = result;
+        }
+
+        // BEAM CALCULATOR
+        function calculateBeam() {
+            const load = parseFloat(document.getElementById('beamLoad').value);
+            const length = parseFloat(document.getElementById('beamLength').value);
+            const inertia = parseFloat(document.getElementById('beamInertia').value);
+            
+            if (isNaN(load) || isNaN(length) || isNaN(inertia)) {
+                document.getElementById('beamResult').textContent = 'Enter all values';
+                return;
+            }
+            
+            // Simplified center deflection: δ = (F * L³) / (48 * E * I)
+            // Assuming E (Young's modulus) = 200 GPa for steel
+            const E = 200e9; // Pa
+            const deflection = (load * Math.pow(length, 3)) / (48 * E * inertia);
+            
+            document.getElementById('beamResult').textContent = 
+                `Deflection: ${(deflection * 1000).toFixed(6)} mm`;
         }
 
         // NOTES FUNCTIONS
@@ -1111,14 +1372,17 @@
                     current = end;
                     clearInterval(timer);
                 }
-                element.textContent = Math.floor(current).toLocaleString();
+                element.textContent = Math.floor(current);
             }, 16);
         }
 
         // INITIALIZE APP
         function initApp() {
-            animateValue('statValue1', 0, 1284, 1000);
+            animateValue('statValue1', 0, 12, 1000);
+            animateValue('statValue2', 0, 47, 1200);
+            animateValue('statValue3', 0, 156, 1400);
             displayNotes();
+            updateGeometryInputs();
         }
     </script>
 </body>
