@@ -73,6 +73,24 @@ h1 {
   font-size: .95rem;
 }
 
+.item.header {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  border-bottom: 1px solid rgba(255,255,255,.15);
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+
+.item.header span {
+  text-align: center;
+}
+
+.item.header span:first-child {
+  text-align: left;
+}  
+
 .controls {
   display: flex;
   gap: 8px;
@@ -157,6 +175,11 @@ CATEGORY_LIST.forEach(cat => {
   card.className = "category";
   card.innerHTML = `
     <h2>${cat}</h2>
+    <div class="item header">
+      <span>Item</span>
+      <span>Packed</span>
+      <span>Need To Buy</span>
+    </div>
     <div id="${safeId}-items"></div>
     <div class="add-item">
       <input placeholder="Add item..." />
