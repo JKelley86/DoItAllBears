@@ -18,6 +18,13 @@ document.addEventListener('DOMContentLoaded', function () {
             sidebar.insertBefore(houseLink, insertBeforeNode);
         }
 
+        if (!sidebar.querySelector('a[href="justin/index.html"]')) {
+            const justinLink = document.createElement('a');
+            justinLink.href = 'justin/index.html';
+            justinLink.textContent = '🏕️ Justins Page';
+            sidebar.insertBefore(justinLink, insertBeforeNode);
+        }
+
         if (!sidebar.querySelector('button.logout-btn')) {
             const logoutBtn = document.createElement('button');
             logoutBtn.textContent = '🚪 Logout';
