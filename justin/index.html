@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engineering Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --od-green: #4a5d3e;
+            --od-green-dark: #3a4d2e;
+            --od-green-light: #5a6d4e;
+            --od-accent: #7a8d6e;
+            --sand: #d4c5a9;
+            --dark-bg: #2a2a2a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--od-green-dark) 0%, var(--od-green) 50%, var(--od-green-light) 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* LOGIN STYLES */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            max-width: 440px;
+            width: 100%;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-form {
+            padding: 48px 40px;
+        }
+
+        .logo {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--od-green) 0%, var(--od-green-dark) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 32px;
+            box-shadow: 0 8px 20px rgba(74, 93, 62, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--od-green-dark);
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            font-size: 15px;
+            margin-bottom: 32px;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            color: var(--od-green-dark);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        input[type="password"], input[type="number"], input[type="text"], textarea, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            outline: none;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--od-green);
+            box-shadow: 0 0 0 3px rgba(74, 93, 62, 0.1);
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+            animation: shake 0.4s ease;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--od-green) 0%, var(--od-green-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(74, 93, 62, 0.4);
+        }
+
+        /* MAIN APP STYLES */
+        .app-container {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .app-container.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 260px;
+            background: var(--od-green-dark);
+            color: white;
+            padding: 24px 0;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--sand);
+        }
+
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(212, 197, 169, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-menu {
+            padding: 24px 0;
+        }
+
+        .nav-item {
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(212, 197, 169, 0.2);
+            color: var(--sand);
+            border-left: 3px solid var(--sand);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .user-section {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--sand);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--od-green-dark);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 260px;
+            padding: 32px;
+            min-height: 100vh;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .page-description {
+            color: var(--sand);
+            font-size: 16px;
+        }
+
+        /* DASHBOARD GRID */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--od-green) 0%, var(--od-green-dark) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--od-green-dark);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        /* FEATURE CARDS */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h3 {
+            color: var(--od-green-dark);
+            font-size: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-card p {
+            color: #718096;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .feature-btn {
+            padding: 10px 20px;
+            background: var(--od-green);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .feature-btn:hover {
+            background: var(--od-green-dark);
+            transform: translateY(-2px);
+        }
+
+        /* TIMER */
+        .timer-display {
+            font-size: 72px;
+            font-weight: 700;
+            color: var(--od-green-dark);
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            margin: 24px 0;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        /* CALCULATOR */
+        .calculator {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 320px;
+        }
+
+        .calc-display {
+            background: var(--od-green-dark);
+            color: var(--sand);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: right;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            min-height: 60px;
+            font-family: 'Courier New', monospace;
+            word-wrap: break-word;
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .calc-btn {
+            padding: 20px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .calc-btn:hover {
+            background: var(--od-accent);
+            color: white;
+            border-color: var(--od-accent);
+        }
+
+        .calc-btn.operator {
+            background: var(--od-green);
+            color: white;
+            border-color: var(--od-green);
+        }
+
+        .calc-btn.operator:hover {
+            background: var(--od-green-dark);
+        }
+
+        /* NOTES */
+        .notes-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .notes-input {
+            width: 100%;
+            min-height: 200px;
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .note-item {
+            background: #f7fafc;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--od-green);
+        }
+
+        .note-time {
+            color: #718096;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        /* QUICK LINKS */
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+        }
+
+        .quick-link {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+            border: 2px solid #e2e8f0;
+        }
+
+        .quick-link:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            border-color: var(--od-green);
+        }
+
+        .quick-link-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .quick-link-label {
+            font-weight: 600;
+            color: var(--od-green-dark);
+        }
+
+        /* PROJECT CARD */
+        .project-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--od-green);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .project-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .project-name {
+            font-weight: 700;
+            color: var(--od-green-dark);
+            font-size: 18px;
+        }
+
+        .project-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-pending {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .status-completed {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN SCREEN -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <div class="login-form">
+                <div class="logo">⚙️</div>
+                <h1>Engineering Portal</h1>
+                <p class="subtitle">Enter your password to continue</p>
+                
+                <form onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                        >
+                        <div class="error-message" id="errorMessage">
+                            Incorrect password. Please try again.
+                        </div>
+                    </div>
+                    <button type="submit" class="login-btn">Sign In</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div class="app-container" id="appContainer">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚙️</div>
+                    <span>Engineering</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <div class="nav-item active" onclick="navigateTo('dashboard')">
+                    <span class="nav-icon">🏠</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('projects')">
+                    <span class="nav-icon">📁</span>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('tools')">
+                    <span class="nav-icon">🛠️</span>
+                    <span>Tools</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('calculations')">
+                    <span class="nav-icon">🧮</span>
+                    <span>Calculations</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('notes')">
+                    <span class="nav-icon">📝</span>
+                    <span>Notes</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('settings')">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </div>
+            </nav>
+
+            <div class="user-section">
+                <div class="user-info">
+                    <div class="user-avatar">EN</div>
+                    <div>
+                        <div style="font-weight: 600;">Engineer</div>
+                        <div style="font-size: 12px; opacity: 0.7;">Online</div>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <!-- DASHBOARD PAGE -->
+            <div class="page active" id="dashboard">
+                <div class="page-header">
+                    <h2 class="page-title">Engineering Dashboard</h2>
+                    <p class="page-description">Welcome back! Here's an overview of your projects and metrics.</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="stat-card" onclick="editStat('activeProjects')" style="cursor: pointer;">
+                        <div class="stat-header">
+                            <div class="stat-icon">📊</div>
+                        </div>
+                        <div class="stat-value" id="statValue1">12</div>
+                        <div class="stat-label">Active Projects (click to edit)</div>
+                    </div>
+                    <div class="stat-card" onclick="editStat('tasksCompleted')" style="cursor: pointer;">
+                        <div class="stat-header">
+                            <div class="stat-icon">✅</div>
+                        </div>
+                        <div class="stat-value" id="statValue2">47</div>
+                        <div class="stat-label">Tasks Completed (click to edit)</div>
+                    </div>
+                    <div class="stat-card" onclick="editStat('hoursLogged')" style="cursor: pointer;">
+                        <div class="stat-header">
+                            <div class="stat-icon">⏱️</div>
+                        </div>
+                        <div class="stat-value" id="statValue3">156</div>
+                        <div class="stat-label">Hours Logged (click to edit)</div>
+                    </div>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>⏱️ Project Timer</h3>
+                        <p>Track time spent on current project</p>
+                        <div class="timer-display" id="timerDisplay">00:00</div>
+                        <div class="timer-controls">
+                            <button class="feature-btn" onclick="startTimer()">Start</button>
+                            <button class="feature-btn" onclick="stopTimer()">Stop</button>
+                            <button class="feature-btn" onclick="resetTimer()">Reset</button>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>🔗 Quick Links</h3>
+                        <p>Frequently accessed resources</p>
+                        <div class="quick-links">
+                            <a class="quick-link" href="travelsupplies.html">
+                                <div class="quick-link-icon">✈️</div>
+                                <div class="quick-link-label">Travel</div>
+                            </a>
+                            <a class="quick-link" href="#" onclick="alert('Specs'); return false;">
+                                <div class="quick-link-icon">📋</div>
+                                <div class="quick-link-label">Specs</div>
+                            </a>
+                            <a class="quick-link" href="#" onclick="alert('Documentation'); return false;">
+                                <div class="quick-link-icon">📚</div>
+                                <div class="quick-link-label">Docs</div>
+                            </a>
+                            <a class="quick-link" href="#" onclick="alert('Resources'); return false;">
+                                <div class="quick-link-icon">🔧</div>
+                                <div class="quick-link-label">Tools</div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>📈 Recent Activity</h3>
+                        <p>Latest updates across your projects</p>
+                        <div style="margin-top: 16px; font-size: 14px; color: #718096;">
+                            <div style="padding: 12px; background: #f7fafc; border-radius: 6px; margin-bottom: 8px;">
+                                <strong>Bridge Design</strong> - Updated stress calculations
+                            </div>
+                            <div style="padding: 12px; background: #f7fafc; border-radius: 6px; margin-bottom: 8px;">
+                                <strong>HVAC System</strong> - Completed load analysis
+                            </div>
+                            <div style="padding: 12px; background: #f7fafc; border-radius: 6px;">
+                                <strong>Circuit Board</strong> - Finalized schematic
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROJECTS PAGE -->
+            <div class="page" id="projects">
+                <div class="page-header">
+                    <h2 class="page-title">Projects</h2>
+                    <p class="page-description">Manage and track all your engineering projects</p>
+                </div>
+
+                <div class="feature-card" style="margin-bottom: 24px;">
+                    <button class="feature-btn" onclick="addProject()">+ New Project</button>
+                </div>
+
+                <div id="projectsContainer"></div>
+            </div>
+
+            <!-- TOOLS PAGE -->
+            <div class="page" id="tools">
+                <div class="page-header">
+                    <h2 class="page-title">Engineering Tools</h2>
+                    <p class="page-description">Quick access to calculation and conversion tools</p>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>🎲 Random Number Generator</h3>
+                        <p>Generate random values for testing and simulation</p>
+                        <div style="margin: 20px 0;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--od-green-dark);">Range: 1 to</label>
+                            <input type="number" id="randomMax" value="100" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px;">
+                        </div>
+                        <div style="text-align: center; font-size: 48px; font-weight: 700; color: var(--od-green-dark); margin: 20px 0;" id="randomResult">?</div>
+                        <button class="feature-btn" onclick="generateRandom()" style="width: 100%;">Generate</button>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>📏 Unit Converter</h3>
+                        <p>Convert between engineering units</p>
+                        <div style="margin: 20px 0;">
+                            <input type="number" id="convertValue" placeholder="Enter value" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
+                            <select id="convertType" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
+                                <option value="km-mi">Kilometers to Miles</option>
+                                <option value="mi-km">Miles to Kilometers</option>
+                                <option value="m-ft">Meters to Feet</option>
+                                <option value="ft-m">Feet to Meters</option>
+                                <option value="kg-lb">Kilograms to Pounds</option>
+                                <option value="lb-kg">Pounds to Kilograms</option>
+                                <option value="c-f">Celsius to Fahrenheit</option>
+                                <option value="f-c">Fahrenheit to Celsius</option>
+                                <option value="kpa-psi">kPa to PSI</option>
+                                <option value="psi-kpa">PSI to kPa</option>
+                            </select>
+                            <button class="feature-btn" onclick="convertUnit()" style="width: 100%;">Convert</button>
+                        </div>
+                        <div id="convertResult" style="text-align: center; font-size: 24px; font-weight: 700; color: var(--od-green-dark);"></div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>📐 Geometry Calculator</h3>
+                        <p>Calculate area, volume, and perimeter</p>
+                        <div style="margin: 20px 0;">
+                            <select id="geometryShape" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;" onchange="updateGeometryInputs()">
+                                <option value="circle">Circle (Area)</option>
+                                <option value="rectangle">Rectangle (Area)</option>
+                                <option value="triangle">Triangle (Area)</option>
+                                <option value="cylinder">Cylinder (Volume)</option>
+                                <option value="sphere">Sphere (Volume)</option>
+                            </select>
+                            <div id="geometryInputs"></div>
+                            <button class="feature-btn" onclick="calculateGeometry()" style="width: 100%; margin-top: 12px;">Calculate</button>
+                        </div>
+                        <div id="geometryResult" style="text-align: center; font-size: 20px; font-weight: 700; color: var(--od-green-dark); margin-top: 16px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CALCULATIONS PAGE -->
+            <div class="page" id="calculations">
+                <div class="page-header">
+                    <h2 class="page-title">Engineering Calculations</h2>
+                    <p class="page-description">Advanced calculators and computation tools</p>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>🧮 Scientific Calculator</h3>
+                        <div class="calculator">
+                            <div class="calc-display" id="calcDisplay">0</div>
+                            <div class="calc-buttons">
+                                <button class="calc-btn" onclick="calcInput('7')">7</button>
+                                <button class="calc-btn" onclick="calcInput('8')">8</button>
+                                <button class="calc-btn" onclick="calcInput('9')">9</button>
+                                <button class="calc-btn operator" onclick="calcInput('/')">÷</button>
+                                <button class="calc-btn" onclick="calcInput('4')">4</button>
+                                <button class="calc-btn" onclick="calcInput('5')">5</button>
+                                <button class="calc-btn" onclick="calcInput('6')">6</button>
+                                <button class="calc-btn operator" onclick="calcInput('*')">×</button>
+                                <button class="calc-btn" onclick="calcInput('1')">1</button>
+                                <button class="calc-btn" onclick="calcInput('2')">2</button>
+                                <button class="calc-btn" onclick="calcInput('3')">3</button>
+                                <button class="calc-btn operator" onclick="calcInput('-')">−</button>
+                                <button class="calc-btn" onclick="calcInput('0')">0</button>
+                                <button class="calc-btn" onclick="calcInput('.')">.</button>
+                                <button class="calc-btn operator" onclick="calcEquals()">=</button>
+                                <button class="calc-btn operator" onclick="calcInput('+')">+</button>
+                                <button class="calc-btn operator" onclick="calcClear()" style="grid-column: span 4;">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>⚡ Ohm's Law Calculator</h3>
+                        <p>Calculate Voltage, Current, or Resistance</p>
+                        <div style="margin: 20px 0;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Voltage (V)</label>
+                            <input type="number" id="voltage" placeholder="Volts" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
+                            
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Current (I)</label>
+                            <input type="number" id="current" placeholder="Amperes" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
+                            
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Resistance (R)</label>
+                            <input type="number" id="resistance" placeholder="Ohms" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
+                            
+                            <button class="feature-btn" onclick="calculateOhmsLaw()" style="width: 100%;">Calculate</button>
+                        </div>
+                        <div id="ohmsResult" style="text-align: center; font-size: 18px; font-weight: 700; color: var(--od-green-dark);"></div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>🏗️ Beam Calculator</h3>
+                        <p>Simple beam deflection and stress</p>
+                        <div style="margin: 20px 0;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Load (N)</label>
+                            <input type="number" id="beamLoad" placeholder="Force in Newtons" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
+                            
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Length (m)</label>
+                            <input type="number" id="beamLength" placeholder="Length in meters" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
+                            
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Moment of Inertia (m⁴)</label>
+                            <input type="number" id="beamInertia" placeholder="I value" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 12px;">
+                            
+                            <button class="feature-btn" onclick="calculateBeam()" style="width: 100%;">Calculate Deflection</button>
+                        </div>
+                        <div id="beamResult" style="text-align: center; font-size: 18px; font-weight: 700; color: var(--od-green-dark);"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOTES PAGE -->
+            <div class="page" id="notes">
+                <div class="page-header">
+                    <h2 class="page-title">Engineering Notes</h2>
+                    <p class="page-description">Document your calculations, ideas, and observations</p>
+                </div>
+
+                <div class="notes-container">
+                    <textarea 
+                        class="notes-input" 
+                        id="noteInput" 
+                        placeholder="Write your engineering notes here..."></textarea>
+                    <button class="feature-btn" onclick="saveNote()" style="margin-top: 16px;">Save Note</button>
+                    
+                    <div style="margin-top: 32px;">
+                        <h3 style="color: var(--od-green-dark); margin-bottom: 16px;">Saved Notes</h3>
+                        <div id="notesList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS PAGE -->
+            <div class="page" id="settings">
+                <div class="page-header">
+                    <h2 class="page-title">Settings</h2>
+                    <p class="page-description">Customize your engineering portal</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>⚙️ General Settings</h3>
+                    <div style="margin-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #e2e8f0;">
+                            <div>
+                                <div style="font-weight: 600; color: var(--od-green-dark);">Unit System</div>
+                                <div style="font-size: 14px; color: #718096;">Metric or Imperial</div>
+                            </div>
+                            <select style="padding: 8px 16px; border: 2px solid #e2e8f0; border-radius: 6px;">
+                                <option>Metric</option>
+                                <option>Imperial</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #e2e8f0;">
+                            <div>
+                                <div style="font-weight: 600; color: var(--od-green-dark);">Auto-save Notes</div>
+                                <div style="font-size: 14px; color: #718096;">Automatically save your work</div>
+                            </div>
+                            <div style="width: 50px; height: 24px; background: var(--od-green); border-radius: 24px;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0;">
+                            <div>
+                                <div style="font-weight: 600; color: var(--od-green-dark);">Decimal Places</div>
+                                <div style="font-size: 14px; color: #718096;">Precision for calculations</div>
+                            </div>
+                            <input type="number" value="2" min="0" max="10" style="width: 80px; padding: 8px; border: 2px solid #e2e8f0; border-radius: 6px;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card" style="margin-top: 24px;">
+                    <h3>🔒 Security</h3>
+                    <p>Your session is secure and encrypted</p>
+                    <button class="feature-btn" style="margin-top: 16px;" onclick="alert('Password change feature - coming soon!')">Change Password</button>
+                </div>
+
+                <div class="feature-card" style="margin-top: 24px;">
+                    <h3>ℹ️ About</h3>
+                    <p><strong>Engineering Portal v2.0</strong></p>
+                    <p style="font-size: 14px; color: #718096; margin-top: 8px;">Built for engineers, by engineers</p>
+                    <p style="font-size: 14px; color: #718096; margin-top: 4px;">© 2025 Engineering Portal</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURATION
+        const CORRECT_PASSWORD = 'engineer';
+        
+        // STATE (stored in memory, persists during session)
+        let sessionData = {
+            isAuthenticated: false,
+            timerSeconds: 0,
+            notes: [],
+            projects: [
+                { name: 'Structural Bridge Analysis', status: 'active', description: 'Load calculations and stress analysis for downtown bridge renovation', due: 'Dec 20, 2025', progress: 65 },
+                { name: 'Industrial HVAC Design', status: 'active', description: 'Complete system design for 50,000 sq ft manufacturing facility', due: 'Jan 15, 2026', progress: 42 },
+                { name: 'Circuit Board Prototype', status: 'pending', description: 'PCB design for IoT sensor module with wireless connectivity', due: 'Dec 18, 2025', progress: 88 },
+                { name: 'Water Treatment Plant', status: 'completed', description: 'Efficiency optimization and flow analysis', due: 'Nov 28, 2025', progress: 100 }
+            ],
+            stats: {
+                activeProjects: 12,
+                tasksCompleted: 47,
+                hoursLogged: 156
+            }
+        };
+        
+        let timerInterval = null;
+        let calcCurrent = '0';
+        let calcPrevious = '';
+        let calcOperation = '';
+
+        // LOGIN HANDLER
+        function handleLogin(event) {
+            event.preventDefault();
+            const passwordInput = document.getElementById('password');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            if (passwordInput.value === CORRECT_PASSWORD) {
+                sessionData.isAuthenticated = true;
+                errorMessage.classList.remove('show');
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('appContainer').classList.add('show');
+                initApp();
+            } else {
+                errorMessage.classList.add('show');
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        }
+
+        // LOGOUT HANDLER
+        function handleLogout() {
+            sessionData.isAuthenticated = false;
+            document.getElementById('appContainer').classList.remove('show');
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('password').value = '';
+            stopTimer();
+        }
+
+        // NAVIGATION
+        function navigateTo(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(page).classList.add('active');
+            event.target.closest('.nav-item').classList.add('active');
+        }
+
+        // TIMER FUNCTIONS
+        function startTimer() {
+            if (timerInterval) return;
+            timerInterval = setInterval(() => {
+                sessionData.timerSeconds++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function resetTimer() {
+            stopTimer();
+            sessionData.timerSeconds = 0;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const hours = Math.floor(sessionData.timerSeconds / 3600);
+            const minutes = Math.floor((sessionData.timerSeconds % 3600) / 60);
+            const seconds = sessionData.timerSeconds % 60;
+            
+            if (hours > 0) {
+                document.getElementById('timerDisplay').textContent = 
+                    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            } else {
+                document.getElementById('timerDisplay').textContent = 
+                    `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
+        }
+
+        // CALCULATOR FUNCTIONS
+        function calcInput(value) {
+            if (value === '/' || value === '*' || value === '-' || value === '+') {
+                calcPrevious = calcCurrent;
+                calcOperation = value;
+                calcCurrent = '0';
+            } else {
+                if (calcCurrent === '0') {
+                    calcCurrent = value;
+                } else {
+                    calcCurrent += value;
+                }
+            }
+            document.getElementById('calcDisplay').textContent = calcCurrent;
+        }
+
+        function calcEquals() {
+            let result = 0;
+            const prev = parseFloat(calcPrevious);
+            const curr = parseFloat(calcCurrent);
+            
+            switch(calcOperation) {
+                case '+': result = prev + curr; break;
+                case '-': result = prev - curr; break;
+                case '*': result = prev * curr; break;
+                case '/': result = prev / curr; break;
+            }
+            
+            calcCurrent = String(result);
+            calcPrevious = '';
+            calcOperation = '';
+            document.getElementById('calcDisplay').textContent = calcCurrent;
+        }
+
+        function calcClear() {
+            calcCurrent = '0';
+            calcPrevious = '';
+            calcOperation = '';
+            document.getElementById('calcDisplay').textContent = '0';
+        }
+
+        // RANDOM GENERATOR
+        function generateRandom() {
+            const max = parseInt(document.getElementById('randomMax').value) || 100;
+            const random = Math.floor(Math.random() * max) + 1;
+            document.getElementById('randomResult').textContent = random;
+        }
+
+        // UNIT CONVERTER
+        function convertUnit() {
+            const value = parseFloat(document.getElementById('convertValue').value);
+            const type = document.getElementById('convertType').value;
+            let result = 0;
+            let unit = '';
+
+            if (isNaN(value)) {
+                document.getElementById('convertResult').textContent = 'Enter a valid number';
+                return;
+            }
+
+            switch(type) {
+                case 'km-mi': result = value * 0.621371; unit = 'miles'; break;
+                case 'mi-km': result = value * 1.60934; unit = 'km'; break;
+                case 'm-ft': result = value * 3.28084; unit = 'feet'; break;
+                case 'ft-m': result = value * 0.3048; unit = 'meters'; break;
+                case 'kg-lb': result = value * 2.20462; unit = 'lbs'; break;
+                case 'lb-kg': result = value * 0.453592; unit = 'kg'; break;
+                case 'c-f': result = (value * 9/5) + 32; unit = '°F'; break;
+                case 'f-c': result = (value - 32) * 5/9; unit = '°C'; break;
+                case 'kpa-psi': result = value * 0.145038; unit = 'PSI'; break;
+                case 'psi-kpa': result = value * 6.89476; unit = 'kPa'; break;
+            }
+
+            document.getElementById('convertResult').textContent = 
+                `${result.toFixed(4)} ${unit}`;
+        }
+
+        // GEOMETRY CALCULATOR
+        function updateGeometryInputs() {
+            const shape = document.getElementById('geometryShape').value;
+            const container = document.getElementById('geometryInputs');
+            
+            let html = '';
+            switch(shape) {
+                case 'circle':
+                    html = '<input type="number" id="geoInput1" placeholder="Radius" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px;">';
+                    break;
+                case 'rectangle':
+                    html = '<input type="number" id="geoInput1" placeholder="Width" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 8px;"><input type="number" id="geoInput2" placeholder="Height" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px;">';
+                    break;
+                case 'triangle':
+                    html = '<input type="number" id="geoInput1" placeholder="Base" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 8px;"><input type="number" id="geoInput2" placeholder="Height" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px;">';
+                    break;
+                case 'cylinder':
+                    html = '<input type="number" id="geoInput1" placeholder="Radius" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 8px;"><input type="number" id="geoInput2" placeholder="Height" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px;">';
+                    break;
+                case 'sphere':
+                    html = '<input type="number" id="geoInput1" placeholder="Radius" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px;">';
+                    break;
+            }
+            container.innerHTML = html;
+        }
+
+        function calculateGeometry() {
+            const shape = document.getElementById('geometryShape').value;
+            const input1 = parseFloat(document.getElementById('geoInput1').value);
+            const input2 = document.getElementById('geoInput2') ? parseFloat(document.getElementById('geoInput2').value) : 0;
+            let result = 0;
+            let label = '';
+
+            if (isNaN(input1)) {
+                document.getElementById('geometryResult').textContent = 'Enter valid values';
+                return;
+            }
+
+            switch(shape) {
+                case 'circle':
+                    result = Math.PI * input1 * input1;
+                    label = 'Area';
+                    break;
+                case 'rectangle':
+                    result = input1 * input2;
+                    label = 'Area';
+                    break;
+                case 'triangle':
+                    result = 0.5 * input1 * input2;
+                    label = 'Area';
+                    break;
+                case 'cylinder':
+                    result = Math.PI * input1 * input1 * input2;
+                    label = 'Volume';
+                    break;
+                case 'sphere':
+                    result = (4/3) * Math.PI * Math.pow(input1, 3);
+                    label = 'Volume';
+                    break;
+            }
+
+            document.getElementById('geometryResult').textContent = 
+                `${label}: ${result.toFixed(4)}`;
+        }
+
+        // OHMS LAW CALCULATOR
+        function calculateOhmsLaw() {
+            const v = parseFloat(document.getElementById('voltage').value);
+            const i = parseFloat(document.getElementById('current').value);
+            const r = parseFloat(document.getElementById('resistance').value);
+            
+            let result = '';
+            
+            if (!isNaN(v) && !isNaN(i)) {
+                result = `Resistance: ${(v/i).toFixed(4)} Ω`;
+            } else if (!isNaN(v) && !isNaN(r)) {
+                result = `Current: ${(v/r).toFixed(4)} A`;
+            } else if (!isNaN(i) && !isNaN(r)) {
+                result = `Voltage: ${(i*r).toFixed(4)} V`;
+            } else {
+                result = 'Enter any two values';
+            }
+            
+            document.getElementById('ohmsResult').textContent = result;
+        }
+
+        // BEAM CALCULATOR
+        function calculateBeam() {
+            const load = parseFloat(document.getElementById('beamLoad').value);
+            const length = parseFloat(document.getElementById('beamLength').value);
+            const inertia = parseFloat(document.getElementById('beamInertia').value);
+            
+            if (isNaN(load) || isNaN(length) || isNaN(inertia)) {
+                document.getElementById('beamResult').textContent = 'Enter all values';
+                return;
+            }
+            
+            // Simplified center deflection: δ = (F * L³) / (48 * E * I)
+            // Assuming E (Young's modulus) = 200 GPa for steel
+            const E = 200e9; // Pa
+            const deflection = (load * Math.pow(length, 3)) / (48 * E * inertia);
+            
+            document.getElementById('beamResult').textContent = 
+                `Deflection: ${(deflection * 1000).toFixed(6)} mm`;
+        }
+
+        // NOTES FUNCTIONS
+        function saveNote() {
+            const noteText = document.getElementById('noteInput').value.trim();
+            if (!noteText) return;
+
+            const note = {
+                text: noteText,
+                time: new Date().toLocaleString()
+            };
+            sessionData.notes.unshift(note);
+            document.getElementById('noteInput').value = '';
+            displayNotes();
+        }
+
+        function displayNotes() {
+            const notesList = document.getElementById('notesList');
+            if (sessionData.notes.length === 0) {
+                notesList.innerHTML = '<p style="color: #718096; text-align: center;">No notes yet</p>';
+                return;
+            }
+
+            notesList.innerHTML = sessionData.notes.map((note, index) => `
+                <div class="note-item">
+                    <div class="note-time">${note.time}</div>
+                    <div>${note.text}</div>
+                    <button onclick="deleteNote(${index})" style="margin-top: 8px; padding: 6px 12px; background: #e53e3e; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteNote(index) {
+            sessionData.notes.splice(index, 1);
+            displayNotes();
+        }
+
+        // ANIMATE STATS
+        function animateValue(id, start, end, duration) {
+            const element = document.getElementById(id);
+            const range = end - start;
+            const increment = range / (duration / 16);
+            let current = start;
+
+            const timer = setInterval(() => {
+                current += increment;
+                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current);
+            }, 16);
+        }
+
+        // STATS EDITING
+        function editStat(statName) {
+            const newValue = prompt(`Enter new value for ${statName}:`, sessionData.stats[statName]);
+            if (newValue !== null && !isNaN(newValue)) {
+                sessionData.stats[statName] = parseInt(newValue);
+                updateStats();
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('statValue1').textContent = sessionData.stats.activeProjects;
+            document.getElementById('statValue2').textContent = sessionData.stats.tasksCompleted;
+            document.getElementById('statValue3').textContent = sessionData.stats.hoursLogged;
+        }
+
+        // PROJECT MANAGEMENT
+        function renderProjects() {
+            const projectsContainer = document.getElementById('projectsContainer');
+            projectsContainer.innerHTML = sessionData.projects.map((project, index) => {
+                const statusClass = project.status === 'active' ? 'status-active' : 
+                                   project.status === 'pending' ? 'status-pending' : 'status-completed';
+                const statusText = project.status.charAt(0).toUpperCase() + project.status.slice(1);
+                const progressColor = project.status === 'active' ? 'var(--od-green)' : 
+                                     project.status === 'pending' ? '#e53e3e' : '#4299e1';
+                
+                return `
+                    <div class="project-card">
+                        <div class="project-header">
+                            <div class="project-name">${project.name}</div>
+                            <div class="project-status ${statusClass}">${statusText}</div>
+                        </div>
+                        <p style="color: #718096; font-size: 14px;">${project.description}</p>
+                        <div style="margin-top: 12px; font-size: 13px; color: #718096;">
+                            <strong>Due:</strong> ${project.due} • <strong>Progress:</strong> ${project.progress}%
+                        </div>
+                        <div style="margin-top: 12px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                            <div style="width: ${project.progress}%; height: 100%; background: ${progressColor};"></div>
+                        </div>
+                        <div style="margin-top: 12px; display: flex; gap: 8px;">
+                            <button onclick="editProject(${index})" class="feature-btn" style="flex: 1; padding: 8px;">Edit</button>
+                            <button onclick="deleteProject(${index})" style="flex: 1; padding: 8px; background: #e53e3e; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addProject() {
+            const name = prompt('Project Name:');
+            if (!name) return;
+            
+            const description = prompt('Project Description:');
+            const due = prompt('Due Date (e.g., Jan 15, 2026):');
+            const progress = prompt('Progress (0-100):', '0');
+            
+            sessionData.projects.push({
+                name: name,
+                status: 'active',
+                description: description || '',
+                due: due || 'TBD',
+                progress: parseInt(progress) || 0
+            });
+            
+            renderProjects();
+            updateProjectCount();
+        }
+
+        function editProject(index) {
+            const project = sessionData.projects[index];
+            
+            const name = prompt('Project Name:', project.name);
+            if (name === null) return;
+            
+            const description = prompt('Description:', project.description);
+            const due = prompt('Due Date:', project.due);
+            const progress = prompt('Progress (0-100):', project.progress);
+            const status = prompt('Status (active/pending/completed):', project.status);
+            
+            sessionData.projects[index] = {
+                name: name || project.name,
+                description: description !== null ? description : project.description,
+                due: due !== null ? due : project.due,
+                progress: progress !== null ? parseInt(progress) : project.progress,
+                status: status !== null ? status : project.status
+            };
+            
+            renderProjects();
+            updateProjectCount();
+        }
+
+        function deleteProject(index) {
+            if (confirm('Are you sure you want to delete this project?')) {
+                sessionData.projects.splice(index, 1);
+                renderProjects();
+                updateProjectCount();
+            }
+        }
+
+        function updateProjectCount() {
+            const activeCount = sessionData.projects.filter(p => p.status === 'active').length;
+            sessionData.stats.activeProjects = activeCount;
+            updateStats();
+        }
+
+        // INITIALIZE APP
+        function initApp() {
+            animateValue('statValue1', 0, sessionData.stats.activeProjects, 1000);
+            animateValue('statValue2', 0, sessionData.stats.tasksCompleted, 1200);
+            animateValue('statValue3', 0, sessionData.stats.hoursLogged, 1400);
+            displayNotes();
+            updateGeometryInputs();
+            renderProjects();
+        }
+    </script>
+</body>
+</html>
