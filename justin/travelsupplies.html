@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Travel Organizer</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+:root {
+  --bg: #0b0f1a;
+  --card: rgba(255,255,255,0.08);
+  --accent: #4cc9f0;
+  --text: #ffffff;
+  --muted: #9aa4b2;
+}
+
+* { box-sizing: border-box; font-family: "Segoe UI", system-ui; }
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #141b2d, #060814);
+  color: var(--text);
+  padding: 40px;
+}
+
+h1 {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 40px;
+  background: linear-gradient(90deg, #4cc9f0, #b5179e);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.category {
+  backdrop-filter: blur(14px);
+  background: var(--card);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.4);
+}
+
+.category h2 {
+  margin-top: 0;
+  font-size: 1.4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+
+.item:last-child { border-bottom: none; }
+
+.item label {
+  font-size: .95rem;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+}
+
+input[type="checkbox"] {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+.add-item {
+  display: flex;
+  margin-top: 12px;
+}
+
+.add-item input {
+  flex: 1;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 10px;
+  padding: 8px 12px;
+  color: white;
+}
+
+.add-item button {
+  margin-left: 8px;
+  background: linear-gradient(135deg, #4cc9f0, #4895ef);
+  border: none;
+  border-radius: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+  color: #000;
+  font-weight: bold;
+}
+
+.add-item button:hover {
+  filter: brightness(1.1);
+}
+
+@media (max-width: 600px) {
+  body { padding: 20px; }
+}
+</style>
+</head>
+
+<body>
+<h1>✈️ Travel Organizer</h1>
+
+<div class="grid" id="categories"></div>
+
+<script>
+/* 🔥 Firebase Config */
+const firebaseConfig = {
+  apiKey: "AIzaSyBytsujikovxmALWlt3VQhgzri9306x2TY",
+  authDomain: "plc-dashboard-99f31.firebaseapp.com",
+  databaseURL: "https://plc-dashboard-99f31-default-rtdb.firebaseio.com",
+  projectId: "plc-dashboard-99f31",
+  storageBucket: "plc-dashboard-99f31.firebasestorage.app",
+  messagingSenderId: "781768573643",
+  appId: "1:781768573643:web:56a4f7996bf0c4aab1514e",
+  measurementId: "G-RT2V4D5P19"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const CATEGORY_LIST = [
+  "Toiletry Bag",
+  "Charger Bag",
+  "Medicine Bag",
+  "Clothes",
+  "Misc"
+];
+
+const container = document.getElementById("categories");
+
+/* Create Category Cards */
+CATEGORY_LIST.forEach(cat => {
+  const card = document.createElement("div");
+  card.className = "category";
+  card.innerHTML = `
+    <h2>${cat}</h2>
+    <div id="${cat}-items"></div>
+    <div class="add-item">
+      <input placeholder="Add item..." />
+      <button>Add</button>
+    </div>
+  `;
+  container.appendChild(card);
+
+  const listRef = db.ref(`travel/${cat}`);
+  const itemsDiv = card.querySelector(`#${cat}-items`);
+  const input = card.querySelector("input");
+  const button = card.querySelector("button");
+
+  button.onclick = () => {
+    if (!input.value) return;
+    listRef.push({
+      name: input.value,
+      packed: false,
+      needToBuy: false
+    });
+    input.value = "";
+  };
+
+  listRef.on("value", snap => {
+    itemsDiv.innerHTML = "";
+    snap.forEach(child => {
+      const item = child.val();
+      const id = child.key;
+
+      const row = document.createElement("div");
+      row.className = "item";
+
+      row.innerHTML = `
+        <label>${item.name}</label>
+        <input type="checkbox" ${item.packed ? "checked" : ""}>
+        <input type="checkbox" ${item.needToBuy ? "checked" : ""}>
+      `;
+
+      const [packedBox, buyBox] = row.querySelectorAll("input");
+
+      packedBox.onchange = e => {
+        listRef.child(id).update({ packed: e.target.checked });
+      };
+
+      buyBox.onchange = e => {
+        listRef.child(id).update({ needToBuy: e.target.checked });
+      };
+
+      itemsDiv.appendChild(row);
+    });
+  });
+});
+</script>
+</body>
+</html>
