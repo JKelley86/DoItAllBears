@@ -151,11 +151,13 @@ const container = document.getElementById("categories");
 
 /* Create Category Cards */
 CATEGORY_LIST.forEach(cat => {
+  const safeId = cat.replace(/\s+/g, "-").toLowerCase();
+
   const card = document.createElement("div");
   card.className = "category";
   card.innerHTML = `
     <h2>${cat}</h2>
-    <div id="${cat}-items"></div>
+    <div id="${safeId}-items"></div>
     <div class="add-item">
       <input placeholder="Add item..." />
       <button>Add</button>
@@ -164,12 +166,12 @@ CATEGORY_LIST.forEach(cat => {
   container.appendChild(card);
 
   const listRef = db.ref(`travel/${cat}`);
-  const itemsDiv = card.querySelector(`#${cat}-items`);
+  const itemsDiv = document.getElementById(`${safeId}-items`);
   const input = card.querySelector("input");
   const button = card.querySelector("button");
 
   button.onclick = () => {
-    if (!input.value) return;
+    if (!input.value.trim()) return;
     listRef.push({
       name: input.value,
       packed: false,
@@ -179,14 +181,16 @@ CATEGORY_LIST.forEach(cat => {
   };
 
   listRef.on("value", snap => {
+    if (!itemsDiv) return;
+
     itemsDiv.innerHTML = "";
+
     snap.forEach(child => {
       const item = child.val();
       const id = child.key;
 
       const row = document.createElement("div");
       row.className = "item";
-
       row.innerHTML = `
         <label>${item.name}</label>
         <input type="checkbox" ${item.packed ? "checked" : ""}>
@@ -195,13 +199,11 @@ CATEGORY_LIST.forEach(cat => {
 
       const [packedBox, buyBox] = row.querySelectorAll("input");
 
-      packedBox.onchange = e => {
+      packedBox.onchange = e =>
         listRef.child(id).update({ packed: e.target.checked });
-      };
 
-      buyBox.onchange = e => {
+      buyBox.onchange = e =>
         listRef.child(id).update({ needToBuy: e.target.checked });
-      };
 
       itemsDiv.appendChild(row);
     });
