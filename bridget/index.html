@@ -14,6 +14,271 @@
 .pulse-light { animation: pulse 2s ease-in-out infinite; }
 .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
 .glass:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(59, 130, 246, 0.3); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); }
+.page { display: none; }
+.page.active { display: block; }
+@media (max-width: 768px) {
+  .sidenav { width: 100%; height: 60px; top: auto; bottom: 0; flex-direction: row; padding: 0; border-right: none; border-top: 1px solid rgba(59, 130, 246, 0.2); }
+  .main-content { margin-left: 0 !important; margin-bottom: 60px; padding: 1rem !important; }
+  .nav-item { width: auto; height: 100%; flex: 1; }
+}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white min-h-screen">
+
+<!-- SPLASH SCREEN -->
+<div id="splash" class="splash fixed inset-0 bg-gradient-to-br from-blue-900 via-slate-900 to-blue-950 flex flex-col items-center justify-center z-50">
+  <div class="relative">
+    <div class="absolute inset-0 bg-blue-500 blur-3xl opacity-20 pulse-light"></div>
+    <div class="relative text-6xl md:text-9xl mb-6">🚔</div>
+  </div>
+  <h1 class="text-3xl md:text-5xl font-black text-white mb-3 tracking-tight text-center px-4">OFFICER BRIDGET</h1>
+  <div class="flex gap-2 mb-4">
+    <div class="w-3 h-3 bg-red-500 rounded-full pulse-light"></div>
+    <div class="w-3 h-3 bg-blue-500 rounded-full pulse-light" style="animation-delay: 0.3s;"></div>
+    <div class="w-3 h-3 bg-red-500 rounded-full pulse-light" style="animation-delay: 0.6s;"></div>
+  </div>
+  <p class="text-blue-300 text-sm md:text-lg font-semibold uppercase tracking-widest">Portal Access</p>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" class="opacity-0" style="transition: opacity 0.5s ease-in 2.5s; animation: none;">
+  <!-- Top Nav -->
+  <div class="fixed top-0 left-0 right-0 h-[60px] md:h-[70px] bg-slate-900/95 backdrop-blur-xl border-b border-blue-500/20 flex items-center justify-between px-4 md:px-8 z-40">
+    <div class="flex items-center gap-2 md:gap-4">
+      <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center text-xl md:text-2xl shadow-lg shadow-blue-500/50">🚔</div>
+      <div>
+        <div class="text-lg md:text-2xl font-black bg-gradient-to-r from-blue-400 to-blue-200 bg-clip-text text-transparent">OFFICER BRIDGET</div>
+        <div class="text-[10px] md:text-xs text-blue-400 font-semibold uppercase tracking-wider hidden sm:block">Law Enforcement Portal</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 md:gap-4">
+      <div class="flex items-center gap-2 px-2 md:px-4 py-1 md:py-2 bg-green-500/20 border border-green-500/30 rounded-lg">
+        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+        <span class="text-green-300 text-xs md:text-sm font-semibold hidden sm:inline">ON DUTY</span>
+      </div>
+      <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center font-bold text-xs md:text-sm shadow-lg">B</div>
+    </div>
+  </div>
+
+  <!-- Side Nav (Bottom on mobile) -->
+  <div class="sidenav fixed left-0 top-[60px] md:top-[70px] bottom-0 md:bottom-auto w-20 bg-slate-900/95 backdrop-blur-xl border-r border-blue-500/20 flex flex-col items-center py-6 gap-2 z-30">
+    <div onclick="navigateTo('home')" class="nav-item active w-14 h-14 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all bg-gradient-to-br from-blue-600 to-blue-800 shadow-lg shadow-blue-500/50" data-page="home">
+      <div class="text-xl md:text-2xl">🏠</div><div class="text-[8px] md:text-[9px] font-semibold mt-1 uppercase">Home</div>
+    </div>
+    <div onclick="navigateTo('dispatch')" class="nav-item w-14 h-14 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all text-white/50 hover:bg-white/5 hover:text-white" data-page="dispatch">
+      <div class="text-xl md:text-2xl">📡</div><div class="text-[8px] md:text-[9px] font-semibold mt-1 uppercase">Dispatch</div>
+    </div>
+    <div onclick="navigateTo('reports')" class="nav-item w-14 h-14 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all text-white/50 hover:bg-white/5 hover:text-white" data-page="reports">
+      <div class="text-xl md:text-2xl">📋</div><div class="text-[8px] md:text-[9px] font-semibold mt-1 uppercase">Reports</div>
+    </div>
+    <div onclick="navigateTo('codes')" class="nav-item w-14 h-14 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all text-white/50 hover:bg-white/5 hover:text-white" data-page="codes">
+      <div class="text-xl md:text-2xl">🔢</div><div class="text-[8px] md:text-[9px] font-semibold mt-1 uppercase">Codes</div>
+    </div>
+    <div onclick="navigateTo('notes')" class="nav-item w-14 h-14 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all text-white/50 hover:bg-white/5 hover:text-white" data-page="notes">
+      <div class="text-xl md:text-2xl">📝</div><div class="text-[8px] md:text-[9px] font-semibold mt-1 uppercase">Notes</div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content ml-0 md:ml-20 mt-[60px] md:mt-[70px] p-4 md:p-10">
+    <!-- HOME PAGE -->
+    <div id="page-home" class="page active animate-slideUp">
+      <div class="flex flex-col md:flex-row items-center gap-4 mb-6 md:mb-10">
+        <div class="text-4xl md:text-6xl">👮‍♀️</div>
+        <div class="text-center md:text-left">
+          <h1 class="text-3xl md:text-5xl font-black bg-gradient-to-r from-white via-blue-200 to-blue-400 bg-clip-text text-transparent">Welcome, Officer Bridget</h1>
+          <p class="text-blue-300 text-base md:text-lg mt-2">Your command center is ready</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+        <div class="bg-gradient-to-br from-blue-600/20 to-blue-800/10 border border-blue-500/30 rounded-2xl p-4 md:p-6 hover:-translate-y-1 transition-all">
+          <div class="flex items-center justify-between mb-4">
+            <div class="text-3xl md:text-4xl">⏱️</div>
+            <div class="px-2 md:px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full text-green-300 text-xs font-bold">ACTIVE</div>
+          </div>
+          <div id="shiftTime" class="text-3xl md:text-5xl font-black bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent mb-2">00:00</div>
+          <div class="text-blue-300 text-xs md:text-sm font-semibold uppercase tracking-wider">Shift Duration</div>
+        </div>
+        
+        <div class="bg-gradient-to-br from-red-600/20 to-red-800/10 border border-red-500/30 rounded-2xl p-4 md:p-6 hover:-translate-y-1 transition-all">
+          <div class="text-3xl md:text-4xl mb-4">🚨</div>
+          <div id="callCount" class="text-3xl md:text-5xl font-black bg-gradient-to-r from-white to-red-200 bg-clip-text text-transparent mb-2">0</div>
+          <div class="text-red-300 text-xs md:text-sm font-semibold uppercase tracking-wider">Calls Today</div>
+        </div>
+        
+        <div class="bg-gradient-to-br from-yellow-600/20 to-yellow-800/10 border border-yellow-500/30 rounded-2xl p-4 md:p-6 hover:-translate-y-1 transition-all">
+          <div class="text-3xl md:text-4xl mb-4">📋</div>
+          <div id="reportCount" class="text-3xl md:text-5xl font-black bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent mb-2">0</div>
+          <div class="text-yellow-300 text-xs md:text-sm font-semibold uppercase tracking-wider">Reports Filed</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+        <div class="glass rounded-2xl p-5 md:p-7 transition-all">
+          <div class="flex items-center gap-3 mb-4 md:mb-6">
+            <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center shadow-lg text-lg md:text-xl">⏰</div>
+            <div class="text-xl md:text-2xl font-bold">Shift Timer</div>
+          </div>
+          <div id="timerDisplay" class="text-4xl md:text-7xl font-black text-center font-mono bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent my-6 md:my-8">00:00:00</div>
+          <div class="flex gap-2 md:gap-3 justify-center flex-wrap">
+            <button onclick="startShift()" class="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg font-semibold hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/50 transition-all text-sm md:text-base">Start Shift</button>
+            <button onclick="stopShift()" class="px-4 md:px-6 py-2 md:py-3 bg-white/5 border border-white/10 rounded-lg font-semibold hover:bg-white/8 transition-all text-sm md:text-base">Stop</button>
+            <button onclick="resetShift()" class="px-4 md:px-6 py-2 md:py-3 bg-white/5 border border-white/10 rounded-lg font-semibold hover:bg-white/8 transition-all text-sm md:text-base">Reset</button>
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-5 md:p-7 transition-all">
+          <div class="flex items-center gap-3 mb-4 md:mb-6">
+            <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-red-600 to-red-800 rounded-lg flex items-center justify-center shadow-lg text-lg md:text-xl">🚨</div>
+            <div class="text-xl md:text-2xl font-bold">Quick Actions</div>
+          </div>
+          <div class="space-y-3 mt-4 md:mt-6">
+            <button onclick="logCall()" class="w-full p-3 md:p-4 bg-gradient-to-r from-red-600 to-red-700 rounded-lg font-semibold hover:-translate-y-0.5 hover:shadow-lg hover:shadow-red-500/50 transition-all flex items-center justify-center gap-2 text-sm md:text-base">
+              <span class="text-lg md:text-xl">🚨</span> Log Emergency Call
+            </button>
+            <button onclick="navigateTo('reports')" class="w-full p-3 md:p-4 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg font-semibold hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/50 transition-all flex items-center justify-center gap-2 text-sm md:text-base">
+              <span class="text-lg md:text-xl">📋</span> File Report
+            </button>
+            <button onclick="navigateTo('codes')" class="w-full p-3 md:p-4 bg-gradient-to-r from-yellow-600 to-yellow-700 rounded-lg font-semibold hover:-translate-y-0.5 hover:shadow-lg hover:shadow-yellow-500/50 transition-all flex items-center justify-center gap-2 text-sm md:text-base">
+              <span class="text-lg md:text-xl">🔢</span> View 10-Codes
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-blue-300">Quick Reference</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <div class="glass rounded-xl p-4 text-center cursor-pointer hover:bg-blue-600/20 transition-all">
+          <div class="text-2xl md:text-3xl mb-2">🚓</div>
+          <div class="font-semibold text-xs md:text-sm">Patrol</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center cursor-pointer hover:bg-blue-600/20 transition-all">
+          <div class="text-2xl md:text-3xl mb-2">👥</div>
+          <div class="font-semibold text-xs md:text-sm">Backup</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center cursor-pointer hover:bg-blue-600/20 transition-all">
+          <div class="text-2xl md:text-3xl mb-2">🚑</div>
+          <div class="font-semibold text-xs md:text-sm">Medical</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center cursor-pointer hover:bg-blue-600/20 transition-all">
+          <div class="text-2xl md:text-3xl mb-2">🔥</div>
+          <div class="font-semibold text-xs md:text-sm">Fire</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DISPATCH PAGE -->
+    <div id="page-dispatch" class="page hidden">
+      <h1 class="text-3xl md:text-5xl font-black bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent mb-3">Dispatch Center</h1>
+      <p class="text-blue-300 text-base md:text-lg mb-6 md:mb-10">Active calls and dispatch information</p>
+      
+      <div class="glass rounded-2xl p-5 md:p-7 mb-6">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 md:w-10 md:h-10 bg-red-600 rounded-lg flex items-center justify-center animate-pulse text-lg md:text-xl">🚨</div>
+            <div class="text-xl md:text-2xl font-bold">Active Incidents</div>
+          </div>
+          <div class="px-3 md:px-4 py-1 md:py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300 font-bold text-xs md:text-sm">LIVE</div>
+        </div>
+        <div id="dispatchList" class="space-y-4"></div>
+      </div>
+
+      <button onclick="addDispatch()" class="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg font-semibold hover:-translate-y-0.5 hover:shadow-lg transition-all text-sm md:text-base">+ Add Incident</button>
+    </div>
+
+    <!-- REPORTS PAGE -->
+    <div id="page-reports" class="page hidden">
+      <h1 class="text-3xl md:text-5xl font-black bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent mb-3">Incident Reports</h1>
+      <p class="text-blue-300 text-base md:text-lg mb-6 md:mb-10">File and review incident reports</p>
+      
+      <div class="glass rounded-2xl p-5 md:p-7 mb-6">
+        <h3 class="text-lg md:text-xl font-bold mb-4">New Report</h3>
+        <input type="text" id="reportTitle" placeholder="Incident Title" class="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white mb-3 focus:outline-none focus:bg-white/8 focus:border-blue-500 text-sm md:text-base">
+        <textarea id="reportDetails" placeholder="Report Details..." class="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white min-h-[120px] md:min-h-[150px] focus:outline-none focus:bg-white/8 focus:border-blue-500 mb-4 text-sm md:text-base"></textarea>
+        <button onclick="saveReport()" class="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg font-semibold hover:-translate-y-0.5 hover:shadow-lg transition-all text-sm md:text-base">Submit Report</button>
+      </div>
+
+      <h3 class="text-xl md:text-2xl font-bold mb-4 text-blue-300">Filed Reports</h3>
+      <div id="reportsList"></div>
+    </div>
+
+    <!-- CODES PAGE -->
+    <div id="page-codes" class="page hidden">
+      <h1 class="text-3xl md:text-5xl font-black bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent mb-3">10-Codes Reference</h1>
+      <p class="text-blue-300 text-base md:text-lg mb-6 md:mb-10">Quick reference for police radio codes</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+        <div class="glass rounded-xl p-4 md:p-5"><div class="flex justify-between items-center gap-2"><span class="text-lg md:text-2xl font-bold text-blue-400">10-4</span><span class="text-sm md:text-lg">Acknowledgment (OK)</span></div></div>
+        <div class="glass rounded-xl p-4 md:p-5"><div class="flex justify-between items-center gap-2"><span class="text-lg md:text-2xl font-bold text-blue-400">10-8</span><span class="text-sm md:text-lg">In Service</span></div></div>
+        <div class="glass rounded-xl p-4 md:p-5"><div class="flex justify-between items-center gap-2"><span class="text-lg md:text-2xl font-bold text-blue-400">10-20</span><span class="text-sm md:text-lg">Location</span></div></div>
+        <div class="glass rounded-xl p-4 md:p-5"><div class="flex justify-between items-center gap-2"><span class="text-lg md:text-2xl font-bold text-blue-400">10-23</span><span class="text-sm md:text-lg">Arrived at Scene</span></div></div>
+        <div class="glass rounded-xl p-4 md:p-5"><div class="flex justify-between items-center gap-2"><span class="text-lg md:text-2xl font-bold text-red-400">10-33</span><span class="text-sm md:text-lg">Emergency Traffic</span></div></div>
+        <div class="glass rounded-xl p-4 md:p-5"><div class="flex justify-between items-center gap-2"><span class="text-lg md:text-2xl font-bold text-blue-400">10-42</span><span class="text-sm md:text-lg">End of Shift</span></div></div>
+        <div class="glass rounded-xl p-4 md:p-5"><div class="flex justify-between items-center gap-2"><span class="text-lg md:text-2xl font-bold text-yellow-400">10-97</span><span class="text-sm md:text-lg">Arrived at Scene</span></div></div>
+        <div class="glass rounded-xl p-4 md:p-5"><div class="flex justify-between items-center gap-2"><span class="text-lg md:text-2xl font-bold text-yellow-400">10-98</span><span class="text-sm md:text-lg">Assignment Completed</span></div></div>
+        <div class="glass rounded-xl p-4 md:p-5"><div class="flex justify-between items-center gap-2"><span class="text-lg md:text-2xl font-bold text-red-400">Code 3</span><span class="text-sm md:text-lg">Emergency Response</span></div></div>
+        <div class="glass rounded-xl p-4 md:p-5"><div class="flex justify-between items-center gap-2"><span class="text-lg md:text-2xl font-bold text-green-400">Code 4</span><span class="text-sm md:text-lg">No Further Assistance</span></div></div>
+      </div>
+    </div>
+
+    <!-- NOTES PAGE -->
+    <div id="page-notes" class="page hidden">
+      <h1 class="text-3xl md:text-5xl font-black bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent mb-3">Shift Notes</h1>
+      <p class="text-blue-300 text-base md:text-lg mb-6 md:mb-10">Personal notes and reminders</p>
+      
+      <div class="glass rounded-2xl p-5 md:p-7 mb-6">
+        <textarea id="noteInput" placeholder="Add a note..." class="w-full p-3 md:p-4 bg-white/5 border border-white/10 rounded-lg text-white min-h-[120px] md:min-h-[150px] focus:outline-none focus:bg-white/8 focus:border-blue-500 text-sm md:text-base"></textarea>
+        <button onclick="saveNote()" class="mt-4 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg font-semibold hover:-translate-y-0.5 hover:shadow-lg transition-all text-sm md:text-base">Save Note</button>
+      </div>
+
+      <h3 class="text-xl md:text-2xl font-bold mb-4 text-blue-300">Saved Notes</h3>
+      <div id="notesList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+setTimeout(()=>{document.getElementById('mainApp').style.opacity='1';},2500);
+
+function loadFromCache(){try{const saved=localStorage.getItem('policePortalData');return saved?JSON.parse(saved):null;}catch(e){return null;}}
+function saveToCache(data){try{localStorage.setItem('policePortalData',JSON.stringify(data));}catch(e){console.error('Cache save failed',e);}}
+
+let state=loadFromCache()||{shiftTimer:0,shiftRunning:false,shiftStartTime:null,callCount:0,reportCount:0,notes:[],reports:[],dispatches:[]};
+let shiftInterval=null;
+
+function saveState(){saveToCache(state);}
+
+function navigateTo(page){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>{n.classList.remove('active','bg-gradient-to-br','from-blue-600','to-blue-800','shadow-lg','shadow-blue-500/50');n.classList.add('text-white/50');});const nav=document.querySelector(`[data-page="${page}"]`);nav.classList.add('active','bg-gradient-to-br','from-blue-600','to-blue-800','shadow-lg','shadow-blue-500/50');nav.classList.remove('text-white/50');}
+
+function startShift(){if(state.shiftRunning)return;state.shiftRunning=true;state.shiftStartTime=Date.now()-(state.shiftTimer*1000);saveState();shiftInterval=setInterval(()=>{state.shiftTimer=Math.floor((Date.now()-state.shiftStartTime)/1000);updateTimerDisplay();saveState();},1000);}
+
+function stopShift(){state.shiftRunning=false;if(shiftInterval){clearInterval(shiftInterval);shiftInterval=null;}saveState();}
+
+function resetShift(){stopShift();state.shiftTimer=0;state.shiftStartTime=null;updateTimerDisplay();saveState();}
+
+function updateTimerDisplay(){const h=Math.floor(state.shiftTimer/3600);const m=Math.floor((state.shiftTimer%3600)/60);const s=state.shiftTimer%60;document.getElementById('timerDisplay').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;const mins=Math.floor(state.shiftTimer/60);document.getElementById('shiftTime').textContent=`${String(mins).padStart(2,'0')}:${String(s).padStart(2,'0')}`;}
+
+function logCall(){state.callCount++;document.getElementById('callCount').textContent=state.callCount;saveState();}
+
+function addDispatch(){const incident=prompt('Incident Type:');const location=prompt('Location:');if(!incident||!location)return;const dispatch={incident,location,time:new Date().toLocaleTimeString(),id:Date.now()};state.dispatches.unshift(dispatch);displayDispatches();saveState();}
+
+function displayDispatches(){const list=document.getElementById('dispatchList');if(state.dispatches.length===0){list.innerHTML='<p class="text-white/40 text-center py-8">No active incidents</p>';return;}list.innerHTML=state.dispatches.map(d=>`<div class="bg-white/5 border border-red-500/30 rounded-lg p-4"><div class="flex justify-between items-start mb-2 gap-2"><div class="text-base md:text-lg font-bold text-red-400">${d.incident}</div><div class="text-xs text<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Officer Bridget - Portal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; pointer-events: none; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.splash { animation: fadeOut 0.5s ease-out 2.5s forwards; }
+.animate-slideUp { animation: slideUp 0.6s ease-out; }
+.pulse-light { animation: pulse 2s ease-in-out infinite; }
+.glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
+.glass:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(59, 130, 246, 0.3); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); }
 </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white min-h-screen">
