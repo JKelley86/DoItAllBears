@@ -25,6 +25,13 @@ document.addEventListener('DOMContentLoaded', function () {
             sidebar.insertBefore(justinLink, insertBeforeNode);
         }
 
+        if (!sidebar.querySelector('a[href="bridget/index.html"]')) {
+            const bridgetLink = document.createElement('a');
+           bridgetLink.href = 'bridget/index.html';
+           bridgetLink.textContent = '🚔 bridgets Page';
+            sidebar.insertBefore(bridgetLink, insertBeforeNode);
+        }
+
         if (!sidebar.querySelector('button.logout-btn')) {
             const logoutBtn = document.createElement('button');
             logoutBtn.textContent = '🚪 Logout';
