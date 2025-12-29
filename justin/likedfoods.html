@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Library</title>
+
+<style>
+:root {
+  --bg: #0b0f1a;
+  --card: rgba(255,255,255,0.08);
+  --accent: #ffb703;
+  --text: #ffffff;
+  --muted: #9aa4b2;
+}
+
+* { box-sizing: border-box; font-family: "Segoe UI", system-ui; }
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #141b2d, #060814);
+  color: var(--text);
+  padding: 40px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #ffb703, #fb8500);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--muted);
+  margin-bottom: 30px;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.controls input,
+.controls select {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: white;
+  font-size: .95rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: var(--card);
+  backdrop-filter: blur(14px);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 15px 35px rgba(0,0,0,.4);
+  transition: transform .25s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.2rem;
+}
+
+.tag {
+  display: inline-block;
+  font-size: .75rem;
+  color: #000;
+  background: var(--accent);
+  padding: 3px 8px;
+  border-radius: 999px;
+  margin-bottom: 8px;
+}
+
+.card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.card li {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  font-size: .9rem;
+}
+
+.card li:last-child { border-bottom: none; }
+
+.hidden { display: none; }
+
+@media (max-width: 600px) {
+  body { padding: 20px; }
+}
+</style>
+</head>
+
+<body>
+
+<h1>🍽️ Food Library</h1>
+<div class="subtitle">All the foods I love, organized & searchable</div>
+
+<div class="controls">
+  <input id="search" placeholder="Search food..." />
+  <select id="categoryFilter">
+    <option value="all">All Categories</option>
+    <option>Soups & Chili</option>
+    <option>Breakfast</option>
+    <option>Chicken</option>
+    <option>Beef & Pork</option>
+    <option>Pasta</option>
+    <option>Seafood</option>
+    <option>Grilling</option>
+    <option>Snacks</option>
+    <option>Comfort Food</option>
+    <option>Desserts</option>
+  </select>
+</div>
+
+<div class="grid" id="foodGrid">
+
+  <!-- Soups & Chili -->
+  <div class="card" data-category="Soups & Chili">
+    <div class="tag">Soups & Chili</div>
+    <h3>Warm Bowls</h3>
+    <ul>
+      <li>Chili</li>
+      <li>Chicken Noodle Soup</li>
+      <li>Beef Stew</li>
+      <li>Potato Soup</li>
+      <li>French Onion Soup</li>
+    </ul>
+  </div>
+
+  <!-- Breakfast -->
+  <div class="card" data-category="Breakfast">
+    <div class="tag">Breakfast</div>
+    <h3>Morning Favorites</h3>
+    <ul>
+      <li>Pancakes</li>
+      <li>Breakfast Burritos</li>
+      <li>Egg & Cheese Sandwich</li>
+      <li>Biscuits and Gravy</li>
+    </ul>
+  </div>
+
+  <!-- Chicken -->
+  <div class="card" data-category="Chicken">
+    <div class="tag">Chicken</div>
+    <h3>Chicken Dishes</h3>
+    <ul>
+      <li>Grilled Chicken</li>
+      <li>Chicken Alfredo</li>
+      <li>Chicken Pot Pie</li>
+      <li>Buffalo Chicken</li>
+    </ul>
+  </div>
+
+  <!-- Beef & Pork -->
+  <div class="card" data-category="Beef & Pork">
+    <div class="tag">Beef & Pork</div>
+    <h3>Hearty Meals</h3>
+    <ul>
+      <li>Steak</li>
+      <li>Pork Chops</li>
+      <li>Meatloaf</li>
+      <li>Ribs</li>
+    </ul>
+  </div>
+
+  <!-- Pasta -->
+  <div class="card" data-category="Pasta">
+    <div class="tag">Pasta</div>
+    <h3>Pasta Nights</h3>
+    <ul>
+      <li>Spaghetti</li>
+      <li>Lasagna</li>
+      <li>Mac and Cheese</li>
+      <li>Carbonara</li>
+    </ul>
+  </div>
+
+  <!-- Seafood -->
+  <div class="card" data-category="Seafood">
+    <div class="tag">Seafood</div>
+    <h3>From the Water</h3>
+    <ul>
+      <li>Salmon</li>
+      <li>Shrimp Tacos</li>
+      <li>Fish Fry</li>
+    </ul>
+  </div>
+
+  <!-- Snacks -->
+  <div class="card" data-category="Snacks">
+    <div class="tag">Snacks</div>
+    <h3>Quick Bites</h3>
+    <ul>
+      <li>Nachos</li>
+      <li>Chips & Dip</li>
+      <li>Wings</li>
+    </ul>
+  </div>
+
+  <!-- Comfort Food -->
+  <div class="card" data-category="Comfort Food">
+    <div class="tag">Comfort Food</div>
+    <h3>Feel Good</h3>
+    <ul>
+      <li>Mashed Potatoes</li>
+      <li>Grilled Cheese</li>
+      <li>Chicken Fried Steak</li>
+    </ul>
+  </div>
+
+  <!-- Desserts -->
+  <div class="card" data-category="Desserts">
+    <div class="tag">Desserts</div>
+    <h3>Sweet Treats</h3>
+    <ul>
+      <li>Brownies</li>
+      <li>Cheesecake</li>
+      <li>Ice Cream</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+const search = document.getElementById("search");
+const filter = document.getElementById("categoryFilter");
+const cards = document.querySelectorAll(".card");
+
+function applyFilters() {
+  const text = search.value.toLowerCase();
+  const category = filter.value;
+
+  cards.forEach(card => {
+    const matchesCategory =
+      category === "all" || card.dataset.category === category;
+
+    const matchesText =
+      card.innerText.toLowerCase().includes(text);
+
+    card.classList.toggle("hidden", !(matchesCategory && matchesText));
+  });
+}
+
+search.addEventListener("input", applyFilters);
+filter.addEventListener("change", applyFilters);
+</script>
+
+</body>
+</html>
