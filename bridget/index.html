@@ -239,33 +239,71 @@
 </div>
 
 <script>
-setTimeout(()=>{document.getElementById('mainApp').style.opacity='1';},2500);
+// Wait for app to be visible
+setTimeout(()=>{
+  document.getElementById('mainApp').style.opacity='1';
+  initializeApp();
+},2500);
 
 function loadFromCache(){
   try{
+    if(typeof localStorage === 'undefined'){
+      console.error('localStorage not available');
+      return null;
+    }
     const saved=localStorage.getItem('policePortalData');
     if(saved){
       const data=JSON.parse(saved);
-      console.log('Loaded from cache:', data);
+      console.log('✅ Loaded from cache:', data);
       return data;
+    }else{
+      console.log('No saved data found');
     }
   }catch(e){
-    console.error('Cache load failed:',e);
+    console.error('❌ Cache load failed:',e);
   }
   return null;
 }
 
 function saveToCache(data){
   try{
-    localStorage.setItem('policePortalData',JSON.stringify(data));
-    console.log('Saved to cache:', data);
+    if(typeof localStorage === 'undefined'){
+      console.error('localStorage not available');
+      return;
+    }
+    const jsonData = JSON.stringify(data);
+    localStorage.setItem('policePortalData',jsonData);
+    console.log('✅ Saved to cache:', data);
+    // Verify it saved
+    const verify = localStorage.getItem('policePortalData');
+    console.log('✅ Verified save:', verify === jsonData);
   }catch(e){
-    console.error('Cache save failed:',e);
+    console.error('❌ Cache save failed:',e);
   }
 }
 
-let state=loadFromCache()||{shiftTimer:0,shiftRunning:false,shiftStartTime:null,callCount:0,reportCount:0,notes:[],reports:[],dispatches:[]};
+let state={shiftTimer:0,shiftRunning:false,shiftStartTime:null,callCount:0,reportCount:0,notes:[],reports:[],dispatches:[]};
 let shiftInterval=null;
+
+function initializeApp(){
+  const loaded = loadFromCache();
+  if(loaded){
+    state = loaded;
+    console.log('State initialized from cache');
+  }else{
+    console.log('State initialized fresh');
+  }
+  
+  updateTimerDisplay();
+  document.getElementById('callCount').textContent=state.callCount;
+  document.getElementById('reportCount').textContent=state.reportCount;
+  displayDispatches();
+  displayReports();
+  displayNotes();
+  if(state.shiftRunning){
+    startShift();
+  }
+}
 
 function saveState(){
   saveToCache(state);
