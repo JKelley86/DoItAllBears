@@ -3,83 +3,161 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Update</title>
+  <title>Event Update</title>
+
   <style>
+    :root {
+      --accent: #ff4d4d;
+      --accent-soft: rgba(255, 77, 77, 0.25);
+      --text-main: #ffffff;
+      --text-muted: #cfcfcf;
+      --card-bg: rgba(20, 20, 20, 0.92);
+    }
+
     body {
       font-family: "Georgia", serif;
-      background: linear-gradient(135deg, #1b1b1b, #2b2b2b);
       margin: 0;
-      padding: 0;
-      color: #fff;
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
+      background:
+        radial-gradient(circle at top, #2a2a2a, #0f0f0f 70%);
+      color: var(--text-main);
+      overflow: hidden;
+    }
+
+    /* subtle animated grain/glow */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 30% 20%, var(--accent-soft), transparent 40%),
+        radial-gradient(circle at 70% 80%, rgba(255,255,255,0.05), transparent 45%);
+      animation: floatGlow 18s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+
+    @keyframes floatGlow {
+      from { transform: translateY(0); }
+      to { transform: translateY(-20px); }
     }
 
     .card {
-      max-width: 700px;
-      background: rgba(30, 30, 30, 0.9);
-      padding: 3rem;
-      border-radius: 18px;
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      padding: 3.2rem;
+      background: var(--card-bg);
+      border-radius: 22px;
       text-align: center;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+      box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.75),
+        0 0 40px var(--accent-soft);
+      animation: fadeIn 1.1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     h1 {
-      font-size: 2.4rem;
-      margin-bottom: 1rem;
+      font-size: 2.7rem;
+      margin-bottom: 0.6rem;
+      letter-spacing: 1px;
+      text-shadow: 0 0 18px var(--accent-soft);
     }
 
     h2 {
       font-size: 1.4rem;
       font-weight: normal;
-      margin-bottom: 2rem;
-      color: #ccc;
+      margin-bottom: 2.2rem;
+      color: var(--text-muted);
+    }
+
+    .divider {
+      width: 120px;
+      height: 2px;
+      background: linear-gradient(
+        to right,
+        transparent,
+        var(--accent),
+        transparent
+      );
+      margin: 2rem auto;
     }
 
     .message {
       font-size: 1.1rem;
-      line-height: 1.7;
-      color: #e0e0e0;
+      line-height: 1.75;
+      color: #e5e5e5;
+    }
+
+    .message p {
+      margin-bottom: 1.4rem;
+    }
+
+    .message strong {
+      color: var(--accent);
     }
 
     .footer {
-      margin-top: 2.5rem;
+      margin-top: 2.8rem;
       font-size: 0.95rem;
-      color: #aaa;
+      color: #bdbdbd;
       font-style: italic;
+    }
+
+    /* micro interaction */
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.85),
+        0 0 55px var(--accent-soft);
     }
   </style>
 </head>
+
 <body>
   <main class="card">
     <h1>📢 Important Update</h1>
     <h2>Please Read Carefully</h2>
 
+    <div class="divider"></div>
+
     <div class="message">
       <p>
-        After reviewing the RSVP list, crunching the numbers, and staring at the
-        spreadsheet longer than we’d like to admit…
+        After reviewing the RSVP list, crunching the numbers,
+        and making aggressive eye contact with the spreadsheet…
       </p>
 
       <p>
-        We regret to inform you that <strong>nothing is happening.</strong>
+        We regret to inform you that <strong>nothing is happening</strong>.
       </p>
 
       <p>
-        That’s right. No party. No food. No awkward small talk.
-        Just us, the couch, and the realization that everyone is busy.
+        No party. No food. No awkward small talk.
+        Just vibes, disappointment, and the couch.
       </p>
 
       <p>
-        Thank you to the few people who <em>thought about</em> coming.
-        Your emotional support has been noted.
+        Thank you to the few who considered coming.
+        Your effort has been emotionally appreciated.
       </p>
     </div>
 
+    <div class="divider"></div>
+
     <div class="footer">
-      This event has been officially canceled due to lack of attendance.<br>
+      This event has been officially canceled due to low attendance.<br>
       We’ll try again when everyone magically becomes free at the same time.
     </div>
   </main>
