@@ -17,9 +17,9 @@
 .page { display: none; }
 .page.active { display: block; }
 @media (max-width: 768px) {
-  .sidenav { width: 100%; height: 60px; top: auto; bottom: 0; flex-direction: row; padding: 0; border-right: none; border-top: 1px solid rgba(59, 130, 246, 0.2); }
-  .main-content { margin-left: 0 !important; margin-bottom: 60px; padding: 1rem !important; }
-  .nav-item { width: auto; height: 100%; flex: 1; }
+  .sidenav { width: 100%; height: 60px; top: auto; bottom: 0; left: 0; flex-direction: row; padding: 0 8px; border-right: none; border-top: 1px solid rgba(59, 130, 246, 0.2); justify-content: space-around; }
+  .main-content { margin-left: 0 !important; margin-bottom: 70px !important; padding: 1rem !important; margin-top: 60px !important; }
+  .nav-item { width: auto; height: auto; flex: 1; padding: 8px 4px; margin: 0; }
 }
 </style>
 </head>
@@ -80,7 +80,7 @@
   </div>
 
   <!-- Main Content -->
-  <div class="main-content ml-0 md:ml-20 mt-[60px] md:mt-[70px] p-4 md:p-10">
+  <div class="main-content ml-20 mt-[60px] md:mt-[70px] p-4 md:p-10 mb-0 md:mb-0">
     <!-- HOME PAGE -->
     <div id="page-home" class="page active animate-slideUp">
       <div class="flex flex-col md:flex-row items-center gap-4 mb-6 md:mb-10">
@@ -241,13 +241,35 @@
 <script>
 setTimeout(()=>{document.getElementById('mainApp').style.opacity='1';},2500);
 
-function loadFromCache(){try{const saved=localStorage.getItem('policePortalData');return saved?JSON.parse(saved):null;}catch(e){return null;}}
-function saveToCache(data){try{localStorage.setItem('policePortalData',JSON.stringify(data));}catch(e){console.error('Cache save failed',e);}}
+function loadFromCache(){
+  try{
+    const saved=localStorage.getItem('policePortalData');
+    if(saved){
+      const data=JSON.parse(saved);
+      console.log('Loaded from cache:', data);
+      return data;
+    }
+  }catch(e){
+    console.error('Cache load failed:',e);
+  }
+  return null;
+}
+
+function saveToCache(data){
+  try{
+    localStorage.setItem('policePortalData',JSON.stringify(data));
+    console.log('Saved to cache:', data);
+  }catch(e){
+    console.error('Cache save failed:',e);
+  }
+}
 
 let state=loadFromCache()||{shiftTimer:0,shiftRunning:false,shiftStartTime:null,callCount:0,reportCount:0,notes:[],reports:[],dispatches:[]};
 let shiftInterval=null;
 
-function saveState(){saveToCache(state);}
+function saveState(){
+  saveToCache(state);
+}
 
 function navigateTo(page){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>{n.classList.remove('active','bg-gradient-to-br','from-blue-600','to-blue-800','shadow-lg','shadow-blue-500/50');n.classList.add('text-white/50');});const nav=document.querySelector(`[data-page="${page}"]`);nav.classList.add('active','bg-gradient-to-br','from-blue-600','to-blue-800','shadow-lg','shadow-blue-500/50');nav.classList.remove('text-white/50');}
 
