@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Date Night Picker 💕</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<style>
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  background: linear-gradient(135deg, #ff758c, #ff7eb3);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+#app {
+  width: 95%;
+  max-width: 420px;
+  text-align: center;
+}
+
+.card {
+  background: #fff;
+  color: #333;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+  min-height: 260px;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+button {
+  width: 45%;
+  padding: 14px;
+  border-radius: 30px;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.no {
+  background: #ddd;
+}
+
+.yes {
+  background: #ff4d6d;
+  color: white;
+}
+
+.hidden {
+  display: none;
+}
+
+.match {
+  font-size: 28px;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<div id="userSelect" class="card">
+  <h2>Who are you?</h2>
+  <button onclick="setUser('justin')">Justin</button><br><br>
+  <button onclick="setUser('bridget')">Bridget</button>
+</div>
+
+<div id="cardView" class="card hidden">
+  <h2 id="name">Loading...</h2>
+  <p id="distance"></p>
+
+  <div class="buttons">
+    <button class="no" onclick="swipe(false)">❌ No</button>
+    <button class="yes" onclick="swipe(true)">❤️ Yes</button>
+  </div>
+</div>
+
+<div id="matchView" class="card hidden">
+  <div class="match">🎉 MATCH!</div>
+  <h2 id="matchName"></h2>
+  <button class="yes" onclick="openMaps()">Open in Maps</button>
+</div>
+
+</div>
+
+<script>
+// 🔥 FIREBASE CONFIG (REPLACE THIS)
+const firebaseConfig = {
+  apiKey: "AIzaSyBytsujikovxmALWlt3VQhgzri9306x2TY",
+  authDomain: "plc-dashboard-99f31.firebaseapp.com",
+  projectId: "plc-dashboard-99f31"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const docRef = db.collection("dateNight").doc("choices");
+
+let USER = null;
+let restaurants = [];
+let index = 0;
+let matchedRestaurant = null;
+
+// ---------------- USER ----------------
+function setUser(name) {
+  USER = name;
+  localStorage.setItem("dateUser", name);
+  document.getElementById("userSelect").classList.add("hidden");
+  init();
+}
+
+USER = localStorage.getItem("dateUser");
+if (USER) init();
+
+// ---------------- INIT ----------------
+function init() {
+  navigator.geolocation.getCurrentPosition(pos => {
+    fetchRestaurants(pos.coords.latitude, pos.coords.longitude);
+  });
+
+  docRef.onSnapshot(snapshot => {
+    const data = snapshot.data();
+    if (!data) return;
+    if (data.match) showMatch(data.match);
+  });
+}
+
+// ---------------- FETCH RESTAURANTS ----------------
+async function fetchRestaurants(lat, lng) {
+  const query = `
+  [out:json];
+  (
+    node["amenity"="restaurant"](around:2500, ${lat}, ${lng});
+    node["amenity"="fast_food"](around:2500, ${lat}, ${lng});
+  );
+  out;
+  `;
+
+  const res = await fetch("https://overpass-api.de/api/interpreter", {
+    method: "POST",
+    body: query
+  });
+
+  const data = await res.json();
+  restaurants = data.elements.filter(r => r.tags && r.tags.name);
+  showCard();
+}
+
+// ---------------- UI ----------------
+function showCard() {
+  if (index >= restaurants.length) return;
+
+  const r = restaurants[index];
+  document.getElementById("cardView").classList.remove("hidden");
+  document.getElementById("name").textContent = r.tags.name;
+  document.getElementById("distance").textContent =
+    r.tags.cuisine ? "🍴 " + r.tags.cuisine : "";
+}
+
+// ---------------- SWIPE ----------------
+async function swipe(yes) {
+  const r = restaurants[index];
+  index++;
+
+  if (yes) {
+    await docRef.set({
+      [USER]: firebase.firestore.FieldValue.arrayUnion(r.id)
+    }, { merge: true });
+
+    checkMatch(r.id, r);
+  }
+
+  showCard();
+}
+
+// ---------------- MATCH CHECK ----------------
+async function checkMatch(id, restaurant) {
+  const snap = await docRef.get();
+  const data = snap.data();
+  if (!data) return;
+
+  const other = USER === "justin" ? "bridget" : "justin";
+  if (data[other]?.includes(id)) {
+    await docRef.set({ match: restaurant }, { merge: true });
+  }
+}
+
+// ---------------- MATCH SCREEN ----------------
+function showMatch(restaurant) {
+  matchedRestaurant = restaurant;
+  document.getElementById("cardView").classList.add("hidden");
+  document.getElementById("matchView").classList.remove("hidden");
+  document.getElementById("matchName").textContent = restaurant.tags.name;
+}
+
+function openMaps() {
+  const r = matchedRestaurant;
+  window.open(
+    `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lon}`,
+    "_blank"
+  );
+}
+</script>
+</body>
+</html>
