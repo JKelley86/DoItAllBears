@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>Date Night Picker 💕</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -34,6 +34,7 @@ body {
   padding: 24px;
   box-shadow: 0 15px 30px rgba(0,0,0,0.25);
   min-height: 260px;
+  transition: transform 0.2s ease;
 }
 
 h2 {
@@ -55,18 +56,10 @@ button {
   cursor: pointer;
 }
 
-.no {
-  background: #ddd;
-}
+.no { background: #ddd; }
+.yes { background: #ff4d6d; color: white; }
 
-.yes {
-  background: #ff4d6d;
-  color: white;
-}
-
-.hidden {
-  display: none;
-}
+.hidden { display: none; }
 
 .match {
   font-size: 28px;
@@ -78,15 +71,17 @@ button {
 <body>
 <div id="app">
 
+<!-- USER SELECT -->
 <div id="userSelect" class="card">
   <h2>Who are you?</h2>
   <button onclick="setUser('justin')">Justin</button><br><br>
   <button onclick="setUser('bridget')">Bridget</button>
 </div>
 
+<!-- CARD VIEW -->
 <div id="cardView" class="card hidden">
   <h2 id="name">Loading...</h2>
-  <p id="distance"></p>
+  <p id="cuisine"></p>
 
   <div class="buttons">
     <button class="no" onclick="swipe(false)">❌ No</button>
@@ -94,6 +89,7 @@ button {
   </div>
 </div>
 
+<!-- MATCH VIEW -->
 <div id="matchView" class="card hidden">
   <div class="match">🎉 MATCH!</div>
   <h2 id="matchName"></h2>
@@ -103,7 +99,7 @@ button {
 </div>
 
 <script>
-// 🔥 FIREBASE CONFIG (REPLACE THIS)
+// ================= FIREBASE CONFIG =================
 const firebaseConfig = {
   apiKey: "AIzaSyBytsujikovxmALWlt3VQhgzri9306x2TY",
   authDomain: "plc-dashboard-99f31.firebaseapp.com",
@@ -114,45 +110,46 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const docRef = db.collection("dateNight").doc("choices");
 
+// ================= STATE =================
 let USER = null;
 let restaurants = [];
 let index = 0;
 let matchedRestaurant = null;
 
-// ---------------- USER ----------------
+// Swipe tracking
+let startX = 0;
+let currentX = 0;
+let isDragging = false;
+
+// ================= USER SELECT =================
 function setUser(name) {
   USER = name;
-  localStorage.setItem("dateUser", name);
   document.getElementById("userSelect").classList.add("hidden");
   init();
 }
 
-USER = localStorage.getItem("dateUser");
-if (USER) init();
-
-// ---------------- INIT ----------------
+// ================= INIT =================
 function init() {
   navigator.geolocation.getCurrentPosition(pos => {
     fetchRestaurants(pos.coords.latitude, pos.coords.longitude);
   });
 
-  docRef.onSnapshot(snapshot => {
-    const data = snapshot.data();
-    if (!data) return;
-    if (data.match) showMatch(data.match);
+  docRef.onSnapshot(snap => {
+    const data = snap.data();
+    if (data?.match) showMatch(data.match);
   });
 }
 
-// ---------------- FETCH RESTAURANTS ----------------
+// ================= RESTAURANTS =================
 async function fetchRestaurants(lat, lng) {
   const RADII = [3000, 6000, 10000, 16100];
-  const OVERPASS_URLS = [
+  const URLS = [
     "https://overpass.kumi.systems/api/interpreter",
     "https://overpass.nchc.org.tw/api/interpreter"
   ];
 
   for (const radius of RADII) {
-    for (const url of OVERPASS_URLS) {
+    for (const url of URLS) {
       const query = `
       [out:json][timeout:25];
       (
@@ -163,44 +160,40 @@ async function fetchRestaurants(lat, lng) {
       `;
 
       try {
-        const res = await fetch(url, {
-          method: "POST",
-          body: query
-        });
-
+        const res = await fetch(url, { method: "POST", body: query });
         if (!res.ok) continue;
 
         const data = await res.json();
-        const found = data.elements.filter(
-          r => r.tags && r.tags.name
-        );
+        const found = data.elements.filter(r => r.tags?.name);
 
-        if (found.length > 0) {
+        if (found.length) {
           restaurants = found;
           showCard();
           return;
         }
-
-      } catch (e) {
-        console.warn("Overpass failed:", url, radius);
-      }
+      } catch {}
     }
   }
 
   alert("No restaurants found within 10 miles 😕");
 }
-// ---------------- UI ----------------
+
+// ================= UI =================
 function showCard() {
   if (index >= restaurants.length) return;
 
   const r = restaurants[index];
+  const card = document.getElementById("cardView");
+
   document.getElementById("cardView").classList.remove("hidden");
   document.getElementById("name").textContent = r.tags.name;
-  document.getElementById("distance").textContent =
+  document.getElementById("cuisine").textContent =
     r.tags.cuisine ? "🍴 " + r.tags.cuisine : "";
+
+  card.style.transform = "translateX(0)";
 }
 
-// ---------------- SWIPE ----------------
+// ================= SWIPE =================
 async function swipe(yes) {
   const r = restaurants[index];
   index++;
@@ -216,32 +209,70 @@ async function swipe(yes) {
   showCard();
 }
 
-// ---------------- MATCH CHECK ----------------
+// ================= MATCH =================
 async function checkMatch(id, restaurant) {
   const snap = await docRef.get();
   const data = snap.data();
-  if (!data) return;
-
   const other = USER === "justin" ? "bridget" : "justin";
-  if (data[other]?.includes(id)) {
+
+  if (data?.[other]?.includes(id)) {
     await docRef.set({ match: restaurant }, { merge: true });
   }
 }
 
-// ---------------- MATCH SCREEN ----------------
-function showMatch(restaurant) {
-  matchedRestaurant = restaurant;
+function showMatch(r) {
+  matchedRestaurant = r;
   document.getElementById("cardView").classList.add("hidden");
   document.getElementById("matchView").classList.remove("hidden");
-  document.getElementById("matchName").textContent = restaurant.tags.name;
+  document.getElementById("matchName").textContent = r.tags.name;
 }
 
 function openMaps() {
-  const r = matchedRestaurant;
   window.open(
-    `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lon}`,
+    `https://www.google.com/maps/search/?api=1&query=${matchedRestaurant.lat},${matchedRestaurant.lon}`,
     "_blank"
   );
+}
+
+// ================= SWIPE EVENTS =================
+const card = document.getElementById("cardView");
+
+card.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+  isDragging = true;
+});
+
+card.addEventListener("touchmove", e => {
+  if (!isDragging) return;
+  currentX = e.touches[0].clientX;
+  card.style.transform = `translateX(${currentX - startX}px) rotate(${(currentX - startX)/20}deg)`;
+});
+
+card.addEventListener("touchend", handleSwipe);
+
+card.addEventListener("mousedown", e => {
+  startX = e.clientX;
+  isDragging = true;
+});
+
+card.addEventListener("mousemove", e => {
+  if (!isDragging) return;
+  currentX = e.clientX;
+  card.style.transform = `translateX(${currentX - startX}px) rotate(${(currentX - startX)/20}deg)`;
+});
+
+card.addEventListener("mouseup", handleSwipe);
+card.addEventListener("mouseleave", () => isDragging = false);
+
+function handleSwipe() {
+  if (!isDragging) return;
+  isDragging = false;
+
+  const deltaX = currentX - startX;
+  card.style.transform = "translateX(0)";
+
+  if (deltaX > 80) swipe(true);
+  else if (deltaX < -80) swipe(false);
 }
 </script>
 </body>
