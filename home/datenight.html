@@ -64,6 +64,18 @@ button {
 .match {
   font-size: 28px;
   font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Reset button */
+#resetBtn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: none;
+  background: #555;
+  color: #fff;
+  cursor: pointer;
 }
 </style>
 </head>
@@ -95,6 +107,9 @@ button {
   <h2 id="matchName"></h2>
   <button class="yes" onclick="openMaps()">Open in Maps</button>
 </div>
+
+<!-- RESET BUTTON -->
+<button id="resetBtn" onclick="resetDateNight()">Reset Date Night</button>
 
 </div>
 
@@ -232,6 +247,23 @@ function openMaps() {
     `https://www.google.com/maps/search/?api=1&query=${matchedRestaurant.lat},${matchedRestaurant.lon}`,
     "_blank"
   );
+}
+
+// ================= RESET =================
+function resetDateNight() {
+  docRef.set({
+    justin: [],
+    bridget: [],
+    match: null
+  }).then(() => {
+    alert("Date night reset! You can start swiping again.");
+    index = 0;
+    restaurants = [];
+    matchedRestaurant = null;
+    document.getElementById("cardView").classList.add("hidden");
+    document.getElementById("matchView").classList.add("hidden");
+    document.getElementById("userSelect").classList.remove("hidden");
+  });
 }
 
 // ================= SWIPE EVENTS =================
