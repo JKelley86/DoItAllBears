@@ -148,8 +148,8 @@ async function fetchRestaurants(lat, lng) {
   const query = `
   [out:json][timeout:25];
   (
-    node["amenity"="restaurant"](around:1500, ${lat}, ${lng});
-    node["amenity"="fast_food"](around:1500, ${lat}, ${lng});
+    node["amenity"="restaurant"](around:5000, ${lat}, ${lng});
+    node["amenity"="fast_food"](around:5000, ${lat}, ${lng});
   );
   out;
   `;
