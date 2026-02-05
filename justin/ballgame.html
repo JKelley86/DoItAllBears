@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Satisfying Things</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  body {
+    margin: 0;
+    background: #0f0f14;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    color: white;
+  }
+
+  h1 {
+    position: fixed;
+    top: 10px;
+    width: 100%;
+    text-align: center;
+    font-weight: 300;
+    letter-spacing: 2px;
+  }
+
+  canvas {
+    display: block;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>Satisfying Zone</h1>
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+resize();
+window.addEventListener("resize", resize);
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+class Ball {
+  constructor(x, y, vx, vy, color) {
+    this.x = x;
+    this.y = y;
+    this.vx = vx;
+    this.vy = vy;
+    this.radius = 10;
+    this.lines = [];
+    this.color = color;
+    this.alive = true;
+  }
+
+  update() {
+    if (!this.alive) return;
+
+    this.x += this.vx;
+    this.y += this.vy;
+
+    // Wall collisions
+    if (this.x < this.radius || this.x > canvas.width - this.radius) {
+      this.vx *= -1;
+      this.attachLine();
+    }
+
+    if (this.y < this.radius || this.y > canvas.height - this.radius) {
+      this.vy *= -1;
+      this.attachLine();
+    }
+  }
+
+  attachLine() {
+    const line = {
+      x: this.x,
+      y: this.y
+    };
+    this.lines.push(line);
+  }
+
+  draw() {
+    if (!this.alive) return;
+
+    // draw lines
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = 1;
+
+    this.lines.forEach(l => {
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(l.x, l.y);
+      ctx.stroke();
+    });
+
+    // ball
+    ctx.beginPath();
+    ctx.fillStyle = this.color;
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+let balls = [];
+
+function randomColor() {
+  return `hsl(${Math.random()*360},70%,60%)`;
+}
+
+function spawnBalls() {
+  balls = [];
+
+  for (let i = 0; i < 5; i++) {
+    balls.push(
+      new Ball(
+        Math.random()*canvas.width,
+        Math.random()*canvas.height,
+        (Math.random()-0.5)*6,
+        (Math.random()-0.5)*6,
+        randomColor()
+      )
+    );
+  }
+}
+
+spawnBalls();
+
+function checkLineBreaks() {
+  balls.forEach(ball => {
+    if (!ball.alive) return;
+
+    ball.lines = ball.lines.filter(line => {
+      let intact = true;
+
+      balls.forEach(other => {
+        if (other === ball || !other.alive) return;
+
+        const dx = other.x - line.x;
+        const dy = other.y - line.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+
+        if (dist < other.radius) {
+          intact = false;
+        }
+      });
+
+      return intact;
+    });
+
+    if (ball.lines.length === 0) {
+      ball.alive = false;
+    }
+  });
+}
+
+function draw() {
+  ctx.fillStyle = "rgba(15,15,20,0.25)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  balls.forEach(b => {
+    b.update();
+    b.draw();
+  });
+
+  checkLineBreaks();
+
+  const alive = balls.filter(b => b.alive);
+
+  if (alive.length <= 1) {
+    setTimeout(spawnBalls, 1200);
+  }
+
+  requestAnimationFrame(draw);
+}
+
+draw();
+</script>
+</body>
+</html>
