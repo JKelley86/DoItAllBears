@@ -1,383 +1,400 @@
-import React, { useState, useEffect, useRef } from 'react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tether Battle - Bouncing Balls Game</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div id="root"></div>
 
-const BouncingBallsGame = () => {
-  const canvasRef = useRef(null);
-  const [isRunning, setIsRunning] = useState(false);
-  const [winner, setWinner] = useState(null);
-  const [ballCount, setBallCount] = useState(5);
-  const [speed, setSpeed] = useState(4);
-  const gameStateRef = useRef(null);
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
 
-  const CANVAS_SIZE = 600;
-  const ARENA_RADIUS = 280;
-  const BALL_RADIUS = 12;
-  const INITIAL_BALL_COUNT = 5;
-  const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];
+    const BouncingBallsGame = () => {
+      const canvasRef = useRef(null);
+      const [isRunning, setIsRunning] = useState(false);
+      const [winner, setWinner] = useState(null);
+      const [ballCount, setBallCount] = useState(5);
+      const [speed, setSpeed] = useState(4);
+      const gameStateRef = useRef(null);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+      const CANVAS_SIZE = 600;
+      const ARENA_RADIUS = 280;
+      const BALL_RADIUS = 12;
+      const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];
 
-    const ctx = canvas.getContext('2d');
-    const centerX = CANVAS_SIZE / 2;
-    const centerY = CANVAS_SIZE / 2;
+      useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
 
-    const initializeBalls = () => {
-      const balls = [];
-      for (let i = 0; i < ballCount; i++) {
-        const angle = (Math.PI * 2 * i) / ballCount;
-        const distance = ARENA_RADIUS * 0.5;
-        balls.push({
-          id: i,
-          x: centerX + Math.cos(angle) * distance,
-          y: centerY + Math.sin(angle) * distance,
-          vx: (Math.random() - 0.5) * speed,
-          vy: (Math.random() - 0.5) * speed,
-          color: COLORS[i % COLORS.length],
-          tethers: [],
-          alive: true,
-          hasHadTethers: false
-        });
-      }
-      return balls;
-    };
+        const ctx = canvas.getContext('2d');
+        const centerX = CANVAS_SIZE / 2;
+        const centerY = CANVAS_SIZE / 2;
 
-    if (!gameStateRef.current) {
-      gameStateRef.current = {
-        balls: initializeBalls()
-      };
-    }
-
-    const checkLineIntersection = (p1, p2, p3, p4) => {
-      const denominator = ((p4.y - p3.y) * (p2.x - p1.x)) - ((p4.x - p3.x) * (p2.y - p1.y));
-      if (denominator === 0) return false;
-
-      const ua = (((p4.x - p3.x) * (p1.y - p3.y)) - ((p4.y - p3.y) * (p1.x - p3.x))) / denominator;
-      const ub = (((p2.x - p1.x) * (p1.y - p3.y)) - ((p2.y - p1.y) * (p1.x - p3.x))) / denominator;
-
-      return (ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1);
-    };
-
-    const pointToLineDistance = (px, py, x1, y1, x2, y2) => {
-      const A = px - x1;
-      const B = py - y1;
-      const C = x2 - x1;
-      const D = y2 - y1;
-
-      const dot = A * C + B * D;
-      const lenSq = C * C + D * D;
-      let param = -1;
-      
-      if (lenSq !== 0) param = dot / lenSq;
-
-      let xx, yy;
-
-      if (param < 0) {
-        xx = x1;
-        yy = y1;
-      } else if (param > 1) {
-        xx = x2;
-        yy = y2;
-      } else {
-        xx = x1 + param * C;
-        yy = y1 + param * D;
-      }
-
-      const dx = px - xx;
-      const dy = py - yy;
-      return Math.sqrt(dx * dx + dy * dy);
-    };
-
-    const gameLoop = () => {
-      if (!isRunning) return;
-
-      const { balls } = gameStateRef.current;
-
-      // Update ball positions
-      balls.forEach(ball => {
-        if (!ball.alive) return;
-
-        ball.x += ball.vx;
-        ball.y += ball.vy;
-
-        // Check collision with arena
-        const dx = ball.x - centerX;
-        const dy = ball.y - centerY;
-        const distFromCenter = Math.sqrt(dx * dx + dy * dy);
-
-        if (distFromCenter + BALL_RADIUS >= ARENA_RADIUS) {
-          // Calculate collision point on the circle
-          const angle = Math.atan2(dy, dx);
-          const collisionX = centerX + Math.cos(angle) * ARENA_RADIUS;
-          const collisionY = centerY + Math.sin(angle) * ARENA_RADIUS;
-
-          // Add tether
-          ball.tethers.push({
-            x: collisionX,
-            y: collisionY,
-            createdAt: Date.now()
-          });
-          ball.hasHadTethers = true;
-
-          // Reflect velocity
-          const normal = { x: dx / distFromCenter, y: dy / distFromCenter };
-          const dotProduct = ball.vx * normal.x + ball.vy * normal.y;
-          ball.vx = ball.vx - 2 * dotProduct * normal.x;
-          ball.vy = ball.vy - 2 * dotProduct * normal.y;
-
-          // Push ball back inside
-          ball.x = centerX + Math.cos(angle) * (ARENA_RADIUS - BALL_RADIUS);
-          ball.y = centerY + Math.sin(angle) * (ARENA_RADIUS - BALL_RADIUS);
-        }
-      });
-
-      // Check ball-to-ball collisions
-      for (let i = 0; i < balls.length; i++) {
-        for (let j = i + 1; j < balls.length; j++) {
-          const ball1 = balls[i];
-          const ball2 = balls[j];
-          
-          if (!ball1.alive || !ball2.alive) continue;
-
-          const dx = ball2.x - ball1.x;
-          const dy = ball2.y - ball1.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < BALL_RADIUS * 2) {
-            // Simple elastic collision
-            const angle = Math.atan2(dy, dx);
-            const sin = Math.sin(angle);
-            const cos = Math.cos(angle);
-
-            // Rotate velocities
-            const vx1 = ball1.vx * cos + ball1.vy * sin;
-            const vy1 = ball1.vy * cos - ball1.vx * sin;
-            const vx2 = ball2.vx * cos + ball2.vy * sin;
-            const vy2 = ball2.vy * cos - ball2.vx * sin;
-
-            // Swap velocities
-            const temp = vx1;
-            const newVx1 = vx2;
-            const newVx2 = temp;
-
-            // Rotate back
-            ball1.vx = newVx1 * cos - vy1 * sin;
-            ball1.vy = vy1 * cos + newVx1 * sin;
-            ball2.vx = newVx2 * cos - vy2 * sin;
-            ball2.vy = vy2 * cos + newVx2 * sin;
-
-            // Separate balls
-            const overlap = BALL_RADIUS * 2 - distance;
-            const separateX = (dx / distance) * overlap / 2;
-            const separateY = (dy / distance) * overlap / 2;
-            ball1.x -= separateX;
-            ball1.y -= separateY;
-            ball2.x += separateX;
-            ball2.y += separateY;
+        const initializeBalls = () => {
+          const balls = [];
+          for (let i = 0; i < ballCount; i++) {
+            const angle = (Math.PI * 2 * i) / ballCount;
+            const distance = ARENA_RADIUS * 0.5;
+            balls.push({
+              id: i,
+              x: centerX + Math.cos(angle) * distance,
+              y: centerY + Math.sin(angle) * distance,
+              vx: (Math.random() - 0.5) * speed,
+              vy: (Math.random() - 0.5) * speed,
+              color: COLORS[i % COLORS.length],
+              tethers: [],
+              alive: true,
+              hasHadTethers: false
+            });
           }
+          return balls;
+        };
+
+        if (!gameStateRef.current) {
+          gameStateRef.current = {
+            balls: initializeBalls()
+          };
         }
-      }
 
-      // Check tether cutting
-      balls.forEach(ball => {
-        if (!ball.alive) return;
+        const checkLineIntersection = (p1, p2, p3, p4) => {
+          const denominator = ((p4.y - p3.y) * (p2.x - p1.x)) - ((p4.x - p3.x) * (p2.y - p1.y));
+          if (denominator === 0) return false;
 
-        const prevX = ball.x - ball.vx;
-        const prevY = ball.y - ball.vy;
+          const ua = (((p4.x - p3.x) * (p1.y - p3.y)) - ((p4.y - p3.y) * (p1.x - p3.x))) / denominator;
+          const ub = (((p2.x - p1.x) * (p1.y - p3.y)) - ((p2.y - p1.y) * (p1.x - p3.x))) / denominator;
 
-        balls.forEach(otherBall => {
-          if (ball.id === otherBall.id || !otherBall.alive) return;
+          return (ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1);
+        };
 
-          const remainingTethers = [];
-          otherBall.tethers.forEach(tether => {
-            // Check if the ball's movement path intersects with the tether line
-            const intersects = checkLineIntersection(
-              { x: prevX, y: prevY },
-              { x: ball.x, y: ball.y },
-              { x: otherBall.x, y: otherBall.y },
-              { x: tether.x, y: tether.y }
-            );
-            
-            // Also check if the ball is currently close to the line (within ball radius)
-            const distToLine = pointToLineDistance(
-              ball.x, ball.y,
-              otherBall.x, otherBall.y,
-              tether.x, tether.y
-            );
-            
-            const cut = intersects || distToLine < BALL_RADIUS;
-            
-            if (!cut) {
-              remainingTethers.push(tether);
+        const pointToLineDistance = (px, py, x1, y1, x2, y2) => {
+          const A = px - x1;
+          const B = py - y1;
+          const C = x2 - x1;
+          const D = y2 - y1;
+
+          const dot = A * C + B * D;
+          const lenSq = C * C + D * D;
+          let param = -1;
+          
+          if (lenSq !== 0) param = dot / lenSq;
+
+          let xx, yy;
+
+          if (param < 0) {
+            xx = x1;
+            yy = y1;
+          } else if (param > 1) {
+            xx = x2;
+            yy = y2;
+          } else {
+            xx = x1 + param * C;
+            yy = y1 + param * D;
+          }
+
+          const dx = px - xx;
+          const dy = py - yy;
+          return Math.sqrt(dx * dx + dy * dy);
+        };
+
+        const gameLoop = () => {
+          if (!isRunning) return;
+
+          const { balls } = gameStateRef.current;
+
+          // Update ball positions
+          balls.forEach(ball => {
+            if (!ball.alive) return;
+
+            ball.x += ball.vx;
+            ball.y += ball.vy;
+
+            // Check collision with arena
+            const dx = ball.x - centerX;
+            const dy = ball.y - centerY;
+            const distFromCenter = Math.sqrt(dx * dx + dy * dy);
+
+            if (distFromCenter + BALL_RADIUS >= ARENA_RADIUS) {
+              // Calculate collision point on the circle
+              const angle = Math.atan2(dy, dx);
+              const collisionX = centerX + Math.cos(angle) * ARENA_RADIUS;
+              const collisionY = centerY + Math.sin(angle) * ARENA_RADIUS;
+
+              // Add tether
+              ball.tethers.push({
+                x: collisionX,
+                y: collisionY,
+                createdAt: Date.now()
+              });
+              ball.hasHadTethers = true;
+
+              // Reflect velocity
+              const normal = { x: dx / distFromCenter, y: dy / distFromCenter };
+              const dotProduct = ball.vx * normal.x + ball.vy * normal.y;
+              ball.vx = ball.vx - 2 * dotProduct * normal.x;
+              ball.vy = ball.vy - 2 * dotProduct * normal.y;
+
+              // Push ball back inside
+              ball.x = centerX + Math.cos(angle) * (ARENA_RADIUS - BALL_RADIUS);
+              ball.y = centerY + Math.sin(angle) * (ARENA_RADIUS - BALL_RADIUS);
             }
           });
-          otherBall.tethers = remainingTethers;
-        });
-      });
 
-      // Remove balls with no tethers (only after they've had a chance to create some)
-      balls.forEach(ball => {
-        if (ball.alive && ball.hasHadTethers && ball.tethers.length === 0) {
-          ball.alive = false;
-        }
-      });
+          // Check ball-to-ball collisions
+          for (let i = 0; i < balls.length; i++) {
+            for (let j = i + 1; j < balls.length; j++) {
+              const ball1 = balls[i];
+              const ball2 = balls[j];
+              
+              if (!ball1.alive || !ball2.alive) continue;
 
-      // Check for winner
-      const aliveBalls = balls.filter(b => b.alive);
-      if (aliveBalls.length === 1 && !winner) {
-        setWinner(aliveBalls[0]);
-        setIsRunning(false);
-      } else if (aliveBalls.length === 0 && !winner) {
-        setWinner({ color: '#888', id: -1 });
-        setIsRunning(false);
-      }
+              const dx = ball2.x - ball1.x;
+              const dy = ball2.y - ball1.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
 
-      // Draw
-      ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+              if (distance < BALL_RADIUS * 2) {
+                // Simple elastic collision
+                const angle = Math.atan2(dy, dx);
+                const sin = Math.sin(angle);
+                const cos = Math.cos(angle);
 
-      // Draw arena
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, ARENA_RADIUS, 0, Math.PI * 2);
-      ctx.strokeStyle = '#333';
-      ctx.lineWidth = 3;
-      ctx.stroke();
+                // Rotate velocities
+                const vx1 = ball1.vx * cos + ball1.vy * sin;
+                const vy1 = ball1.vy * cos - ball1.vx * sin;
+                const vx2 = ball2.vx * cos + ball2.vy * sin;
+                const vy2 = ball2.vy * cos - ball2.vx * sin;
 
-      // Draw tethers
-      balls.forEach(ball => {
-        if (!ball.alive) return;
-        
-        ctx.strokeStyle = ball.color;
-        ctx.lineWidth = 2;
-        ball.tethers.forEach(tether => {
+                // Swap velocities
+                const temp = vx1;
+                const newVx1 = vx2;
+                const newVx2 = temp;
+
+                // Rotate back
+                ball1.vx = newVx1 * cos - vy1 * sin;
+                ball1.vy = vy1 * cos + newVx1 * sin;
+                ball2.vx = newVx2 * cos - vy2 * sin;
+                ball2.vy = vy2 * cos + newVx2 * sin;
+
+                // Separate balls
+                const overlap = BALL_RADIUS * 2 - distance;
+                const separateX = (dx / distance) * overlap / 2;
+                const separateY = (dy / distance) * overlap / 2;
+                ball1.x -= separateX;
+                ball1.y -= separateY;
+                ball2.x += separateX;
+                ball2.y += separateY;
+              }
+            }
+          }
+
+          // Check tether cutting
+          balls.forEach(ball => {
+            if (!ball.alive) return;
+
+            const prevX = ball.x - ball.vx;
+            const prevY = ball.y - ball.vy;
+
+            balls.forEach(otherBall => {
+              if (ball.id === otherBall.id || !otherBall.alive) return;
+
+              const remainingTethers = [];
+              otherBall.tethers.forEach(tether => {
+                // Check if the ball's movement path intersects with the tether line
+                const intersects = checkLineIntersection(
+                  { x: prevX, y: prevY },
+                  { x: ball.x, y: ball.y },
+                  { x: otherBall.x, y: otherBall.y },
+                  { x: tether.x, y: tether.y }
+                );
+                
+                // Also check if the ball is currently close to the line (within ball radius)
+                const distToLine = pointToLineDistance(
+                  ball.x, ball.y,
+                  otherBall.x, otherBall.y,
+                  tether.x, tether.y
+                );
+                
+                const cut = intersects || distToLine < BALL_RADIUS;
+                
+                if (!cut) {
+                  remainingTethers.push(tether);
+                }
+              });
+              otherBall.tethers = remainingTethers;
+            });
+          });
+
+          // Remove balls with no tethers (only after they've had a chance to create some)
+          balls.forEach(ball => {
+            if (ball.alive && ball.hasHadTethers && ball.tethers.length === 0) {
+              ball.alive = false;
+            }
+          });
+
+          // Check for winner
+          const aliveBalls = balls.filter(b => b.alive);
+          if (aliveBalls.length === 1 && !winner) {
+            setWinner(aliveBalls[0]);
+            setIsRunning(false);
+          } else if (aliveBalls.length === 0 && !winner) {
+            setWinner({ color: '#888', id: -1 });
+            setIsRunning(false);
+          }
+
+          // Draw
+          ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+          // Draw arena
           ctx.beginPath();
-          ctx.moveTo(ball.x, ball.y);
-          ctx.lineTo(tether.x, tether.y);
+          ctx.arc(centerX, centerY, ARENA_RADIUS, 0, Math.PI * 2);
+          ctx.strokeStyle = '#333';
+          ctx.lineWidth = 3;
           ctx.stroke();
-        });
-      });
 
-      // Draw balls
-      balls.forEach(ball => {
-        if (!ball.alive) return;
+          // Draw tethers
+          balls.forEach(ball => {
+            if (!ball.alive) return;
+            
+            ctx.strokeStyle = ball.color;
+            ctx.lineWidth = 2;
+            ball.tethers.forEach(tether => {
+              ctx.beginPath();
+              ctx.moveTo(ball.x, ball.y);
+              ctx.lineTo(tether.x, tether.y);
+              ctx.stroke();
+            });
+          });
 
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, Math.PI * 2);
-        ctx.fillStyle = ball.color;
-        ctx.fill();
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      });
+          // Draw balls
+          balls.forEach(ball => {
+            if (!ball.alive) return;
 
-      requestAnimationFrame(gameLoop);
-    };
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, Math.PI * 2);
+            ctx.fillStyle = ball.color;
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          });
 
-    if (isRunning) {
-      gameLoop();
-    }
-  }, [isRunning, winner, ballCount, speed]);
+          requestAnimationFrame(gameLoop);
+        };
 
-  const startGame = () => {
-    gameStateRef.current = null;
-    setWinner(null);
-    setIsRunning(true);
-  };
+        if (isRunning) {
+          gameLoop();
+        }
+      }, [isRunning, winner, ballCount, speed]);
 
-  const togglePause = () => {
-    setIsRunning(!isRunning);
-  };
+      const startGame = () => {
+        gameStateRef.current = null;
+        setWinner(null);
+        setIsRunning(true);
+      };
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-8">
-      <div className="mb-6 text-center">
-        <h1 className="text-4xl font-bold text-white mb-2">Tether Battle</h1>
-        <p className="text-slate-300">Last ball with tethers wins!</p>
-      </div>
+      const togglePause = () => {
+        setIsRunning(!isRunning);
+      };
 
-      <div className="relative mb-6">
-        <canvas
-          ref={canvasRef}
-          width={CANVAS_SIZE}
-          height={CANVAS_SIZE}
-          className="bg-slate-950 rounded-lg shadow-2xl"
-        />
-        
-        {winner && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 rounded-lg">
-            <div className="text-center">
-              <div 
-                className="text-6xl font-bold mb-4"
-                style={{ color: winner.id === -1 ? '#888' : winner.color }}
-              >
-                {winner.id === -1 ? 'Draw!' : 'Winner!'}
+      return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-8">
+          <div className="mb-6 text-center">
+            <h1 className="text-4xl font-bold text-white mb-2">Tether Battle</h1>
+            <p className="text-slate-300">Last ball with tethers wins!</p>
+          </div>
+
+          <div className="relative mb-6">
+            <canvas
+              ref={canvasRef}
+              width={CANVAS_SIZE}
+              height={CANVAS_SIZE}
+              className="bg-slate-950 rounded-lg shadow-2xl"
+            />
+            
+            {winner && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 rounded-lg">
+                <div className="text-center">
+                  <div 
+                    className="text-6xl font-bold mb-4"
+                    style={{ color: winner.id === -1 ? '#888' : winner.color }}
+                  >
+                    {winner.id === -1 ? 'Draw!' : 'Winner!'}
+                  </div>
+                  {winner.id !== -1 && (
+                    <div 
+                      className="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-white"
+                      style={{ backgroundColor: winner.color }}
+                    />
+                  )}
+                </div>
               </div>
-              {winner.id !== -1 && (
-                <div 
-                  className="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-white"
-                  style={{ backgroundColor: winner.color }}
-                />
-              )}
+            )}
+          </div>
+
+          <div className="flex gap-6 mb-6">
+            <div className="bg-slate-800 rounded-lg p-4 shadow-lg">
+              <label className="block text-slate-300 text-sm font-semibold mb-2">
+                Number of Balls: {ballCount}
+              </label>
+              <input
+                type="range"
+                min="2"
+                max="10"
+                value={ballCount}
+                onChange={(e) => setBallCount(parseInt(e.target.value))}
+                disabled={isRunning}
+                className="w-48 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer disabled:opacity-50"
+              />
+            </div>
+
+            <div className="bg-slate-800 rounded-lg p-4 shadow-lg">
+              <label className="block text-slate-300 text-sm font-semibold mb-2">
+                Speed: {speed.toFixed(1)}x
+              </label>
+              <input
+                type="range"
+                min="2"
+                max="8"
+                step="0.5"
+                value={speed}
+                onChange={(e) => setSpeed(parseFloat(e.target.value))}
+                disabled={isRunning}
+                className="w-48 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer disabled:opacity-50"
+              />
             </div>
           </div>
-        )}
-      </div>
 
-      <div className="flex gap-6 mb-6">
-        <div className="bg-slate-800 rounded-lg p-4 shadow-lg">
-          <label className="block text-slate-300 text-sm font-semibold mb-2">
-            Number of Balls: {ballCount}
-          </label>
-          <input
-            type="range"
-            min="2"
-            max="10"
-            value={ballCount}
-            onChange={(e) => setBallCount(parseInt(e.target.value))}
-            disabled={isRunning}
-            className="w-48 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer disabled:opacity-50"
-          />
+          <div className="flex gap-4">
+            <button
+              onClick={startGame}
+              className="px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-lg transition-colors"
+            >
+              {winner ? 'Play Again' : 'Start Game'}
+            </button>
+            
+            {!winner && gameStateRef.current && (
+              <button
+                onClick={togglePause}
+                className="px-8 py-3 bg-slate-600 hover:bg-slate-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
+              >
+                {isRunning ? 'Pause' : 'Resume'}
+              </button>
+            )}
+          </div>
+
+          <div className="mt-6 text-slate-400 text-sm max-w-md text-center">
+            Watch the balls bounce! When they hit the wall, they create tethers. Cut other balls' tethers by passing through them. Last ball standing wins!
+          </div>
         </div>
+      );
+    };
 
-        <div className="bg-slate-800 rounded-lg p-4 shadow-lg">
-          <label className="block text-slate-300 text-sm font-semibold mb-2">
-            Speed: {speed.toFixed(1)}x
-          </label>
-          <input
-            type="range"
-            min="2"
-            max="8"
-            step="0.5"
-            value={speed}
-            onChange={(e) => setSpeed(parseFloat(e.target.value))}
-            disabled={isRunning}
-            className="w-48 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer disabled:opacity-50"
-          />
-        </div>
-      </div>
-
-      <div className="flex gap-4">
-        <button
-          onClick={startGame}
-          className="px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-lg transition-colors"
-        >
-          {winner ? 'Play Again' : 'Start Game'}
-        </button>
-        
-        {!winner && gameStateRef.current && (
-          <button
-            onClick={togglePause}
-            className="px-8 py-3 bg-slate-600 hover:bg-slate-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
-          >
-            {isRunning ? 'Pause' : 'Resume'}
-          </button>
-        )}
-      </div>
-
-      <div className="mt-6 text-slate-400 text-sm max-w-md text-center">
-        Watch the balls bounce! When they hit the wall, they create tethers. Cut other balls' tethers by passing through them. Last ball standing wins!
-      </div>
-    </div>
-  );
-};
-
-export default BouncingBallsGame;
+    ReactDOM.render(<BouncingBallsGame />, document.getElementById('root'));
+  </script>
+</body>
+</html>
