@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escape - Ball Game</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(to bottom right, #1e3a8a, #312e81);
+      padding: 2rem;
+    }
+
+    .header {
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .title {
+      font-size: 2.25rem;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: #cbd5e1;
+    }
+
+    .canvas-container {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .canvas {
+      background-color: #0c4a6e;
+      border-radius: 0.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .stats {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .stat-item {
+      margin-bottom: 0.25rem;
+    }
+
+    .timer-bar {
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
+      right: 1rem;
+      height: 0.5rem;
+      background-color: rgba(0, 0, 0, 0.4);
+      border-radius: 0.25rem;
+      overflow: hidden;
+    }
+
+    .timer-fill {
+      height: 100%;
+      background: linear-gradient(to right, #10b981, #fbbf24, #ef4444);
+      transition: width 0.1s linear;
+    }
+
+    .game-over {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.8);
+      border-radius: 0.5rem;
+    }
+
+    .game-over-content {
+      text-align: center;
+      color: white;
+    }
+
+    .game-over-title {
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      color: #10b981;
+    }
+
+    .game-over-stats {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+      color: #cbd5e1;
+    }
+
+    .controls-container {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .control-panel {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .control-label {
+      display: block;
+      color: #cbd5e1;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .slider {
+      width: 12rem;
+      height: 0.5rem;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 0.5rem;
+      appearance: none;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .slider:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 1rem;
+      height: 1rem;
+      background-color: #3b82f6;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+      width: 1rem;
+      height: 1rem;
+      background-color: #3b82f6;
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+    }
+
+    .button {
+      padding: 0.75rem 2rem;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      background-color: #10b981;
+      color: white;
+    }
+
+    .button:hover {
+      background-color: #059669;
+    }
+
+    .instructions {
+      margin-top: 1.5rem;
+      color: #cbd5e1;
+      font-size: 0.875rem;
+      max-width: 28rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    const EscapeGame = () => {
+      const canvasRef = useRef(null);
+      const [isRunning, setIsRunning] = useState(false);
+      const [gameOver, setGameOver] = useState(false);
+      const [ballsEscaped, setBallsEscaped] = useState(0);
+      const [ballsTrapped, setBallsTrapped] = useState(0);
+      const [rotationSpeed, setRotationSpeed] = useState(1);
+      const [gapSize, setGapSize] = useState(60);
+      const [timeRemaining, setTimeRemaining] = useState(4);
+      const gameStateRef = useRef(null);
+
+      const CANVAS_SIZE = 600;
+      const ARENA_RADIUS = 250;
+      const BALL_RADIUS = 10;
+      const BALL_TIME = 4000; // 4 seconds per ball
+
+      useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        const centerX = CANVAS_SIZE / 2;
+        const centerY = CANVAS_SIZE / 2;
+
+        if (!gameStateRef.current) {
+          gameStateRef.current = {
+            rotation: 0,
+            activeBall: null,
+            frozenBalls: [],
+            ballStartTime: null,
+            escaped: 0,
+            trapped: 0
+          };
+        }
+
+        const spawnBall = () => {
+          const angle = Math.random() * Math.PI * 2;
+          const distance = Math.random() * (ARENA_RADIUS - BALL_RADIUS - 50);
+          return {
+            x: centerX + Math.cos(angle) * distance,
+            y: centerY + Math.sin(angle) * distance,
+            vx: (Math.random() - 0.5) * 6,
+            vy: (Math.random() - 0.5) * 6,
+            color: `hsl(${Math.random() * 360}, 70%, 60%)`
+          };
+        };
+
+        const checkBallInGap = (ball, rotation) => {
+          const dx = ball.x - centerX;
+          const dy = ball.y - centerY;
+          const distFromCenter = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distFromCenter > ARENA_RADIUS - BALL_RADIUS) {
+            const ballAngle = Math.atan2(dy, dx);
+            let normalizedBallAngle = ballAngle - rotation;
+            
+            // Normalize to 0-2PI
+            while (normalizedBallAngle < 0) normalizedBallAngle += Math.PI * 2;
+            while (normalizedBallAngle > Math.PI * 2) normalizedBallAngle -= Math.PI * 2;
+            
+            const gapStart = (Math.PI * 2) - (gapSize * Math.PI / 180 / 2);
+            const gapEnd = (gapSize * Math.PI / 180 / 2);
+            
+            // Check if in gap (gap is centered at 0 radians)
+            if (normalizedBallAngle >= gapStart || normalizedBallAngle <= gapEnd) {
+              return true; // Ball escaped!
+            }
+          }
+          return false;
+        };
+
+        const gameLoop = () => {
+          if (!isRunning) return;
+
+          const state = gameStateRef.current;
+          const now = Date.now();
+
+          // Spawn first ball or next ball after previous one froze
+          if (!state.activeBall && !state.ballStartTime) {
+            state.activeBall = spawnBall();
+            state.ballStartTime = now;
+          }
+
+          // Update rotation
+          state.rotation += (rotationSpeed * 0.02);
+          if (state.rotation > Math.PI * 2) state.rotation -= Math.PI * 2;
+
+          // Update active ball
+          if (state.activeBall) {
+            const elapsed = now - state.ballStartTime;
+            const timeLeft = Math.max(0, BALL_TIME - elapsed) / 1000;
+            setTimeRemaining(timeLeft);
+
+            if (elapsed < BALL_TIME) {
+              // Update ball position
+              state.activeBall.x += state.activeBall.vx;
+              state.activeBall.y += state.activeBall.vy;
+
+              // Check collision with arena wall
+              const dx = state.activeBall.x - centerX;
+              const dy = state.activeBall.y - centerY;
+              const distFromCenter = Math.sqrt(dx * dx + dy * dy);
+
+              if (distFromCenter + BALL_RADIUS >= ARENA_RADIUS) {
+                // Check if ball is in the gap
+                if (checkBallInGap(state.activeBall, state.rotation)) {
+                  // Ball escaped!
+                  state.escaped++;
+                  setBallsEscaped(state.escaped);
+                  state.activeBall = null;
+                  state.ballStartTime = null;
+                  
+                  // End game after first escape
+                  setGameOver(true);
+                  setIsRunning(false);
+                  return;
+                } else {
+                  // Bounce off wall
+                  const angle = Math.atan2(dy, dx);
+                  const normal = { x: dx / distFromCenter, y: dy / distFromCenter };
+                  const dotProduct = state.activeBall.vx * normal.x + state.activeBall.vy * normal.y;
+                  state.activeBall.vx = state.activeBall.vx - 2 * dotProduct * normal.x;
+                  state.activeBall.vy = state.activeBall.vy - 2 * dotProduct * normal.y;
+                  
+                  state.activeBall.x = centerX + Math.cos(angle) * (ARENA_RADIUS - BALL_RADIUS);
+                  state.activeBall.y = centerY + Math.sin(angle) * (ARENA_RADIUS - BALL_RADIUS);
+                }
+              }
+            } else {
+              // Time's up - freeze the ball
+              state.frozenBalls.push({
+                x: state.activeBall.x,
+                y: state.activeBall.y,
+                color: state.activeBall.color
+              });
+              state.trapped++;
+              setBallsTrapped(state.trapped);
+              state.activeBall = null;
+              state.ballStartTime = null;
+            }
+          }
+
+          // Draw
+          ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+          // Draw the circle with gap
+          const gapAngle = (gapSize * Math.PI / 180) / 2;
+          
+          ctx.beginPath();
+          ctx.arc(
+            centerX, 
+            centerY, 
+            ARENA_RADIUS, 
+            state.rotation + gapAngle,
+            state.rotation + (Math.PI * 2) - gapAngle
+          );
+          ctx.strokeStyle = '#1e293b';
+          ctx.lineWidth = 6;
+          ctx.stroke();
+
+          // Draw gap indicators
+          const gapStart1X = centerX + Math.cos(state.rotation + gapAngle) * ARENA_RADIUS;
+          const gapStart1Y = centerY + Math.sin(state.rotation + gapAngle) * ARENA_RADIUS;
+          const gapStart2X = centerX + Math.cos(state.rotation - gapAngle) * ARENA_RADIUS;
+          const gapStart2Y = centerY + Math.sin(state.rotation - gapAngle) * ARENA_RADIUS;
+
+          ctx.fillStyle = '#10b981';
+          ctx.beginPath();
+          ctx.arc(gapStart1X, gapStart1Y, 8, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(gapStart2X, gapStart2Y, 8, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Draw frozen balls
+          state.frozenBalls.forEach(ball => {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, Math.PI * 2);
+            ctx.fillStyle = ball.color;
+            ctx.globalAlpha = 0.6;
+            ctx.fill();
+            ctx.globalAlpha = 1;
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          });
+
+          // Draw active ball
+          if (state.activeBall) {
+            ctx.beginPath();
+            ctx.arc(state.activeBall.x, state.activeBall.y, BALL_RADIUS, 0, Math.PI * 2);
+            ctx.fillStyle = state.activeBall.color;
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          }
+
+          requestAnimationFrame(gameLoop);
+        };
+
+        if (isRunning) {
+          gameLoop();
+        }
+      }, [isRunning, rotationSpeed, gapSize]);
+
+      const startGame = () => {
+        gameStateRef.current = {
+          rotation: 0,
+          activeBall: null,
+          frozenBalls: [],
+          ballStartTime: null,
+          escaped: 0,
+          trapped: 0
+        };
+        setGameOver(false);
+        setBallsEscaped(0);
+        setBallsTrapped(0);
+        setTimeRemaining(4);
+        setIsRunning(true);
+      };
+
+      const timerPercentage = (timeRemaining / 4) * 100;
+
+      return (
+        <div className="container">
+          <div className="header">
+            <h1 className="title">Escape</h1>
+            <p className="subtitle">Find the gap before time runs out!</p>
+          </div>
+
+          <div className="canvas-container">
+            <canvas
+              ref={canvasRef}
+              width={CANVAS_SIZE}
+              height={CANVAS_SIZE}
+              className="canvas"
+            />
+            
+            <div className="stats">
+              <div className="stat-item">⭐ Escaped: {ballsEscaped}</div>
+              <div className="stat-item">❄️ Trapped: {ballsTrapped}</div>
+            </div>
+
+            {isRunning && (
+              <div className="timer-bar">
+                <div 
+                  className="timer-fill" 
+                  style={{ width: `${timerPercentage}%` }}
+                />
+              </div>
+            )}
+
+            {gameOver && (
+              <div className="game-over">
+                <div className="game-over-content">
+                  <div className="game-over-title">Victory!</div>
+                  <div className="game-over-stats">
+                    A ball escaped after {ballsTrapped} {ballsTrapped === 1 ? 'attempt' : 'attempts'}!
+                  </div>
+                  <button onClick={startGame} className="button">
+                    Play Again
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="controls-container">
+            <div className="control-panel">
+              <label className="control-label">
+                Rotation Speed: {rotationSpeed.toFixed(1)}x
+              </label>
+              <input
+                type="range"
+                min="0.5"
+                max="3"
+                step="0.1"
+                value={rotationSpeed}
+                onChange={(e) => setRotationSpeed(parseFloat(e.target.value))}
+                disabled={isRunning}
+                className="slider"
+              />
+            </div>
+
+            <div className="control-panel">
+              <label className="control-label">
+                Gap Size: {gapSize}°
+              </label>
+              <input
+                type="range"
+                min="30"
+                max="90"
+                step="5"
+                value={gapSize}
+                onChange={(e) => setGapSize(parseInt(e.target.value))}
+                disabled={isRunning}
+                className="slider"
+              />
+            </div>
+          </div>
+
+          {!isRunning && !gameOver && (
+            <button onClick={startGame} className="button">
+              Start Game
+            </button>
+          )}
+
+          <div className="instructions">
+            Each ball has 4 seconds to find the rotating gap and escape. If time runs out, it freezes in place. The game continues until one ball makes it through!
+          </div>
+        </div>
+      );
+    };
+
+    ReactDOM.render(<EscapeGame />, document.getElementById('root'));
+  </script>
+</body>
+</html>
