@@ -216,6 +216,8 @@
       const ARENA_RADIUS = 250;
       const BALL_RADIUS = 10;
       const BALL_TIME = 4000; // 4 seconds per ball
+      const GRAVITY = 0.3;
+      const BOUNCINESS = 0.85; // How much velocity is retained after bounce
 
       useEffect(() => {
         const canvas = canvasRef.current;
@@ -242,8 +244,8 @@
           return {
             x: centerX + Math.cos(angle) * distance,
             y: centerY + Math.sin(angle) * distance,
-            vx: (Math.random() - 0.5) * 6,
-            vy: (Math.random() - 0.5) * 6,
+            vx: (Math.random() - 0.5) * 8,
+            vy: (Math.random() - 0.5) * 8 - 3, // Give upward bias to counter gravity
             color: `hsl(${Math.random() * 360}, 70%, 60%)`
           };
         };
@@ -295,9 +297,44 @@
             setTimeRemaining(timeLeft);
 
             if (elapsed < BALL_TIME) {
+              // Apply gravity
+              state.activeBall.vy += GRAVITY;
+              
               // Update ball position
               state.activeBall.x += state.activeBall.vx;
               state.activeBall.y += state.activeBall.vy;
+
+              // Check collision with frozen balls
+              state.frozenBalls.forEach(frozenBall => {
+                const dx = state.activeBall.x - frozenBall.x;
+                const dy = state.activeBall.y - frozenBall.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < BALL_RADIUS * 2) {
+                  // Collision detected - bounce off
+                  const angle = Math.atan2(dy, dx);
+                  const sin = Math.sin(angle);
+                  const cos = Math.cos(angle);
+
+                  // Rotate velocity to collision normal
+                  const vx1 = state.activeBall.vx * cos + state.activeBall.vy * sin;
+                  const vy1 = state.activeBall.vy * cos - state.activeBall.vx * sin;
+
+                  // Reverse and apply bounciness
+                  const newVx1 = -vx1 * BOUNCINESS;
+
+                  // Rotate back
+                  state.activeBall.vx = newVx1 * cos - vy1 * sin;
+                  state.activeBall.vy = vy1 * cos + newVx1 * sin;
+
+                  // Separate balls
+                  const overlap = BALL_RADIUS * 2 - distance;
+                  const separateX = (dx / distance) * (overlap / 2 + 1);
+                  const separateY = (dy / distance) * (overlap / 2 + 1);
+                  state.activeBall.x += separateX;
+                  state.activeBall.y += separateY;
+                }
+              });
 
               // Check collision with arena wall
               const dx = state.activeBall.x - centerX;
@@ -318,12 +355,12 @@
                   setIsRunning(false);
                   return;
                 } else {
-                  // Bounce off wall
+                  // Bounce off wall with bounciness
                   const angle = Math.atan2(dy, dx);
                   const normal = { x: dx / distFromCenter, y: dy / distFromCenter };
                   const dotProduct = state.activeBall.vx * normal.x + state.activeBall.vy * normal.y;
-                  state.activeBall.vx = state.activeBall.vx - 2 * dotProduct * normal.x;
-                  state.activeBall.vy = state.activeBall.vy - 2 * dotProduct * normal.y;
+                  state.activeBall.vx = (state.activeBall.vx - 2 * dotProduct * normal.x) * BOUNCINESS;
+                  state.activeBall.vy = (state.activeBall.vy - 2 * dotProduct * normal.y) * BOUNCINESS;
                   
                   state.activeBall.x = centerX + Math.cos(angle) * (ARENA_RADIUS - BALL_RADIUS);
                   state.activeBall.y = centerY + Math.sin(angle) * (ARENA_RADIUS - BALL_RADIUS);
