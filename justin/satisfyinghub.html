@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Satisfying Games Collection</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .title {
+      font-size: 3.5rem;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .subtitle {
+      font-size: 1.25rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .game-card {
+      background: white;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .game-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+    }
+
+    .game-preview {
+      width: 100%;
+      height: 250px;
+      background: #0f172a;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .game-preview canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .game-info {
+      padding: 1.5rem;
+    }
+
+    .game-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+    }
+
+    .game-description {
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    .play-button {
+      margin-top: 1rem;
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      transition: opacity 0.3s ease;
+    }
+
+    .game-card:hover .play-button {
+      opacity: 0.9;
+    }
+
+    .footer {
+      text-align: center;
+      color: white;
+      opacity: 0.8;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">🎮 Satisfying Games</h1>
+      <p class="subtitle">Watch, play, and relax</p>
+    </div>
+
+    <div class="games-grid">
+      <!-- Tether Battle Card -->
+      <a href="bouncing-balls-production.html" class="game-card">
+        <div class="game-preview">
+          <canvas id="tetherCanvas" width="400" height="250"></canvas>
+        </div>
+        <div class="game-info">
+          <h2 class="game-title">Tether Battle</h2>
+          <p class="game-description">
+            Watch colorful balls bounce around a circular arena. When they hit the walls, they create tethers. Cut through other balls' tethers to eliminate them. Last ball standing wins!
+          </p>
+          <span class="play-button">Play Now →</span>
+        </div>
+      </a>
+
+      <!-- Placeholder for future games -->
+      <div class="game-card" style="opacity: 0.6; cursor: not-allowed; pointer-events: none;">
+        <div class="game-preview" style="display: flex; align-items: center; justify-content: center; color: #64748b;">
+          <div style="text-align: center;">
+            <div style="font-size: 4rem; margin-bottom: 0.5rem;">🎲</div>
+            <div style="font-size: 1.25rem;">Coming Soon</div>
+          </div>
+        </div>
+        <div class="game-info">
+          <h2 class="game-title">Next Game</h2>
+          <p class="game-description">
+            More satisfying games are on the way! Check back soon for new experiences.
+          </p>
+          <span class="play-button" style="opacity: 0.5;">Coming Soon</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Made with ❤️ for satisfying moments</p>
+    </div>
+  </div>
+
+  <script>
+    // Animated preview for Tether Battle
+    const canvas = document.getElementById('tetherCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    const centerX = 200;
+    const centerY = 125;
+    const arenaRadius = 110;
+    const ballRadius = 6;
+    
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];
+    
+    // Initialize 3 balls for the preview
+    const balls = [];
+    for (let i = 0; i < 3; i++) {
+      const angle = (Math.PI * 2 * i) / 3;
+      const distance = arenaRadius * 0.5;
+      balls.push({
+        x: centerX + Math.cos(angle) * distance,
+        y: centerY + Math.sin(angle) * distance,
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 0.5) * 2,
+        color: colors[i],
+        tethers: []
+      });
+    }
+    
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Update balls
+      balls.forEach(ball => {
+        ball.x += ball.vx;
+        ball.y += ball.vy;
+        
+        // Check collision with arena
+        const dx = ball.x - centerX;
+        const dy = ball.y - centerY;
+        const distFromCenter = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distFromCenter + ballRadius >= arenaRadius) {
+          const angle = Math.atan2(dy, dx);
+          const collisionX = centerX + Math.cos(angle) * arenaRadius;
+          const collisionY = centerY + Math.sin(angle) * arenaRadius;
+          
+          // Add tether (keep max 3 per ball for preview)
+          if (ball.tethers.length < 3) {
+            ball.tethers.push({
+              x: collisionX,
+              y: collisionY
+            });
+          }
+          
+          // Reflect velocity
+          const normal = { x: dx / distFromCenter, y: dy / distFromCenter };
+          const dotProduct = ball.vx * normal.x + ball.vy * normal.y;
+          ball.vx = ball.vx - 2 * dotProduct * normal.x;
+          ball.vy = ball.vy - 2 * dotProduct * normal.y;
+          
+          ball.x = centerX + Math.cos(angle) * (arenaRadius - ballRadius);
+          ball.y = centerY + Math.sin(angle) * (arenaRadius - ballRadius);
+        }
+      });
+      
+      // Draw arena
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, arenaRadius, 0, Math.PI * 2);
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      
+      // Draw tethers
+      balls.forEach(ball => {
+        ctx.strokeStyle = ball.color;
+        ctx.lineWidth = 1.5;
+        ball.tethers.forEach(tether => {
+          ctx.beginPath();
+          ctx.moveTo(ball.x, ball.y);
+          ctx.lineTo(tether.x, tether.y);
+          ctx.stroke();
+        });
+      });
+      
+      // Draw balls
+      balls.forEach(ball => {
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
+        ctx.fillStyle = ball.color;
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      });
+      
+      requestAnimationFrame(animate);
+    }
+    
+    animate();
+  </script>
+</body>
+</html>
