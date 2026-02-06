@@ -1,195 +1,383 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Satisfying Arena</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+import React, { useState, useEffect, useRef } from 'react';
 
-<style>
-body{
-  margin:0;
-  background:#0e0e11;
-  overflow:hidden;
-  font-family:sans-serif;
-}
+const BouncingBallsGame = () => {
+  const canvasRef = useRef(null);
+  const [isRunning, setIsRunning] = useState(false);
+  const [winner, setWinner] = useState(null);
+  const [ballCount, setBallCount] = useState(5);
+  const [speed, setSpeed] = useState(4);
+  const gameStateRef = useRef(null);
 
-canvas{
-  display:block;
-}
-</style>
-</head>
+  const CANVAS_SIZE = 600;
+  const ARENA_RADIUS = 280;
+  const BALL_RADIUS = 12;
+  const INITIAL_BALL_COUNT = 5;
+  const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];
 
-<body>
-<canvas id="c"></canvas>
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-<script>
-const canvas = document.getElementById("c");
-const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
+    const centerX = CANVAS_SIZE / 2;
+    const centerY = CANVAS_SIZE / 2;
 
-function resize(){
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resize();
-window.addEventListener("resize",resize);
+    const initializeBalls = () => {
+      const balls = [];
+      for (let i = 0; i < ballCount; i++) {
+        const angle = (Math.PI * 2 * i) / ballCount;
+        const distance = ARENA_RADIUS * 0.5;
+        balls.push({
+          id: i,
+          x: centerX + Math.cos(angle) * distance,
+          y: centerY + Math.sin(angle) * distance,
+          vx: (Math.random() - 0.5) * speed,
+          vy: (Math.random() - 0.5) * speed,
+          color: COLORS[i % COLORS.length],
+          tethers: [],
+          alive: true,
+          hasHadTethers: false
+        });
+      }
+      return balls;
+    };
 
-const center = () => ({
-  x: canvas.width/2,
-  y: canvas.height/2
-});
-
-const ARENA_RADIUS = Math.min(canvas.width,canvas.height)*0.4;
-
-class Ball{
-  constructor(){
-    const angle = Math.random()*Math.PI*2;
-    const r = ARENA_RADIUS*0.5*Math.random();
-
-    const c = center();
-    this.x = c.x + Math.cos(angle)*r;
-    this.y = c.y + Math.sin(angle)*r;
-
-    this.vx = (Math.random()-0.5)*4;
-    this.vy = (Math.random()-0.5)*4;
-
-    this.radius = 8;
-    this.lines = [];
-    this.color = `hsl(${Math.random()*360},80%,60%)`;
-    this.alive = true;
-  }
-
-  update(){
-    if(!this.alive) return;
-
-    this.x += this.vx;
-    this.y += this.vy;
-
-    const c = center();
-    const dx = this.x - c.x;
-    const dy = this.y - c.y;
-    const dist = Math.sqrt(dx*dx+dy*dy);
-
-    // hit circle wall
-    if(dist > ARENA_RADIUS - this.radius){
-      const angle = Math.atan2(dy,dx);
-
-      // reflect velocity
-      const nx = Math.cos(angle);
-      const ny = Math.sin(angle);
-      const dot = this.vx*nx + this.vy*ny;
-      this.vx -= 2*dot*nx;
-      this.vy -= 2*dot*ny;
-
-      // clamp inside
-      this.x = c.x + nx*(ARENA_RADIUS - this.radius);
-      this.y = c.y + ny*(ARENA_RADIUS - this.radius);
-
-      // attach line to wall
-      this.lines.push({
-        x: this.x,
-        y: this.y
-      });
+    if (!gameStateRef.current) {
+      gameStateRef.current = {
+        balls: initializeBalls()
+      };
     }
-  }
 
-  draw(){
-    if(!this.alive) return;
+    const checkLineIntersection = (p1, p2, p3, p4) => {
+      const denominator = ((p4.y - p3.y) * (p2.x - p1.x)) - ((p4.x - p3.x) * (p2.y - p1.y));
+      if (denominator === 0) return false;
 
-    ctx.strokeStyle = this.color;
-    ctx.lineWidth = 1;
+      const ua = (((p4.x - p3.x) * (p1.y - p3.y)) - ((p4.y - p3.y) * (p1.x - p3.x))) / denominator;
+      const ub = (((p2.x - p1.x) * (p1.y - p3.y)) - ((p2.y - p1.y) * (p1.x - p3.x))) / denominator;
 
-    // draw lines
-    this.lines.forEach(l=>{
-      ctx.beginPath();
-      ctx.moveTo(this.x,this.y);
-      ctx.lineTo(l.x,l.y);
-      ctx.stroke();
-    });
+      return (ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1);
+    };
 
-    // ball
-    ctx.beginPath();
-    ctx.fillStyle = this.color;
-    ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);
-    ctx.fill();
-  }
-}
+    const pointToLineDistance = (px, py, x1, y1, x2, y2) => {
+      const A = px - x1;
+      const B = py - y1;
+      const C = x2 - x1;
+      const D = y2 - y1;
 
-let balls = [];
+      const dot = A * C + B * D;
+      const lenSq = C * C + D * D;
+      let param = -1;
+      
+      if (lenSq !== 0) param = dot / lenSq;
 
-function spawn(){
-  balls=[];
-  for(let i=0;i<5;i++) balls.push(new Ball());
-}
-spawn();
+      let xx, yy;
 
-function breakLines(){
-  balls.forEach(ball=>{
-    if(!ball.alive) return;
+      if (param < 0) {
+        xx = x1;
+        yy = y1;
+      } else if (param > 1) {
+        xx = x2;
+        yy = y2;
+      } else {
+        xx = x1 + param * C;
+        yy = y1 + param * D;
+      }
 
-    ball.lines = ball.lines.filter(line=>{
-      let intact=true;
+      const dx = px - xx;
+      const dy = py - yy;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
 
-      balls.forEach(other=>{
-        if(other===ball || !other.alive) return;
+    const gameLoop = () => {
+      if (!isRunning) return;
 
-        // distance from other ball to line segment
-        const dx = line.x - ball.x;
-        const dy = line.y - ball.y;
+      const { balls } = gameStateRef.current;
 
-        const t = ((other.x-ball.x)*dx + (other.y-ball.y)*dy)/(dx*dx+dy*dy);
-        const clamped = Math.max(0,Math.min(1,t));
+      // Update ball positions
+      balls.forEach(ball => {
+        if (!ball.alive) return;
 
-        const px = ball.x + dx*clamped;
-        const py = ball.y + dy*clamped;
+        ball.x += ball.vx;
+        ball.y += ball.vy;
 
-        const dist = Math.hypot(other.x-px, other.y-py);
+        // Check collision with arena
+        const dx = ball.x - centerX;
+        const dy = ball.y - centerY;
+        const distFromCenter = Math.sqrt(dx * dx + dy * dy);
 
-        if(dist < other.radius){
-          intact=false;
+        if (distFromCenter + BALL_RADIUS >= ARENA_RADIUS) {
+          // Calculate collision point on the circle
+          const angle = Math.atan2(dy, dx);
+          const collisionX = centerX + Math.cos(angle) * ARENA_RADIUS;
+          const collisionY = centerY + Math.sin(angle) * ARENA_RADIUS;
+
+          // Add tether
+          ball.tethers.push({
+            x: collisionX,
+            y: collisionY,
+            createdAt: Date.now()
+          });
+          ball.hasHadTethers = true;
+
+          // Reflect velocity
+          const normal = { x: dx / distFromCenter, y: dy / distFromCenter };
+          const dotProduct = ball.vx * normal.x + ball.vy * normal.y;
+          ball.vx = ball.vx - 2 * dotProduct * normal.x;
+          ball.vy = ball.vy - 2 * dotProduct * normal.y;
+
+          // Push ball back inside
+          ball.x = centerX + Math.cos(angle) * (ARENA_RADIUS - BALL_RADIUS);
+          ball.y = centerY + Math.sin(angle) * (ARENA_RADIUS - BALL_RADIUS);
         }
       });
 
-      return intact;
-    });
+      // Check ball-to-ball collisions
+      for (let i = 0; i < balls.length; i++) {
+        for (let j = i + 1; j < balls.length; j++) {
+          const ball1 = balls[i];
+          const ball2 = balls[j];
+          
+          if (!ball1.alive || !ball2.alive) continue;
 
-    if(ball.lines.length===0){
-      ball.alive=false;
+          const dx = ball2.x - ball1.x;
+          const dy = ball2.y - ball1.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < BALL_RADIUS * 2) {
+            // Simple elastic collision
+            const angle = Math.atan2(dy, dx);
+            const sin = Math.sin(angle);
+            const cos = Math.cos(angle);
+
+            // Rotate velocities
+            const vx1 = ball1.vx * cos + ball1.vy * sin;
+            const vy1 = ball1.vy * cos - ball1.vx * sin;
+            const vx2 = ball2.vx * cos + ball2.vy * sin;
+            const vy2 = ball2.vy * cos - ball2.vx * sin;
+
+            // Swap velocities
+            const temp = vx1;
+            const newVx1 = vx2;
+            const newVx2 = temp;
+
+            // Rotate back
+            ball1.vx = newVx1 * cos - vy1 * sin;
+            ball1.vy = vy1 * cos + newVx1 * sin;
+            ball2.vx = newVx2 * cos - vy2 * sin;
+            ball2.vy = vy2 * cos + newVx2 * sin;
+
+            // Separate balls
+            const overlap = BALL_RADIUS * 2 - distance;
+            const separateX = (dx / distance) * overlap / 2;
+            const separateY = (dy / distance) * overlap / 2;
+            ball1.x -= separateX;
+            ball1.y -= separateY;
+            ball2.x += separateX;
+            ball2.y += separateY;
+          }
+        }
+      }
+
+      // Check tether cutting
+      balls.forEach(ball => {
+        if (!ball.alive) return;
+
+        const prevX = ball.x - ball.vx;
+        const prevY = ball.y - ball.vy;
+
+        balls.forEach(otherBall => {
+          if (ball.id === otherBall.id || !otherBall.alive) return;
+
+          const remainingTethers = [];
+          otherBall.tethers.forEach(tether => {
+            // Check if the ball's movement path intersects with the tether line
+            const intersects = checkLineIntersection(
+              { x: prevX, y: prevY },
+              { x: ball.x, y: ball.y },
+              { x: otherBall.x, y: otherBall.y },
+              { x: tether.x, y: tether.y }
+            );
+            
+            // Also check if the ball is currently close to the line (within ball radius)
+            const distToLine = pointToLineDistance(
+              ball.x, ball.y,
+              otherBall.x, otherBall.y,
+              tether.x, tether.y
+            );
+            
+            const cut = intersects || distToLine < BALL_RADIUS;
+            
+            if (!cut) {
+              remainingTethers.push(tether);
+            }
+          });
+          otherBall.tethers = remainingTethers;
+        });
+      });
+
+      // Remove balls with no tethers (only after they've had a chance to create some)
+      balls.forEach(ball => {
+        if (ball.alive && ball.hasHadTethers && ball.tethers.length === 0) {
+          ball.alive = false;
+        }
+      });
+
+      // Check for winner
+      const aliveBalls = balls.filter(b => b.alive);
+      if (aliveBalls.length === 1 && !winner) {
+        setWinner(aliveBalls[0]);
+        setIsRunning(false);
+      } else if (aliveBalls.length === 0 && !winner) {
+        setWinner({ color: '#888', id: -1 });
+        setIsRunning(false);
+      }
+
+      // Draw
+      ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+      // Draw arena
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, ARENA_RADIUS, 0, Math.PI * 2);
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Draw tethers
+      balls.forEach(ball => {
+        if (!ball.alive) return;
+        
+        ctx.strokeStyle = ball.color;
+        ctx.lineWidth = 2;
+        ball.tethers.forEach(tether => {
+          ctx.beginPath();
+          ctx.moveTo(ball.x, ball.y);
+          ctx.lineTo(tether.x, tether.y);
+          ctx.stroke();
+        });
+      });
+
+      // Draw balls
+      balls.forEach(ball => {
+        if (!ball.alive) return;
+
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, Math.PI * 2);
+        ctx.fillStyle = ball.color;
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      });
+
+      requestAnimationFrame(gameLoop);
+    };
+
+    if (isRunning) {
+      gameLoop();
     }
-  });
-}
+  }, [isRunning, winner, ballCount, speed]);
 
-function drawArena(){
-  const c = center();
+  const startGame = () => {
+    gameStateRef.current = null;
+    setWinner(null);
+    setIsRunning(true);
+  };
 
-  ctx.strokeStyle="#2a2a35";
-  ctx.lineWidth=3;
-  ctx.beginPath();
-  ctx.arc(c.x,c.y,ARENA_RADIUS,0,Math.PI*2);
-  ctx.stroke();
-}
+  const togglePause = () => {
+    setIsRunning(!isRunning);
+  };
 
-function loop(){
-  ctx.fillStyle="rgba(14,14,17,0.25)";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-8">
+      <div className="mb-6 text-center">
+        <h1 className="text-4xl font-bold text-white mb-2">Tether Battle</h1>
+        <p className="text-slate-300">Last ball with tethers wins!</p>
+      </div>
 
-  drawArena();
+      <div className="relative mb-6">
+        <canvas
+          ref={canvasRef}
+          width={CANVAS_SIZE}
+          height={CANVAS_SIZE}
+          className="bg-slate-950 rounded-lg shadow-2xl"
+        />
+        
+        {winner && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 rounded-lg">
+            <div className="text-center">
+              <div 
+                className="text-6xl font-bold mb-4"
+                style={{ color: winner.id === -1 ? '#888' : winner.color }}
+              >
+                {winner.id === -1 ? 'Draw!' : 'Winner!'}
+              </div>
+              {winner.id !== -1 && (
+                <div 
+                  className="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-white"
+                  style={{ backgroundColor: winner.color }}
+                />
+              )}
+            </div>
+          </div>
+        )}
+      </div>
 
-  balls.forEach(b=>{
-    b.update();
-    b.draw();
-  });
+      <div className="flex gap-6 mb-6">
+        <div className="bg-slate-800 rounded-lg p-4 shadow-lg">
+          <label className="block text-slate-300 text-sm font-semibold mb-2">
+            Number of Balls: {ballCount}
+          </label>
+          <input
+            type="range"
+            min="2"
+            max="10"
+            value={ballCount}
+            onChange={(e) => setBallCount(parseInt(e.target.value))}
+            disabled={isRunning}
+            className="w-48 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer disabled:opacity-50"
+          />
+        </div>
 
-  breakLines();
+        <div className="bg-slate-800 rounded-lg p-4 shadow-lg">
+          <label className="block text-slate-300 text-sm font-semibold mb-2">
+            Speed: {speed.toFixed(1)}x
+          </label>
+          <input
+            type="range"
+            min="2"
+            max="8"
+            step="0.5"
+            value={speed}
+            onChange={(e) => setSpeed(parseFloat(e.target.value))}
+            disabled={isRunning}
+            className="w-48 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer disabled:opacity-50"
+          />
+        </div>
+      </div>
 
-  const alive = balls.filter(b=>b.alive);
-  if(alive.length<=1){
-    setTimeout(spawn,1500);
-  }
+      <div className="flex gap-4">
+        <button
+          onClick={startGame}
+          className="px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-lg transition-colors"
+        >
+          {winner ? 'Play Again' : 'Start Game'}
+        </button>
+        
+        {!winner && gameStateRef.current && (
+          <button
+            onClick={togglePause}
+            className="px-8 py-3 bg-slate-600 hover:bg-slate-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
+          >
+            {isRunning ? 'Pause' : 'Resume'}
+          </button>
+        )}
+      </div>
 
-  requestAnimationFrame(loop);
-}
+      <div className="mt-6 text-slate-400 text-sm max-w-md text-center">
+        Watch the balls bounce! When they hit the wall, they create tethers. Cut other balls' tethers by passing through them. Last ball standing wins!
+      </div>
+    </div>
+  );
+};
 
-loop();
-</script>
-</body>
-</html>
+export default BouncingBallsGame;
