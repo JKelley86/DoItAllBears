@@ -1,8 +1,8 @@
 body{
   margin:0;
-  font-family:Arial;
   background:#0b0f14;
   color:#00ff9c;
+  font-family:Arial;
 }
 
 #topbar{
@@ -14,36 +14,37 @@ body{
 
 #main{
   display:flex;
-  height:90vh;
+  height:92vh;
 }
 
-#map{
+#mapContainer{
   flex:3;
-  background:#0a0a0a;
-  padding:10px;
-  overflow:auto;
-}
-
-.state{
-  background:#1a1f26;
-  border:1px solid #333;
-  padding:8px;
-  margin:4px;
-  cursor:pointer;
-}
-
-.state:hover{
-  background:#2a323c;
-}
-
-.owned{
-  background:#004d2b;
+  background:#000;
 }
 
 #panel{
   flex:1;
   background:#111;
   padding:10px;
+}
+
+.state{
+  fill:#1b2a38;
+  stroke:#111;
+  stroke-width:2;
+  cursor:pointer;
+}
+
+.state:hover{
+  fill:#2f4c63;
+}
+
+.owned{
+  fill:#004d2b;
+}
+
+.ai{
+  fill:#4d0000;
 }
 
 button{
