@@ -1,0 +1,66 @@
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0b0f14;
+  color:#00ff9c;
+}
+
+#topbar{
+  background:#111;
+  padding:10px;
+  display:flex;
+  gap:20px;
+}
+
+#main{
+  display:flex;
+  height:90vh;
+}
+
+#map{
+  flex:3;
+  background:#0a0a0a;
+  padding:10px;
+  overflow:auto;
+}
+
+.state{
+  background:#1a1f26;
+  border:1px solid #333;
+  padding:8px;
+  margin:4px;
+  cursor:pointer;
+}
+
+.state:hover{
+  background:#2a323c;
+}
+
+.owned{
+  background:#004d2b;
+}
+
+#panel{
+  flex:1;
+  background:#111;
+  padding:10px;
+}
+
+button{
+  background:#1f2a33;
+  color:#00ff9c;
+  border:none;
+  padding:8px;
+  margin:4px;
+  cursor:pointer;
+}
+
+#startScreen{
+  position:fixed;
+  inset:0;
+  background:black;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
