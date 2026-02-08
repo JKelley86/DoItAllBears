@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Justin's Test Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="topbar">
+  <span id="money"></span>
+  <span id="oil"></span>
+  <span id="steel"></span>
+  <span id="research"></span>
+  <span id="time"></span>
+</div>
+
+<div id="main">
+  <div id="map"></div>
+
+  <div id="panel">
+    <h2 id="stateName">No State Selected</h2>
+    <button onclick="build('factory')">Factory</button>
+    <button onclick="build('oil')">Oil</button>
+    <button onclick="build('steel')">Steel</button>
+    <button onclick="build('barracks')">Barracks</button>
+
+    <div id="log"></div>
+  </div>
+</div>
+
+<div id="startScreen">
+  <h1>Justin's Test Game</h1>
+  <h3>Select Time Multiplier</h3>
+  <button onclick="startGame(1)">1x</button>
+  <button onclick="startGame(4)">4x</button>
+  <button onclick="startGame(5)">5x</button>
+  <button onclick="startGame(10)">10x</button>
+</div>
+
+<script src="mapData.js"></script>
+<script src="game.js"></script>
+<script src="ui.js"></script>
+
+</body>
+</html>
