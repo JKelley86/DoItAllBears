@@ -1,15 +1,12 @@
 <svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg">
 
-  <!-- OCEAN -->
-  <rect x="0" y="0" width="1000" height="600" fill="#0a1a2a"/>
-
-  <!-- USA STATES (simplified shapes for now) -->
-
-  <path id="California" d="M80 300 L140 260 L160 360 L100 400 Z" class="state"/>
-  <path id="Texas" d="M350 350 L480 350 L520 450 L380 470 Z" class="state"/>
-  <path id="Minnesota" d="M500 150 L560 150 L560 210 L500 210 Z" class="state"/>
-  <path id="Florida" d="M700 380 L760 420 L730 460 L690 420 Z" class="state"/>
-  <path id="NewYork" d="M780 150 L830 150 L830 200 L780 200 Z" class="state"/>
-  <path id="Washington" d="M80 100 L140 100 L140 150 L80 150 Z" class="state"/>
+<path id="Minnesota" class="state" d="M650 120 L720 120 L720 200 L650 200 Z"/>
+<path id="Iowa" class="state" d="M650 200 L720 200 L720 260 L650 260 Z"/>
+<path id="Wisconsin" class="state" d="M720 140 L780 140 L780 210 L720 210 Z"/>
+<path id="Illinois" class="state" d="M720 210 L780 210 L780 300 L720 300 Z"/>
+<path id="Texas" class="state" d="M400 300 L520 300 L520 420 L400 420 Z"/>
+<path id="California" class="state" d="M100 200 L200 200 L200 350 L100 350 Z"/>
+<path id="Florida" class="state" d="M850 350 L920 350 L920 420 L850 420 Z"/>
+<path id="NewYork" class="state" d="M850 150 L920 150 L920 220 L850 220 Z"/>
 
 </svg>
