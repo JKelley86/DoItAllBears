@@ -1,39 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Justin's Test Game</title>
-<link rel="stylesheet" href="style.css">
+  <title>Justin's Test Game</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="startMenu">
   <h1>Justin's Test Game</h1>
-  <h2>Select Starting State</h2>
-  <div id="stateButtons"></div>
 
-  <div class="timeSelect">
-    <label>Time Multiplier:</label>
-    <select id="timeMultiplier">
-      <option value="4">4x</option>
-      <option value="5">5x</option>
-      <option value="10">10x</option>
-    </select>
-  </div>
+  <label>Choose Starting State:</label>
+  <select id="stateSelect"></select>
 
-  <button id="startBtn">Start Game</button>
+  <label>Time Multiplier:</label>
+  <select id="timeSelect">
+    <option value="1">1x</option>
+    <option value="4">4x</option>
+    <option value="10">10x</option>
+  </select>
+
+  <button onclick="startGame()">Start Game</button>
 </div>
 
 <div id="gameUI" class="hidden">
-  <div id="topBar">
-    <div>Supplies: <span id="supplies">0</span></div>
-    <div>Steel: <span id="steel">0</span></div>
-    <div>Oil: <span id="oil">0</span></div>
-    <div>Manpower: <span id="manpower">0</span></div>
-    <div>Game Time: <span id="gameTime">0</span></div>
+
+  <div id="mapContainer">
+    <!-- SVG loads here -->
   </div>
 
-  <canvas id="mapCanvas"></canvas>
+  <div id="sidePanel">
+    <h2 id="panelState">State</h2>
+    <p id="panelStatus">Status:</p>
+    <button id="warBtn" onclick="declareWar()">Declare War</button>
+  </div>
+
+  <div id="topBar">
+    Supplies: <span id="supplies">0</span>
+    | Game Hour: <span id="gameTime">0</span>
+  </div>
+
 </div>
 
 <script src="game.js"></script>
