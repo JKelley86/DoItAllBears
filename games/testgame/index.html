@@ -1,41 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Justin's Test Game</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Justin's Test Game</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="topbar">
-  <span id="money"></span>
-  <span id="oil"></span>
-  <span id="steel"></span>
-  <span id="time"></span>
-</div>
-
-<div id="main">
-  <div id="mapContainer"></div>
-
-  <div id="panel">
-    <h2 id="stateName">Select a state</h2>
-    <button onclick="buildFactory()">Build Factory</button>
-    <div id="log"></div>
-  </div>
-</div>
-
-<div id="startScreen">
+<div id="startMenu">
   <h1>Justin's Test Game</h1>
-  <h3>Time Multiplier</h3>
-  <button onclick="startGame(1)">1x</button>
-  <button onclick="startGame(4)">4x</button>
-  <button onclick="startGame(5)">5x</button>
-  <button onclick="startGame(10)">10x</button>
+  <h2>Select Starting State</h2>
+  <div id="stateButtons"></div>
+
+  <div class="timeSelect">
+    <label>Time Multiplier:</label>
+    <select id="timeMultiplier">
+      <option value="4">4x</option>
+      <option value="5">5x</option>
+      <option value="10">10x</option>
+    </select>
+  </div>
+
+  <button id="startBtn">Start Game</button>
 </div>
 
-<script src="data.js"></script>
-<script src="game.js"></script>
-<script src="ai.js"></script>
-<script src="map.js"></script>
+<div id="gameUI" class="hidden">
+  <div id="topBar">
+    <div>Supplies: <span id="supplies">0</span></div>
+    <div>Steel: <span id="steel">0</span></div>
+    <div>Oil: <span id="oil">0</span></div>
+    <div>Manpower: <span id="manpower">0</span></div>
+    <div>Game Time: <span id="gameTime">0</span></div>
+  </div>
 
+  <canvas id="mapCanvas"></canvas>
+</div>
+
+<script src="game.js"></script>
 </body>
 </html>
