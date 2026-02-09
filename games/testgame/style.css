@@ -1,45 +1,58 @@
 body{
   margin:0;
-  background:#0b0f14;
-  color:#d6d6d6;
+  background:#0b0f0c;
+  color:#d7f5d0;
   font-family:Arial;
 }
 
-.hidden{display:none;}
-
 #startMenu{
-  text-align:center;
-  margin-top:80px;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:#111;
+  padding:30px;
+  border:1px solid #1f3d1f;
 }
 
-button{
-  background:#1b2630;
-  color:white;
-  border:1px solid #3a4a58;
-  padding:10px 20px;
-  margin:5px;
-  cursor:pointer;
+#gameUI{
+  display:flex;
 }
 
-button:hover{
-  background:#263645;
+.hidden{
+  display:none;
+}
+
+#mapContainer{
+  flex:1;
+  height:100vh;
+  background:#050705;
+}
+
+#sidePanel{
+  width:260px;
+  background:#111;
+  border-left:1px solid #1f3d1f;
+  padding:15px;
 }
 
 #topBar{
-  position:absolute;
+  position:fixed;
   top:0;
   left:0;
   right:0;
   height:40px;
-  background:#111820;
-  display:flex;
-  gap:20px;
-  align-items:center;
-  padding-left:10px;
+  background:#020402;
+  border-bottom:1px solid #1f3d1f;
+  padding:8px;
 }
 
-canvas{
-  position:absolute;
-  top:40px;
-  left:0;
+.state{
+  stroke:#000;
+  stroke-width:1;
+  cursor:pointer;
 }
+
+.player{ fill:#1f6b2b; }
+.peace{ fill:#1b3f5a; }
+.enemy{ fill:#8b1e1e; }
