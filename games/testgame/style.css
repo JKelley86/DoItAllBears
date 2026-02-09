@@ -1,67 +1,45 @@
 body{
   margin:0;
   background:#0b0f14;
-  color:#00ff9c;
+  color:#d6d6d6;
   font-family:Arial;
 }
 
-#topbar{
-  background:#111;
-  padding:10px;
-  display:flex;
-  gap:20px;
-}
+.hidden{display:none;}
 
-#main{
-  display:flex;
-  height:92vh;
-}
-
-#mapContainer{
-  flex:3;
-  background:#000;
-}
-
-#panel{
-  flex:1;
-  background:#111;
-  padding:10px;
-}
-
-.state{
-  fill:#1b2a38;
-  stroke:#111;
-  stroke-width:2;
-  cursor:pointer;
-}
-
-.state:hover{
-  fill:#2f4c63;
-}
-
-.owned{
-  fill:#004d2b;
-}
-
-.ai{
-  fill:#4d0000;
+#startMenu{
+  text-align:center;
+  margin-top:80px;
 }
 
 button{
-  background:#1f2a33;
-  color:#00ff9c;
-  border:none;
-  padding:8px;
-  margin:4px;
+  background:#1b2630;
+  color:white;
+  border:1px solid #3a4a58;
+  padding:10px 20px;
+  margin:5px;
   cursor:pointer;
 }
 
-#startScreen{
-  position:fixed;
-  inset:0;
-  background:black;
+button:hover{
+  background:#263645;
+}
+
+#topBar{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:40px;
+  background:#111820;
   display:flex;
-  flex-direction:column;
+  gap:20px;
   align-items:center;
-  justify-content:center;
+  padding-left:10px;
+}
+
+canvas{
+  position:absolute;
+  top:40px;
+  left:0;
 }
