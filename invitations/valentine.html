@@ -5,7 +5,6 @@
 <title>Bridget ❤️</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Confetti library -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
 <style>
@@ -44,7 +43,17 @@ button{
 #yesBtn{background:#ff4d6d;color:white;}
 #noBtn{background:#ccc;}
 
-.celebrate{
+#confettiCanvas{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  pointer-events:none;
+  z-index:9999;
+}
+
+/* 🎉 CELEBRATION SCREEN */
+#celebrationScreen{
   position:fixed;
   inset:0;
   background:white;
@@ -52,18 +61,14 @@ button{
   align-items:center;
   justify-content:center;
   flex-direction:column;
-  font-size:28px;
+  z-index:20;
+  font-size:32px;
   color:#ff4d6d;
-  z-index:10;
 }
-    /* FULL-SCREEN CONFETTI CANVAS */
-#confettiCanvas {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 9999;
+
+#celebrationScreen img{
+  width:300px;
+  margin-top:20px;
 }
 
 /* FLOW */
@@ -86,7 +91,6 @@ button{
   margin-top:40px;
 }
 
-/* handwritten cards */
 .flipCard{
   width:200px;
   height:250px;
@@ -116,30 +120,11 @@ button{
   box-shadow:0 10px 25px rgba(0,0,0,0.2);
 }
 
-.front{
-  background:#fffefc;
-  font-family: "Comic Sans MS", cursive;
-  font-size:22px;
-}
+.front{background:#fffefc;font-size:22px;}
+.back{background:#fffefc;transform:rotateY(180deg);font-size:20px;border:2px dashed #ff4d6d;}
 
-.back{
-  background:#fffefc;
-  transform:rotateY(180deg);
-  font-size:20px;
-  border:2px dashed #ff4d6d;
-}
-
-.nextBtn{
-  margin-top:30px;
-  font-size:20px;
-  background:#ff4d6d;
-  color:white;
-}
-
-.finalNote{
-  font-size:26px;
-  padding:40px;
-}
+.nextBtn{margin-top:30px;font-size:20px;background:#ff4d6d;color:white;}
+.finalNote{font-size:26px;padding:40px;}
 
 .resetBtn{
   position:fixed;
@@ -152,6 +137,8 @@ button{
 
 <body>
 
+<canvas id="confettiCanvas"></canvas>
+
 <div class="card">
   <h1>Bridget ❤️</h1>
   <p>Will you be my Valentine?</p>
@@ -160,8 +147,10 @@ button{
   <button id="noBtn">No 😅</button>
 </div>
 
-<div class="celebrate" id="celebrate">
+<!-- 🎉 NEW CELEBRATION PAGE -->
+<div id="celebrationScreen">
   <div>YAY!!! 💖</div>
+  <img src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif">
 </div>
 
 <div id="dateFlow">
@@ -174,7 +163,7 @@ button{
 <button class="resetBtn" onclick="resetAll()">reset</button>
 
 <script>
-/* dodge no */
+/* NO BUTTON */
 const noBtn=document.getElementById("noBtn");
 noBtn.addEventListener("mouseenter",()=>{
   noBtn.style.position="absolute";
@@ -182,49 +171,49 @@ noBtn.addEventListener("mouseenter",()=>{
   noBtn.style.top=Math.random()*window.innerHeight+"px";
 });
 
-/* yes */
+/* CONFETTI */
+const confettiCanvas=document.getElementById("confettiCanvas");
+function resize(){const dpr=Math.max(1,window.devicePixelRatio||1);
+confettiCanvas.width=innerWidth*dpr;confettiCanvas.height=innerHeight*dpr;}
+resize();addEventListener("resize",resize);
+
+const confettiInstance=confetti.create(confettiCanvas,{resize:false,useWorker:true});
+
+/* YES CLICK */
 const yesBtn=document.getElementById("yesBtn");
-const celebrate=document.getElementById("celebrate");
+const celebration=document.getElementById("celebrationScreen");
 
 yesBtn.onclick=()=>{
-  celebrate.style.display="flex";
+
+  celebration.style.display="flex";
+
+  // BIG CONFETTI
+  confettiInstance({
+    particleCount:300,
+    spread:120,
+    startVelocity:70,
+    origin:{x:0.5,y:1}
+  });
+
   setTimeout(()=>{
-    celebrate.style.display="none";
     startFlow();
-  },1500);
+  },2500);
 };
 
-/* ===== STAGES EDIT HERE ===== */
+/* ===== STAGES ===== */
 const stages=[
-{
-title:"Breakfast 🍳",
-options:["Breakfast in bed 🧸","Go get breakfast ☕"]
-},
-{
-title:"Morning 🌤",
-options:["Shopping 🛍️","Park walk 🌳"]
-},
-{
-title:"Midday 💕",
-options:["Coffee ☕","Arcade 🎮"]
-},
-{
-title:"Afternoon 🤸",
-options:["Bowling 🎳","Mini golf ⛳"]
-},
-{
-title:"Dinner 😋",
-options:["Dinner out 🍝","Cook together 🍳"]
-},
-{
-title:"Evening 🌙",
-options:["Competitive gaming 🎮","Fort movie 🎬"]
-}
+{title:"Breakfast 🍳",options:["Breakfast in bed 🧸","Go get breakfast ☕"]},
+{title:"Morning 🌤",options:["Shopping 🛍️","Park walk 🌳"]},
+{title:"Midday 💕",options:["Coffee ☕","Arcade 🎮"]},
+{title:"Afternoon 🤸",options:["Bowling 🎳","Mini golf ⛳"]},
+{title:"Dinner 😋",options:["Dinner out 🍝","Cook together 🍳"]},
+{title:"Evening 🌙",options:["Competitive gaming 🎮","Fort movie 🎬"]}
 ];
 
 let stageIndex=parseInt(localStorage.getItem("valStage"))||0;
 
 function startFlow(){
+  celebration.style.display="none";
   document.getElementById("dateFlow").style.display="block";
   showStage();
 }
@@ -239,10 +228,7 @@ function showStage(){
 
   if(stageIndex>=stages.length){
     title.innerHTML="One more thing 💌";
-
-    next.innerHTML=`
-      <button class="nextBtn" onclick="showFinal()">Next</button>
-    `;
+    next.innerHTML=`<button class="nextBtn" onclick="showFinal()">Next</button>`;
     return;
   }
 
@@ -260,10 +246,10 @@ function showStage(){
     `;
 
     wrap.onclick=()=>{
-      if(document.querySelector(".flipped")) return;
-
+      if(document.querySelector(".flipped"))return;
       wrap.classList.add("flipped");
-      confettiBurst();
+
+      confettiInstance({particleCount:120,spread:70,origin:{x:0.5,y:1}});
 
       stageIndex++;
       localStorage.setItem("valStage",stageIndex);
@@ -275,12 +261,12 @@ function showStage(){
   });
 }
 
-/* final note */
 function showFinal(){
   const area=document.getElementById("cardArea");
   const title=document.getElementById("stageTitle");
   const next=document.getElementById("nextArea");
 
+  // clear everything including NEXT button
   area.innerHTML="";
   next.innerHTML="";
   title.innerHTML="";
@@ -292,40 +278,6 @@ function showFinal(){
       Happy Valentine’s Day ❤️
     </div>
   `;
-}
-
-/* confetti */
-function confettiBurst(){
-  const colors = ["#ff4d6d","#ffd166","#06d6a0","#118ab2","#ef476f","#ffffff"];
-
-  for(let i=0;i<120;i++){
-    const piece=document.createElement("div");
-
-    piece.style.position="fixed";
-    piece.style.width="6px";
-    piece.style.height="12px";
-    piece.style.background=colors[Math.floor(Math.random()*colors.length)];
-    piece.style.left=(window.innerWidth/2 + (Math.random()*200-100))+"px";
-    piece.style.bottom="0px";
-    piece.style.zIndex=9999;
-    piece.style.pointerEvents="none";
-
-    const xVel=(Math.random()*8-4);
-    const yVel=(Math.random()*10+8);
-    const rot=(Math.random()*720-360);
-
-    piece.style.transform=`translate(0,0) rotate(${rot}deg)`;
-    piece.style.transition=`transform 1.4s cubic-bezier(.2,.8,.2,1), opacity 1.6s`;
-
-    document.body.appendChild(piece);
-
-    requestAnimationFrame(()=>{
-      piece.style.transform=`translate(${xVel*30}px,-${yVel*40}px) rotate(${rot}deg)`;
-      piece.style.opacity="0";
-    });
-
-    setTimeout(()=>piece.remove(),1600);
-  }
 }
 
 function resetAll(){
