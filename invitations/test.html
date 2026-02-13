@@ -263,6 +263,14 @@ function showStage(){
 
 function showFinal(){
   const area=document.getElementById("cardArea");
+  const title=document.getElementById("stageTitle");
+  const next=document.getElementById("nextArea");
+
+  // clear everything including NEXT button
+  area.innerHTML="";
+  next.innerHTML="";
+  title.innerHTML="";
+
   area.innerHTML=`
     <div class="finalNote">
       🧸<br><br>
