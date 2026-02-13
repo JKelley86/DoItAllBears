@@ -5,6 +5,9 @@
 <title>Bridget ❤️</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Confetti library -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
 <style>
 body{
   margin:0;
@@ -52,6 +55,15 @@ button{
   font-size:28px;
   color:#ff4d6d;
   z-index:10;
+}
+    /* FULL-SCREEN CONFETTI CANVAS */
+#confettiCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
 }
 
 /* FLOW */
@@ -256,7 +268,7 @@ function showStage(){
       stageIndex++;
       localStorage.setItem("valStage",stageIndex);
 
-      setTimeout(showStage,2000);
+      setTimeout(showStage,10000);
     };
 
     area.appendChild(wrap);
