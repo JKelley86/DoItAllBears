@@ -8,7 +8,7 @@
 <style>
 body{
   margin:0;
-  font-family: "Comic Sans MS", sans-serif;
+  font-family: "Comic Sans MS", cursive;
   background: linear-gradient(135deg,#ff9a9e,#fad0c4);
   height:100vh;
   overflow:hidden;
@@ -27,16 +27,7 @@ body{
   max-width:420px;
 }
 
-.bear{
-  font-size:90px;
-  margin:20px 0;
-  animation:bounce 2s infinite;
-}
-
-@keyframes bounce{
-  0%,100%{transform:translateY(0);}
-  50%{transform:translateY(-10px);}
-}
+.bear{font-size:90px;margin:20px 0;}
 
 button{
   font-size:18px;
@@ -63,25 +54,18 @@ button{
   z-index:10;
 }
 
-/* ==== DATE FLOW ==== */
-
+/* FLOW */
 #dateFlow{
   display:none;
   position:fixed;
   inset:0;
-  background:linear-gradient(135deg,#ffd6e0,#ffeef2);
+  background:#fff6f8;
   text-align:center;
   padding-top:40px;
 }
 
-.stageTitle{
-  font-size:28px;
-}
-
-.bearGuide{
-  font-size:60px;
-  margin-bottom:10px;
-}
+.stageTitle{font-size:28px;margin-bottom:10px;}
+.bearGuide{font-size:60px;}
 
 .cardArea{
   display:flex;
@@ -90,9 +74,10 @@ button{
   margin-top:40px;
 }
 
+/* handwritten cards */
 .flipCard{
-  width:190px;
-  height:240px;
+  width:200px;
+  height:250px;
   perspective:1000px;
 }
 
@@ -104,36 +89,44 @@ button{
   transition:.6s;
 }
 
-.flipCard.flipped .inner{
-  transform:rotateY(180deg);
-}
+.flipCard.flipped .inner{transform:rotateY(180deg);}
 
 .front,.back{
   position:absolute;
   inset:0;
-  border-radius:20px;
+  border-radius:15px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:22px;
+  padding:20px;
+  text-align:center;
   backface-visibility:hidden;
-  box-shadow:0 12px 30px rgba(0,0,0,0.2);
+  box-shadow:0 10px 25px rgba(0,0,0,0.2);
 }
 
 .front{
-  background:white;
+  background:#fffefc;
+  font-family: "Comic Sans MS", cursive;
+  font-size:22px;
 }
 
 .back{
-  background:#ff4d6d;
-  color:white;
+  background:#fffefc;
   transform:rotateY(180deg);
-  padding:20px;
+  font-size:20px;
+  border:2px dashed #ff4d6d;
 }
 
-.finalScreen{
-  font-size:30px;
-  margin-top:40px;
+.nextBtn{
+  margin-top:30px;
+  font-size:20px;
+  background:#ff4d6d;
+  color:white;
+}
+
+.finalNote{
+  font-size:26px;
+  padding:40px;
 }
 
 .resetBtn{
@@ -157,20 +150,19 @@ button{
 
 <div class="celebrate" id="celebrate">
   <div>YAY!!! 💖</div>
-  <div>You made me the happiest</div>
 </div>
 
-<!-- DATE FLOW -->
 <div id="dateFlow">
   <div class="bearGuide">🧸</div>
   <div class="stageTitle" id="stageTitle"></div>
   <div class="cardArea" id="cardArea"></div>
-  <div class="finalScreen" id="finalScreen"></div>
+  <div id="nextArea"></div>
 </div>
 
 <button class="resetBtn" onclick="resetAll()">reset</button>
 
 <script>
+/* dodge no */
 const noBtn=document.getElementById("noBtn");
 noBtn.addEventListener("mouseenter",()=>{
   noBtn.style.position="absolute";
@@ -178,6 +170,7 @@ noBtn.addEventListener("mouseenter",()=>{
   noBtn.style.top=Math.random()*window.innerHeight+"px";
 });
 
+/* yes */
 const yesBtn=document.getElementById("yesBtn");
 const celebrate=document.getElementById("celebrate");
 
@@ -186,30 +179,34 @@ yesBtn.onclick=()=>{
   setTimeout(()=>{
     celebrate.style.display="none";
     startFlow();
-  },2000);
+  },1500);
 };
 
-/* ====== STAGES ====== */
+/* ===== STAGES EDIT HERE ===== */
 const stages=[
 {
-title:"Breakfast time 🍳",
+title:"Breakfast 🍳",
 options:["Breakfast in bed 🧸","Go get breakfast ☕"]
 },
 {
-title:"Morning adventure 🌤",
+title:"Morning 🌤",
 options:["Shopping 🛍️","Park walk 🌳"]
 },
 {
-title:"Next stop 💕",
-options:["Coffee date ☕","Arcade 🎮"]
+title:"Midday 💕",
+options:["Coffee ☕","Arcade 🎮"]
 },
 {
-title:"Afternoon adventure",
+title:"Afternoon 🤸",
 options:["Bowling 🎳","Mini golf ⛳"]
 },
 {
-title:"Evening plans 🌙",
+title:"Dinner 😋",
 options:["Dinner out 🍝","Cook together 🍳"]
+},
+{
+title:"Evening 🌙",
+options:["Competitive gaming 🎮","Fort movie 🎬"]
 }
 ];
 
@@ -223,20 +220,16 @@ function startFlow(){
 function showStage(){
   const title=document.getElementById("stageTitle");
   const area=document.getElementById("cardArea");
-  const final=document.getElementById("finalScreen");
+  const next=document.getElementById("nextArea");
 
   area.innerHTML="";
-  final.innerHTML="";
+  next.innerHTML="";
 
   if(stageIndex>=stages.length){
-    title.innerHTML="Final card 💖";
+    title.innerHTML="One more thing 💌";
 
-    final.innerHTML=`
-    <div style="font-size:40px">🧸</div>
-    <div>Best Valentine ever</div>
-    <div style="margin-top:20px;font-size:20px">
-    Now we just enjoy the rest of the day together 💕
-    </div>
+    next.innerHTML=`
+      <button class="nextBtn" onclick="showFinal()">Next</button>
     `;
     return;
   }
@@ -249,7 +242,7 @@ function showStage(){
 
     wrap.innerHTML=`
       <div class="inner">
-        <div class="front">Pick me</div>
+        <div class="front">Pick one</div>
         <div class="back">${option}</div>
       </div>
     `;
@@ -258,19 +251,73 @@ function showStage(){
       if(document.querySelector(".flipped")) return;
 
       wrap.classList.add("flipped");
+      confettiBurst();
+
       stageIndex++;
       localStorage.setItem("valStage",stageIndex);
 
-      setTimeout(showStage,2500);
+      setTimeout(showStage,2000);
     };
 
     area.appendChild(wrap);
   });
 }
 
+/* final note */
+function showFinal(){
+  const area=document.getElementById("cardArea");
+  const title=document.getElementById("stageTitle");
+  const next=document.getElementById("nextArea");
+
+  area.innerHTML="";
+  next.innerHTML="";
+  title.innerHTML="";
+
+  area.innerHTML=`
+    <div class="finalNote">
+      🧸<br><br>
+      Thank you for going on this adventure with me and I hope I could make this day special for you! I love you more than anything Mama Bear!<br><br>
+      Happy Valentine’s Day ❤️
+    </div>
+  `;
+}
+
+/* confetti */
+function confettiBurst(){
+  const colors = ["#ff4d6d","#ffd166","#06d6a0","#118ab2","#ef476f","#ffffff"];
+
+  for(let i=0;i<120;i++){
+    const piece=document.createElement("div");
+
+    piece.style.position="fixed";
+    piece.style.width="6px";
+    piece.style.height="12px";
+    piece.style.background=colors[Math.floor(Math.random()*colors.length)];
+    piece.style.left=(window.innerWidth/2 + (Math.random()*200-100))+"px";
+    piece.style.bottom="0px";
+    piece.style.zIndex=9999;
+    piece.style.pointerEvents="none";
+
+    const xVel=(Math.random()*8-4);
+    const yVel=(Math.random()*10+8);
+    const rot=(Math.random()*720-360);
+
+    piece.style.transform=`translate(0,0) rotate(${rot}deg)`;
+    piece.style.transition=`transform 1.4s cubic-bezier(.2,.8,.2,1), opacity 1.6s`;
+
+    document.body.appendChild(piece);
+
+    requestAnimationFrame(()=>{
+      piece.style.transform=`translate(${xVel*30}px,-${yVel*40}px) rotate(${rot}deg)`;
+      piece.style.opacity="0";
+    });
+
+    setTimeout(()=>piece.remove(),1600);
+  }
+}
+
 function resetAll(){
   localStorage.removeItem("valStage");
-  stageIndex=0;
   location.reload();
 }
 </script>
