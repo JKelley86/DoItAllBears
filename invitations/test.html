@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Bridget ❤️</title>
+<title>Date Planner</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -10,69 +10,43 @@
 <style>
 body{
   margin:0;
-  font-family: "Comic Sans MS", cursive;
-  background: linear-gradient(135deg,#ff9a9e,#fad0c4);
+  font-family:"Comic Sans MS",cursive;
+  background:linear-gradient(135deg,#c2e9fb,#f9f7d9);
   height:100vh;
-  overflow:hidden;
   display:flex;
   align-items:center;
   justify-content:center;
+  overflow:hidden;
 }
 
 .card{
   background:white;
-  padding:40px;
+  padding:35px;
   border-radius:25px;
   text-align:center;
-  box-shadow:0 15px 40px rgba(0,0,0,0.2);
+  box-shadow:0 15px 40px rgba(0,0,0,.2);
   width:90%;
-  max-width:420px;
+  max-width:500px;
 }
 
-.bear{font-size:90px;margin:20px 0;}
+select{
+  padding:10px;
+  margin:10px;
+  font-size:16px;
+  border-radius:10px;
+}
 
 button{
+  padding:12px 22px;
   font-size:18px;
-  padding:12px 25px;
   border:none;
-  border-radius:30px;
+  border-radius:25px;
+  background:#ff4d6d;
+  color:white;
   cursor:pointer;
-  margin:10px;
 }
 
-#yesBtn{background:#ff4d6d;color:white;}
-#noBtn{background:#ccc;}
-
-#confettiCanvas{
-  position:fixed;
-  inset:0;
-  width:100vw;
-  height:100vh;
-  pointer-events:none;
-  z-index:9999;
-}
-
-/* 🎉 CELEBRATION SCREEN */
-#celebrationScreen{
-  position:fixed;
-  inset:0;
-  background:white;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  z-index:20;
-  font-size:32px;
-  color:#ff4d6d;
-}
-
-#celebrationScreen img{
-  width:300px;
-  margin-top:20px;
-}
-
-/* FLOW */
-#dateFlow{
+#stageArea{
   display:none;
   position:fixed;
   inset:0;
@@ -82,55 +56,35 @@ button{
 }
 
 .stageTitle{font-size:28px;margin-bottom:10px;}
-.bearGuide{font-size:60px;}
+.cardArea{display:flex;justify-content:center;gap:40px;margin-top:40px;}
 
-.cardArea{
-  display:flex;
-  justify-content:center;
-  gap:40px;
-  margin-top:40px;
-}
-
-.flipCard{
-  width:200px;
-  height:250px;
-  perspective:1000px;
-}
-
-.inner{
-  width:100%;
-  height:100%;
-  position:relative;
-  transform-style:preserve-3d;
-  transition:.6s;
-}
-
+.flipCard{width:200px;height:240px;perspective:1000px;}
+.inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:.6s;}
 .flipCard.flipped .inner{transform:rotateY(180deg);}
 
 .front,.back{
   position:absolute;
   inset:0;
-  border-radius:15px;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:20px;
-  text-align:center;
+  border-radius:15px;
   backface-visibility:hidden;
-  box-shadow:0 10px 25px rgba(0,0,0,0.2);
+  box-shadow:0 10px 25px rgba(0,0,0,.2);
+  padding:20px;
 }
 
-.front{background:#fffefc;font-size:22px;}
-.back{background:#fffefc;transform:rotateY(180deg);font-size:20px;border:2px dashed #ff4d6d;}
+.front{background:#fff;}
+.back{
+  background:#fff;
+  transform:rotateY(180deg);
+  border:2px dashed #ff4d6d;
+}
 
-.nextBtn{margin-top:30px;font-size:20px;background:#ff4d6d;color:white;}
-.finalNote{font-size:26px;padding:40px;}
-
-.resetBtn{
+#confettiCanvas{
   position:fixed;
-  bottom:10px;
-  right:10px;
-  font-size:12px;
+  inset:0;
+  pointer-events:none;
 }
 </style>
 </head>
@@ -139,96 +93,105 @@ button{
 
 <canvas id="confettiCanvas"></canvas>
 
-<div class="card">
-  <h1>Bridget ❤️</h1>
-  <p>Will you be my Valentine?</p>
-  <div class="bear">🧸</div>
-  <button id="yesBtn">Yes 💕</button>
-  <button id="noBtn">No 😅</button>
+<div class="card" id="setup">
+  <h1>Choose the vibe</h1>
+
+  <select id="typeSelect">
+    <option value="">Stay in / Go out / Combo</option>
+    <option value="stay">Stay in</option>
+    <option value="out">Go out</option>
+    <option value="combo">Combination</option>
+  </select>
+
+  <select id="budgetSelect">
+    <option value="">Cheap / Go wild</option>
+    <option value="cheap">Cheap</option>
+    <option value="wild">Go wild</option>
+  </select>
+
+  <br>
+  <button onclick="startFlow()">Start</button>
 </div>
 
-<!-- 🎉 NEW CELEBRATION PAGE -->
-<div id="celebrationScreen">
-  <div>YAY!!! 💖</div>
-  <img src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif">
-</div>
-
-<div id="dateFlow">
-  <div class="bearGuide">🧸</div>
+<div id="stageArea">
   <div class="stageTitle" id="stageTitle"></div>
   <div class="cardArea" id="cardArea"></div>
-  <div id="nextArea"></div>
 </div>
 
-<button class="resetBtn" onclick="resetAll()">reset</button>
-
 <script>
-/* NO BUTTON */
-const noBtn=document.getElementById("noBtn");
-noBtn.addEventListener("mouseenter",()=>{
-  noBtn.style.position="absolute";
-  noBtn.style.left=Math.random()*window.innerWidth+"px";
-  noBtn.style.top=Math.random()*window.innerHeight+"px";
-});
+/* =========================
+   EDIT OPTIONS HERE
+========================= */
 
-/* CONFETTI */
-const confettiCanvas=document.getElementById("confettiCanvas");
-function resize(){const dpr=Math.max(1,window.devicePixelRatio||1);
-confettiCanvas.width=innerWidth*dpr;confettiCanvas.height=innerHeight*dpr;}
-resize();addEventListener("resize",resize);
+const DATA = {
+stay:{
+cheap:[
+ {title:"Breakfast", options:["Pancakes","Bagels"]},
+ {title:"Activity", options:["Board games","Movie"]},
+ {title:"Dinner", options:["Cook pasta","Order pizza"]}
+],
+wild:[
+ {title:"Breakfast", options:["Fancy brunch","Steak & eggs"]},
+ {title:"Activity", options:["Spa day","Gaming marathon"]},
+ {title:"Dinner", options:["Steak dinner","Sushi night"]}
+]
+},
 
-const confettiInstance=confetti.create(confettiCanvas,{resize:false,useWorker:true});
+out:{
+cheap:[
+ {title:"Morning", options:["Coffee shop","Walk"]},
+ {title:"Activity", options:["Arcade","Bowling"]},
+ {title:"Dinner", options:["Diner","Burgers"]}
+],
+wild:[
+ {title:"Morning", options:["Brunch","Cafe"]},
+ {title:"Activity", options:["Shopping","Museum"]},
+ {title:"Dinner", options:["Nice dinner","Bar hopping"]}
+]
+},
 
-/* YES CLICK */
-const yesBtn=document.getElementById("yesBtn");
-const celebration=document.getElementById("celebrationScreen");
-
-yesBtn.onclick=()=>{
-
-  celebration.style.display="flex";
-
-  // BIG CONFETTI
-  confettiInstance({
-    particleCount:300,
-    spread:120,
-    startVelocity:70,
-    origin:{x:0.5,y:1}
-  });
-
-  setTimeout(()=>{
-    startFlow();
-  },2500);
+combo:{
+cheap:[
+ {title:"Morning", options:["Coffee out","Breakfast home"]},
+ {title:"Activity", options:["Park","Movie"]},
+ {title:"Dinner", options:["Takeout","Cook"]}
+],
+wild:[
+ {title:"Morning", options:["Brunch","Cafe"]},
+ {title:"Activity", options:["Bowling","Arcade"]},
+ {title:"Dinner", options:["Restaurant","Dessert bar"]}
+]
+}
 };
 
-/* ===== STAGES ===== */
-const stages=[
-{title:"Breakfast 🍳",options:["Breakfast in bed 🧸","Go get breakfast ☕"]},
-{title:"Morning 🌤",options:["Shopping 🛍️","Park walk 🌳"]},
-{title:"Midday 💕",options:["Coffee ☕","Arcade 🎮"]},
-{title:"Afternoon 🤸",options:["Bowling 🎳","Mini golf ⛳"]},
-{title:"Dinner 😋",options:["Dinner out 🍝","Cook together 🍳"]},
-{title:"Evening 🌙",options:["Competitive gaming 🎮","Fort movie 🎬"]}
-];
+/* ========================= */
 
-let stageIndex=parseInt(localStorage.getItem("valStage"))||0;
+let stages=[];
+let stageIndex=0;
 
 function startFlow(){
-  celebration.style.display="none";
-  document.getElementById("dateFlow").style.display="block";
+  const type=document.getElementById("typeSelect").value;
+  const budget=document.getElementById("budgetSelect").value;
+
+  if(!type || !budget) return;
+
+  stages = DATA[type][budget];
+  stageIndex = 0;
+
+  document.getElementById("setup").style.display="none";
+  document.getElementById("stageArea").style.display="block";
+
   showStage();
 }
 
 function showStage(){
   const title=document.getElementById("stageTitle");
   const area=document.getElementById("cardArea");
-  const next=document.getElementById("nextArea");
 
   area.innerHTML="";
-  next.innerHTML="";
 
   if(stageIndex>=stages.length){
-    title.innerHTML="One more thing 💌";
-    next.innerHTML=`<button class="nextBtn" onclick="showFinal()">Next</button>`;
+    title.innerHTML="Done 😎";
     return;
   }
 
@@ -246,43 +209,30 @@ function showStage(){
     `;
 
     wrap.onclick=()=>{
-      if(document.querySelector(".flipped"))return;
-      wrap.classList.add("flipped");
+      if(document.querySelector(".flipped")) return;
 
-      confettiInstance({particleCount:120,spread:70,origin:{x:0.5,y:1}});
+      wrap.classList.add("flipped");
+      fireConfetti();
 
       stageIndex++;
-      localStorage.setItem("valStage",stageIndex);
-
-      setTimeout(showStage,10000);
+      setTimeout(showStage,1800);
     };
 
     area.appendChild(wrap);
   });
 }
 
-function showFinal(){
-  const area=document.getElementById("cardArea");
-  const title=document.getElementById("stageTitle");
-  const next=document.getElementById("nextArea");
+/* CONFETTI */
+const confettiCanvas=document.getElementById("confettiCanvas");
+const confettiInstance=confetti.create(confettiCanvas,{resize:true,useWorker:true});
 
-  // clear everything including NEXT button
-  area.innerHTML="";
-  next.innerHTML="";
-  title.innerHTML="";
-
-  area.innerHTML=`
-    <div class="finalNote">
-      🧸<br><br>
-      Thank you for going on this adventure with me and I hope I could make this day special for you! I love you more than anything Mama Bear!<br><br>
-      Happy Valentine’s Day ❤️
-    </div>
-  `;
-}
-
-function resetAll(){
-  localStorage.removeItem("valStage");
-  location.reload();
+function fireConfetti(){
+  confettiInstance({
+    particleCount:180,
+    spread:80,
+    startVelocity:70,
+    origin:{x:.5,y:1}
+  });
 }
 </script>
 
