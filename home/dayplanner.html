@@ -1163,24 +1163,22 @@ function showPlanSummary() {
 const STORAGE_KEY = 'dateplannerSurprise';
 
 function startSurpriseMode() {
-  // Check for saved state first
-  checkSavedSurprise().then(saved => {
-    if (saved) {
-      document.getElementById('savedNotice').classList.add('show');
-    }
-    goTo('surpriseSetup');
-  });
+  const saved = checkSavedSurprise();
+  if (saved) {
+    document.getElementById('savedNotice').classList.add('show');
+  }
+  goTo('surpriseSetup');
 }
 
-async function checkSavedSurprise() {
+function checkSavedSurprise() {
   try {
-    const res = await window.storage.get(STORAGE_KEY);
-    return res && res.value ? JSON.parse(res.value) : null;
+    const val = localStorage.getItem(STORAGE_KEY);
+    return val ? JSON.parse(val) : null;
   } catch { return null; }
 }
 
-async function resumeSurprise() {
-  const saved = await checkSavedSurprise();
+function resumeSurprise() {
+  const saved = checkSavedSurprise();
   if (saved) {
     surpriseStages  = saved.stages;
     surpriseIndex   = saved.index;
@@ -1190,7 +1188,7 @@ async function resumeSurprise() {
   }
 }
 
-async function startSurprise() {
+function startSurprise() {
   const type   = pillSelections.stype;
   const budget = pillSelections.sbudget;
   if (!type || !budget) return;
@@ -1208,15 +1206,15 @@ async function startSurprise() {
   surprisePicked = [];
   isTransitioning = false;
 
-  await saveSurpriseState();
+  saveSurpriseState();
   document.getElementById('savedNotice').classList.remove('show');
   goTo('surpriseActive');
   renderSurpriseStage();
 }
 
-async function saveSurpriseState() {
+function saveSurpriseState() {
   try {
-    await window.storage.set(STORAGE_KEY, JSON.stringify({
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
       stages: surpriseStages,
       index:  surpriseIndex,
       picked: surprisePicked
@@ -1224,8 +1222,8 @@ async function saveSurpriseState() {
   } catch (e) { console.warn('Storage unavailable:', e); }
 }
 
-async function clearSurpriseState() {
-  try { await window.storage.delete(STORAGE_KEY); } catch {}
+function clearSurpriseState() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch {}
 }
 
 function renderSurpriseStage() {
@@ -1297,16 +1295,16 @@ function renderSurpriseStage() {
   });
 }
 
-async function markDone(chosenOption) {
+function markDone(chosenOption) {
   surprisePicked.push({
     title:  surpriseStages[surpriseIndex].title,
     chosen: chosenOption
   });
   surpriseIndex++;
-  await saveSurpriseState();
+  saveSurpriseState();
 
   if (surpriseIndex >= surpriseStages.length) {
-    await clearSurpriseState();
+    clearSurpriseState();
     showSurpriseDone();
   } else {
     renderSurpriseStage();
@@ -1323,9 +1321,8 @@ function showSurpriseDone() {
 function confirmExitSurprise() {
   if (confirm('Go back to home? Your surprise day progress is saved.')) {
     goTo('homeScreen');
-    checkSavedSurprise().then(s => {
-      if (s) document.getElementById('savedNotice').classList.add('show');
-    });
+    const saved = checkSavedSurprise();
+    if (saved) document.getElementById('savedNotice').classList.add('show');
   }
 }
 
@@ -1358,8 +1355,8 @@ function fireConfetti(size) {
 /* ================================================
    ON LOAD — check for saved surprise day
 ================================================ */
-window.addEventListener('load', async () => {
-  const saved = await checkSavedSurprise();
+window.addEventListener('load', () => {
+  const saved = checkSavedSurprise();
   if (saved) document.getElementById('savedNotice').classList.add('show');
 });
 </script>
