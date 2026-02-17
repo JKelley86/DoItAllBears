@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Date Planner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --cream: #fdf6ee;
+  --warm: #f5e6d3;
+  --rose: #e8a598;
+  --blush: #d4756a;
+  --deep: #8b3a3a;
+  --ink: #2c1810;
+  --gold: #c9973f;
+  --muted: #9b7b72;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Lato', sans-serif;
+  background: var(--cream);
+  min-height: 100vh;
+  color: var(--ink);
+}
+
+/* subtle paper texture via repeating gradient */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(0,0,0,.018) 28px, rgba(0,0,0,.018) 29px),
+    repeating-linear-gradient(90deg, transparent, transparent 28px, rgba(0,0,0,.01) 28px, rgba(0,0,0,.01) 29px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* =====================
+   SCREENS
+===================== */
+.screen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  z-index: 1;
+  padding: 40px 20px;
+}
+.screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.screen.active.top { justify-content: flex-start; padding-top: 50px; }
+
+/* =====================
+   HOME SCREEN
+===================== */
+#homeScreen {
+  background: var(--cream);
+}
+
+.home-inner {
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+}
+
+.logo-date {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 16px;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.logo-main {
+  font-family: 'Playfair Display', serif;
+  font-size: 52px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.logo-sub {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--muted);
+  margin-bottom: 50px;
+}
+
+.divider {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 0 auto 50px;
+}
+
+.mode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.mode-card {
+  background: white;
+  border: 1.5px solid #e8ddd6;
+  border-radius: 18px;
+  padding: 32px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(139,58,58,.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.mode-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--warm) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  border-radius: 18px;
+}
+
+.mode-card:hover {
+  border-color: var(--rose);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(139,58,58,.14);
+}
+
+.mode-card:hover::after { opacity: 1; }
+
+.mode-card > * { position: relative; z-index: 1; }
+
+.mode-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.mode-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.mode-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.surprise-notice {
+  background: linear-gradient(135deg, #fff8f0, #fdf0e8);
+  border: 1px solid #f0d8c8;
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: var(--muted);
+  display: none;
+  align-items: center;
+  gap: 10px;
+}
+
+.surprise-notice.show { display: flex; }
+.notice-dot {
+  width: 8px; height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+/* =====================
+   PLAN SETUP SCREEN
+===================== */
+#planSetup {
+  background: var(--cream);
+}
+
+.setup-card {
+  background: white;
+  border-radius: 24px;
+  padding: 44px 40px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 4px 40px rgba(139,58,58,.1);
+  border: 1px solid #ecddd5;
+}
+
+.screen-back {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  background: white;
+  border: 1.5px solid #e8ddd6;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Lato', sans-serif;
+  z-index: 10;
+}
+
+.screen-back:hover { border-color: var(--rose); color: var(--blush); }
+
+.setup-eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.setup-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.setup-sub {
+  color: var(--muted);
+  font-size: 15px;
+  margin-bottom: 36px;
+  line-height: 1.5;
+}
+
+.field-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.field-group { margin-bottom: 22px; }
+
+.pill-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: 1.5px solid #e8ddd6;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--ink);
+  font-family: 'Lato', sans-serif;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.pill:hover { border-color: var(--rose); }
+.pill.selected {
+  background: var(--blush);
+  border-color: var(--blush);
+  color: white;
+  font-weight: 700;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 16px;
+  background: var(--deep);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Lato', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.03em;
+  margin-top: 10px;
+}
+
+.btn-primary:hover { background: var(--blush); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,58,58,.25); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* =====================
+   SURPRISE SETUP SCREEN
+===================== */
+#surpriseSetup {
+  background: var(--cream);
+}
+
+/* =====================
+   PLAN PLAY SCREEN
+===================== */
+#planPlay {
+  background: linear-gradient(160deg, #8b3a3a 0%, #6b2828 100%);
+}
+
+.play-container {
+  max-width: 860px;
+  width: 100%;
+}
+
+.play-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.play-progress-wrap {
+  background: rgba(255,255,255,.12);
+  border-radius: 14px;
+  padding: 16px 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.progress-bar-outer {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, var(--rose), var(--gold));
+  border-radius: 3px;
+  transition: width 0.6s ease;
+  box-shadow: 0 0 8px rgba(232,165,152,.5);
+}
+
+.progress-label {
+  color: rgba(255,255,255,.7);
+  font-size: 13px;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.play-category {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 15px;
+  color: rgba(255,255,255,.6);
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+.play-question {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  color: white;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.play-hint {
+  color: rgba(255,255,255,.5);
+  font-size: 14px;
+}
+
+.cards-row {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.flip-card {
+  width: 220px;
+  height: 270px;
+  perspective: 1200px;
+  cursor: pointer;
+}
+
+.flip-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(.4,0,.2,1);
+}
+
+.flip-card:hover:not(.flipped) .flip-inner {
+  transform: rotateY(8deg) rotateX(-4deg);
+}
+
+.flip-card.flipped .flip-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-front, .flip-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  padding: 30px 22px;
+  text-align: center;
+}
+
+.flip-front {
+  background: rgba(255,255,255,.1);
+  border: 1.5px solid rgba(255,255,255,.2);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 8px 32px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.15);
+}
+
+.flip-front-icon {
+  font-size: 36px;
+  margin-bottom: 16px;
+  opacity: 0.7;
+}
+
+.flip-front-text {
+  color: rgba(255,255,255,.7);
+  font-size: 15px;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+}
+
+.flip-back {
+  background: var(--cream);
+  border: 2px solid var(--warm);
+  transform: rotateY(180deg);
+  box-shadow: 0 12px 40px rgba(0,0,0,.25);
+}
+
+.flip-back-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+.flip-back-check {
+  font-size: 28px;
+  margin-top: 12px;
+  opacity: 0;
+  transition: opacity 0.3s 0.5s;
+}
+
+.flip-card.flipped .flip-back-check { opacity: 1; }
+
+.play-back-btn {
+  background: rgba(255,255,255,.1);
+  border: 1.5px solid rgba(255,255,255,.25);
+  color: rgba(255,255,255,.7);
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  padding: 10px 22px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: none;
+}
+
+.play-back-btn:hover { background: rgba(255,255,255,.18); color: white; }
+.play-back-btn.visible { display: inline-flex; align-items: center; gap: 8px; }
+
+/* =====================
+   PLAN SUMMARY SCREEN
+===================== */
+#planSummary {
+  background: var(--cream);
+}
+
+.summary-card {
+  background: white;
+  border-radius: 24px;
+  padding: 48px 40px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 4px 40px rgba(139,58,58,.1);
+  border: 1px solid #ecddd5;
+  text-align: center;
+}
+
+.summary-icon { font-size: 54px; margin-bottom: 16px; }
+
+.summary-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 34px;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.summary-date {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 32px;
+}
+
+.summary-items { margin-bottom: 36px; }
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #f5ece6;
+  text-align: left;
+}
+
+.summary-row:last-child { border-bottom: none; }
+
+.summary-row-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  width: 90px;
+  flex-shrink: 0;
+}
+
+.summary-row-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 19px;
+  color: var(--ink);
+  flex: 1;
+}
+
+.summary-row-icon { font-size: 22px; margin-left: 12px; }
+
+.btn-outline {
+  background: white;
+  color: var(--deep);
+  border: 1.5px solid #e8ddd6;
+  border-radius: 12px;
+  font-family: 'Lato', sans-serif;
+  font-size: 15px;
+  padding: 13px 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-right: 12px;
+}
+
+.btn-outline:hover { border-color: var(--rose); }
+
+/* =====================
+   SURPRISE ACTIVE SCREEN
+===================== */
+#surpriseActive {
+  background: var(--cream);
+}
+
+.surprise-wrap {
+  max-width: 720px;
+  width: 100%;
+}
+
+.surprise-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.surprise-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+.surprise-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 38px;
+  color: var(--ink);
+  line-height: 1.15;
+  margin-bottom: 6px;
+}
+
+.surprise-sub {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+/* Envelope cards — two side by side */
+.envelope-area {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin: 0 auto 32px;
+  flex-wrap: wrap;
+}
+
+.envelope-card {
+  width: 260px;
+  height: 340px;
+  perspective: 1200px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.envelope-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(.4,0,.2,1);
+}
+
+.envelope-card.flipped .envelope-inner {
+  transform: rotateY(180deg);
+}
+
+.env-front, .env-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  padding: 36px 30px;
+  text-align: center;
+}
+
+.env-front {
+  background: linear-gradient(150deg, var(--deep) 0%, #6b2828 100%);
+  box-shadow: 0 16px 50px rgba(139,58,58,.35);
+}
+
+.env-wax { font-size: 56px; margin-bottom: 20px; }
+
+.env-front-title {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 22px;
+  color: rgba(255,255,255,.85);
+  margin-bottom: 10px;
+}
+
+.env-front-hint {
+  font-size: 13px;
+  color: rgba(255,255,255,.45);
+  letter-spacing: 0.08em;
+}
+
+/* Pulsing ring on envelope */
+.env-front::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 30px;
+  border: 2px solid rgba(201,151,63,.25);
+  animation: ringPulse 2.5s infinite;
+}
+
+@keyframes ringPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 0; transform: scale(1.04); }
+}
+
+.env-back {
+  background: white;
+  border: 2px solid var(--warm);
+  transform: rotateY(180deg);
+  box-shadow: 0 16px 50px rgba(0,0,0,.12);
+}
+
+.env-back-category {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+
+.env-back-activity {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: 24px;
+}
+
+.env-done-btn {
+  background: var(--deep);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 13px 28px;
+  font-family: 'Lato', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: none;
+}
+
+.envelope-card.flipped .env-done-btn { display: inline-block; }
+.env-done-btn:hover { background: var(--blush); transform: translateY(-2px); }
+
+/* Progress dots */
+.surprise-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e8ddd6;
+  transition: all 0.3s;
+}
+
+.dot.done { background: var(--blush); }
+.dot.active { background: var(--gold); transform: scale(1.3); box-shadow: 0 0 0 3px rgba(201,151,63,.2); }
+
+.surprise-status {
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.reset-link {
+  display: inline-block;
+  margin-top: 28px;
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: underline;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.reset-link:hover { opacity: 1; }
+
+/* =====================
+   SURPRISE DONE SCREEN
+===================== */
+#surpriseDone {
+  background: var(--cream);
+}
+
+.done-card {
+  background: white;
+  border-radius: 24px;
+  padding: 56px 40px;
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 4px 40px rgba(139,58,58,.1);
+  border: 1px solid #ecddd5;
+}
+
+.done-card .done-icon { font-size: 64px; margin-bottom: 20px; }
+
+.done-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 38px;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+.done-message {
+  font-size: 16px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 36px;
+}
+
+/* =====================
+   CANVAS / SHARED
+===================== */
+#confettiCanvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.fade-enter {
+  animation: fadeEnter 0.4s ease both;
+}
+
+@keyframes fadeEnter {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 520px) {
+  .mode-grid { grid-template-columns: 1fr; }
+  .logo-main { font-size: 40px; }
+  .play-question { font-size: 28px; }
+  .flip-card { width: 160px; height: 200px; }
+  .flip-back-text { font-size: 17px; }
+  .summary-card, .setup-card, .done-card { padding: 36px 24px; }
+  .envelope-card { width: 200px; height: 270px; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="confettiCanvas"></canvas>
+
+<!-- =================== HOME =================== -->
+<div class="screen active" id="homeScreen">
+  <div class="home-inner fade-enter">
+    <div class="logo-date">for the two of you</div>
+    <div class="logo-main">Date<br>Planner</div>
+    <div class="logo-sub">make today memorable</div>
+    <div class="divider"></div>
+
+    <div class="mode-grid">
+      <div class="mode-card" onclick="goTo('planSetup')">
+        <span class="mode-icon">🗓️</span>
+        <div class="mode-title">Plan the Day</div>
+        <div class="mode-desc">Pick your vibe & budget, then build your whole day at once</div>
+      </div>
+      <div class="mode-card" onclick="startSurpriseMode()">
+        <span class="mode-icon">✉️</span>
+        <div class="mode-title">Surprise Me</div>
+        <div class="mode-desc">She reveals each activity one at a time as you go</div>
+      </div>
+    </div>
+
+    <div class="surprise-notice" id="savedNotice">
+      <div class="notice-dot"></div>
+      <span>You have a surprise day in progress — <strong style="cursor:pointer;color:var(--blush)" onclick="resumeSurprise()">tap to continue</strong></span>
+    </div>
+  </div>
+</div>
+
+<!-- =================== PLAN SETUP =================== -->
+<div class="screen" id="planSetup">
+  <button class="screen-back" onclick="goTo('homeScreen')">← Back</button>
+  <div class="setup-card fade-enter">
+    <div class="setup-eyebrow">Plan the Day</div>
+    <div class="setup-title">What kind of day are you planning?</div>
+    <div class="setup-sub">Pick your vibe and budget, then flip cards to build your full itinerary.</div>
+
+    <div class="field-group">
+      <div class="field-label">Where</div>
+      <div class="pill-group">
+        <div class="pill" onclick="selectPill(this,'type','stay')">🏠 Stay in</div>
+        <div class="pill" onclick="selectPill(this,'type','out')">🌆 Go out</div>
+        <div class="pill" onclick="selectPill(this,'type','combo')">🔄 Mix it up</div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Budget</div>
+      <div class="pill-group">
+        <div class="pill" onclick="selectPill(this,'budget','cheap')">💰 Affordable</div>
+        <div class="pill" onclick="selectPill(this,'budget','wild')">💎 Go all out</div>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="planStartBtn" onclick="startPlan()" disabled>Let's Plan →</button>
+  </div>
+</div>
+
+<!-- =================== SURPRISE SETUP =================== -->
+<div class="screen" id="surpriseSetup">
+  <button class="screen-back" onclick="goTo('homeScreen')">← Back</button>
+  <div class="setup-card fade-enter">
+    <div class="setup-eyebrow">Surprise Mode</div>
+    <div class="setup-title">Set up the surprise</div>
+    <div class="setup-sub">You choose the vibe — she won't see what's planned. She'll reveal each activity as the day unfolds.</div>
+
+    <div class="field-group">
+      <div class="field-label">Where</div>
+      <div class="pill-group">
+        <div class="pill" onclick="selectPill(this,'stype','stay')">🏠 Stay in</div>
+        <div class="pill" onclick="selectPill(this,'stype','out')">🌆 Go out</div>
+        <div class="pill" onclick="selectPill(this,'stype','combo')">🔄 Mix it up</div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Budget</div>
+      <div class="pill-group">
+        <div class="pill" onclick="selectPill(this,'sbudget','cheap')">💰 Affordable</div>
+        <div class="pill" onclick="selectPill(this,'sbudget','wild')">💎 Go all out</div>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="surpriseStartBtn" onclick="startSurprise()" disabled>Start the Surprise →</button>
+  </div>
+</div>
+
+<!-- =================== PLAN PLAY =================== -->
+<div class="screen top" id="planPlay">
+  <button class="screen-back" style="position:fixed;top:24px;left:24px;" onclick="goTo('homeScreen')">← Exit</button>
+  <div class="play-container fade-enter">
+    <div class="play-header">
+      <div class="play-progress-wrap">
+        <div class="progress-bar-outer">
+          <div class="progress-bar-inner" id="planProgressBar"></div>
+        </div>
+        <div class="progress-label" id="planProgressLabel"></div>
+      </div>
+      <div class="play-category" id="planCategory"></div>
+      <div class="play-question" id="planQuestion"></div>
+      <div class="play-hint">Tap a card to reveal</div>
+    </div>
+    <div class="cards-row" id="planCards"></div>
+    <div style="text-align:center">
+      <button class="play-back-btn" id="planBackBtn" onclick="planGoBack()">← Choose again</button>
+    </div>
+  </div>
+</div>
+
+<!-- =================== PLAN SUMMARY =================== -->
+<div class="screen" id="planSummary">
+  <div class="summary-card fade-enter">
+    <div class="summary-icon">💑</div>
+    <div class="summary-title">Your Day Is Set</div>
+    <div class="summary-date" id="summaryDate"></div>
+    <div class="summary-items" id="summaryItems"></div>
+    <div>
+      <button class="btn-outline" onclick="goTo('planSetup')">Plan Again</button>
+      <button class="btn-primary" style="width:auto;padding:13px 24px;margin-top:0" onclick="goTo('homeScreen')">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- =================== SURPRISE ACTIVE =================== -->
+<div class="screen" id="surpriseActive">
+  <button class="screen-back" style="position:fixed;top:24px;left:24px;z-index:10" onclick="confirmExitSurprise()">← Home</button>
+  <div class="surprise-wrap fade-enter">
+    <div class="surprise-header">
+      <div class="surprise-eyebrow">Surprise Mode</div>
+      <div class="surprise-title" id="surpriseStageName">What's next?</div>
+      <div class="surprise-sub" id="surpriseSubtitle"></div>
+    </div>
+
+    <div class="surprise-dots" id="surpriseDots"></div>
+
+    <div class="envelope-area" id="envelopeArea"></div>
+
+    <div class="surprise-status" id="surpriseStatus"></div>
+    <div style="text-align:center">
+      <span class="reset-link" onclick="confirmResetSurprise()">Start a new surprise day</span>
+    </div>
+  </div>
+</div>
+
+<!-- =================== SURPRISE DONE =================== -->
+<div class="screen" id="surpriseDone">
+  <div class="done-card fade-enter">
+    <div class="done-icon">🥂</div>
+    <div class="done-title">What a day.</div>
+    <div class="done-message">You did it all. Hope today was everything and more.</div>
+    <button class="btn-primary" onclick="resetSurpriseAndHome()">Back to Home</button>
+  </div>
+</div>
+
+<script>
+/* ================================================
+   DATA
+================================================ */
+const DATA = {
+  stay: {
+    cheap: [
+      {title:"Breakfast",    category:"Morning",   options:["Homemade Pancakes","Bagels & Coffee"]},
+      {title:"Activity",     category:"Afternoon", options:["Board Games","Movie Marathon"]},
+      {title:"Dinner",       category:"Evening",   options:["Cook Pasta Together","Order Pizza"]}
+    ],
+    wild: [
+      {title:"Breakfast",    category:"Morning",   options:["Fancy Brunch Spread","Steak & Eggs"]},
+      {title:"Activity",     category:"Afternoon", options:["At-Home Spa Day","Gaming Marathon"]},
+      {title:"Dinner",       category:"Evening",   options:["Cook Steak Together","Premium Sushi Delivery"]}
+    ]
+  },
+  out: {
+    cheap: [
+      {title:"Morning",      category:"Morning",   options:["Local Coffee Shop","Nature Walk"]},
+      {title:"Activity",     category:"Afternoon", options:["Arcade","Bowling"]},
+      {title:"Dinner",       category:"Evening",   options:["Classic Diner","Burger Joint"]}
+    ],
+    wild: [
+      {title:"Morning",      category:"Morning",   options:["Upscale Brunch","Trendy Café"]},
+      {title:"Activity",     category:"Afternoon", options:["Shopping Spree","Art Museum"]},
+      {title:"Dinner",       category:"Evening",   options:["Fine Dining","Bar Hopping"]}
+    ]
+  },
+  combo: {
+    cheap: [
+      {title:"Morning",      category:"Morning",   options:["Coffee Shop Run","Breakfast at Home"]},
+      {title:"Activity",     category:"Afternoon", options:["Park Picnic","Movie Theater"]},
+      {title:"Dinner",       category:"Evening",   options:["Takeout Night","Cook Together"]}
+    ],
+    wild: [
+      {title:"Morning",      category:"Morning",   options:["Restaurant Brunch","Specialty Café"]},
+      {title:"Activity",     category:"Afternoon", options:["Bowling + Drinks","Escape Room"]},
+      {title:"Dinner",       category:"Evening",   options:["Nice Restaurant","Dessert Bar Tour"]}
+    ]
+  }
+};
+
+/* ================================================
+   STATE
+================================================ */
+const pillSelections = {};
+let planStages = [], planIndex = 0, planChoices = [];
+let surpriseStages = [], surpriseIndex = 0, surprisePicked = [];
+let isTransitioning = false;
+
+/* ================================================
+   NAVIGATION
+================================================ */
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+  });
+  const el = document.getElementById(id);
+  el.classList.add('active');
+  // Re-trigger fade on the inner fade-enter element
+  const inner = el.querySelector('.fade-enter');
+  if (inner) { inner.style.animation = 'none'; requestAnimationFrame(() => inner.style.animation = ''); }
+}
+
+/* ================================================
+   PILL SELECTIONS
+================================================ */
+function selectPill(el, key, value) {
+  // Deselect siblings in same group
+  el.parentElement.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  pillSelections[key] = value;
+  updateStartButtons();
+}
+
+function updateStartButtons() {
+  document.getElementById('planStartBtn').disabled = !(pillSelections.type && pillSelections.budget);
+  document.getElementById('surpriseStartBtn').disabled = !(pillSelections.stype && pillSelections.sbudget);
+}
+
+/* ================================================
+   PLAN MODE
+================================================ */
+function startPlan() {
+  planStages = DATA[pillSelections.type][pillSelections.budget];
+  planIndex = 0;
+  planChoices = [];
+  isTransitioning = false;
+  goTo('planPlay');
+  renderPlanStage();
+}
+
+function renderPlanStage() {
+  const category = document.getElementById('planCategory');
+  const question = document.getElementById('planQuestion');
+  const cards    = document.getElementById('planCards');
+  const backBtn  = document.getElementById('planBackBtn');
+  const bar      = document.getElementById('planProgressBar');
+  const label    = document.getElementById('planProgressLabel');
+
+  if (planIndex >= planStages.length) {
+    showPlanSummary();
+    return;
+  }
+
+  const stage = planStages[planIndex];
+  const pct   = (planIndex / planStages.length) * 100;
+
+  bar.style.width = pct + '%';
+  label.textContent = `${planIndex + 1} of ${planStages.length}`;
+  category.textContent = stage.category;
+  question.textContent = stage.title;
+  backBtn.classList.toggle('visible', planIndex > 0);
+
+  cards.innerHTML = '';
+
+  stage.options.forEach(option => {
+    const card = document.createElement('div');
+    card.className = 'flip-card';
+    card.innerHTML = `
+      <div class="flip-inner">
+        <div class="flip-front">
+          <div class="flip-front-icon">🎲</div>
+          <div class="flip-front-text">Tap to reveal</div>
+        </div>
+        <div class="flip-back">
+          <div class="flip-back-text">${option}</div>
+          <div class="flip-back-check">✓</div>
+        </div>
+      </div>`;
+
+    card.onclick = () => {
+      if (isTransitioning || cards.querySelector('.flipped')) return;
+      isTransitioning = true;
+      card.classList.add('flipped');
+      fireConfetti('small');
+      planChoices[planIndex] = { title: stage.title, option };
+      planIndex++;
+      setTimeout(() => { isTransitioning = false; renderPlanStage(); }, 1500);
+    };
+
+    cards.appendChild(card);
+  });
+}
+
+function planGoBack() {
+  if (planIndex > 0 && !isTransitioning) {
+    planIndex--;
+    planChoices.pop();
+    renderPlanStage();
+  }
+}
+
+function showPlanSummary() {
+  const now = new Date();
+  document.getElementById('summaryDate').textContent =
+    now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+
+  const items = document.getElementById('summaryItems');
+  items.innerHTML = '';
+  const icons = ['☀️','🎯','🌙'];
+  planChoices.forEach((c, i) => {
+    items.innerHTML += `
+      <div class="summary-row">
+        <div class="summary-row-label">${c.title}</div>
+        <div class="summary-row-value">${c.option}</div>
+        <div class="summary-row-icon">${icons[i] || '✨'}</div>
+      </div>`;
+  });
+
+  goTo('planSummary');
+  fireConfetti('big');
+}
+
+/* ================================================
+   SURPRISE MODE
+================================================ */
+const STORAGE_KEY = 'dateplannerSurprise';
+
+function startSurpriseMode() {
+  // Check for saved state first
+  checkSavedSurprise().then(saved => {
+    if (saved) {
+      document.getElementById('savedNotice').classList.add('show');
+    }
+    goTo('surpriseSetup');
+  });
+}
+
+async function checkSavedSurprise() {
+  try {
+    const res = await window.storage.get(STORAGE_KEY);
+    return res && res.value ? JSON.parse(res.value) : null;
+  } catch { return null; }
+}
+
+async function resumeSurprise() {
+  const saved = await checkSavedSurprise();
+  if (saved) {
+    surpriseStages  = saved.stages;
+    surpriseIndex   = saved.index;
+    surprisePicked  = saved.picked;
+    goTo('surpriseActive');
+    renderSurpriseStage();
+  }
+}
+
+async function startSurprise() {
+  const type   = pillSelections.stype;
+  const budget = pillSelections.sbudget;
+  if (!type || !budget) return;
+
+  const allStages = DATA[type][budget];
+
+  // Keep both options — she will choose when the day starts
+  surpriseStages = allStages.map(stage => ({
+    title:    stage.title,
+    category: stage.category,
+    options:  stage.options   // both options, revealed one at a time
+  }));
+
+  surpriseIndex  = 0;
+  surprisePicked = [];
+  isTransitioning = false;
+
+  await saveSurpriseState();
+  document.getElementById('savedNotice').classList.remove('show');
+  goTo('surpriseActive');
+  renderSurpriseStage();
+}
+
+async function saveSurpriseState() {
+  try {
+    await window.storage.set(STORAGE_KEY, JSON.stringify({
+      stages: surpriseStages,
+      index:  surpriseIndex,
+      picked: surprisePicked
+    }));
+  } catch (e) { console.warn('Storage unavailable:', e); }
+}
+
+async function clearSurpriseState() {
+  try { await window.storage.delete(STORAGE_KEY); } catch {}
+}
+
+function renderSurpriseStage() {
+  if (surpriseIndex >= surpriseStages.length) {
+    showSurpriseDone();
+    return;
+  }
+
+  const stage = surpriseStages[surpriseIndex];
+
+  // Update header
+  document.getElementById('surpriseStageName').textContent = stage.title;
+  document.getElementById('surpriseSubtitle').textContent =
+    surpriseIndex === 0
+      ? 'Pick an envelope to reveal your first activity!'
+      : `${surpriseIndex} ${surpriseIndex === 1 ? 'activity' : 'activities'} done — what's next?`;
+
+  // Progress dots
+  const dotsEl = document.getElementById('surpriseDots');
+  dotsEl.innerHTML = '';
+  surpriseStages.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < surpriseIndex ? ' done' : i === surpriseIndex ? ' active' : '');
+    dotsEl.appendChild(d);
+  });
+
+  // Status
+  document.getElementById('surpriseStatus').textContent =
+    `Activity ${surpriseIndex + 1} of ${surpriseStages.length}`;
+
+  // Build two fresh envelope cards — no stale flipped state, no flash
+  const area = document.getElementById('envelopeArea');
+  area.innerHTML = '';
+
+  stage.options.forEach((option, idx) => {
+    const card = document.createElement('div');
+    card.className = 'envelope-card';
+    card.innerHTML = `
+      <div class="envelope-inner">
+        <div class="env-front">
+          <div class="env-wax">💌</div>
+          <div class="env-front-title">Option ${idx + 1}</div>
+          <div class="env-front-hint">tap to reveal</div>
+        </div>
+        <div class="env-back">
+          <div class="env-back-category">${stage.category}</div>
+          <div class="env-back-activity">${option}</div>
+          <button class="env-done-btn">We did it! ✓</button>
+        </div>
+      </div>`;
+
+    // Flip on card tap (only if nothing already flipped)
+    card.addEventListener('click', () => {
+      if (area.querySelector('.flipped')) return;
+      card.classList.add('flipped');
+      // Fade out the unchosen card
+      const otherCards = area.querySelectorAll('.envelope-card:not(.flipped)');
+      otherCards.forEach(c => { c.style.transition = 'opacity 0.4s'; c.style.opacity = '0.25'; c.style.pointerEvents = 'none'; });
+      fireConfetti('small');
+    });
+
+    // Done button advances the stage
+    card.querySelector('.env-done-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      markDone(option);
+    });
+
+    area.appendChild(card);
+  });
+}
+
+async function markDone(chosenOption) {
+  surprisePicked.push({
+    title:  surpriseStages[surpriseIndex].title,
+    chosen: chosenOption
+  });
+  surpriseIndex++;
+  await saveSurpriseState();
+
+  if (surpriseIndex >= surpriseStages.length) {
+    await clearSurpriseState();
+    showSurpriseDone();
+  } else {
+    renderSurpriseStage();
+  }
+}
+
+function showSurpriseDone() {
+  goTo('surpriseDone');
+  setTimeout(() => fireConfetti('big'), 300);
+  clearSurpriseState();
+  document.getElementById('savedNotice').classList.remove('show');
+}
+
+function confirmExitSurprise() {
+  if (confirm('Go back to home? Your surprise day progress is saved.')) {
+    goTo('homeScreen');
+    checkSavedSurprise().then(s => {
+      if (s) document.getElementById('savedNotice').classList.add('show');
+    });
+  }
+}
+
+function confirmResetSurprise() {
+  if (confirm('Start a completely new surprise day? This will erase the current plan.')) {
+    resetSurpriseAndHome();
+  }
+}
+
+function resetSurpriseAndHome() {
+  clearSurpriseState();
+  document.getElementById('savedNotice').classList.remove('show');
+  goTo('homeScreen');
+}
+
+/* ================================================
+   CONFETTI
+================================================ */
+const confettiCanvas = document.getElementById('confettiCanvas');
+const confettiInst   = confetti.create(confettiCanvas, { resize: true, useWorker: true });
+
+function fireConfetti(size) {
+  if (size === 'big') {
+    confettiInst({ particleCount: 280, spread: 100, startVelocity: 75, origin: { x:.5, y:.4 } });
+  } else {
+    confettiInst({ particleCount: 80, spread: 60, startVelocity: 55, origin: { x:.5, y:.6 } });
+  }
+}
+
+/* ================================================
+   ON LOAD — check for saved surprise day
+================================================ */
+window.addEventListener('load', async () => {
+  const saved = await checkSavedSurprise();
+  if (saved) document.getElementById('savedNotice').classList.add('show');
+});
+</script>
+</body>
+</html>
