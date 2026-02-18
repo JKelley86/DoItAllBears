@@ -772,11 +772,23 @@ body::before {
   background: white;
   border-radius: 24px;
   padding: 56px 40px;
-  max-width: 460px;
+  max-width: 90%;
   width: 100%;
   text-align: center;
   box-shadow: 0 4px 40px rgba(139,58,58,.1);
   border: 1px solid #ecddd5;
+}
+
+@media (min-width: 640px) {
+  .done-card {
+    max-width: 560px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .done-card {
+    max-width: 700px;
+  }
 }
 
 .done-card .done-icon { font-size: 64px; margin-bottom: 20px; }
@@ -1651,11 +1663,45 @@ const confettiCanvas = document.getElementById('confettiCanvas');
 const confettiInst   = confetti.create(confettiCanvas, { resize: true, useWorker: true });
 
 function fireConfetti(size) {
-  if (size === 'big') {
-    confettiInst({ particleCount: 280, spread: 100, startVelocity: 75, origin: { x:.5, y:.4 } });
-  } else {
-    confettiInst({ particleCount: 80, spread: 60, startVelocity: 55, origin: { x:.5, y:.6 } });
-  }
+  const count = size === 'big' ? 70 : 20;
+  const spread = size === 'big' ? 100 : 60;
+  const velocity = size === 'big' ? 75 : 55;
+  
+  // Top-left corner, shooting right and down
+  confettiInst({
+    particleCount: count,
+    spread: spread,
+    startVelocity: velocity,
+    angle: 315, // Shoot down-right
+    origin: { x: 0, y: 0 }
+  });
+  
+  // Top-right corner, shooting left and down
+  confettiInst({
+    particleCount: count,
+    spread: spread,
+    startVelocity: velocity,
+    angle: 225, // Shoot down-left
+    origin: { x: 1, y: 0 }
+  });
+  
+  // Bottom-left corner, shooting right and up
+  confettiInst({
+    particleCount: count,
+    spread: spread,
+    startVelocity: velocity,
+    angle: 45, // Shoot up-right
+    origin: { x: 0, y: 1 }
+  });
+  
+  // Bottom-right corner, shooting left and up
+  confettiInst({
+    particleCount: count,
+    spread: spread,
+    startVelocity: velocity,
+    angle: 135, // Shoot up-left
+    origin: { x: 1, y: 1 }
+  });
 }
 
 /* ================================================
