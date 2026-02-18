@@ -4,111 +4,400 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Vehicles</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="../theme.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+      min-height: 100vh;
+      padding: 2rem;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .header h1 {
+      font-size: 3rem;
+      color: white;
+      margin-bottom: 0.5rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .header p {
+      color: rgba(255,255,255,0.9);
+      font-size: 1.1rem;
+    }
+
+    .back-btn {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid white;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .back-btn:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateX(-5px);
+    }
+
+    .vehicles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    .vehicle-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .vehicle-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    }
+
+    .vehicle-image {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .vehicle-image::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.1) 75%, rgba(255,255,255,0.1)),
+                  linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.1) 75%, rgba(255,255,255,0.1));
+      background-size: 20px 20px;
+      background-position: 0 0, 10px 10px;
+    }
+
+    .vehicle-card h2 {
+      padding: 1.5rem;
+      font-size: 1.5rem;
+      color: #333;
+    }
+
+    .vehicle-card p {
+      padding: 0 1.5rem 1.5rem;
+      color: #666;
+    }
+
+    .vehicle-detail {
+      display: none;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .vehicle-detail.active {
+      display: block;
+    }
+
+    .detail-header {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .detail-image {
+      width: 200px;
+      height: 150px;
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      flex-shrink: 0;
+    }
+
+    .detail-title {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .detail-title h2 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .spec-card {
+      background: white;
+      border-radius: 15px;
+      padding: 1.5rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .spec-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    .spec-card h3 {
+      color: #2563eb;
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .spec-card ul {
+      list-style: none;
+    }
+
+    .spec-card li {
+      padding: 0.5rem 0;
+      color: #555;
+      border-bottom: 1px solid #eee;
+      line-height: 1.6;
+    }
+
+    .spec-card li:last-child {
+      border-bottom: none;
+    }
+
+    .spec-card li:empty::before {
+      content: 'No data available';
+      color: #999;
+      font-style: italic;
+    }
+
+    .icon {
+      font-size: 1.2rem;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .detail-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .detail-image {
+        width: 150px;
+        height: 120px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h1>Vehicles</h1>
-    <p>Here you will find any information for your vehicles!</p>
+    <div class="header">
+      <h1>🚗 My Vehicles</h1>
+      <p>Manage and track your vehicle information</p>
+    </div>
 
-    <!-- Vehicle: Dodge Challenger -->
-    <section class="vehicle-section">
-      <h2>2020 Dodge Challenger GT</h2>
-      <div class="item-group">
-        <h3>Oil</h3>
-        <ul>
-          <li>SAE 5W-20 – 5.9 Quarts</li>
-        </ul>
-      </div>
-      <div class="item-group">
-        <h3>Oil Filters</h3>
-        <ul>
-          <li>Bosch K&G PS-7026</li>
-          <li>Mopar M0-349</li>
-          <!-- Add more filters as needed -->
-        </ul>
-      </div>
-      <div class="item-group">
-        <h3>Drain Plugs</h3>
-        <ul>
-          <li>M14-1.5 Item number: 653106</li>
-        </ul>
-      </div>
-      <div class="item-group">
-        <h3>Front Brakes</h3>
-        <ul>
-          <li><!-- Info here --></li>
-        </ul>
-      </div>
-      <div class="item-group">
-        <h3>Rear Brakes</h3>
-        <ul>
-          <li><!-- Info here --></li>
-        </ul>
-      </div>
-      <div class="item-group">
-        <h3>Head Lights</h3>
-        <ul>
-          <li><!-- Info here --></li>
-        </ul>
-      </div>
-      <div class="item-group">
-        <h3>Tail Lights</h3>
-        <ul>
-          <li><!-- Info here --></li>
-        </ul>
-      </div>
-    </section>
+    <!-- Vehicle Selection View -->
+    <div id="selectionView">
+      <div class="vehicles-grid">
+        <div class="vehicle-card" onclick="showVehicle('challenger')">
+          <div class="vehicle-image">🏁</div>
+          <h2>2020 Dodge Challenger GT</h2>
+          <p>Click to view specifications</p>
+        </div>
 
-    <!-- Vehicle: Ram 1500 -->
-    <section class="vehicle-section">
-      <h2>2024 Ram 1500 Bighorn</h2>
-      <div class="item-group">
-        <h3>Oil</h3>
-        <ul>
-          <li>SAE 0W-20 – 5.0 Quarts</li>
-        </ul>
+        <div class="vehicle-card" onclick="showVehicle('ram')">
+          <div class="vehicle-image">🚙</div>
+          <h2>2024 Ram 1500 Bighorn</h2>
+          <p>Click to view specifications</p>
+        </div>
       </div>
-      <div class="item-group">
-        <h3>Oil Filters</h3>
-        <ul>
-          <li>Bosch K&G PS-7026</li>
-          <li>Mopar M0-349</li>
-        </ul>
+    </div>
+
+    <!-- Dodge Challenger Detail View -->
+    <div id="challenger" class="vehicle-detail">
+      <button class="back-btn" onclick="showSelection()">← Back to Vehicles</button>
+      
+      <div class="detail-header">
+        <div class="detail-image">🏁</div>
+        <div class="detail-title">
+          <h2>2020 Dodge Challenger GT</h2>
+        </div>
       </div>
-      <div class="item-group">
-        <h3>Drain Plugs</h3>
-        <ul>
-          <li>M14-1.5 Item number: 653106</li>
-        </ul>
+
+      <div class="specs-grid">
+        <div class="spec-card">
+          <h3><span class="icon">🛢️</span> Oil</h3>
+          <ul>
+            <li>SAE 5W-20 – 5.9 Quarts</li>
+          </ul>
+        </div>
+
+        <div class="spec-card">
+          <h3><span class="icon">🔧</span> Oil Filters</h3>
+          <ul>
+            <li>Bosch K&G PS-7026</li>
+            <li>Mopar M0-349</li>
+          </ul>
+        </div>
+
+        <div class="spec-card">
+          <h3><span class="icon">🔩</span> Drain Plugs</h3>
+          <ul>
+            <li>M14-1.5 Item number: 653106</li>
+          </ul>
+        </div>
+
+        <div class="spec-card">
+          <h3><span class="icon">🛑</span> Front Brakes</h3>
+          <ul>
+            <li></li>
+          </ul>
+        </div>
+
+        <div class="spec-card">
+          <h3><span class="icon">🛑</span> Rear Brakes</h3>
+          <ul>
+            <li></li>
+          </ul>
+        </div>
+
+        <div class="spec-card">
+          <h3><span class="icon">💡</span> Head Lights</h3>
+          <ul>
+            <li></li>
+          </ul>
+        </div>
+
+        <div class="spec-card">
+          <h3><span class="icon">🔴</span> Tail Lights</h3>
+          <ul>
+            <li></li>
+          </ul>
+        </div>
       </div>
-      <div class="item-group">
-        <h3>Front Brakes</h3>
-        <ul>
-          <li><!-- Info here --></li>
-        </ul>
+    </div>
+
+    <!-- Ram 1500 Detail View -->
+    <div id="ram" class="vehicle-detail">
+      <button class="back-btn" onclick="showSelection()">← Back to Vehicles</button>
+      
+      <div class="detail-header">
+        <div class="detail-image">🚙</div>
+        <div class="detail-title">
+          <h2>2024 Ram 1500 Bighorn</h2>
+        </div>
       </div>
-      <div class="item-group">
-        <h3>Rear Brakes</h3>
-        <ul>
-          <li><!-- Info here --></li>
-        </ul>
+
+      <div class="specs-grid">
+        <div class="spec-card">
+          <h3><span class="icon">🛢️</span> Oil</h3>
+          <ul>
+            <li>SAE 0W-20 – 5.0 Quarts</li>
+          </ul>
+        </div>
+
+        <div class="spec-card">
+          <h3><span class="icon">🔧</span> Oil Filters</h3>
+          <ul>
+            <li>Bosch K&G PS-7026</li>
+            <li>Mopar M0-349</li>
+          </ul>
+        </div>
+
+        <div class="spec-card">
+          <h3><span class="icon">🔩</span> Drain Plugs</h3>
+          <ul>
+            <li>M14-1.5 Item number: 653106</li>
+          </ul>
+        </div>
+
+        <div class="spec-card">
+          <h3><span class="icon">🛑</span> Front Brakes</h3>
+          <ul>
+            <li></li>
+          </ul>
+        </div>
+
+        <div class="spec-card">
+          <h3><span class="icon">🛑</span> Rear Brakes</h3>
+          <ul>
+            <li></li>
+          </ul>
+        </div>
+
+        <div class="spec-card">
+          <h3><span class="icon">💡</span> Head Lights</h3>
+          <ul>
+            <li></li>
+          </ul>
+        </div>
+
+        <div class="spec-card">
+          <h3><span class="icon">🔴</span> Tail Lights</h3>
+          <ul>
+            <li>Break Lights: Sylvania 7443</li>
+            <li>Reverse Lights: Sylvania 921</li>
+          </ul>
+        </div>
       </div>
-      <div class="item-group">
-        <h3>Head Lights</h3>
-        <ul>
-          <li><!-- Info here --></li>
-        </ul>
-      </div>
-      <div class="item-group">
-        <h3>Tail Lights</h3>
-        <ul>
-          <li>Break Lights: Sylvania 7443</li>
-          <li>Reverse Lights: Sylvania 921</li>
-        </ul>
-      </div>
-    </section>
+    </div>
   </div>
 
   <!-- Sidebar & Footer -->
@@ -124,8 +413,19 @@
   </footer>
 
   <script>
-    function navigateTo(page) {
-      window.location.href = page;
+    function showVehicle(vehicleId) {
+      document.getElementById('selectionView').style.display = 'none';
+      document.querySelectorAll('.vehicle-detail').forEach(detail => {
+        detail.classList.remove('active');
+      });
+      document.getElementById(vehicleId).classList.add('active');
+    }
+
+    function showSelection() {
+      document.getElementById('selectionView').style.display = 'block';
+      document.querySelectorAll('.vehicle-detail').forEach(detail => {
+        detail.classList.remove('active');
+      });
     }
 
     function toggleSidebar() {
@@ -149,14 +449,6 @@
 
     function toggleTheme() {
       document.body.classList.toggle('light-mode');
-      localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-    }
-
-    window.onload = function() {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'light') {
-        document.body.classList.add('light-mode');
-      }
     }
 
     fetch('sidebar.html')
