@@ -1,285 +1,948 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Family Grocery</title>
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{
- --bg:#111;
- --card:#1c1c1e;
- --text:#fff;
- --muted:#666;
- --accent:#4ade80;
+:root {
+  --bg: #F2F2F7;
+  --card: #FFFFFF;
+  --card2: #F9F9FB;
+  --text: #1C1C1E;
+  --text2: #3A3A3C;
+  --muted: #8E8E93;
+  --border: rgba(0,0,0,0.08);
+  --accent: #34C759;
+  --accent-dark: #248A3D;
+  --accent-light: #E8F9EC;
+  --danger: #FF3B30;
+  --danger-light: #FFF1F0;
+  --blue: #007AFF;
+  --blue-light: #EBF4FF;
+  --orange: #FF9500;
+  --orange-light: #FFF5E6;
+  --purple: #AF52DE;
+  --purple-light: #F5EDFB;
+  --teal: #5AC8FA;
+  --teal-light: #EAF7FE;
+  --pink: #FF2D55;
+  --pink-light: #FFF0F3;
+  --yellow: #FFCC00;
+  --yellow-light: #FFFBE6;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
+  --radius: 16px;
+  --safe-top: env(safe-area-inset-top, 44px);
+  --safe-bottom: env(safe-area-inset-bottom, 34px);
 }
-.light{
- --bg:#f5f5f5;
- --card:#fff;
- --text:#111;
- --muted:#aaa;
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Nunito', -apple-system, sans-serif;
+  height: 100%;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{
- background:var(--bg);
- color:var(--text);
- font-family:-apple-system,BlinkMacSystemFont,sans-serif;
- height:100%;
- overflow-x:hidden;
- overscroll-behavior-x:none;
+
+body {
+  max-width: 430px;
+  margin: 0 auto;
+  padding-bottom: calc(100px + var(--safe-bottom));
 }
-body{max-width:500px;margin:auto}
-header{
- padding:20px;
- display:flex;
- justify-content:space-between;
- align-items:center;
+
+/* ── HEADER ── */
+.header {
+  padding: calc(var(--safe-top) + 8px) 20px 16px;
+  background: rgba(242,242,247,0.94);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
-h1{font-size:20px}
-.section{
- margin:10px;
- background:var(--card);
- border-radius:16px;
- overflow:hidden;
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
 }
-.section h2{
- padding:12px;
- font-size:15px;
- cursor:pointer;
- display:flex;
- justify-content:space-between;
+
+.header-title {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: var(--text);
 }
-.section.empty h2{opacity:.3}
-.items{padding:10px;display:none}
-.section.open .items{display:block}
-.item{
- padding:12px;
- background:rgba(255,255,255,0.05);
- border-radius:12px;
- margin-bottom:6px;
- display:flex;
- justify-content:space-between;
- align-items:center;
- transition:.2s;
- position:relative;
+
+.header-subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-top: 1px;
 }
-.item.checked{opacity:.4}
-.store{font-size:12px;opacity:.6;margin-left:6px}
-.fab{
- position:fixed;
- bottom:20px;
- right:20px;
- width:60px;
- height:60px;
- border-radius:50%;
- background:var(--accent);
- color:#000;
- font-size:30px;
- border:none;
+
+.theme-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--card);
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.15s;
 }
-.panel{
- position:fixed;
- bottom:-100%;
- left:0;
- width:100%;
- background:var(--card);
- padding:20px;
- border-radius:20px 20px 0 0;
- transition:.3s;
+.theme-btn:active { transform: scale(0.92); }
+
+/* Search bar */
+.search-wrap {
+  position: relative;
 }
-.panel.open{bottom:0}
-input,select{
- width:100%;
- padding:12px;
- margin-bottom:10px;
- border-radius:12px;
- border:none;
+.search-icon {
+  position: absolute;
+  left: 12px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 16px;
+  pointer-events: none;
 }
-.clear{
- text-align:center;
- padding:15px;
- opacity:.5;
+.search-input {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  border-radius: 12px;
+  border: none;
+  background: rgba(142,142,147,0.12);
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  color: var(--text);
+  outline: none;
 }
-.delete-bg{
- position:absolute;
- right:10px;
- top:0;
- bottom:0;
- display:flex;
- align-items:center;
- color:red;
+.search-input::placeholder { color: var(--muted); }
+
+/* ── STORE FILTER PILLS ── */
+.store-filter {
+  padding: 12px 0 4px 20px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
+.store-filter::-webkit-scrollbar { display: none; }
+
+.store-pill {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: none;
+  background: var(--card);
+  color: var(--muted);
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.store-pill.active {
+  background: var(--text);
+  color: #fff;
+}
+.store-pill:active { transform: scale(0.95); }
+
+/* ── CONTENT ── */
+.content {
+  padding: 8px 14px 0;
+}
+
+/* ── SUMMARY STRIP ── */
+.summary {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.summary-card {
+  flex: 1;
+  background: var(--card);
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+.summary-num {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1;
+}
+.summary-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 700;
+  margin-top: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.summary-card.done .summary-num { color: var(--accent); }
+.summary-card.remaining .summary-num { color: var(--blue); }
+
+/* ── CATEGORY SECTION ── */
+.category-section {
+  margin-bottom: 12px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  background: var(--card);
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.category-header:active { background: rgba(0,0,0,0.03); }
+
+.cat-emoji {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.cat-info { flex: 1; min-width: 0; }
+.cat-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+}
+.cat-count {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+.cat-badge {
+  min-width: 22px; height: 22px;
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 0 6px;
+  flex-shrink: 0;
+}
+
+.cat-chevron {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  flex-shrink: 0;
+}
+.category-section.open .cat-chevron { transform: rotate(90deg); }
+
+/* Items list */
+.items-list {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.category-section.open .items-list { max-height: 2000px; }
+
+.items-inner {
+  padding: 0 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── ITEM ROW ── */
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--card2);
+  border-radius: 12px;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.item-row.deleting {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.item-check {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: transparent;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  color: transparent;
+  font-size: 13px;
+}
+
+.item-row.checked .item-check {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.item-body { flex: 1; min-width: 0; }
+.item-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.2s;
+}
+.item-row.checked .item-name {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--muted);
+}
+.item-store {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+.item-delete {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--danger-light);
+  border: none;
+  color: var(--danger);
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+.item-row:hover .item-delete,
+.item-row.show-delete .item-delete { opacity: 1; }
+
+/* Empty state */
+.empty-state {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ── FAB ── */
+.fab {
+  position: fixed;
+  bottom: calc(20px + var(--safe-bottom));
+  right: 20px;
+  width: 60px; height: 60px;
+  border-radius: 30px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 28px;
+  border: none;
+  box-shadow: 0 4px 20px rgba(52,199,89,0.5);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  z-index: 100;
+}
+.fab:active { transform: scale(0.92); }
+
+/* ── SHEET OVERLAY ── */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  backdrop-filter: blur(2px);
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+/* ── BOTTOM SHEET ── */
+.sheet {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  max-width: 430px;
+  margin: 0 auto;
+  background: var(--card);
+  border-radius: 24px 24px 0 0;
+  padding: 0 20px calc(24px + var(--safe-bottom));
+  z-index: 300;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.32,0.72,0,1);
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.12);
+}
+.sheet.open { transform: translateY(0); }
+
+.sheet-handle {
+  width: 36px; height: 4px;
+  border-radius: 2px;
+  background: rgba(0,0,0,0.12);
+  margin: 12px auto 20px;
+}
+
+.sheet-title {
+  font-size: 18px;
+  font-weight: 900;
+  margin-bottom: 20px;
+  color: var(--text);
+}
+
+/* Sheet inputs */
+.field-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+  margin-top: 14px;
+}
+.field-label:first-of-type { margin-top: 0; }
+
+.sheet-input, .sheet-select {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.sheet-input:focus, .sheet-select:focus {
+  border-color: var(--accent);
+}
+
+/* Category picker grid */
+.cat-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 4px;
+}
+.cat-pick-btn {
+  padding: 10px 6px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  font-family: 'Nunito', sans-serif;
+}
+.cat-pick-btn .cpb-emoji { font-size: 20px; display: block; margin-bottom: 3px; }
+.cat-pick-btn .cpb-label { font-size: 11px; font-weight: 800; color: var(--muted); }
+.cat-pick-btn.selected {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+.cat-pick-btn.selected .cpb-label { color: var(--accent-dark); }
+.cat-pick-btn:active { transform: scale(0.95); }
+
+.add-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  margin-top: 20px;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 4px 16px rgba(52,199,89,0.35);
+}
+.add-btn:active { transform: scale(0.97); }
+
+/* Clear button */
+.clear-row {
+  padding: 8px 14px 4px;
+}
+.clear-btn {
+  width: 100%;
+  padding: 13px;
+  border-radius: 12px;
+  border: none;
+  background: var(--card);
+  color: var(--danger);
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s;
+}
+.clear-btn:active { transform: scale(0.98); opacity: 0.8; }
+
+/* ── DARK MODE ── */
+body.dark {
+  --bg: #000000;
+  --card: #1C1C1E;
+  --card2: #2C2C2E;
+  --text: #FFFFFF;
+  --text2: #EBEBF5;
+  --muted: #8E8E93;
+  --border: rgba(255,255,255,0.08);
+  --accent-light: rgba(52,199,89,0.15);
+  --danger-light: rgba(255,59,48,0.15);
+  --blue-light: rgba(0,122,255,0.15);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+}
+body.dark .header { background: rgba(0,0,0,0.92); }
+body.dark .search-input { background: rgba(255,255,255,0.08); }
+body.dark .sheet-input, body.dark .sheet-select, body.dark .cat-pick-btn { background: #2C2C2E; }
+
+/* ── LOADING ── */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 12px;
+}
+.spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Swipe hint */
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+.item-row { animation: fadeIn 0.25s ease forwards; }
 </style>
 </head>
-
 <body>
 
-<header>
-  <h1>Family Grocery</h1>
-  <div onclick="toggleTheme()">🌓</div>
-</header>
-
-<div id="list"></div>
-
-<div class="clear">
-  <button onclick="clearCompleted()">Clear Completed</button>
+<!-- Header -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="header-title">🛒 Groceries</div>
+      <div class="header-subtitle" id="header-sub">Loading...</div>
+    </div>
+    <button class="theme-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="search" placeholder="Search items..." oninput="applyFilters()" />
+  </div>
 </div>
 
-<button class="fab" onclick="openPanel()">+</button>
+<!-- Store filter pills -->
+<div class="store-filter" id="store-filter">
+  <button class="store-pill active" onclick="setStoreFilter('All', this)">All Stores</button>
+  <button class="store-pill" onclick="setStoreFilter('Costco', this)">Costco</button>
+  <button class="store-pill" onclick="setStoreFilter('Cub', this)">Cub</button>
+  <button class="store-pill" onclick="setStoreFilter('Target', this)">Target</button>
+  <button class="store-pill" onclick="setStoreFilter('Walmart', this)">Walmart</button>
+  <button class="store-pill" onclick="setStoreFilter('County Market', this)">County Market</button>
+  <button class="store-pill" onclick="setStoreFilter("Jerry's", this)">Jerry's</button>
+</div>
 
-<div class="panel" id="panel">
-  <input id="itemName" placeholder="Add item..." />
-  <select id="store">
-    <option>Costco</option>
-    <option>Cub</option>
-    <option>Target</option>
-    <option>Walmart</option>
-    <Option>County Market</Option>
-    <Option>Jerry's</Option>
+<!-- Content -->
+<div class="content">
+  <!-- Summary -->
+  <div class="summary">
+    <div class="summary-card remaining">
+      <div class="summary-num" id="sum-remaining">—</div>
+      <div class="summary-label">Remaining</div>
+    </div>
+    <div class="summary-card done">
+      <div class="summary-num" id="sum-done">—</div>
+      <div class="summary-label">Done</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-num" id="sum-total">—</div>
+      <div class="summary-label">Total</div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div style="color:var(--muted);font-size:14px;font-weight:700">Loading your list…</div>
+  </div>
+
+  <!-- Category sections -->
+  <div id="categories"></div>
+
+  <!-- Clear completed -->
+  <div class="clear-row">
+    <button class="clear-btn" onclick="clearCompleted()">🗑 Clear Completed Items</button>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="openSheet()">+</button>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+
+<!-- Add Item Sheet -->
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">Add Item</div>
+
+  <div class="field-label">Item Name</div>
+  <input class="sheet-input" id="itemName" placeholder="e.g. Chocolate Milk" autocomplete="off" autocorrect="off" />
+
+  <div class="field-label">Store</div>
+  <select class="sheet-select" id="storeSelect">
+    <option value="Costco">Costco</option>
+    <option value="Cub">Cub</option>
+    <option value="Target">Target</option>
+    <option value="Walmart">Walmart</option>
+    <option value="County Market">County Market</option>
+    <option value="Jerry's">Jerry's</option>
   </select>
-  <button onclick="addItem()">Add</button>
+
+  <div class="field-label">Category</div>
+  <div class="cat-picker" id="catPicker"></div>
+
+  <button class="add-btn" onclick="addItem()">Add to List</button>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
- getFirestore,collection,addDoc,onSnapshot,doc,
- updateDoc,deleteDoc,getDocs,setDoc,
- enableIndexedDbPersistence
+  getFirestore, collection, addDoc, onSnapshot,
+  doc, updateDoc, deleteDoc, getDocs, setDoc,
+  enableIndexedDbPersistence
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const firebaseConfig={
- apiKey:"AIzaSyABD9vjdzX62oxEf8hLePjVRfu_YxGgcQ0",
- authDomain:"grocerylist-e4b7c.firebaseapp.com",
- projectId:"grocerylist-e4b7c"
+// ── CONFIG ──
+const firebaseConfig = {
+  apiKey: "AIzaSyABD9vjdzX62oxEf8hLePjVRfu_YxGgcQ0",
+  authDomain: "grocerylist-e4b7c.firebaseapp.com",
+  projectId: "grocerylist-e4b7c"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+enableIndexedDbPersistence(db).catch(() => {});
+
+const listRef = collection(db, "items");
+const mapRef  = collection(db, "categoryMappings");
+
+// ── CATEGORIES ──
+const CATEGORIES = [
+  { id: "Produce",   label: "Produce",    emoji: "🥦", color: "#34C759", light: "#E8F9EC" },
+  { id: "Dairy",     label: "Dairy",      emoji: "🥛", color: "#5AC8FA", light: "#EAF7FE" },
+  { id: "Bread",     label: "Bread",      emoji: "🍞", color: "#FF9500", light: "#FFF5E6" },
+  { id: "Meat",      label: "Meat",       emoji: "🥩", color: "#FF3B30", light: "#FFF1F0" },
+  { id: "Frozen",    label: "Frozen",     emoji: "🧊", color: "#007AFF", light: "#EBF4FF" },
+  { id: "Snacks",    label: "Snacks",     emoji: "🍿", color: "#FF2D55", light: "#FFF0F3" },
+  { id: "Drinks",    label: "Drinks",     emoji: "🧃", color: "#AF52DE", light: "#F5EDFB" },
+  { id: "Household", label: "Household",  emoji: "🧹", color: "#FFCC00", light: "#FFFBE6" },
+  { id: "Other",     label: "Other",      emoji: "🛍️", color: "#8E8E93", light: "#F2F2F7" },
+];
+
+// ── STATE ──
+let items = [];
+let mapping = {};
+let storeFilter = "All";
+let searchQuery = "";
+let selectedCategory = "Other";
+
+// Expose globals
+window.toggleTheme = () => {
+  document.body.classList.toggle("dark");
+  const btn = document.querySelector(".theme-btn");
+  btn.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
 };
 
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
-enableIndexedDbPersistence(db);
+window.setStoreFilter = (store, btn) => {
+  storeFilter = store;
+  document.querySelectorAll(".store-pill").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  render();
+};
 
-const listRef=collection(db,"items");
-const mapRef=collection(db,"categoryMappings");
+window.applyFilters = () => {
+  searchQuery = document.getElementById("search").value.toLowerCase();
+  render();
+};
 
-const categories=["Produce","Dairy","Bread","Drinks","Other"];
-let items=[];
-let mapping={};
-
-async function loadMappings(){
- const snap=await getDocs(mapRef);
- snap.forEach(d=>mapping[d.id]=d.data().category);
-}
-loadMappings();
-
-function normalize(text){
- return text.toLowerCase().split(" ")[0];
+// ── LOAD MAPPINGS ──
+async function loadMappings() {
+  const snap = await getDocs(mapRef);
+  snap.forEach(d => mapping[d.id] = d.data().category);
 }
 
-async function getCategory(word){
- if(mapping[word]) return mapping[word];
- return "Other";
+// ── NORMALIZE: use the FULL trimmed lowercase name, not just first word ──
+function normalize(text) {
+  return text.trim().toLowerCase();
 }
 
-window.addItem=async function(){
- const name=document.getElementById("itemName").value;
- if(!name) return;
- const norm=normalize(name);
+async function getCategory(fullName) {
+  const key = normalize(fullName);
+  if (mapping[key]) return mapping[key];
+  return null; // null = needs user to pick
+}
 
- if(items.find(i=>i.normalizedName===norm && !i.checked)){
-  if(!confirm("Item already exists. Add anyway?")) return;
- }
-
- let category=await getCategory(norm);
-
- if(category==="Other"){
-  let pick=prompt("Assign category: Produce, Dairy, Bread, Drinks, Other");
-  if(pick){
-   category=pick;
-   await setDoc(doc(db,"categoryMappings",norm),{category:pick});
-   mapping[norm]=pick;
+// ── ADD ITEM ──
+window.addItem = async function() {
+  const name = document.getElementById("itemName").value.trim();
+  if (!name) {
+    document.getElementById("itemName").focus();
+    return;
   }
- }
 
- await addDoc(listRef,{
-  name,
-  normalizedName:norm,
-  category,
-  store:document.getElementById("store").value,
-  checked:false,
-  createdAt:Date.now()
- });
+  const store = document.getElementById("storeSelect").value;
+  const normKey = normalize(name);
 
- document.getElementById("itemName").value="";
- closePanel();
-};
+  // Check duplicate (unchecked)
+  if (items.find(i => normalize(i.name) === normKey && !i.checked)) {
+    if (!confirm(`"${name}" is already on your list. Add again?`)) return;
+  }
 
-onSnapshot(listRef,snap=>{
- items=[];
- snap.forEach(d=>items.push({...d.data(),id:d.id}));
- render();
-});
+  // Save mapping
+  await setDoc(doc(db, "categoryMappings", normKey), { category: selectedCategory });
+  mapping[normKey] = selectedCategory;
 
-function render(){
- const container=document.getElementById("list");
- container.innerHTML="";
-
- categories.forEach(cat=>{
-  const section=document.createElement("div");
-  section.className="section open";
-
-  const header=document.createElement("h2");
-  header.innerHTML=`${cat} <span>${items.filter(i=>i.category===cat).length}</span>`;
-  header.onclick=()=>section.classList.toggle("open");
-  section.appendChild(header);
-
-  const wrapper=document.createElement("div");
-  wrapper.className="items";
-
-  const catItems=items.filter(i=>i.category===cat);
-  if(catItems.length===0) section.classList.add("empty");
-
-  catItems.sort((a,b)=>a.checked-b.checked)
-  .forEach(i=>{
-   const div=document.createElement("div");
-   div.className="item"+(i.checked?" checked":"");
-   div.innerHTML=`
-    <span>${i.name}<span class="store">(${i.store})</span></span>
-    <div class="delete-bg">Delete</div>
-   `;
-
-   let startX=0;
-   div.addEventListener("touchstart",e=>startX=e.touches[0].clientX);
-   div.addEventListener("touchmove",e=>{
-    let diff=e.touches[0].clientX-startX;
-    if(diff<-50) deleteItem(i.id);
-   });
-
-   div.onclick=()=>toggleItem(i.id,i.checked);
-
-   wrapper.appendChild(div);
+  await addDoc(listRef, {
+    name,
+    normalizedName: normKey,
+    category: selectedCategory,
+    store,
+    checked: false,
+    createdAt: Date.now()
   });
 
-  section.appendChild(wrapper);
-  container.appendChild(section);
- });
+  document.getElementById("itemName").value = "";
+  closeSheet();
+};
+
+// ── REAL-TIME LISTENER ──
+onSnapshot(listRef, snap => {
+  items = [];
+  snap.forEach(d => items.push({ ...d.data(), id: d.id }));
+  document.getElementById("loading").style.display = "none";
+  render();
+});
+
+// ── RENDER ──
+function render() {
+  const container = document.getElementById("categories");
+
+  // Filter
+  let visible = items;
+  if (storeFilter !== "All") visible = visible.filter(i => i.store === storeFilter);
+  if (searchQuery) visible = visible.filter(i => i.name.toLowerCase().includes(searchQuery));
+
+  // Stats
+  const total = visible.length;
+  const done  = visible.filter(i => i.checked).length;
+  document.getElementById("sum-remaining").textContent = total - done;
+  document.getElementById("sum-done").textContent = done;
+  document.getElementById("sum-total").textContent = total;
+  document.getElementById("header-sub").textContent =
+    total === 0 ? "Nothing on the list" :
+    `${total - done} item${total - done !== 1 ? "s" : ""} left to grab`;
+
+  container.innerHTML = "";
+
+  CATEGORIES.forEach(cat => {
+    const catItems = visible
+      .filter(i => i.category === cat.id)
+      .sort((a, b) => a.checked - b.checked || a.createdAt - b.createdAt);
+
+    const section = document.createElement("div");
+    section.className = "category-section"; // collapsed by default
+    section.dataset.cat = cat.id;
+
+    const unchecked = catItems.filter(i => !i.checked).length;
+
+    section.innerHTML = `
+      <div class="category-header" onclick="this.parentElement.classList.toggle('open')">
+        <div class="cat-emoji" style="background:${cat.light}">
+          <span>${cat.emoji}</span>
+        </div>
+        <div class="cat-info">
+          <div class="cat-name">${cat.label}</div>
+          <div class="cat-count">${catItems.length} item${catItems.length !== 1 ? "s" : ""}${unchecked > 0 ? ` · ${unchecked} remaining` : catItems.length > 0 ? " · all done!" : ""}</div>
+        </div>
+        ${unchecked > 0 ? `<div class="cat-badge" style="background:${cat.light};color:${cat.color}">${unchecked}</div>` : ""}
+        <span class="cat-chevron">›</span>
+      </div>
+      <div class="items-list">
+        <div class="items-inner" id="items-${cat.id}"></div>
+      </div>
+    `;
+
+    container.appendChild(section);
+
+    const inner = document.getElementById("items-" + cat.id);
+
+    if (catItems.length === 0) {
+      inner.innerHTML = `<div class="empty-state">Nothing here yet</div>`;
+      return;
+    }
+
+    catItems.forEach(item => {
+      const row = document.createElement("div");
+      row.className = "item-row" + (item.checked ? " checked" : "");
+      row.id = "item-" + item.id;
+      row.innerHTML = `
+        <div class="item-check" onclick="toggleItem('${item.id}',${item.checked})">
+          ${item.checked ? "✓" : ""}
+        </div>
+        <div class="item-body">
+          <div class="item-name">${item.name}</div>
+          <div class="item-store">${item.store}</div>
+        </div>
+        <button class="item-delete" onclick="deleteItem('${item.id}')">✕</button>
+      `;
+
+      // Long press to reveal delete on iOS
+      let pressTimer;
+      row.addEventListener("touchstart", () => {
+        pressTimer = setTimeout(() => row.classList.add("show-delete"), 500);
+      }, { passive: true });
+      row.addEventListener("touchend", () => clearTimeout(pressTimer));
+      row.addEventListener("touchmove", () => clearTimeout(pressTimer), { passive: true });
+
+      // Swipe left to delete
+      let startX, startY;
+      row.addEventListener("touchstart", e => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+      row.addEventListener("touchend", e => {
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = Math.abs(e.changedTouches[0].clientY - startY);
+        if (dx < -60 && dy < 30) {
+          row.classList.add("deleting");
+          setTimeout(() => deleteItem(item.id), 200);
+        }
+      });
+
+      inner.appendChild(row);
+    });
+  });
 }
 
-window.toggleItem=async function(id,checked){
- await updateDoc(doc(db,"items",id),{checked:!checked});
+// ── ACTIONS ──
+window.toggleItem = async function(id, checked) {
+  await updateDoc(doc(db, "items", id), { checked: !checked });
 };
 
-window.deleteItem=async function(id){
- await deleteDoc(doc(db,"items",id));
+window.deleteItem = async function(id) {
+  const row = document.getElementById("item-" + id);
+  if (row) {
+    row.classList.add("deleting");
+    await new Promise(r => setTimeout(r, 200));
+  }
+  await deleteDoc(doc(db, "items", id));
 };
 
-window.clearCompleted=function(){
- items.filter(i=>i.checked).forEach(i=>deleteItem(i.id));
+window.clearCompleted = function() {
+  if (!items.some(i => i.checked)) return;
+  if (confirm("Remove all completed items?")) {
+    items.filter(i => i.checked).forEach(i => deleteDoc(doc(db, "items", i.id)));
+  }
 };
 
-window.openPanel=()=>document.getElementById("panel").classList.add("open");
-window.closePanel=()=>document.getElementById("panel").classList.remove("open");
-window.toggleTheme=()=>document.body.classList.toggle("light");
+// ── SHEET ──
+window.openSheet = function() {
+  // Pre-select category based on recent input if possible
+  document.getElementById("itemName").value = "";
+  document.getElementById("sheet").classList.add("open");
+  document.getElementById("overlay").classList.add("open");
+  setTimeout(() => document.getElementById("itemName").focus(), 400);
+};
+
+window.closeSheet = function() {
+  document.getElementById("sheet").classList.remove("open");
+  document.getElementById("overlay").classList.remove("open");
+};
+
+// Enter key submits
+document.getElementById("itemName").addEventListener("keydown", e => {
+  if (e.key === "Enter") addItem();
+});
+
+// ── BUILD CATEGORY PICKER ──
+function buildCategoryPicker() {
+  const picker = document.getElementById("catPicker");
+  CATEGORIES.forEach(cat => {
+    const btn = document.createElement("button");
+    btn.className = "cat-pick-btn" + (cat.id === "Other" ? " selected" : "");
+    btn.dataset.catId = cat.id;
+    btn.innerHTML = `<span class="cpb-emoji">${cat.emoji}</span><span class="cpb-label">${cat.label}</span>`;
+    btn.onclick = () => {
+      document.querySelectorAll(".cat-pick-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      selectedCategory = cat.id;
+    };
+    picker.appendChild(btn);
+  });
+}
+
+// ── SMART CATEGORY SUGGESTION ──
+document.getElementById("itemName").addEventListener("input", async function() {
+  const val = this.value.trim();
+  if (!val) return;
+  const key = normalize(val);
+  const cat = await getCategory(key);
+  if (cat) {
+    selectedCategory = cat;
+    document.querySelectorAll(".cat-pick-btn").forEach(b => {
+      b.classList.toggle("selected", b.dataset.catId === cat);
+    });
+  }
+});
+
+// ── INIT ──
+loadMappings();
+buildCategoryPicker();
 </script>
-
 </body>
 </html>
