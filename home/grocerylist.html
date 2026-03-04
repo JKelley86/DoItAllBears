@@ -1138,37 +1138,47 @@ function render() {
       outer.appendChild(row);
 
       // ── UNIFIED TOUCH HANDLER ──
-      // Single touchstart/move/end set handles both tap detection and swipe
-      let touchStartX, touchStartY, touchMoved = false, swipeTracking = false;
+      let touchStartX, touchStartY, touchMoved = false, swipeTracking = false, isHorizontal = null;
 
       row.addEventListener("touchstart", e => {
         touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
         touchMoved = false;
         swipeTracking = true;
+        isHorizontal = null; // undecided until first move
         row.style.transition = "none";
       }, { passive: true });
 
+      // *** NOT passive — we need preventDefault to stop iOS scroll stealing ***
       row.addEventListener("touchmove", e => {
         if (!swipeTracking) return;
         const dx = e.touches[0].clientX - touchStartX;
-        const dy = Math.abs(e.touches[0].clientY - touchStartY);
+        const dy = e.touches[0].clientY - touchStartY;
+        const absDx = Math.abs(dx);
+        const absDy = Math.abs(dy);
 
-        // If scrolling vertically, cancel swipe tracking
-        if (dy > 12 && Math.abs(dx) < dy) {
+        // On first meaningful move, decide axis
+        if (isHorizontal === null && (absDx > 4 || absDy > 4)) {
+          isHorizontal = absDx > absDy;
+        }
+
+        if (isHorizontal === false) {
+          // Vertical scroll — hand back to browser
           swipeTracking = false;
           row.style.transition = "";
+          row.style.transform = "";
           return;
         }
 
-        touchMoved = Math.abs(dx) > 6 || dy > 6;
-
-        // Drag the row with finger
-        const currentBase = row.classList.contains("swiped") ? -80 : 0;
-        const raw = currentBase + dx;
-        const clamped = Math.max(-80, Math.min(0, raw));
-        row.style.transform = `translateX(${clamped}px)`;
-      }, { passive: true });
+        if (isHorizontal) {
+          // Horizontal — own this gesture, stop browser scrolling
+          e.preventDefault();
+          touchMoved = absDx > 4;
+          const base = row.classList.contains("swiped") ? -80 : 0;
+          const clamped = Math.max(-80, Math.min(0, base + dx));
+          row.style.transform = `translateX(${clamped}px)`;
+        }
+      }, { passive: false });
 
       row.addEventListener("touchend", e => {
         swipeTracking = false;
@@ -1177,31 +1187,26 @@ function render() {
         const dx = e.changedTouches[0].clientX - touchStartX;
         const wasSwiped = row.classList.contains("swiped");
 
-        if (!touchMoved) {
-          // Pure tap — toggle complete, reset if swiped
+        if (!touchMoved || isHorizontal === false) {
+          // Pure tap
           if (wasSwiped) {
             row.classList.remove("swiped");
-            row.style.transform = "";
           } else {
             toggleItem(item.id, item.checked);
           }
+          row.style.transform = "";
           return;
         }
 
-        // Decide final position based on direction + distance
+        // Snap to open or closed based on direction + threshold
         if (!wasSwiped && dx < -30) {
-          // Swiped open
           row.classList.add("swiped");
-          row.style.transform = "";
         } else if (wasSwiped && dx > 20) {
-          // Swiped closed
           row.classList.remove("swiped");
-          row.style.transform = "";
-        } else {
-          // Snap back to previous state
-          row.style.transform = "";
         }
-      });
+        // Either way, let CSS class handle the final position
+        row.style.transform = "";
+      }, { passive: true });
 
       // Desktop click fallback
       row.addEventListener("click", () => {
