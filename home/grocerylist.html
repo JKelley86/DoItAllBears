@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Family Grocery</title>
+
+<style>
+:root {
+  --bg:#111;
+  --card:#1c1c1e;
+  --text:#fff;
+  --muted:#888;
+  --accent:#4ade80;
+}
+.light {
+  --bg:#f5f5f5;
+  --card:#fff;
+  --text:#111;
+  --muted:#777;
+}
+* {
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+html,body {
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+  height:100%;
+  overflow-x:hidden;
+  overscroll-behavior-x:none;
+}
+body {
+  max-width:500px;
+  margin:0 auto;
+}
+header {
+  padding:20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+h1 {
+  font-size:22px;
+}
+.toggle {
+  cursor:pointer;
+}
+.section {
+  margin:10px;
+  background:var(--card);
+  border-radius:14px;
+  padding:10px;
+}
+.section h2 {
+  font-size:16px;
+  margin-bottom:8px;
+  opacity:.8;
+}
+.item {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:5px;
+  background:rgba(255,255,255,0.05);
+  transition:.2s ease;
+}
+.item.checked {
+  opacity:.4;
+}
+.item span {
+  flex:1;
+}
+button {
+  border:none;
+  background:none;
+  color:var(--text);
+}
+.fab {
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  background:var(--accent);
+  color:#000;
+  font-size:30px;
+}
+.panel {
+  position:fixed;
+  bottom:-100%;
+  left:0;
+  width:100%;
+  background:var(--card);
+  padding:20px;
+  border-radius:20px 20px 0 0;
+  transition:.3s;
+}
+.panel.open {
+  bottom:0;
+}
+input,select {
+  width:100%;
+  padding:12px;
+  margin-bottom:10px;
+  border-radius:10px;
+  border:none;
+}
+.clear {
+  text-align:center;
+  padding:15px;
+  opacity:.6;
+}
+.empty {
+  opacity:.3;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Family Grocery</h1>
+  <div class="toggle" onclick="toggleTheme()">🌓</div>
+</header>
+
+<div id="list"></div>
+
+<div class="clear">
+  <button onclick="clearCompleted()">Clear Completed</button>
+</div>
+
+<button class="fab" onclick="openPanel()">+</button>
+
+<div class="panel" id="panel">
+  <input id="itemName" placeholder="Add item..." />
+  <select id="store">
+    <option>Costco</option>
+    <option>Cub</option>
+    <option>Target</option>
+  </select>
+  <button onclick="addItem()">Add</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot,
+  doc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
+  enableIndexedDbPersistence
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyABD9vjdzX62oxEf8hLePjVRfu_YxGgcQ0",
+  authDomain: "grocerylist-e4b7c.firebaseapp.com",
+  projectId: "grocerylist-e4b7c"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+enableIndexedDbPersistence(db);
+
+const categories = ["Produce","Dairy","Bread","Drinks","Other"];
+const listRef = collection(db,"items");
+const mapRef = collection(db,"categoryMappings");
+
+let items = [];
+
+function normalize(text){
+  return text.toLowerCase().split(" ")[0];
+}
+
+async function getCategory(word){
+  const snap = await getDocs(mapRef);
+  let found = "Other";
+  snap.forEach(d=>{
+    if(d.id === word) found = d.data().category;
+  });
+  if(found === "Other"){
+    let pick = prompt("Choose category: Produce, Dairy, Bread, Drinks, Other");
+    if(pick){
+      await addDoc(mapRef,{word,category:pick});
+      return pick;
+    }
+  }
+  return found;
+}
+
+window.addItem = async function(){
+  const name = document.getElementById("itemName").value;
+  if(!name) return;
+  const norm = normalize(name);
+
+  if(items.find(i=>i.normalizedName===norm && !i.checked)){
+    if(!confirm("Item already exists. Add anyway?")) return;
+  }
+
+  const category = await getCategory(norm);
+
+  await addDoc(listRef,{
+    name,
+    normalizedName:norm,
+    category,
+    store:document.getElementById("store").value,
+    checked:false,
+    createdAt:Date.now()
+  });
+
+  document.getElementById("itemName").value="";
+  closePanel();
+};
+
+onSnapshot(listRef,snap=>{
+  items=[];
+  snap.forEach(d=>items.push({...d.data(),id:d.id}));
+  render();
+});
+
+function render(){
+  const container=document.getElementById("list");
+  container.innerHTML="";
+  categories.forEach(cat=>{
+    const section=document.createElement("div");
+    section.className="section";
+
+    const header=document.createElement("h2");
+    header.textContent=cat;
+    section.appendChild(header);
+
+    const catItems=items.filter(i=>i.category===cat);
+
+    if(catItems.length===0){
+      section.classList.add("empty");
+    }
+
+    catItems
+      .sort((a,b)=>a.checked-b.checked)
+      .forEach(i=>{
+        const div=document.createElement("div");
+        div.className="item"+(i.checked?" checked":"");
+        div.innerHTML=`
+          <span>${i.name} (${i.store})</span>
+          <button onclick="toggleItem('${i.id}',${i.checked})">✓</button>
+          <button onclick="deleteItem('${i.id}')">✕</button>
+        `;
+        section.appendChild(div);
+      });
+
+    container.appendChild(section);
+  });
+}
+
+window.toggleItem = async function(id,checked){
+  await updateDoc(doc(db,"items",id),{checked:!checked});
+};
+
+window.deleteItem = async function(id){
+  await deleteDoc(doc(db,"items",id));
+};
+
+window.clearCompleted = async function(){
+  items.filter(i=>i.checked).forEach(i=>deleteItem(i.id));
+};
+
+window.openPanel=function(){
+  document.getElementById("panel").classList.add("open");
+};
+window.closePanel=function(){
+  document.getElementById("panel").classList.remove("open");
+};
+window.toggleTheme=function(){
+  document.body.classList.toggle("light");
+};
+</script>
+
+</body>
+</html>
