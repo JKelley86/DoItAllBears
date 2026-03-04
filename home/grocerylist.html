@@ -278,55 +278,26 @@ body {
 }
 
 /* ── ITEM ROW ── */
-.item-outer {
-  position: relative;
-  border-radius: 12px;
-  /* NO overflow:hidden — swipe needs to slide outside bounds */
-}
-
-.item-delete-bg {
-  position: absolute;
-  right: 0; top: 0; bottom: 0;
-  width: 80px;
-  background: var(--danger);
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column;
-  gap: 2px;
-  border-radius: 12px;
-  pointer-events: all;
-  cursor: pointer;
-}
-.item-delete-bg .del-icon { font-size: 17px; line-height: 1; }
-.item-delete-bg .del-label { font-size: 10px; font-weight: 800; color: #fff; letter-spacing: 0.04em; }
-
 .item-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
+  gap: 10px;
+  padding: 12px 10px 12px 14px;
   background: var(--card2);
   border-radius: 12px;
   position: relative;
-  cursor: pointer;
-  z-index: 1;
   user-select: none;
   -webkit-user-select: none;
-  /* Tell iOS: you handle vertical scroll, JS handles horizontal */
-  touch-action: pan-y;
-  will-change: transform;
-  transition: transform 0.25s ease;
+  transition: opacity 0.2s, transform 0.2s;
 }
 
-.item-row.swiped { transform: translateX(-80px); }
-
 .item-row.deleting {
-  transform: translateX(-110%) !important;
   opacity: 0;
-  transition: transform 0.22s ease-in, opacity 0.22s !important;
+  transform: scale(0.95);
 }
 
 .item-check {
-  width: 24px; height: 24px;
+  width: 26px; height: 26px;
   border-radius: 50%;
   border: 2px solid var(--border);
   background: transparent;
@@ -335,7 +306,6 @@ body {
   transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
   color: transparent;
   font-size: 13px;
-  pointer-events: none;
 }
 
 .item-row.checked .item-check {
@@ -344,7 +314,7 @@ body {
   color: white;
 }
 
-.item-body { flex: 1; min-width: 0; pointer-events: none; }
+.item-body { flex: 1; min-width: 0; }
 .item-name {
   font-size: 15px;
   font-weight: 700;
@@ -364,6 +334,20 @@ body {
   color: var(--muted);
   font-weight: 600;
   margin-top: 1px;
+}
+
+.item-del-btn {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--danger-light);
+  border: none;
+  color: var(--danger);
+  font-size: 18px;
+  line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Empty state */
@@ -1115,82 +1099,43 @@ function render() {
     }
 
     catItems.forEach(item => {
-      // Outer wrapper holds both the red delete bg and the sliding row
-      const outer = document.createElement("div");
-      outer.className = "item-outer";
-      outer.id = "outer-" + item.id;
-
-      // Red delete zone behind
-      const deleteBg = document.createElement("div");
-      deleteBg.className = "item-delete-bg";
-      deleteBg.innerHTML = `<span class="del-icon">🗑</span><span class="del-label">DELETE</span>`;
-      deleteBg.addEventListener("click", () => confirmDelete(item.id));
-
       const row = document.createElement("div");
       row.className = "item-row" + (item.checked ? " checked" : "");
       row.id = "item-" + item.id;
-      row.innerHTML = `
-        <div class="item-check">${item.checked ? "✓" : ""}</div>
-        <div class="item-body">
-          <div class="item-name">${item.name}</div>
-          <div class="item-store">${item.store}</div>
-        </div>
-      `;
 
-      outer.appendChild(deleteBg);
-      outer.appendChild(row);
+      const check = document.createElement("div");
+      check.className = "item-check";
+      check.textContent = item.checked ? "✓" : "";
 
-      let x0 = 0, y0 = 0, moved = false;
+      const body = document.createElement("div");
+      body.className = "item-body";
+      body.innerHTML = `<div class="item-name">${item.name}</div><div class="item-store">${item.store}</div>`;
 
-      row.addEventListener("touchstart", e => {
-        x0 = e.touches[0].clientX;
-        y0 = e.touches[0].clientY;
-        moved = false;
-        row.style.transition = "none";
-      }, { passive: true });
+      const delBtn = document.createElement("button");
+      delBtn.className = "item-del-btn";
+      delBtn.textContent = "✕";
+      delBtn.setAttribute("aria-label", "Delete");
+      delBtn.addEventListener("touchend", e => {
+        e.stopPropagation();
+        e.preventDefault();
+        confirmDelete(item.id);
+      }, { passive: false });
+      delBtn.addEventListener("click", e => {
+        e.stopPropagation();
+        confirmDelete(item.id);
+      });
 
-      row.addEventListener("touchmove", e => {
-        const dx = e.touches[0].clientX - x0;
-        const dy = e.touches[0].clientY - y0;
-        // Only track if clearly more horizontal than vertical
-        if (Math.abs(dx) < Math.abs(dy)) return;
-        moved = true;
-        const base = row.classList.contains("swiped") ? -80 : 0;
-        const clamped = Math.max(-80, Math.min(0, base + dx));
-        row.style.transform = `translateX(${clamped}px)`;
-      }, { passive: true });
+      row.appendChild(check);
+      row.appendChild(body);
+      row.appendChild(delBtn);
 
-      row.addEventListener("touchend", e => {
-        row.style.transition = "";
-        const dx = e.changedTouches[0].clientX - x0;
-        const wasSwiped = row.classList.contains("swiped");
-
-        if (!moved) {
-          // Tap
-          row.style.transform = "";
-          if (wasSwiped) {
-            row.classList.remove("swiped");
-          } else {
-            toggleItem(item.id, item.checked);
-          }
-          return;
-        }
-
-        row.style.transform = "";
-        if (!wasSwiped && dx < -30) {
-          row.classList.add("swiped");
-        } else if (wasSwiped && dx > 20) {
-          row.classList.remove("swiped");
-        }
-      }, { passive: true });
-
-      // Desktop
-      row.addEventListener("click", () => {
-        if (row.classList.contains("swiped")) { row.classList.remove("swiped"); return; }
+      // Tap row body to complete — click works on both iOS and desktop
+      row.addEventListener("click", e => {
+        if (e.target === delBtn || delBtn.contains(e.target)) return;
         toggleItem(item.id, item.checked);
       });
 
-      inner.appendChild(outer);
+      inner.appendChild(row);
     });
   });
 }
@@ -1201,24 +1146,14 @@ window.toggleItem = async function(id, checked) {
 };
 
 window.confirmDelete = async function(id) {
-  const outer = document.getElementById("outer-" + id);
   const row = document.getElementById("item-" + id);
   if (row) row.classList.add("deleting");
   setTimeout(async () => {
     await deleteDoc(doc(db, "items", id));
-  }, 220);
+  }, 200);
 };
 
 window.deleteItem = window.confirmDelete;
-
-// Tapping anywhere outside a swiped row closes it
-document.addEventListener("touchstart", e => {
-  document.querySelectorAll(".item-row.swiped").forEach(r => {
-    if (!r.contains(e.target)) {
-      r.classList.remove("swiped");
-    }
-  });
-}, { passive: true });
 
 window.clearCompleted = function() {
   if (!items.some(i => i.checked)) return;
