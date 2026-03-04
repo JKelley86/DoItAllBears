@@ -270,10 +270,10 @@ body {
 .category-section.open .items-list { max-height: 2000px; }
 
 .items-inner {
-  padding: 0 12px 12px;
+  padding: 10px 12px 12px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   border-top: 1px solid var(--border);
 }
 
@@ -281,7 +281,7 @@ body {
 .item-outer {
   position: relative;
   border-radius: 12px;
-  overflow: hidden;
+  /* NO overflow:hidden — swipe needs to slide outside bounds */
 }
 
 .item-delete-bg {
@@ -293,7 +293,8 @@ body {
   flex-direction: column;
   gap: 2px;
   border-radius: 12px;
-  pointer-events: none;
+  pointer-events: all;
+  cursor: pointer;
 }
 .item-delete-bg .del-icon { font-size: 17px; line-height: 1; }
 .item-delete-bg .del-label { font-size: 10px; font-weight: 800; color: #fff; letter-spacing: 0.04em; }
@@ -1136,77 +1137,79 @@ function render() {
       outer.appendChild(deleteBg);
       outer.appendChild(row);
 
-      // ── TAP TO COMPLETE ──
-      // Distinguish tap from swipe: only toggle if horizontal movement was tiny
-      let tapStartX, tapStartY, didSwipe = false;
+      // ── UNIFIED TOUCH HANDLER ──
+      // Single touchstart/move/end set handles both tap detection and swipe
+      let touchStartX, touchStartY, touchMoved = false, swipeTracking = false;
 
       row.addEventListener("touchstart", e => {
-        tapStartX = e.touches[0].clientX;
-        tapStartY = e.touches[0].clientY;
-        didSwipe = false;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchMoved = false;
+        swipeTracking = true;
+        row.style.transition = "none";
       }, { passive: true });
 
       row.addEventListener("touchmove", e => {
-        const dx = Math.abs(e.touches[0].clientX - tapStartX);
-        const dy = Math.abs(e.touches[0].clientY - tapStartY);
-        if (dx > 8 || dy > 8) didSwipe = true;
-      }, { passive: true });
+        if (!swipeTracking) return;
+        const dx = e.touches[0].clientX - touchStartX;
+        const dy = Math.abs(e.touches[0].clientY - touchStartY);
 
-      row.addEventListener("touchend", e => {
-        if (didSwipe) return;
-        // It was a tap — toggle complete
-        toggleItem(item.id, item.checked);
-      });
-
-      // Fallback for non-touch (desktop/preview)
-      row.addEventListener("click", e => {
-        if (didSwipe) return;
-        toggleItem(item.id, item.checked);
-      });
-
-      // ── SWIPE LEFT → REVEAL DELETE ──
-      let swipeStartX, swipeStartY, tracking = false;
-
-      row.addEventListener("touchstart", e => {
-        swipeStartX = e.touches[0].clientX;
-        swipeStartY = e.touches[0].clientY;
-        tracking = true;
-      }, { passive: true });
-
-      row.addEventListener("touchmove", e => {
-        if (!tracking) return;
-        const dx = e.touches[0].clientX - swipeStartX;
-        const dy = Math.abs(e.touches[0].clientY - swipeStartY);
-        if (dy > 20) { tracking = false; return; } // vertical scroll, ignore
-        if (dx < -10) {
-          // Live drag feel
-          const clamp = Math.max(-80, Math.min(0, dx));
-          row.style.transition = "none";
-          row.style.transform = `translateX(${clamp}px)`;
-        } else if (dx > 10 && row.classList.contains("swiped")) {
-          // Swiping back right
-          const clamp = Math.max(-80, Math.min(0, -80 + dx));
-          row.style.transition = "none";
-          row.style.transform = `translateX(${clamp}px)`;
+        // If scrolling vertically, cancel swipe tracking
+        if (dy > 12 && Math.abs(dx) < dy) {
+          swipeTracking = false;
+          row.style.transition = "";
+          return;
         }
+
+        touchMoved = Math.abs(dx) > 6 || dy > 6;
+
+        // Drag the row with finger
+        const currentBase = row.classList.contains("swiped") ? -80 : 0;
+        const raw = currentBase + dx;
+        const clamped = Math.max(-80, Math.min(0, raw));
+        row.style.transform = `translateX(${clamped}px)`;
       }, { passive: true });
 
       row.addEventListener("touchend", e => {
-        if (!tracking) return;
-        tracking = false;
-        const dx = e.changedTouches[0].clientX - swipeStartX;
+        swipeTracking = false;
         row.style.transition = "";
-        row.style.transform = "";
 
-        if (dx < -40) {
-          // Swiped far enough left — reveal delete
-          row.classList.add("swiped");
-          didSwipe = true;
-        } else if (dx > 20) {
-          // Swiped back right — hide delete
-          row.classList.remove("swiped");
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const wasSwiped = row.classList.contains("swiped");
+
+        if (!touchMoved) {
+          // Pure tap — toggle complete, reset if swiped
+          if (wasSwiped) {
+            row.classList.remove("swiped");
+            row.style.transform = "";
+          } else {
+            toggleItem(item.id, item.checked);
+          }
+          return;
         }
-        // If in-between, snap back
+
+        // Decide final position based on direction + distance
+        if (!wasSwiped && dx < -30) {
+          // Swiped open
+          row.classList.add("swiped");
+          row.style.transform = "";
+        } else if (wasSwiped && dx > 20) {
+          // Swiped closed
+          row.classList.remove("swiped");
+          row.style.transform = "";
+        } else {
+          // Snap back to previous state
+          row.style.transform = "";
+        }
+      });
+
+      // Desktop click fallback
+      row.addEventListener("click", () => {
+        if (row.classList.contains("swiped")) {
+          row.classList.remove("swiped");
+          return;
+        }
+        toggleItem(item.id, item.checked);
       });
 
       inner.appendChild(outer);
