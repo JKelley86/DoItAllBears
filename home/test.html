@@ -2,1715 +2,1451 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Date Planner</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Family Grocery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --cream: #fdf6ee;
-  --warm: #f5e6d3;
-  --rose: #e8a598;
-  --blush: #d4756a;
-  --deep: #8b3a3a;
-  --ink: #2c1810;
-  --gold: #c9973f;
-  --muted: #9b7b72;
+  --bg: #F2F2F7;
+  --card: #FFFFFF;
+  --card2: #F9F9FB;
+  --text: #1C1C1E;
+  --text2: #3A3A3C;
+  --muted: #8E8E93;
+  --border: rgba(0,0,0,0.08);
+  --accent: #34C759;
+  --accent-dark: #248A3D;
+  --accent-light: #E8F9EC;
+  --danger: #FF3B30;
+  --danger-light: #FFF1F0;
+  --blue: #007AFF;
+  --blue-light: #EBF4FF;
+  --orange: #FF9500;
+  --orange-light: #FFF5E6;
+  --purple: #AF52DE;
+  --purple-light: #F5EDFB;
+  --teal: #5AC8FA;
+  --teal-light: #EAF7FE;
+  --pink: #FF2D55;
+  --pink-light: #FFF0F3;
+  --yellow: #FFCC00;
+  --yellow-light: #FFFBE6;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
+  --radius: 16px;
+  --safe-top: env(safe-area-inset-top, 44px);
+  --safe-bottom: env(safe-area-inset-bottom, 34px);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Nunito', -apple-system, sans-serif;
+  height: 100%;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+}
 
 body {
-  font-family: 'Lato', sans-serif;
-  background: var(--cream);
-  min-height: 100vh;
-  color: var(--ink);
+  max-width: 430px;
+  margin: 0 auto;
+  padding-bottom: calc(100px + var(--safe-bottom));
 }
 
-/* subtle paper texture via repeating gradient */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(0,0,0,.018) 28px, rgba(0,0,0,.018) 29px),
-    repeating-linear-gradient(90deg, transparent, transparent 28px, rgba(0,0,0,.01) 28px, rgba(0,0,0,.01) 29px);
-  pointer-events: none;
-  z-index: 0;
+/* ── HEADER ── */
+.header {
+  padding: calc(var(--safe-top) + 8px) 20px 12px;
+  background: rgba(242,242,247,0.94);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
-/* =====================
-   SCREENS
-===================== */
-.screen {
-  display: none;
-  position: fixed;
-  inset: 0;
-  overflow-y: auto;
-  z-index: 1;
-  padding: 40px 20px;
-}
-.screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.screen.active.top { justify-content: flex-start; padding-top: 50px; }
-
-/* =====================
-   HOME SCREEN
-===================== */
-#homeScreen {
-  background: var(--cream);
-}
-
-.home-inner {
-  max-width: 460px;
-  width: 100%;
-  text-align: center;
-}
-
-.logo-date {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: 16px;
-  letter-spacing: 0.1em;
-  color: var(--gold);
-  margin-bottom: 8px;
-}
-
-.logo-main {
-  font-family: 'Playfair Display', serif;
-  font-size: 52px;
-  font-weight: 700;
-  color: var(--ink);
-  line-height: 1.1;
-  margin-bottom: 6px;
-}
-
-.logo-sub {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: 18px;
-  color: var(--muted);
-  margin-bottom: 50px;
-}
-
-.divider {
-  width: 60px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  margin: 0 auto 50px;
-}
-
-.mode-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 30px;
-}
-
-.mode-card {
-  background: white;
-  border: 1.5px solid #e8ddd6;
-  border-radius: 18px;
-  padding: 32px 20px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
-  box-shadow: 0 2px 12px rgba(139,58,58,.06);
-  position: relative;
-  overflow: hidden;
-}
-
-.mode-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, var(--warm) 0%, transparent 100%);
-  opacity: 0;
-  transition: opacity 0.3s;
-  border-radius: 18px;
-}
-
-.mode-card:hover {
-  border-color: var(--rose);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 30px rgba(139,58,58,.14);
-}
-
-.mode-card:hover::after { opacity: 1; }
-
-.mode-card > * { position: relative; z-index: 1; }
-
-.mode-icon {
-  font-size: 40px;
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 12px;
-  display: block;
 }
 
-.mode-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--ink);
-  margin-bottom: 8px;
-}
-
-.mode-desc {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.5;
-}
-
-.surprise-notice {
-  background: linear-gradient(135deg, #fff8f0, #fdf0e8);
-  border: 1px solid #f0d8c8;
-  border-radius: 12px;
-  padding: 14px 18px;
-  font-size: 13px;
-  color: var(--muted);
-  display: none;
-  align-items: center;
-  gap: 10px;
-}
-
-.surprise-notice.show { display: flex; }
-.notice-dot {
-  width: 8px; height: 8px;
-  background: var(--gold);
-  border-radius: 50%;
-  flex-shrink: 0;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.3); }
-}
-
-/* =====================
-   PLAN SETUP SCREEN
-===================== */
-#planSetup {
-  background: var(--cream);
-}
-
-.setup-card {
-  background: white;
-  border-radius: 24px;
-  padding: 44px 40px;
-  max-width: 480px;
-  width: 100%;
-  box-shadow: 0 4px 40px rgba(139,58,58,.1);
-  border: 1px solid #ecddd5;
-}
-
-.screen-back {
-  position: fixed;
-  top: 24px;
-  left: 24px;
-  background: white;
-  border: 1.5px solid #e8ddd6;
-  color: var(--muted);
-  font-size: 14px;
-  padding: 8px 16px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: 'Lato', sans-serif;
-  z-index: 10;
-}
-
-.screen-back:hover { border-color: var(--rose); color: var(--blush); }
-
-.setup-eyebrow {
-  font-size: 12px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 12px;
-  font-weight: 700;
-}
-
-.setup-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 32px;
-  color: var(--ink);
-  margin-bottom: 8px;
-  line-height: 1.2;
-}
-
-.setup-sub {
-  color: var(--muted);
-  font-size: 15px;
-  margin-bottom: 36px;
-  line-height: 1.5;
-}
-
-.field-label {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 8px;
-}
-
-.field-group { margin-bottom: 22px; }
-
-.pill-group {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.pill {
-  padding: 10px 20px;
-  border-radius: 50px;
-  border: 1.5px solid #e8ddd6;
-  background: white;
-  cursor: pointer;
-  font-size: 14px;
-  color: var(--ink);
-  font-family: 'Lato', sans-serif;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.pill:hover { border-color: var(--rose); }
-.pill.selected {
-  background: var(--blush);
-  border-color: var(--blush);
-  color: white;
-  font-weight: 700;
-}
-
-.btn-primary {
-  width: 100%;
-  padding: 16px;
-  background: var(--deep);
-  color: white;
-  border: none;
-  border-radius: 14px;
-  font-family: 'Lato', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  letter-spacing: 0.03em;
-  margin-top: 10px;
-}
-
-.btn-primary:hover { background: var(--blush); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,58,58,.25); }
-.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
-
-/* =====================
-   SURPRISE SETUP SCREEN
-===================== */
-#surpriseSetup {
-  background: var(--cream);
-}
-
-/* =====================
-   PLAN PLAY SCREEN
-===================== */
-#planPlay {
-  background: linear-gradient(160deg, #8b3a3a 0%, #6b2828 100%);
-}
-
-.play-container {
-  max-width: 860px;
-  width: 100%;
-}
-
-.play-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.play-progress-wrap {
-  background: rgba(255,255,255,.12);
-  border-radius: 14px;
-  padding: 16px 22px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 18px;
-}
-
-.progress-bar-outer {
-  flex: 1;
-  height: 6px;
-  background: rgba(255,255,255,.2);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progress-bar-inner {
-  height: 100%;
-  background: linear-gradient(90deg, var(--rose), var(--gold));
-  border-radius: 3px;
-  transition: width 0.6s ease;
-  box-shadow: 0 0 8px rgba(232,165,152,.5);
-}
-
-.progress-label {
-  color: rgba(255,255,255,.7);
-  font-size: 13px;
-  white-space: nowrap;
-  font-weight: 700;
-}
-
-.play-category {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: 15px;
-  color: rgba(255,255,255,.6);
-  letter-spacing: 0.08em;
-  margin-bottom: 8px;
-}
-
-.play-question {
-  font-family: 'Playfair Display', serif;
-  font-size: 36px;
-  color: white;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.play-hint {
-  color: rgba(255,255,255,.5);
-  font-size: 14px;
-}
-
-.cards-row {
-  display: flex;
-  justify-content: center;
-  gap: 28px;
-  flex-wrap: wrap;
-  margin-bottom: 30px;
-}
-
-.flip-card {
-  width: 220px;
-  height: 270px;
-  perspective: 1200px;
-  cursor: pointer;
-}
-
-.flip-inner {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform 0.65s cubic-bezier(.4,0,.2,1);
-}
-
-.flip-card:hover:not(.flipped) .flip-inner {
-  transform: rotateY(8deg) rotateX(-4deg);
-}
-
-.flip-card.flipped .flip-inner {
-  transform: rotateY(180deg);
-}
-
-.flip-front, .flip-back {
-  position: absolute;
-  inset: 0;
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  backface-visibility: hidden;
-  padding: 30px 22px;
-  text-align: center;
-}
-
-.flip-front {
-  background: rgba(255,255,255,.1);
-  border: 1.5px solid rgba(255,255,255,.2);
-  backdrop-filter: blur(4px);
-  box-shadow: 0 8px 32px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.15);
-}
-
-.flip-front-icon {
-  font-size: 36px;
-  margin-bottom: 16px;
-  opacity: 0.7;
-}
-
-.flip-front-text {
-  color: rgba(255,255,255,.7);
-  font-size: 15px;
-  font-weight: 300;
-  letter-spacing: 0.05em;
-}
-
-.flip-back {
-  background: var(--cream);
-  border: 2px solid var(--warm);
-  transform: rotateY(180deg);
-  box-shadow: 0 12px 40px rgba(0,0,0,.25);
-}
-
-.flip-back-text {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--ink);
-  line-height: 1.3;
-}
-
-.flip-back-check {
+.header-title {
   font-size: 28px;
-  margin-top: 12px;
-  opacity: 0;
-  transition: opacity 0.3s 0.5s;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: var(--text);
 }
 
-.flip-card.flipped .flip-back-check { opacity: 1; }
-
-.play-back-btn {
-  background: rgba(255,255,255,.1);
-  border: 1.5px solid rgba(255,255,255,.25);
-  color: rgba(255,255,255,.7);
-  font-family: 'Lato', sans-serif;
-  font-size: 14px;
-  padding: 10px 22px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: none;
-}
-
-.play-back-btn:hover { background: rgba(255,255,255,.18); color: white; }
-.play-back-btn.visible { display: inline-flex; align-items: center; gap: 8px; }
-
-/* =====================
-   PLAN SUMMARY SCREEN
-===================== */
-#planSummary {
-  background: var(--cream);
-}
-
-.summary-card {
-  background: white;
-  border-radius: 24px;
-  padding: 48px 40px;
-  max-width: 500px;
-  width: 100%;
-  box-shadow: 0 4px 40px rgba(139,58,58,.1);
-  border: 1px solid #ecddd5;
-  text-align: center;
-}
-
-.summary-icon { font-size: 54px; margin-bottom: 16px; }
-
-.summary-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 34px;
-  color: var(--ink);
-  margin-bottom: 6px;
-}
-
-.summary-date {
-  font-size: 14px;
-  color: var(--muted);
-  margin-bottom: 32px;
-}
-
-.summary-items { margin-bottom: 36px; }
-
-.summary-row {
-  display: flex;
-  align-items: center;
-  padding: 16px 0;
-  border-bottom: 1px solid #f5ece6;
-  text-align: left;
-}
-
-.summary-row:last-child { border-bottom: none; }
-
-.summary-row-label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--muted);
-  width: 90px;
-  flex-shrink: 0;
-}
-
-.summary-row-value {
-  font-family: 'Playfair Display', serif;
-  font-size: 19px;
-  color: var(--ink);
-  flex: 1;
-}
-
-.summary-row-icon { font-size: 22px; margin-left: 12px; }
-
-.btn-outline {
-  background: white;
-  color: var(--deep);
-  border: 1.5px solid #e8ddd6;
-  border-radius: 12px;
-  font-family: 'Lato', sans-serif;
-  font-size: 15px;
-  padding: 13px 24px;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-right: 12px;
-}
-
-.btn-outline:hover { border-color: var(--rose); }
-
-/* =====================
-   SURPRISE ACTIVE SCREEN
-===================== */
-#surpriseActive {
-  background: var(--cream);
-}
-
-.surprise-wrap {
-  max-width: 720px;
-  width: 100%;
-}
-
-.surprise-header {
-  text-align: center;
-  margin-bottom: 36px;
-}
-
-.surprise-eyebrow {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 10px;
-}
-
-.surprise-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 38px;
-  color: var(--ink);
-  line-height: 1.15;
-  margin-bottom: 6px;
-}
-
-.surprise-sub {
-  color: var(--muted);
-  font-size: 15px;
-}
-
-/* Envelope cards — two side by side */
-.envelope-area {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
-  margin: 0 auto 32px;
-  flex-wrap: wrap;
-}
-
-.envelope-card {
-  width: 260px;
-  height: 340px;
-  perspective: 1200px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.envelope-inner {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform 0.7s cubic-bezier(.4,0,.2,1);
-}
-
-.envelope-card.flipped .envelope-inner {
-  transform: rotateY(180deg);
-}
-
-.env-front, .env-back {
-  position: absolute;
-  inset: 0;
-  border-radius: 22px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  backface-visibility: hidden;
-  padding: 36px 30px;
-  text-align: center;
-}
-
-.env-front {
-  background: linear-gradient(150deg, var(--deep) 0%, #6b2828 100%);
-  box-shadow: 0 16px 50px rgba(139,58,58,.35);
-}
-
-.env-wax { font-size: 56px; margin-bottom: 20px; }
-
-.env-front-title {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: 22px;
-  color: rgba(255,255,255,.85);
-  margin-bottom: 10px;
-}
-
-.env-front-hint {
+.header-subtitle {
   font-size: 13px;
-  color: rgba(255,255,255,.45);
-  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-weight: 600;
+  margin-top: 1px;
 }
 
-/* Pulsing ring on envelope */
-.env-front::before {
-  content: '';
-  position: absolute;
-  inset: -8px;
-  border-radius: 30px;
-  border: 2px solid rgba(201,151,63,.25);
-  animation: ringPulse 2.5s infinite;
-}
+.header-btns { display: flex; gap: 8px; }
 
-@keyframes ringPulse {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 0; transform: scale(1.04); }
-}
-
-.env-back {
-  background: white;
-  border: 2px solid var(--warm);
-  transform: rotateY(180deg);
-  box-shadow: 0 16px 50px rgba(0,0,0,.12);
-}
-
-.env-back-category {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 16px;
-}
-
-.env-back-activity {
-  font-family: 'Playfair Display', serif;
-  font-size: 30px;
-  font-weight: 700;
-  color: var(--ink);
-  line-height: 1.25;
-  margin-bottom: 24px;
-}
-
-.env-done-btn {
-  background: var(--deep);
-  color: white;
-  border: none;
-  border-radius: 50px;
-  padding: 13px 28px;
-  font-family: 'Lato', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: none;
-}
-
-.envelope-card.flipped .env-done-btn { display: inline-block; }
-.env-done-btn:hover { background: var(--blush); transform: translateY(-2px); }
-
-/* Progress dots */
-.surprise-dots {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
+.theme-btn, .map-btn {
+  width: 36px; height: 36px;
   border-radius: 50%;
-  background: #e8ddd6;
-  transition: all 0.3s;
-}
-
-.dot.done { background: var(--blush); }
-.dot.active { background: var(--gold); transform: scale(1.3); box-shadow: 0 0 0 3px rgba(201,151,63,.2); }
-
-.surprise-status {
-  text-align: center;
-  font-size: 14px;
-  color: var(--muted);
-}
-
-.reset-link {
-  display: inline-block;
-  margin-top: 28px;
-  font-size: 13px;
-  color: var(--muted);
-  text-decoration: underline;
+  background: var(--card);
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
-  opacity: 0.6;
-  transition: opacity 0.2s;
+  transition: transform 0.15s;
 }
+.theme-btn:active, .map-btn:active { transform: scale(0.92); }
 
-.reset-link:hover { opacity: 1; }
-
-/* =====================
-   SURPRISE DONE SCREEN
-===================== */
-#surpriseDone {
-  background: var(--cream);
+/* Search bar */
+.search-wrap { position: relative; }
+.search-icon {
+  position: absolute; left: 12px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted); font-size: 16px; pointer-events: none;
 }
-
-.done-card {
-  background: white;
-  border-radius: 24px;
-  padding: 56px 40px;
-  max-width: 90%;
+.search-input {
   width: 100%;
-  text-align: center;
-  box-shadow: 0 4px 40px rgba(139,58,58,.1);
-  border: 1px solid #ecddd5;
+  padding: 10px 12px 10px 36px;
+  border-radius: 12px; border: none;
+  background: rgba(142,142,147,0.12);
+  font-family: 'Nunito', sans-serif; font-size: 15px;
+  color: var(--text); outline: none;
+}
+.search-input::placeholder { color: var(--muted); }
+
+/* ── TAB BAR ── */
+.tab-bar {
+  display: flex;
+  padding: 8px 14px 0;
+  gap: 6px;
+}
+.tab-btn {
+  flex: 1;
+  padding: 8px 4px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.tab-btn.active {
+  background: var(--card);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+.tab-btn:active { transform: scale(0.96); }
+
+/* ── STORE FILTER PILLS ── */
+.store-filter {
+  padding: 10px 0 4px 14px;
+  display: flex; gap: 8px;
+  overflow-x: auto; scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.store-filter::-webkit-scrollbar { display: none; }
+
+.store-pill {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 20px; border: none;
+  background: var(--card);
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px; font-weight: 700;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all 0.15s; white-space: nowrap;
+  display: flex; align-items: center; gap: 5px;
+  color: var(--text);
+}
+.store-pill.active { background: var(--text); color: #fff; }
+.store-pill:active { transform: scale(0.95); }
+.store-pill .pill-icon { font-size: 15px; }
+
+/* ── CONTENT ── */
+.content { padding: 8px 14px 0; }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── SUMMARY STRIP ── */
+.summary { display: flex; gap: 10px; margin-bottom: 16px; }
+.summary-card {
+  flex: 1; background: var(--card);
+  border-radius: 14px; padding: 12px 14px;
+  box-shadow: var(--shadow-sm); text-align: center;
+}
+.summary-num { font-size: 22px; font-weight: 900; color: var(--text); line-height: 1; }
+.summary-label { font-size: 11px; color: var(--muted); font-weight: 700; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
+.summary-card.done .summary-num { color: var(--accent); }
+.summary-card.remaining .summary-num { color: var(--blue); }
+
+/* ── CATEGORY SECTION ── */
+.category-section {
+  margin-bottom: 12px; border-radius: var(--radius);
+  overflow: hidden; box-shadow: var(--shadow-sm); background: var(--card);
+}
+.category-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px; cursor: pointer; user-select: none;
+  transition: background 0.15s; -webkit-tap-highlight-color: transparent;
+}
+.category-header:active { background: rgba(0,0,0,0.03); }
+.cat-emoji {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.cat-info { flex: 1; min-width: 0; }
+.cat-name { font-size: 15px; font-weight: 800; color: var(--text); line-height: 1.2; }
+.cat-count { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 1px; }
+.cat-badge {
+  min-width: 22px; height: 22px; border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; padding: 0 6px; flex-shrink: 0;
+}
+.cat-chevron {
+  color: var(--muted); font-size: 12px; font-weight: 800;
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); flex-shrink: 0;
+}
+.category-section.open .cat-chevron { transform: rotate(90deg); }
+
+.items-list { max-height: 0; overflow: hidden; transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1); }
+.category-section.open .items-list { max-height: 2000px; }
+.items-inner {
+  padding: 10px 12px 12px; display: flex; flex-direction: column;
+  gap: 8px; border-top: 1px solid var(--border);
 }
 
-@media (min-width: 640px) {
-  .done-card {
-    max-width: 560px;
-  }
+/* ── ITEM ROW ── */
+.item-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 10px 12px 14px;
+  background: var(--card2); border-radius: 12px;
+  position: relative; user-select: none; -webkit-user-select: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.item-row.deleting { opacity: 0; transform: scale(0.95); }
+
+.item-check {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 2px solid var(--border); background: transparent;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  color: transparent; font-size: 13px;
+}
+.item-row.checked .item-check { background: var(--accent); border-color: var(--accent); color: white; }
+
+.item-body { flex: 1; min-width: 0; }
+.item-name {
+  font-size: 15px; font-weight: 700; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s;
+}
+.item-row.checked .item-name { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--muted); }
+
+.item-meta {
+  display: flex; align-items: center; gap: 5px; margin-top: 3px; flex-wrap: wrap;
 }
 
-@media (min-width: 1024px) {
-  .done-card {
-    max-width: 700px;
-  }
+/* Store icon badge */
+.store-icon {
+  width: 20px; height: 20px; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 900; flex-shrink: 0;
 }
 
-.done-card .done-icon { font-size: 64px; margin-bottom: 20px; }
+/* Aisle chip */
+.aisle-chip {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 6px; border-radius: 20px;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.02em;
+  white-space: nowrap; flex-shrink: 0;
+}
 
-.done-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 38px;
-  color: var(--ink);
+.item-del-btn {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--danger-light); border: none;
+  color: var(--danger); font-size: 18px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+
+/* ── RECIPE SECTION ── */
+.recipe-header-row {
+  display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 12px;
 }
+.recipe-section-title {
+  font-size: 20px; font-weight: 900; color: var(--text);
+}
+.new-recipe-btn {
+  padding: 8px 14px; border-radius: 20px; border: none;
+  background: var(--accent); color: #fff;
+  font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
+  cursor: pointer; transition: all 0.15s;
+}
+.new-recipe-btn:active { transform: scale(0.95); }
 
-.done-message {
-  font-size: 16px;
-  color: var(--muted);
-  line-height: 1.6;
-  margin-bottom: 36px;
+.recipe-card {
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: var(--shadow-sm); margin-bottom: 12px; overflow: hidden;
+}
+.recipe-card-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px; cursor: pointer; user-select: none;
+}
+.recipe-emoji {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--orange-light);
+  display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+}
+.recipe-info { flex: 1; min-width: 0; }
+.recipe-name { font-size: 15px; font-weight: 800; color: var(--text); }
+.recipe-count { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 1px; }
+.recipe-chevron {
+  color: var(--muted); font-size: 12px; font-weight: 800;
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+.recipe-card.open .recipe-chevron { transform: rotate(90deg); }
+
+.recipe-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+.recipe-card.open .recipe-body { max-height: 1000px; }
+
+.recipe-body-inner { padding: 0 14px 14px; border-top: 1px solid var(--border); }
+
+.recipe-ingredient-list { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
+.recipe-ing-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px; background: var(--card2); border-radius: 10px;
+}
+.recipe-ing-name { flex: 1; font-size: 14px; font-weight: 700; color: var(--text); }
+.recipe-ing-qty { font-size: 12px; color: var(--muted); font-weight: 600; }
+.recipe-ing-del {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--danger-light); border: none;
+  color: var(--danger); font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
 }
 
-/* =====================
-   CANVAS / SHARED
-===================== */
-#confettiCanvas {
+.add-ing-row {
+  display: flex; gap: 6px; margin-top: 10px;
+}
+.add-ing-input {
+  flex: 1; padding: 10px 12px; border-radius: 10px;
+  border: 1.5px solid var(--border); background: var(--bg);
+  font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600;
+  color: var(--text); outline: none;
+}
+.add-ing-input:focus { border-color: var(--accent); }
+.add-ing-qty {
+  width: 72px; padding: 10px 8px; border-radius: 10px;
+  border: 1.5px solid var(--border); background: var(--bg);
+  font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600;
+  color: var(--text); outline: none;
+}
+.add-ing-qty:focus { border-color: var(--accent); }
+.add-ing-btn {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--accent); border: none; color: #fff;
+  font-size: 22px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+}
+
+.recipe-actions {
+  display: flex; gap: 8px; margin-top: 12px;
+}
+.add-all-btn {
+  flex: 1; padding: 12px; border-radius: 12px; border: none;
+  background: var(--accent); color: #fff;
+  font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800;
+  cursor: pointer; transition: all 0.15s;
+  box-shadow: 0 3px 12px rgba(52,199,89,0.3);
+}
+.add-all-btn:active { transform: scale(0.97); }
+.del-recipe-btn {
+  padding: 12px 16px; border-radius: 12px; border: none;
+  background: var(--danger-light); color: var(--danger);
+  font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800;
+  cursor: pointer; transition: all 0.15s;
+}
+.del-recipe-btn:active { transform: scale(0.97); }
+
+.recipe-empty {
+  text-align: center; padding: 40px 20px;
+  color: var(--muted); font-size: 14px; font-weight: 600;
+}
+.recipe-empty .re-emoji { font-size: 40px; margin-bottom: 10px; }
+
+/* ── STORE MAP / AISLE GUIDE ── */
+.map-panel {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  z-index: 400;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.32,0.72,0,1);
+  overflow-y: auto;
+  max-width: 430px;
+  margin: 0 auto;
+  padding-bottom: calc(40px + var(--safe-bottom));
+}
+.map-panel.open { transform: translateX(0); }
+
+.map-header {
+  padding: calc(var(--safe-top) + 8px) 20px 16px;
+  background: var(--card);
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: var(--shadow-sm);
+}
+.map-back {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--bg); border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; cursor: pointer; flex-shrink: 0;
+}
+.map-title { font-size: 20px; font-weight: 900; color: var(--text); flex: 1; }
+
+.map-store-tabs {
+  display: flex; gap: 8px; padding: 12px 14px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.map-store-tabs::-webkit-scrollbar { display: none; }
+.map-store-tab {
+  flex-shrink: 0; padding: 7px 14px;
+  border-radius: 20px; border: none;
+  background: var(--card); color: var(--muted);
+  font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; box-shadow: var(--shadow-sm);
+  display: flex; align-items: center; gap: 5px; transition: all 0.15s;
+}
+.map-store-tab.active { background: var(--text); color: #fff; }
+
+.map-content { padding: 0 14px; }
+
+.aisle-section {
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: var(--shadow-sm); margin-bottom: 10px; overflow: hidden;
+}
+.aisle-section-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; cursor: pointer;
+}
+.aisle-num {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 900; flex-shrink: 0;
+}
+.aisle-zone-name { font-size: 14px; font-weight: 800; color: var(--text); flex: 1; }
+.aisle-items-preview { font-size: 11px; color: var(--muted); font-weight: 600; }
+.aisle-section-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; border-top: 1px solid var(--border); }
+.aisle-section.open .aisle-section-body { max-height: 500px; }
+.aisle-items-list { padding: 10px 16px 14px; display: flex; flex-wrap: wrap; gap: 6px; }
+.aisle-item-tag {
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 12px; font-weight: 700; color: var(--text);
+  background: var(--card2);
+}
+
+/* ── FAB ── */
+.fab {
   position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
+  bottom: calc(24px + var(--safe-bottom));
+  right: 24px;
+  width: 58px; height: 58px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff; font-size: 28px; border: none;
+  box-shadow: 0 4px 20px rgba(52,199,89,0.5);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  z-index: 100;
 }
+.fab:active { transform: scale(0.92); }
 
-.fade-enter {
-  animation: fadeEnter 0.4s ease both;
+/* ── SHEET ── */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4); z-index: 200;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  backdrop-filter: blur(2px);
 }
+.overlay.open { opacity: 1; pointer-events: all; }
 
-@keyframes fadeEnter {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
+.sheet {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  max-width: 430px; margin: 0 auto;
+  background: var(--card); border-radius: 24px 24px 0 0;
+  padding: 0 20px calc(24px + var(--safe-bottom));
+  z-index: 300; transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.32,0.72,0,1);
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.12);
 }
+.sheet.open { transform: translateY(0); }
+.sheet-handle { width: 36px; height: 4px; border-radius: 2px; background: rgba(0,0,0,0.12); margin: 12px auto 20px; }
+.sheet-title { font-size: 18px; font-weight: 900; margin-bottom: 20px; color: var(--text); }
+.field-label {
+  font-size: 12px; font-weight: 800; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; margin-top: 14px;
+}
+.field-label:first-of-type { margin-top: 0; }
+.sheet-input, .sheet-select {
+  width: 100%; padding: 14px 16px; border-radius: 12px;
+  border: 1.5px solid var(--border); background: var(--bg);
+  font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 600;
+  color: var(--text); outline: none; transition: border-color 0.15s;
+  appearance: none; -webkit-appearance: none;
+}
+.sheet-input:focus, .sheet-select:focus { border-color: var(--accent); }
+.cat-picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
+.cat-pick-btn {
+  padding: 10px 6px; border-radius: 12px; border: 1.5px solid var(--border);
+  background: var(--bg); cursor: pointer; text-align: center;
+  transition: all 0.15s; font-family: 'Nunito', sans-serif;
+}
+.cat-pick-btn .cpb-emoji { font-size: 20px; display: block; margin-bottom: 3px; }
+.cat-pick-btn .cpb-label { font-size: 11px; font-weight: 800; color: var(--muted); }
+.cat-pick-btn.selected { border-color: var(--accent); background: var(--accent-light); }
+.cat-pick-btn.selected .cpb-label { color: var(--accent-dark); }
+.cat-pick-btn:active { transform: scale(0.95); }
+.add-btn {
+  width: 100%; padding: 16px; border-radius: 14px; border: none;
+  background: var(--accent); color: #fff;
+  font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800;
+  letter-spacing: 0.02em; margin-top: 20px; cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 4px 16px rgba(52,199,89,0.35);
+}
+.add-btn:active { transform: scale(0.97); }
 
-@media (max-width: 520px) {
-  .mode-grid { grid-template-columns: 1fr; }
-  .logo-main { font-size: 40px; }
-  .play-question { font-size: 28px; }
-  .flip-card { width: 160px; height: 200px; }
-  .flip-back-text { font-size: 17px; }
-  .summary-card, .setup-card, .done-card { padding: 36px 24px; }
-  .envelope-card { width: 200px; height: 270px; }
+/* Clear button */
+.clear-row { padding: 8px 14px 4px; }
+.clear-btn {
+  width: 100%; padding: 13px; border-radius: 12px; border: none;
+  background: var(--card); color: var(--danger);
+  font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800;
+  cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.15s;
 }
+.clear-btn:active { transform: scale(0.98); opacity: 0.8; }
+
+/* ── DARK MODE ── */
+body.dark {
+  --bg: #000000; --card: #1C1C1E; --card2: #2C2C2E;
+  --text: #FFFFFF; --text2: #EBEBF5; --muted: #8E8E93;
+  --border: rgba(255,255,255,0.08);
+  --accent-light: rgba(52,199,89,0.15);
+  --danger-light: rgba(255,59,48,0.15);
+  --blue-light: rgba(0,122,255,0.15);
+  --orange-light: rgba(255,149,0,0.15);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+}
+body.dark .header { background: rgba(0,0,0,0.92); }
+body.dark .search-input { background: rgba(255,255,255,0.08); }
+body.dark .sheet-input, body.dark .sheet-select, body.dark .cat-pick-btn { background: #2C2C2E; }
+body.dark .map-panel { background: #000; }
+body.dark .add-ing-input, body.dark .add-ing-qty { background: #2C2C2E; }
+
+/* Loading */
+.loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; gap: 12px; }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Empty state */
+.empty-state { padding: 24px 16px; text-align: center; color: var(--muted); font-size: 13px; font-weight: 600; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: calc(90px + var(--safe-bottom)); left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #1C1C1E; color: #fff;
+  padding: 10px 20px; border-radius: 20px;
+  font-size: 14px; font-weight: 700;
+  opacity: 0; transition: all 0.3s; pointer-events: none;
+  white-space: nowrap; z-index: 500;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.item-row { animation: fadeIn 0.25s ease forwards; }
 </style>
 </head>
 <body>
 
-<canvas id="confettiCanvas"></canvas>
-
-<!-- =================== HOME =================== -->
-<div class="screen active" id="homeScreen">
-  <div class="home-inner fade-enter">
-    <div class="logo-date">for the two of you</div>
-    <div class="logo-main">Date<br>Planner</div>
-    <div class="logo-sub">make today memorable</div>
-    <div class="divider"></div>
-
-    <div class="mode-grid">
-      <div class="mode-card" onclick="goTo('planSetup')">
-        <span class="mode-icon">🗓️</span>
-        <div class="mode-title">Plan the Day</div>
-        <div class="mode-desc">Pick your vibe & budget, then build your whole day at once</div>
-      </div>
-      <div class="mode-card" onclick="startSurpriseMode()">
-        <span class="mode-icon">✉️</span>
-        <div class="mode-title">Surprise Me</div>
-        <div class="mode-desc">She reveals each activity one at a time as you go</div>
-      </div>
-    </div>
-
-    <div class="surprise-notice" id="savedNotice">
-      <div class="notice-dot"></div>
-      <span>You have a surprise day in progress — <strong style="cursor:pointer;color:var(--blush)" onclick="resumeSurprise()">tap to continue</strong></span>
-    </div>
-  </div>
-</div>
-
-<!-- =================== PLAN SETUP =================== -->
-<div class="screen" id="planSetup">
-  <button class="screen-back" onclick="goTo('homeScreen')">← Back</button>
-  <div class="setup-card fade-enter">
-    <div class="setup-eyebrow">Plan the Day</div>
-    <div class="setup-title">What kind of day are you planning?</div>
-    <div class="setup-sub">Pick your vibe and budget, then flip cards to build your full itinerary.</div>
-
-    <div class="field-group">
-      <div class="field-label">Where</div>
-      <div class="pill-group">
-        <div class="pill" onclick="selectPill(this,'type','stay')">🏠 Stay in</div>
-        <div class="pill" onclick="selectPill(this,'type','out')">🌆 Go out</div>
-        <div class="pill" onclick="selectPill(this,'type','combo')">🔄 Mix it up</div>
-      </div>
-    </div>
-
-    <div class="field-group">
-      <div class="field-label">Budget</div>
-      <div class="pill-group">
-        <div class="pill" onclick="selectPill(this,'budget','cheap')">💰 Affordable</div>
-        <div class="pill" onclick="selectPill(this,'budget','wild')">💎 Go all out</div>
-      </div>
-    </div>
-
-    <button class="btn-primary" id="planStartBtn" onclick="startPlan()" disabled>Let's Plan →</button>
-  </div>
-</div>
-
-<!-- =================== SURPRISE SETUP =================== -->
-<div class="screen" id="surpriseSetup">
-  <button class="screen-back" onclick="goTo('homeScreen')">← Back</button>
-  <div class="setup-card fade-enter">
-    <div class="setup-eyebrow">Surprise Mode</div>
-    <div class="setup-title">Set up the surprise</div>
-    <div class="setup-sub">You choose the vibe — she won't see what's planned. She'll reveal each activity as the day unfolds.</div>
-
-    <div class="field-group">
-      <div class="field-label">Where</div>
-      <div class="pill-group">
-        <div class="pill" onclick="selectPill(this,'stype','stay')">🏠 Stay in</div>
-        <div class="pill" onclick="selectPill(this,'stype','out')">🌆 Go out</div>
-        <div class="pill" onclick="selectPill(this,'stype','combo')">🔄 Mix it up</div>
-      </div>
-    </div>
-
-    <div class="field-group">
-      <div class="field-label">Budget</div>
-      <div class="pill-group">
-        <div class="pill" onclick="selectPill(this,'sbudget','cheap')">💰 Affordable</div>
-        <div class="pill" onclick="selectPill(this,'sbudget','wild')">💎 Go all out</div>
-      </div>
-    </div>
-
-    <button class="btn-primary" id="surpriseStartBtn" onclick="startSurprise()" disabled>Start the Surprise →</button>
-  </div>
-</div>
-
-<!-- =================== PLAN PLAY =================== -->
-<div class="screen top" id="planPlay">
-  <button class="screen-back" style="position:fixed;top:24px;left:24px;" onclick="goTo('homeScreen')">← Exit</button>
-  <div class="play-container fade-enter">
-    <div class="play-header">
-      <div class="play-progress-wrap">
-        <div class="progress-bar-outer">
-          <div class="progress-bar-inner" id="planProgressBar"></div>
-        </div>
-        <div class="progress-label" id="planProgressLabel"></div>
-      </div>
-      <div class="play-category" id="planCategory"></div>
-      <div class="play-question" id="planQuestion"></div>
-      <div class="play-hint">Tap a card to reveal</div>
-    </div>
-    <div class="cards-row" id="planCards"></div>
-    <div style="text-align:center">
-      <button class="play-back-btn" id="planBackBtn" onclick="planGoBack()">← Choose again</button>
-    </div>
-  </div>
-</div>
-
-<!-- =================== PLAN SUMMARY =================== -->
-<div class="screen" id="planSummary">
-  <div class="summary-card fade-enter">
-    <div class="summary-icon">💑</div>
-    <div class="summary-title">Your Day Is Set</div>
-    <div class="summary-date" id="summaryDate"></div>
-    <div class="summary-items" id="summaryItems"></div>
+<!-- Header -->
+<div class="header">
+  <div class="header-top">
     <div>
-      <button class="btn-outline" onclick="goTo('planSetup')">Plan Again</button>
-      <button class="btn-primary" style="width:auto;padding:13px 24px;margin-top:0" onclick="goTo('homeScreen')">Done</button>
+      <div class="header-title">🛒 Groceries</div>
+      <div class="header-subtitle" id="header-sub">Loading…</div>
     </div>
+    <div class="header-btns">
+      <button class="map-btn" onclick="openMap()" title="Store Map">🗺️</button>
+      <button class="theme-btn" onclick="toggleTheme()">🌙</button>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="search" placeholder="Search items…" oninput="applyFilters()" />
   </div>
 </div>
 
-<!-- =================== SURPRISE ACTIVE =================== -->
-<div class="screen" id="surpriseActive">
-  <button class="screen-back" style="position:fixed;top:24px;left:24px;z-index:10" onclick="confirmExitSurprise()">← Home</button>
-  <div class="surprise-wrap fade-enter">
-    <div class="surprise-header">
-      <div class="surprise-eyebrow">Surprise Mode</div>
-      <div class="surprise-title" id="surpriseStageName">What's next?</div>
-      <div class="surprise-sub" id="surpriseSubtitle"></div>
-    </div>
-
-    <div class="surprise-dots" id="surpriseDots"></div>
-
-    <div class="envelope-area" id="envelopeArea"></div>
-
-    <div class="surprise-status" id="surpriseStatus"></div>
-    <div style="text-align:center">
-      <span class="reset-link" onclick="confirmResetSurprise()">Start a new surprise day</span>
-    </div>
-  </div>
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <button class="tab-btn active" id="tab-list" onclick="switchTab('list')">📋 List</button>
+  <button class="tab-btn" id="tab-recipes" onclick="switchTab('recipes')">👨‍🍳 Recipes</button>
 </div>
 
-<!-- =================== SURPRISE DONE =================== -->
-<div class="screen" id="surpriseDone">
-  <div class="done-card fade-enter">
-    <div class="done-icon">🥂</div>
-    <div class="done-title">What a day.</div>
-    <div class="done-message">You did it all. Hope today was everything and more.</div>
-    
-    <div style="margin: 30px 0; padding-top: 20px; border-top: 1px solid #f5ece6;">
-      <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 16px;">Your Day</div>
-      <div id="surpriseSummary" style="text-align: left;"></div>
-    </div>
-    
-    <button class="btn-primary" onclick="resetSurpriseAndHome()">Back to Home</button>
-  </div>
+<!-- Store Filter Pills (list tab only) -->
+<div class="store-filter" id="storeFilterBar">
+  <button class="store-pill active" onclick="setStoreFilter('All', this)">🛒 All</button>
+  <button class="store-pill" onclick="setStoreFilter('Walmart', this)"><span class="pill-icon">🔵</span>Walmart</button>
+  <button class="store-pill" onclick="setStoreFilter('Costco', this)"><span class="pill-icon">🔴</span>Costco</button>
+  <button class="store-pill" onclick="setStoreFilter('Cub', this)"><span class="pill-icon">🟡</span>Cub</button>
+  <button class="store-pill" onclick="setStoreFilter('Target', this)"><span class="pill-icon">🎯</span>Target</button>
+  <button class="store-pill" onclick="setStoreFilter('County Market', this)"><span class="pill-icon">🟢</span>County Market</button>
+  <button class="store-pill" onclick="setStoreFilter('Jerry\'s', this)"><span class="pill-icon">🟠</span>Jerry's</button>
 </div>
 
-<script>
-/* ================================================
-   DATA
-================================================ */
-const DATA = {
-  stay: {
-    cheap: [
-      {title:"Breakfast",    category:"Morning",   options:["Homemade Pancakes","Bagels & Coffee"]},
-      {title:"Activity",     category:"Afternoon", options:["Board Games","Movie Marathon"]},
-      {title:"Dinner",       category:"Evening",   options:["Cook Pasta Together","Order Pizza"]}
-    ],
-    wild: [
-      {title:"Breakfast",    category:"Morning",   options:["Fancy Brunch Spread","Steak & Eggs"]},
-      {title:"Activity",     category:"Afternoon", options:["At-Home Spa Day","Gaming Marathon"]},
-      {title:"Dinner",       category:"Evening",   options:["Cook Steak Together","Premium Sushi Delivery"]}
-    ]
-  },
-  out: {
-    cheap: [
-      {title:"Morning",      category:"Morning",   options:["Local Coffee Shop","Nature Walk"]},
-      {title:"Activity",     category:"Afternoon", options:["Arcade","Bowling"]},
-      {title:"Dinner",       category:"Evening",   options:["Classic Diner","Burger Joint"]}
-    ],
-    wild: [
-      {title:"Morning",      category:"Morning",   options:["Upscale Brunch","Trendy Café"]},
-      {title:"Activity",     category:"Afternoon", options:["Shopping Spree","Art Museum"]},
-      {title:"Dinner",       category:"Evening",   options:["Fine Dining","Bar Hopping"]}
-    ]
-  },
-  combo: {
-    cheap: [
-      {title:"Morning",      category:"Morning",   options:["Coffee Shop Run","Breakfast at Home"]},
-      {title:"Activity",     category:"Afternoon", options:["Park Picnic","Movie Theater"]},
-      {title:"Dinner",       category:"Evening",   options:["Takeout Night","Cook Together"]}
-    ],
-    wild: [
-      {title:"Morning",      category:"Morning",   options:["Restaurant Brunch","Specialty Café"]},
-      {title:"Activity",     category:"Afternoon", options:["Bowling + Drinks","Escape Room"]},
-      {title:"Dinner",       category:"Evening",   options:["Nice Restaurant","Dessert Bar Tour"]}
-    ]
-  }
+<!-- Content -->
+<div class="content">
+
+  <!-- LIST TAB -->
+  <div class="tab-panel active" id="panel-list">
+    <div class="summary">
+      <div class="summary-card remaining"><div class="summary-num" id="sum-remaining">—</div><div class="summary-label">Remaining</div></div>
+      <div class="summary-card done"><div class="summary-num" id="sum-done">—</div><div class="summary-label">Done</div></div>
+      <div class="summary-card"><div class="summary-num" id="sum-total">—</div><div class="summary-label">Total</div></div>
+    </div>
+    <div class="loading" id="loading"><div class="spinner"></div><div style="color:var(--muted);font-size:14px;font-weight:700">Loading…</div></div>
+    <div id="categories"></div>
+    <div class="clear-row">
+      <button class="clear-btn" onclick="clearCompleted()">🗑 Clear Completed Items</button>
+    </div>
+  </div>
+
+  <!-- RECIPES TAB -->
+  <div class="tab-panel" id="panel-recipes">
+    <div class="recipe-header-row">
+      <div class="recipe-section-title">My Recipes</div>
+      <button class="new-recipe-btn" onclick="promptNewRecipe()">+ New Recipe</button>
+    </div>
+    <div id="recipeList"></div>
+  </div>
+
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="openSheet()">+</button>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+
+<!-- Add Item Sheet -->
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">Add Item</div>
+  <div class="field-label">Item Name</div>
+  <input class="sheet-input" id="itemName" placeholder="e.g. Chocolate Milk" autocomplete="off" autocorrect="off" />
+  <div class="field-label">Store</div>
+  <select class="sheet-select" id="storeSelect">
+    <option value="Walmart">Walmart</option>
+    <option value="Costco">Costco</option>
+    <option value="Cub">Cub</option>
+    <option value="Target">Target</option>
+    <option value="County Market">County Market</option>
+    <option value="Jerry's">Jerry's</option>
+  </select>
+  <div class="field-label">Category</div>
+  <div class="cat-picker" id="catPicker"></div>
+  <button class="add-btn" onclick="addItem()">Add to List</button>
+</div>
+
+<!-- Store Map Panel -->
+<div class="map-panel" id="mapPanel">
+  <div class="map-header">
+    <button class="map-back" onclick="closeMap()">‹</button>
+    <div class="map-title">Store Aisle Guide</div>
+  </div>
+  <div class="map-store-tabs" id="mapStoreTabs"></div>
+  <div class="map-content" id="mapContent"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, onSnapshot,
+  doc, updateDoc, deleteDoc, getDocs, setDoc,
+  enableIndexedDbPersistence
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyABD9vjdzX62oxEf8hLePjVRfu_YxGgcQ0",
+  authDomain: "grocerylist-e4b7c.firebaseapp.com",
+  projectId: "grocerylist-e4b7c"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+enableIndexedDbPersistence(db).catch(() => {});
+
+const listRef    = collection(db, "items");
+const mapRef     = collection(db, "categoryMappings");
+const recipesRef = collection(db, "recipes");
+
+// ── STORE CONFIG ──
+const STORES = {
+  "Walmart":       { icon: "W", bg: "#0071CE", fg: "#fff" },
+  "Costco":        { icon: "C", bg: "#E31837", fg: "#fff" },
+  "Cub":           { icon: "Cb", bg: "#FFC72C", fg: "#000" },
+  "Target":        { icon: "T", bg: "#CC0000", fg: "#fff" },
+  "County Market": { icon: "CM", bg: "#2D8C4E", fg: "#fff" },
+  "Jerry's":       { icon: "J", bg: "#FF6B00", fg: "#fff" },
 };
 
-/* ================================================
-   BRANCHING DATA FOR SURPRISE MODE
-   Each choice leads to different future options
-================================================ */
-const BRANCHING_DATA = {
-  stay: {
-    cheap: {
-      // Stage 1: Breakfast
-      stage1: {
-        title: "Breakfast",
-        category: "Morning",
-        options: ["Homemade Pancakes", "Bagels & Coffee"]
-      },
-      // Stage 2: Activity (branches based on breakfast choice)
-      stage2: {
-        "Homemade Pancakes": {
-          title: "Activity",
-          category: "Afternoon",
-          options: ["Board Game Tournament", "Build a Blanket Fort"]
-        },
-        "Bagels & Coffee": {
-          title: "Activity",
-          category: "Afternoon",
-          options: ["Puzzle Challenge", "Movie Marathon"]
-        }
-      },
-      // Stage 3: Dinner (branches based on activity choice)
-      stage3: {
-        "Board Game Tournament": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Order Pizza & Keep Playing", "Cook Quick Tacos"]
-        },
-        "Build a Blanket Fort": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Eat in the Fort (Delivery)", "Make Grilled Cheese"]
-        },
-        "Puzzle Challenge": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Cook Pasta Together", "Order Chinese"]
-        },
-        "Movie Marathon": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Popcorn & Candy Buffet", "Order Pizza"]
-        }
-      }
-    },
-    wild: {
-      stage1: {
-        title: "Breakfast",
-        category: "Morning",
-        options: ["Fancy Brunch Spread", "Steak & Eggs"]
-      },
-      stage2: {
-        "Fancy Brunch Spread": {
-          title: "Activity",
-          category: "Afternoon",
-          options: ["At-Home Wine Tasting", "Couples Massage"]
-        },
-        "Steak & Eggs": {
-          title: "Activity",
-          category: "Afternoon",
-          options: ["Gaming Marathon Setup", "Home Spa Day"]
-        }
-      },
-      stage3: {
-        "At-Home Wine Tasting": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Charcuterie & More Wine", "Cook Fancy Pasta"]
-        },
-        "Couples Massage": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Order Premium Sushi", "Cook Steak Dinner"]
-        },
-        "Gaming Marathon Setup": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Loaded Nachos & Snacks", "Premium Pizza Delivery"]
-        },
-        "Home Spa Day": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Light Salad & Smoothies", "Order Healthy Bowls"]
-        }
-      }
-    }
-  },
-  out: {
-    cheap: {
-      stage1: {
-        title: "Morning",
-        category: "Morning",
-        options: ["Local Coffee Shop", "Nature Walk"]
-      },
-      stage2: {
-        "Local Coffee Shop": {
-          title: "Activity",
-          category: "Afternoon",
-          options: ["Arcade", "Thrift Store Hunt"]
-        },
-        "Nature Walk": {
-          title: "Activity",
-          category: "Afternoon",
-          options: ["Park Picnic", "Bowling"]
-        }
-      },
-      stage3: {
-        "Arcade": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Pizza Place Nearby", "Food Truck Park"]
-        },
-        "Thrift Store Hunt": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Cozy Diner", "Taco Spot"]
-        },
-        "Park Picnic": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Burger Joint", "BBQ Takeout"]
-        },
-        "Bowling": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Classic Diner", "Wing Place"]
-        }
-      }
-    },
-    wild: {
-      stage1: {
-        title: "Morning",
-        category: "Morning",
-        options: ["Upscale Brunch", "Trendy Café"]
-      },
-      stage2: {
-        "Upscale Brunch": {
-          title: "Activity",
-          category: "Afternoon",
-          options: ["Shopping Spree", "Wine Tasting"]
-        },
-        "Trendy Café": {
-          title: "Activity",
-          category: "Afternoon",
-          options: ["Art Museum", "Botanical Garden"]
-        }
-      },
-      stage3: {
-        "Shopping Spree": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Fine Dining", "Rooftop Bar & Apps"]
-        },
-        "Wine Tasting": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Upscale Italian", "Tapas & More Wine"]
-        },
-        "Art Museum": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Artistic Fusion Restaurant", "Farm-to-Table"]
-        },
-        "Botanical Garden": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Garden Restaurant", "Outdoor Patio Dining"]
-        }
-      }
-    }
-  },
-  combo: {
-    cheap: {
-      stage1: {
-        title: "Morning",
-        category: "Morning",
-        options: ["Coffee Shop Run", "Breakfast at Home"]
-      },
-      stage2: {
-        "Coffee Shop Run": {
-          title: "Activity",
-          category: "Afternoon",
-          options: ["Movie Theater", "Walk in the Park"]
-        },
-        "Breakfast at Home": {
-          title: "Activity",
-          category: "Afternoon",
-          options: ["Board Games", "Bake Together"]
-        }
-      },
-      stage3: {
-        "Movie Theater": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Dinner & Movie Combo", "Quick Bites After"]
-        },
-        "Walk in the Park": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Takeout Picnic", "Cook at Home"]
-        },
-        "Board Games": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Order In & Keep Playing", "Cook Together"]
-        },
-        "Bake Together": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Light Dinner (You Made Dessert!)", "Soup & Fresh Bread"]
-        }
-      }
-    },
-    wild: {
-      stage1: {
-        title: "Morning",
-        category: "Morning",
-        options: ["Restaurant Brunch", "Specialty Café"]
-      },
-      stage2: {
-        "Restaurant Brunch": {
-          title: "Activity",
-          category: "Afternoon",
-          options: ["Escape Room", "Couples Spa"]
-        },
-        "Specialty Café": {
-          title: "Activity",
-          category: "Afternoon",
-          options: ["Bowling Alley Bar", "Paint & Sip Class"]
-        }
-      },
-      stage3: {
-        "Escape Room": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Celebratory Dinner Out", "Cocktail Bar Crawl"]
-        },
-        "Couples Spa": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Romantic Fine Dining", "Sushi & Sake"]
-        },
-        "Bowling Alley Bar": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Steakhouse", "Gourmet Burger Bar"]
-        },
-        "Paint & Sip Class": {
-          title: "Dinner",
-          category: "Evening",
-          options: ["Italian Restaurant", "Dessert Bar Tour"]
-        }
+// ── AISLE DATA per store ──
+// Standard layout based on real Walmart/grocery store floor plans
+const AISLE_DATA = {
+  "Walmart": [
+    { zone: "Entrance / Seasonal", num: "ENT", color: "#8E8E93", light: "#F2F2F7", items: ["Seasonal displays", "Flowers", "Greeting cards", "Magazines", "Batteries", "Gift wrap"] },
+    { zone: "Produce", num: "1", color: "#34C759", light: "#E8F9EC", items: ["Fruits", "Vegetables", "Fresh herbs", "Bagged salads", "Mushrooms", "Avocados", "Potatoes", "Onions", "Garlic"] },
+    { zone: "Bakery / Deli", num: "2", color: "#FF9500", light: "#FFF5E6", items: ["Bread", "Rolls", "Muffins", "Bagels", "Deli meats", "Sliced cheese", "Prepared foods", "Rotisserie chicken"] },
+    { zone: "Meat & Seafood", num: "3", color: "#FF3B30", light: "#FFF1F0", items: ["Chicken", "Ground beef", "Steak", "Pork", "Bacon", "Sausage", "Salmon", "Shrimp", "Hot dogs", "Brats"] },
+    { zone: "Dairy & Eggs", num: "4", color: "#5AC8FA", light: "#EAF7FE", items: ["Milk", "Butter", "Eggs", "Yogurt", "Cream cheese", "Sour cream", "Shredded cheese", "String cheese", "Heavy cream", "Almond milk"] },
+    { zone: "Frozen Foods", num: "5", color: "#007AFF", light: "#EBF4FF", items: ["Ice cream", "Frozen pizza", "Frozen vegetables", "Frozen meals", "Frozen chicken", "Pizza rolls", "Popsicles", "Frozen broccoli", "Edamame"] },
+    { zone: "Beverages", num: "6", color: "#AF52DE", light: "#F5EDFB", items: ["Soda", "Juice", "Water", "Sports drinks", "Energy drinks", "Coffee", "Tea", "Kombucha", "Beer", "Wine"] },
+    { zone: "Snacks & Candy", num: "7", color: "#FF2D55", light: "#FFF0F3", items: ["Chips", "Crackers", "Popcorn", "Pretzels", "Nuts", "Trail mix", "Granola bars", "Candy", "Chocolate", "Fruit snacks"] },
+    { zone: "Cereal & Breakfast", num: "8", color: "#FFCC00", light: "#FFFBE6", items: ["Cereal", "Oatmeal", "Pancake mix", "Syrup", "Pop-Tarts", "Granola", "Breakfast bars"] },
+    { zone: "Canned & Dry Goods", num: "9", color: "#FF9500", light: "#FFF5E6", items: ["Canned beans", "Canned tomatoes", "Pasta", "Rice", "Soup", "Broth", "Canned tuna", "Sauces", "Cooking oils"] },
+    { zone: "Condiments & Spices", num: "10", color: "#5AC8FA", light: "#EAF7FE", items: ["Ketchup", "Mustard", "Mayo", "Salsa", "Hot sauce", "Salad dressing", "Salt", "Pepper", "Spices", "Soy sauce", "Peanut butter", "Jelly"] },
+    { zone: "Baking", num: "11", color: "#AF52DE", light: "#F5EDFB", items: ["Flour", "Sugar", "Baking soda", "Baking powder", "Vanilla", "Chocolate chips", "Cake mix", "Brownie mix", "Frosting", "Yeast"] },
+    { zone: "Paper & Cleaning", num: "12", color: "#34C759", light: "#E8F9EC", items: ["Paper towels", "Toilet paper", "Tissues", "Trash bags", "Ziploc bags", "Foil", "Plastic wrap", "Dish soap", "Laundry detergent", "Bleach", "Windex", "Sponges"] },
+    { zone: "Health & Beauty", num: "13", color: "#FF3B30", light: "#FFF1F0", items: ["Shampoo", "Conditioner", "Body wash", "Toothpaste", "Toothbrush", "Deodorant", "Sunscreen", "Vitamins", "Pain relievers"] },
+    { zone: "Baby & Pet", num: "14", color: "#FFCC00", light: "#FFFBE6", items: ["Diapers", "Baby wipes", "Baby food", "Formula", "Dog food", "Cat food", "Pet treats"] },
+  ],
+  "Costco": [
+    { zone: "Fresh Produce", num: "A", color: "#34C759", light: "#E8F9EC", items: ["Bulk fruits", "Vegetables", "Salad kits", "Herbs", "Berries"] },
+    { zone: "Bakery", num: "B", color: "#FF9500", light: "#FFF5E6", items: ["Muffins", "Croissants", "Bagels", "Bread loaves", "Tortillas", "Pita"] },
+    { zone: "Deli & Prepared", num: "C", color: "#FF3B30", light: "#FFF1F0", items: ["Rotisserie chicken", "Prepared salads", "Sliced meats", "Shredded chicken"] },
+    { zone: "Meat & Seafood", num: "D", color: "#FF2D55", light: "#FFF0F3", items: ["Chicken breast", "Ground beef", "Steak packs", "Salmon fillets", "Shrimp", "Bacon"] },
+    { zone: "Dairy & Eggs", num: "E", color: "#5AC8FA", light: "#EAF7FE", items: ["Milk", "Eggs (36pk)", "Butter", "Yogurt", "String cheese", "Shredded cheese", "Cream cheese"] },
+    { zone: "Frozen", num: "F", color: "#007AFF", light: "#EBF4FF", items: ["Frozen fish", "Pot stickers", "Frozen vegetables", "Ice cream", "Pizza", "Frozen meals", "Edamame"] },
+    { zone: "Beverages", num: "G", color: "#AF52DE", light: "#F5EDFB", items: ["Water cases", "Juice", "Sports drinks", "Sparkling water", "Coffee pods", "Wine", "Beer"] },
+    { zone: "Snacks & Candy", num: "H", color: "#FF2D55", light: "#FFF0F3", items: ["Kirkland trail mix", "Nuts", "Chips", "Crackers", "Granola bars", "Fruit snacks", "Chocolate"] },
+    { zone: "Dry & Canned Goods", num: "I", color: "#FF9500", light: "#FFF5E6", items: ["Rice", "Pasta", "Canned goods", "Cooking oil", "Sauces", "Protein bars", "Cereal"] },
+    { zone: "Paper & Household", num: "J", color: "#34C759", light: "#E8F9EC", items: ["Paper towels", "Toilet paper", "Trash bags", "Laundry pods", "Dish soap", "Ziploc bags", "Foil"] },
+  ],
+  "Target": [
+    { zone: "Produce", num: "A1", color: "#34C759", light: "#E8F9EC", items: ["Fruits", "Vegetables", "Salads", "Fresh herbs"] },
+    { zone: "Meat & Seafood", num: "A2", color: "#FF3B30", light: "#FFF1F0", items: ["Chicken", "Ground beef", "Bacon", "Sausage", "Seafood"] },
+    { zone: "Dairy & Eggs", num: "A3", color: "#5AC8FA", light: "#EAF7FE", items: ["Milk", "Eggs", "Butter", "Yogurt", "Cheese", "Cream"] },
+    { zone: "Bakery & Bread", num: "B1", color: "#FF9500", light: "#FFF5E6", items: ["Bread", "Bagels", "Rolls", "Tortillas", "English muffins"] },
+    { zone: "Frozen", num: "B2", color: "#007AFF", light: "#EBF4FF", items: ["Frozen meals", "Ice cream", "Frozen pizza", "Frozen vegetables", "Popsicles"] },
+    { zone: "Beverages", num: "C1", color: "#AF52DE", light: "#F5EDFB", items: ["Soda", "Juice", "Water", "Coffee", "Tea", "Energy drinks"] },
+    { zone: "Snacks", num: "C2", color: "#FF2D55", light: "#FFF0F3", items: ["Chips", "Crackers", "Nuts", "Granola bars", "Candy", "Popcorn"] },
+    { zone: "Dry Grocery", num: "D1", color: "#FFCC00", light: "#FFFBE6", items: ["Cereal", "Pasta", "Rice", "Canned goods", "Condiments", "Cooking oils", "Baking"] },
+    { zone: "Cleaning & Paper", num: "E1", color: "#34C759", light: "#E8F9EC", items: ["Paper towels", "Toilet paper", "Cleaning supplies", "Trash bags", "Laundry"] },
+    { zone: "Health & Beauty", num: "E2", color: "#FF3B30", light: "#FFF1F0", items: ["Shampoo", "Body wash", "Toothpaste", "Deodorant", "Vitamins", "Sunscreen"] },
+    { zone: "Baby & Pet", num: "F1", color: "#FFCC00", light: "#FFFBE6", items: ["Diapers", "Baby wipes", "Pet food", "Pet treats"] },
+  ],
+  "Cub": [
+    { zone: "Floral & Produce", num: "1", color: "#34C759", light: "#E8F9EC", items: ["Flowers", "Fruits", "Vegetables", "Salads", "Herbs", "Potatoes", "Onions"] },
+    { zone: "Bakery", num: "2", color: "#FF9500", light: "#FFF5E6", items: ["Bread", "Rolls", "Muffins", "Bagels", "Cakes", "Donuts"] },
+    { zone: "Deli", num: "3", color: "#FF3B30", light: "#FFF1F0", items: ["Deli meats", "Sliced cheese", "Prepared foods", "Rotisserie chicken", "Salami", "Pepperoni"] },
+    { zone: "Meat & Seafood", num: "4", color: "#FF2D55", light: "#FFF0F3", items: ["Chicken", "Ground beef", "Steaks", "Pork", "Bacon", "Sausage", "Shrimp", "Salmon"] },
+    { zone: "Dairy & Eggs", num: "5", color: "#5AC8FA", light: "#EAF7FE", items: ["Milk", "Eggs", "Butter", "Yogurt", "Cream cheese", "Sour cream", "Cheese", "Heavy cream"] },
+    { zone: "Frozen", num: "6", color: "#007AFF", light: "#EBF4FF", items: ["Ice cream", "Frozen meals", "Frozen pizza", "Frozen vegetables", "Popsicles", "Frozen chicken"] },
+    { zone: "Beverages", num: "7", color: "#AF52DE", light: "#F5EDFB", items: ["Soda", "Juice", "Water", "Coffee", "Tea", "Sports drinks", "Wine", "Beer"] },
+    { zone: "Snacks & Cereal", num: "8", color: "#FF2D55", light: "#FFF0F3", items: ["Chips", "Crackers", "Popcorn", "Nuts", "Granola bars", "Candy", "Cereal", "Oatmeal"] },
+    { zone: "Canned & Dry Goods", num: "9", color: "#FFCC00", light: "#FFFBE6", items: ["Canned beans", "Soup", "Pasta", "Rice", "Cooking oils", "Sauces", "Condiments", "Spices", "Baking"] },
+    { zone: "Household & Health", num: "10", color: "#34C759", light: "#E8F9EC", items: ["Paper towels", "Toilet paper", "Cleaning supplies", "Laundry", "Shampoo", "Body wash", "Toothpaste"] },
+  ],
+};
+// Use Cub layout as fallback for County Market and Jerry's
+AISLE_DATA["County Market"] = AISLE_DATA["Cub"];
+AISLE_DATA["Jerry's"] = AISLE_DATA["Cub"];
+
+// ── CATEGORIES ──
+const CATEGORIES = [
+  { id: "Produce",   label: "Produce",   emoji: "🥦", color: "#34C759", light: "#E8F9EC" },
+  { id: "Dairy",     label: "Dairy",     emoji: "🥛", color: "#5AC8FA", light: "#EAF7FE" },
+  { id: "Bread",     label: "Bread",     emoji: "🍞", color: "#FF9500", light: "#FFF5E6" },
+  { id: "Meat",      label: "Meat",      emoji: "🥩", color: "#FF3B30", light: "#FFF1F0" },
+  { id: "Frozen",    label: "Frozen",    emoji: "🧊", color: "#007AFF", light: "#EBF4FF" },
+  { id: "Snacks",    label: "Snacks",    emoji: "🍿", color: "#FF2D55", light: "#FFF0F3" },
+  { id: "Drinks",    label: "Drinks",    emoji: "🧃", color: "#AF52DE", light: "#F5EDFB" },
+  { id: "Household", label: "Household", emoji: "🧹", color: "#FFCC00", light: "#FFFBE6" },
+  { id: "Other",     label: "Other",     emoji: "🛍️", color: "#8E8E93", light: "#F2F2F7" },
+];
+
+// ── STATE ──
+let items = [];
+let recipes = [];
+let mapping = {};
+let storeFilter = "All";
+let searchQuery = "";
+let selectedCategory = "Other";
+let activeTab = "list";
+let activeMapStore = "Walmart";
+
+// ── THEME ──
+window.toggleTheme = () => {
+  document.body.classList.toggle("dark");
+  const isDark = document.body.classList.contains("dark");
+  localStorage.setItem("theme", isDark ? "dark" : "light");
+  document.querySelector(".theme-btn").textContent = isDark ? "☀️" : "🌙";
+};
+(function() {
+  const saved = localStorage.getItem("theme");
+  if (saved === "dark") {
+    document.body.classList.add("dark");
+    document.querySelector(".theme-btn").textContent = "☀️";
+  }
+})();
+
+// ── TABS ──
+window.switchTab = function(tab) {
+  activeTab = tab;
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  document.getElementById("tab-" + tab).classList.add("active");
+  document.getElementById("panel-" + tab).classList.add("active");
+  document.getElementById("storeFilterBar").style.display = tab === "list" ? "flex" : "none";
+  document.getElementById("fab").style.display = tab === "list" ? "flex" : "none";
+};
+
+// ── STORE FILTER ──
+window.setStoreFilter = (store, btn) => {
+  storeFilter = store;
+  document.querySelectorAll(".store-pill").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  render();
+};
+
+window.applyFilters = () => {
+  searchQuery = document.getElementById("search").value.toLowerCase();
+  render();
+};
+
+// ── LOAD DATA ──
+async function loadMappings() {
+  const snap = await getDocs(mapRef);
+  snap.forEach(d => mapping[d.id] = d.data().category);
+}
+
+function normalize(text) { return text.trim().toLowerCase(); }
+
+// ── SMART CATEGORIZATION ──
+const CONTEXT_OVERRIDES = [
+  { pattern: /\bfrozen\b/i, category: "Frozen" },
+];
+
+const PHRASE_MAP = [
+  { phrase: /\bmilk\b/i, category: "Dairy" },
+  { phrase: /\bchocolate milk\b/i, category: "Dairy" },
+  { phrase: /\bwhole milk\b/i, category: "Dairy" },
+  { phrase: /\balmond milk\b/i, category: "Dairy" },
+  { phrase: /\boat milk\b/i, category: "Dairy" },
+  { phrase: /\bcream\b/i, category: "Dairy" },
+  { phrase: /\bheavy cream\b/i, category: "Dairy" },
+  { phrase: /\bsour cream\b/i, category: "Dairy" },
+  { phrase: /\bcheese\b/i, category: "Dairy" },
+  { phrase: /\bshredded cheese\b/i, category: "Dairy" },
+  { phrase: /\bsliced cheese\b/i, category: "Dairy" },
+  { phrase: /\bcream cheese\b/i, category: "Dairy" },
+  { phrase: /\bcottage cheese\b/i, category: "Dairy" },
+  { phrase: /\bparmesan\b/i, category: "Dairy" },
+  { phrase: /\bcheddar\b/i, category: "Dairy" },
+  { phrase: /\bmozzarella\b/i, category: "Dairy" },
+  { phrase: /\byogurt\b/i, category: "Dairy" },
+  { phrase: /\bbutter\b/i, category: "Dairy" },
+  { phrase: /\beggs?\b/i, category: "Dairy" },
+  { phrase: /\bwhipped cream\b/i, category: "Dairy" },
+  { phrase: /\bkefir\b/i, category: "Dairy" },
+  { phrase: /\bhalf and half\b/i, category: "Dairy" },
+  { phrase: /\bbroccoli\b/i, category: "Produce" },
+  { phrase: /\bspinach\b/i, category: "Produce" },
+  { phrase: /\bkale\b/i, category: "Produce" },
+  { phrase: /\blettuce\b/i, category: "Produce" },
+  { phrase: /\bromaine\b/i, category: "Produce" },
+  { phrase: /\bcabbage\b/i, category: "Produce" },
+  { phrase: /\bbag salad\b/i, category: "Produce" },
+  { phrase: /\bsalad mix\b/i, category: "Produce" },
+  { phrase: /\btomato(es)?\b/i, category: "Produce" },
+  { phrase: /\bonion(s)?\b/i, category: "Produce" },
+  { phrase: /\bgarlic\b/i, category: "Produce" },
+  { phrase: /\bcarrot(s)?\b/i, category: "Produce" },
+  { phrase: /\bcelery\b/i, category: "Produce" },
+  { phrase: /\bcucumber\b/i, category: "Produce" },
+  { phrase: /\bbell pepper\b/i, category: "Produce" },
+  { phrase: /\bpepper(s)?\b/i, category: "Produce" },
+  { phrase: /\bavocado\b/i, category: "Produce" },
+  { phrase: /\bbanana(s)?\b/i, category: "Produce" },
+  { phrase: /\bapple(s)?\b/i, category: "Produce" },
+  { phrase: /\borange(s)?\b/i, category: "Produce" },
+  { phrase: /\blemon(s)?\b/i, category: "Produce" },
+  { phrase: /\blime(s)?\b/i, category: "Produce" },
+  { phrase: /\bstrawberr/i, category: "Produce" },
+  { phrase: /\bblueberr/i, category: "Produce" },
+  { phrase: /\bgrapes?\b/i, category: "Produce" },
+  { phrase: /\bwatermelon\b/i, category: "Produce" },
+  { phrase: /\bpeach(es)?\b/i, category: "Produce" },
+  { phrase: /\bpear(s)?\b/i, category: "Produce" },
+  { phrase: /\bpotato(es)?\b/i, category: "Produce" },
+  { phrase: /\bsweet potato\b/i, category: "Produce" },
+  { phrase: /\bzucchini\b/i, category: "Produce" },
+  { phrase: /\basparagus\b/i, category: "Produce" },
+  { phrase: /\bbeets?\b/i, category: "Produce" },
+  { phrase: /\bmushroom(s)?\b/i, category: "Produce" },
+  { phrase: /\bcorn\b/i, category: "Produce" },
+  { phrase: /\bgreen bean(s)?\b/i, category: "Produce" },
+  { phrase: /\bpeas?\b/i, category: "Produce" },
+  { phrase: /\bcilantro\b/i, category: "Produce" },
+  { phrase: /\bparsley\b/i, category: "Produce" },
+  { phrase: /\bbasil\b/i, category: "Produce" },
+  { phrase: /\bginger\b/i, category: "Produce" },
+  { phrase: /\bchicken\b/i, category: "Meat" },
+  { phrase: /\bground beef\b/i, category: "Meat" },
+  { phrase: /\bground turkey\b/i, category: "Meat" },
+  { phrase: /\bsteak\b/i, category: "Meat" },
+  { phrase: /\bpork\b/i, category: "Meat" },
+  { phrase: /\bbacon\b/i, category: "Meat" },
+  { phrase: /\bham\b/i, category: "Meat" },
+  { phrase: /\bturkey\b/i, category: "Meat" },
+  { phrase: /\bsalmon\b/i, category: "Meat" },
+  { phrase: /\btilapia\b/i, category: "Meat" },
+  { phrase: /\bshrimp\b/i, category: "Meat" },
+  { phrase: /\bsausage\b/i, category: "Meat" },
+  { phrase: /\bbrats?\b/i, category: "Meat" },
+  { phrase: /\bhot dog(s)?\b/i, category: "Meat" },
+  { phrase: /\bdeli meat\b/i, category: "Meat" },
+  { phrase: /\blunch ?meat\b/i, category: "Meat" },
+  { phrase: /\bsalami\b/i, category: "Meat" },
+  { phrase: /\bpepperoni\b/i, category: "Meat" },
+  { phrase: /\blamb\b/i, category: "Meat" },
+  { phrase: /\btuna\b/i, category: "Meat" },
+  { phrase: /\bice cream\b/i, category: "Frozen" },
+  { phrase: /\bsorbet\b/i, category: "Frozen" },
+  { phrase: /\bpizza rolls\b/i, category: "Frozen" },
+  { phrase: /\bpopsicle\b/i, category: "Frozen" },
+  { phrase: /\bedamame\b/i, category: "Frozen" },
+  { phrase: /\bbread\b/i, category: "Bread" },
+  { phrase: /\bsourdough\b/i, category: "Bread" },
+  { phrase: /\bbagel(s)?\b/i, category: "Bread" },
+  { phrase: /\benglish muffin\b/i, category: "Bread" },
+  { phrase: /\btortilla(s)?\b/i, category: "Bread" },
+  { phrase: /\bwrap(s)?\b/i, category: "Bread" },
+  { phrase: /\bpita\b/i, category: "Bread" },
+  { phrase: /\bnaan\b/i, category: "Bread" },
+  { phrase: /\bcroissant\b/i, category: "Bread" },
+  { phrase: /\bmuffin(s)?\b/i, category: "Bread" },
+  { phrase: /\bdinner roll\b/i, category: "Bread" },
+  { phrase: /\bbuns?\b/i, category: "Bread" },
+  { phrase: /\bcake\b/i, category: "Bread" },
+  { phrase: /\bjuice\b/i, category: "Drinks" },
+  { phrase: /\bsoda\b/i, category: "Drinks" },
+  { phrase: /\bpop\b/i, category: "Drinks" },
+  { phrase: /\bcoke\b/i, category: "Drinks" },
+  { phrase: /\bpepsi\b/i, category: "Drinks" },
+  { phrase: /\bwater\b/i, category: "Drinks" },
+  { phrase: /\benergy drink\b/i, category: "Drinks" },
+  { phrase: /\bred bull\b/i, category: "Drinks" },
+  { phrase: /\bcoffee\b/i, category: "Drinks" },
+  { phrase: /\btea\b/i, category: "Drinks" },
+  { phrase: /\bkombucha\b/i, category: "Drinks" },
+  { phrase: /\bgatorade\b/i, category: "Drinks" },
+  { phrase: /\blemonade\b/i, category: "Drinks" },
+  { phrase: /\bwine\b/i, category: "Drinks" },
+  { phrase: /\bbeer\b/i, category: "Drinks" },
+  { phrase: /\bchips?\b/i, category: "Snacks" },
+  { phrase: /\bpretzels?\b/i, category: "Snacks" },
+  { phrase: /\bpopcorn\b/i, category: "Snacks" },
+  { phrase: /\bcrackers?\b/i, category: "Snacks" },
+  { phrase: /\bgranola bar\b/i, category: "Snacks" },
+  { phrase: /\btrail mix\b/i, category: "Snacks" },
+  { phrase: /\bnuts?\b/i, category: "Snacks" },
+  { phrase: /\balmonds?\b/i, category: "Snacks" },
+  { phrase: /\bcashews?\b/i, category: "Snacks" },
+  { phrase: /\bpeanut butter\b/i, category: "Snacks" },
+  { phrase: /\bcandy\b/i, category: "Snacks" },
+  { phrase: /\bchocolate\b/i, category: "Snacks" },
+  { phrase: /\bhummus\b/i, category: "Snacks" },
+  { phrase: /\bsalsa\b/i, category: "Snacks" },
+  { phrase: /\bcookies?\b/i, category: "Snacks" },
+  { phrase: /\bpaper towel\b/i, category: "Household" },
+  { phrase: /\btoilet paper\b/i, category: "Household" },
+  { phrase: /\btissue(s)?\b/i, category: "Household" },
+  { phrase: /\bdetergent\b/i, category: "Household" },
+  { phrase: /\bdish soap\b/i, category: "Household" },
+  { phrase: /\bhand soap\b/i, category: "Household" },
+  { phrase: /\btrash bag(s)?\b/i, category: "Household" },
+  { phrase: /\bziploc\b/i, category: "Household" },
+  { phrase: /\bfoil\b/i, category: "Household" },
+  { phrase: /\bcleaner\b/i, category: "Household" },
+  { phrase: /\bbleach\b/i, category: "Household" },
+  { phrase: /\bshampoo\b/i, category: "Household" },
+  { phrase: /\bbody wash\b/i, category: "Household" },
+  { phrase: /\btoothpaste\b/i, category: "Household" },
+  { phrase: /\bdeodorant\b/i, category: "Household" },
+  { phrase: /\bdiapers?\b/i, category: "Household" },
+  { phrase: /\bbaby wipes?\b/i, category: "Household" },
+  { phrase: /\bdog food\b/i, category: "Household" },
+  { phrase: /\bcat food\b/i, category: "Household" },
+];
+
+function smartCategorize(fullName) {
+  const name = fullName.trim();
+  const savedKey = name.toLowerCase();
+  if (mapping[savedKey]) return mapping[savedKey];
+  for (const o of CONTEXT_OVERRIDES) {
+    if (o.pattern.test(name)) return o.category;
+  }
+  let bestMatch = null, bestLen = 0;
+  for (const e of PHRASE_MAP) {
+    const m = name.match(e.phrase);
+    if (m && m[0].length > bestLen) { bestLen = m[0].length; bestMatch = e.category; }
+  }
+  return bestMatch;
+}
+
+// ── GET AISLE for an item at a given store ──
+function getAisle(itemName, storeName) {
+  const data = AISLE_DATA[storeName];
+  if (!data) return null;
+  const lower = itemName.toLowerCase();
+  for (const zone of data) {
+    for (const zoneItem of zone.items) {
+      if (lower.includes(zoneItem.toLowerCase()) || zoneItem.toLowerCase().includes(lower.split(" ")[0])) {
+        return { num: zone.num, zone: zone.zone, color: zone.color, light: zone.light };
       }
     }
   }
+  return null;
+}
+
+// ── ADD ITEM ──
+window.addItem = async function() {
+  const name = document.getElementById("itemName").value.trim();
+  if (!name) { document.getElementById("itemName").focus(); return; }
+  const store = document.getElementById("storeSelect").value;
+  const normKey = normalize(name);
+  if (items.find(i => normalize(i.name) === normKey && !i.checked)) {
+    if (!confirm(`"${name}" is already on your list. Add again?`)) return;
+  }
+  await setDoc(doc(db, "categoryMappings", normKey), { category: selectedCategory });
+  mapping[normKey] = selectedCategory;
+  await addDoc(listRef, { name, normalizedName: normKey, category: selectedCategory, store, checked: false, createdAt: Date.now() });
+  document.getElementById("itemName").value = "";
+  closeSheet();
 };
 
-/* ================================================
-   STATE
-================================================ */
-const pillSelections = {};
-let planStages = [], planIndex = 0, planChoices = [];
-let surpriseStages = [], surpriseIndex = 0, surprisePicked = [];
-let surpriseType = '', surpriseBudget = ''; // Track type/budget for branching logic
-let isTransitioning = false;
+// ── FIREBASE LISTENERS ──
+onSnapshot(listRef, snap => {
+  items = [];
+  snap.forEach(d => items.push({ ...d.data(), id: d.id }));
+  document.getElementById("loading").style.display = "none";
+  render();
+});
 
-/* ================================================
-   NAVIGATION
-================================================ */
-function goTo(id) {
-  document.querySelectorAll('.screen').forEach(s => {
-    s.classList.remove('active');
+onSnapshot(recipesRef, snap => {
+  recipes = [];
+  snap.forEach(d => recipes.push({ ...d.data(), id: d.id }));
+  renderRecipes();
+});
+
+// ── RENDER LIST ──
+function render() {
+  const container = document.getElementById("categories");
+  let visible = items;
+  if (storeFilter !== "All") visible = visible.filter(i => i.store === storeFilter);
+  if (searchQuery) visible = visible.filter(i => i.name.toLowerCase().includes(searchQuery));
+
+  const total = visible.length;
+  const done  = visible.filter(i => i.checked).length;
+  document.getElementById("sum-remaining").textContent = total - done;
+  document.getElementById("sum-done").textContent = done;
+  document.getElementById("sum-total").textContent = total;
+  document.getElementById("header-sub").textContent =
+    total === 0 ? "Nothing on the list" :
+    `${total - done} item${total - done !== 1 ? "s" : ""} left to grab`;
+
+  container.innerHTML = "";
+
+  CATEGORIES.forEach(cat => {
+    const catItems = visible.filter(i => i.category === cat.id)
+      .sort((a, b) => a.checked - b.checked || a.createdAt - b.createdAt);
+    if (catItems.length === 0) return;
+
+    const section = document.createElement("div");
+    section.className = "category-section";
+    section.dataset.cat = cat.id;
+
+    const unchecked = catItems.filter(i => !i.checked).length;
+    const countText = catItems.length + " item" + (catItems.length !== 1 ? "s" : "") +
+      (unchecked > 0 ? " · " + unchecked + " remaining" : " · all done!");
+    const badgeHtml = unchecked > 0
+      ? `<div class="cat-badge" style="background:${cat.light};color:${cat.color}">${unchecked}</div>` : "";
+
+    section.innerHTML = `
+      <div class="category-header" onclick="this.parentElement.classList.toggle('open')">
+        <div class="cat-emoji" style="background:${cat.light}"><span>${cat.emoji}</span></div>
+        <div class="cat-info">
+          <div class="cat-name">${cat.label}</div>
+          <div class="cat-count">${countText}</div>
+        </div>
+        ${badgeHtml}
+        <span class="cat-chevron">›</span>
+      </div>
+      <div class="items-list"><div class="items-inner" id="items-${cat.id}"></div></div>
+    `;
+    container.appendChild(section);
+
+    const inner = document.getElementById("items-" + cat.id);
+    catItems.forEach(item => {
+      const store = STORES[item.store] || { icon: item.store[0], bg: "#8E8E93", fg: "#fff" };
+      const aisle = storeFilter !== "All" ? getAisle(item.name, storeFilter) :
+                    getAisle(item.name, item.store);
+
+      const row = document.createElement("div");
+      row.className = "item-row" + (item.checked ? " checked" : "");
+      row.id = "item-" + item.id;
+
+      const check = document.createElement("div");
+      check.className = "item-check";
+      check.textContent = item.checked ? "✓" : "";
+
+      const body = document.createElement("div");
+      body.className = "item-body";
+
+      const aisleHtml = aisle
+        ? `<span class="aisle-chip" style="background:${aisle.light};color:${aisle.color}">📍 ${aisle.num}</span>`
+        : "";
+
+      body.innerHTML = `
+        <div class="item-name">${item.name}</div>
+        <div class="item-meta">
+          <span class="store-icon" style="background:${store.bg};color:${store.fg}">${store.icon}</span>
+          ${aisleHtml}
+        </div>`;
+
+      const delBtn = document.createElement("button");
+      delBtn.className = "item-del-btn";
+      delBtn.textContent = "✕";
+      delBtn.addEventListener("touchend", e => { e.stopPropagation(); e.preventDefault(); confirmDelete(item.id); }, { passive: false });
+      delBtn.addEventListener("click", e => { e.stopPropagation(); confirmDelete(item.id); });
+
+      row.appendChild(check);
+      row.appendChild(body);
+      row.appendChild(delBtn);
+
+      row.addEventListener("click", e => {
+        if (e.target === delBtn || delBtn.contains(e.target)) return;
+        toggleItem(item.id, item.checked);
+      });
+
+      inner.appendChild(row);
+    });
   });
-  const el = document.getElementById(id);
-  el.classList.add('active');
-  // Re-trigger fade on the inner fade-enter element
-  const inner = el.querySelector('.fade-enter');
-  if (inner) { inner.style.animation = 'none'; requestAnimationFrame(() => inner.style.animation = ''); }
 }
 
-/* ================================================
-   PILL SELECTIONS
-================================================ */
-function selectPill(el, key, value) {
-  // Deselect siblings in same group
-  el.parentElement.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
-  el.classList.add('selected');
-  pillSelections[key] = value;
-  updateStartButtons();
-}
+// ── RENDER RECIPES ──
+function renderRecipes() {
+  const container = document.getElementById("recipeList");
+  container.innerHTML = "";
 
-function updateStartButtons() {
-  document.getElementById('planStartBtn').disabled = !(pillSelections.type && pillSelections.budget);
-  document.getElementById('surpriseStartBtn').disabled = !(pillSelections.stype && pillSelections.sbudget);
-}
-
-/* ================================================
-   PLAN MODE
-================================================ */
-function startPlan() {
-  planStages = DATA[pillSelections.type][pillSelections.budget];
-  planIndex = 0;
-  planChoices = [];
-  isTransitioning = false;
-  goTo('planPlay');
-  renderPlanStage();
-}
-
-function renderPlanStage() {
-  const category = document.getElementById('planCategory');
-  const question = document.getElementById('planQuestion');
-  const cards    = document.getElementById('planCards');
-  const backBtn  = document.getElementById('planBackBtn');
-  const bar      = document.getElementById('planProgressBar');
-  const label    = document.getElementById('planProgressLabel');
-
-  if (planIndex >= planStages.length) {
-    showPlanSummary();
+  if (recipes.length === 0) {
+    container.innerHTML = `<div class="recipe-empty"><div class="re-emoji">👨‍🍳</div>No recipes yet.<br>Tap "+ New Recipe" to add one!</div>`;
     return;
   }
 
-  const stage = planStages[planIndex];
-  const pct   = (planIndex / planStages.length) * 100;
+  recipes.forEach(recipe => {
+    const ingredients = recipe.ingredients || [];
+    const card = document.createElement("div");
+    card.className = "recipe-card";
+    card.id = "recipe-" + recipe.id;
 
-  bar.style.width = pct + '%';
-  label.textContent = `${planIndex + 1} of ${planStages.length}`;
-  category.textContent = stage.category;
-  question.textContent = stage.title;
-  backBtn.classList.toggle('visible', planIndex > 0);
-
-  cards.innerHTML = '';
-
-  stage.options.forEach(option => {
-    const card = document.createElement('div');
-    card.className = 'flip-card';
     card.innerHTML = `
-      <div class="flip-inner">
-        <div class="flip-front">
-          <div class="flip-front-icon">🎲</div>
-          <div class="flip-front-text">Tap to reveal</div>
+      <div class="recipe-card-header" onclick="this.parentElement.classList.toggle('open')">
+        <div class="recipe-emoji">🍽️</div>
+        <div class="recipe-info">
+          <div class="recipe-name">${recipe.name}</div>
+          <div class="recipe-count">${ingredients.length} ingredient${ingredients.length !== 1 ? "s" : ""}</div>
         </div>
-        <div class="flip-back">
-          <div class="flip-back-text">${option}</div>
-          <div class="flip-back-check">✓</div>
+        <span class="recipe-chevron">›</span>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-body-inner">
+          <div class="recipe-ingredient-list" id="ings-${recipe.id}"></div>
+          <div class="add-ing-row">
+            <input class="add-ing-input" id="ing-name-${recipe.id}" placeholder="Ingredient…" autocomplete="off" />
+            <input class="add-ing-qty" id="ing-qty-${recipe.id}" placeholder="Qty" autocomplete="off" />
+            <button class="add-ing-btn" onclick="addIngredient('${recipe.id}')">+</button>
+          </div>
+          <div class="recipe-actions">
+            <button class="add-all-btn" onclick="addAllToList('${recipe.id}')">🛒 Add All to List</button>
+            <button class="del-recipe-btn" onclick="deleteRecipe('${recipe.id}')">🗑</button>
+          </div>
         </div>
-      </div>`;
-
-    card.onclick = () => {
-      if (isTransitioning || cards.querySelector('.flipped')) return;
-      isTransitioning = true;
-      card.classList.add('flipped');
-      fireConfetti('small');
-      planChoices[planIndex] = { title: stage.title, option };
-      planIndex++;
-      setTimeout(() => { isTransitioning = false; renderPlanStage(); }, 1500);
-    };
-
-    cards.appendChild(card);
-  });
-}
-
-function planGoBack() {
-  if (planIndex > 0 && !isTransitioning) {
-    planIndex--;
-    planChoices.pop();
-    renderPlanStage();
-  }
-}
-
-function showPlanSummary() {
-  const now = new Date();
-  document.getElementById('summaryDate').textContent =
-    now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
-
-  const items = document.getElementById('summaryItems');
-  items.innerHTML = '';
-  const icons = ['☀️','🎯','🌙'];
-  planChoices.forEach((c, i) => {
-    items.innerHTML += `
-      <div class="summary-row">
-        <div class="summary-row-label">${c.title}</div>
-        <div class="summary-row-value">${c.option}</div>
-        <div class="summary-row-icon">${icons[i] || '✨'}</div>
-      </div>`;
-  });
-
-  goTo('planSummary');
-  fireConfetti('big');
-}
-
-/* ================================================
-   SURPRISE MODE
-================================================ */
-const STORAGE_KEY = 'dateplannerSurprise';
-
-function startSurpriseMode() {
-  const saved = checkSavedSurprise();
-  if (saved) {
-    document.getElementById('savedNotice').classList.add('show');
-  }
-  goTo('surpriseSetup');
-}
-
-function checkSavedSurprise() {
-  try {
-    const val = localStorage.getItem(STORAGE_KEY);
-    return val ? JSON.parse(val) : null;
-  } catch { return null; }
-}
-
-function resumeSurprise() {
-  const saved = checkSavedSurprise();
-  if (saved) {
-    surpriseType    = saved.type;
-    surpriseBudget  = saved.budget;
-    surpriseStages  = saved.stages;
-    surpriseIndex   = saved.index;
-    surprisePicked  = saved.picked;
-    goTo('surpriseActive');
-    renderSurpriseStage();
-  }
-}
-
-function startSurprise() {
-  const type   = pillSelections.stype;
-  const budget = pillSelections.sbudget;
-  if (!type || !budget) return;
-
-  surpriseType = type;
-  surpriseBudget = budget;
-
-  const branchData = BRANCHING_DATA[type][budget];
-
-  // Initialize with stage 1 only — further stages built as choices are made
-  surpriseStages = [branchData.stage1];
-  surpriseIndex  = 0;
-  surprisePicked = [];
-  isTransitioning = false;
-
-  saveSurpriseState();
-  document.getElementById('savedNotice').classList.remove('show');
-  goTo('surpriseActive');
-  renderSurpriseStage();
-}
-
-function saveSurpriseState() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      type:   surpriseType,
-      budget: surpriseBudget,
-      stages: surpriseStages,
-      index:  surpriseIndex,
-      picked: surprisePicked
-    }));
-  } catch (e) { console.warn('Storage unavailable:', e); }
-}
-
-function clearSurpriseState() {
-  try { localStorage.removeItem(STORAGE_KEY); } catch {}
-}
-
-function renderSurpriseStage() {
-  if (surpriseIndex >= surpriseStages.length) {
-    showSurpriseDone();
-    return;
-  }
-
-  const stage = surpriseStages[surpriseIndex];
-
-  // Update header
-  document.getElementById('surpriseStageName').textContent = stage.title;
-  document.getElementById('surpriseSubtitle').textContent =
-    surpriseIndex === 0
-      ? 'Pick an envelope to reveal your first activity!'
-      : `${surpriseIndex} ${surpriseIndex === 1 ? 'activity' : 'activities'} done — what's next?`;
-
-  // Progress dots
-  const dotsEl = document.getElementById('surpriseDots');
-  dotsEl.innerHTML = '';
-  surpriseStages.forEach((_, i) => {
-    const d = document.createElement('div');
-    d.className = 'dot' + (i < surpriseIndex ? ' done' : i === surpriseIndex ? ' active' : '');
-    dotsEl.appendChild(d);
-  });
-
-  // Status
-  document.getElementById('surpriseStatus').textContent =
-    `Activity ${surpriseIndex + 1} of ${surpriseStages.length}`;
-
-  // Build two fresh envelope cards — no stale flipped state, no flash
-  const area = document.getElementById('envelopeArea');
-  area.innerHTML = '';
-
-  stage.options.forEach((option, idx) => {
-    const card = document.createElement('div');
-    card.className = 'envelope-card';
-    card.innerHTML = `
-      <div class="envelope-inner">
-        <div class="env-front">
-          <div class="env-wax">💌</div>
-          <div class="env-front-title">Option ${idx + 1}</div>
-          <div class="env-front-hint">tap to reveal</div>
-        </div>
-        <div class="env-back">
-          <div class="env-back-category">${stage.category}</div>
-          <div class="env-back-activity">${option}</div>
-          <button class="env-done-btn">We did it! ✓</button>
-        </div>
-      </div>`;
-
-    // Flip on card tap (only if nothing already flipped)
-    card.addEventListener('click', () => {
-      if (area.querySelector('.flipped')) return;
-      card.classList.add('flipped');
-      // Fade out the unchosen card
-      const otherCards = area.querySelectorAll('.envelope-card:not(.flipped)');
-      otherCards.forEach(c => { c.style.transition = 'opacity 0.4s'; c.style.opacity = '0.25'; c.style.pointerEvents = 'none'; });
-      fireConfetti('small');
-    });
-
-    // Done button advances the stage
-    card.querySelector('.env-done-btn').addEventListener('click', e => {
-      e.stopPropagation();
-      markDone(option);
-    });
-
-    area.appendChild(card);
-  });
-}
-
-function markDone(chosenOption) {
-  surprisePicked.push({
-    title:  surpriseStages[surpriseIndex].title,
-    chosen: chosenOption
-  });
-  surpriseIndex++;
-
-  // Build the next stage based on her choice (branching logic)
-  const branchData = BRANCHING_DATA[surpriseType][surpriseBudget];
-  const stageNum = surpriseIndex + 1; // stage2, stage3, etc.
-
-  if (stageNum === 2) {
-    // After stage 1, look up stage2 using her breakfast/morning choice
-    const nextStage = branchData.stage2[chosenOption];
-    if (nextStage) surpriseStages.push(nextStage);
-  } else if (stageNum === 3) {
-    // After stage 2, look up stage3 using her activity/afternoon choice
-    const nextStage = branchData.stage3[chosenOption];
-    if (nextStage) surpriseStages.push(nextStage);
-  }
-
-  saveSurpriseState();
-
-  if (surpriseIndex >= surpriseStages.length) {
-    clearSurpriseState();
-    showSurpriseDone();
-  } else {
-    renderSurpriseStage();
-  }
-}
-
-function showSurpriseDone() {
-  // Build summary of the path she took
-  const summaryEl = document.getElementById('surpriseSummary');
-  summaryEl.innerHTML = '';
-  const icons = ['☀️', '🎯', '🌙'];
-  
-  surprisePicked.forEach((item, i) => {
-    const div = document.createElement('div');
-    div.style.cssText = 'display:flex; align-items:center; padding:12px 0; border-bottom: 1px solid #f5ece6;';
-    if (i === surprisePicked.length - 1) div.style.borderBottom = 'none';
-    
-    div.innerHTML = `
-      <div style="font-size:20px; margin-right:12px;">${icons[i] || '✨'}</div>
-      <div style="flex:1;">
-        <div style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em;">${item.title}</div>
-        <div style="font-family:'Playfair Display',serif; font-size:17px; color:var(--ink); margin-top:2px;">${item.chosen}</div>
       </div>
     `;
-    summaryEl.appendChild(div);
+
+    container.appendChild(card);
+
+    // Populate ingredients
+    const ingList = document.getElementById("ings-" + recipe.id);
+    if (ingredients.length === 0) {
+      ingList.innerHTML = `<div style="color:var(--muted);font-size:13px;font-weight:600;padding:8px 0">No ingredients yet</div>`;
+    } else {
+      ingredients.forEach((ing, idx) => {
+        const row = document.createElement("div");
+        row.className = "recipe-ing-row";
+        row.innerHTML = `
+          <div class="recipe-ing-name">${ing.name}</div>
+          ${ing.qty ? `<div class="recipe-ing-qty">${ing.qty}</div>` : ""}
+          <button class="recipe-ing-del" onclick="removeIngredient('${recipe.id}', ${idx})">✕</button>
+        `;
+        ingList.appendChild(row);
+      });
+    }
+
+    // Enter key on ingredient name
+    document.getElementById("ing-name-" + recipe.id).addEventListener("keydown", e => {
+      if (e.key === "Enter") addIngredient(recipe.id);
+    });
   });
-  
-  goTo('surpriseDone');
-  setTimeout(() => fireConfetti('big'), 300);
-  clearSurpriseState();
-  document.getElementById('savedNotice').classList.remove('show');
 }
 
-function confirmExitSurprise() {
-  if (confirm('Go back to home? Your surprise day progress is saved.')) {
-    goTo('homeScreen');
-    const saved = checkSavedSurprise();
-    if (saved) document.getElementById('savedNotice').classList.add('show');
+// ── RECIPE ACTIONS ──
+window.promptNewRecipe = function() {
+  const name = prompt("Recipe name:");
+  if (!name || !name.trim()) return;
+  addDoc(recipesRef, { name: name.trim(), ingredients: [], createdAt: Date.now() });
+};
+
+window.addIngredient = async function(recipeId) {
+  const nameEl = document.getElementById("ing-name-" + recipeId);
+  const qtyEl  = document.getElementById("ing-qty-" + recipeId);
+  const name = nameEl.value.trim();
+  if (!name) { nameEl.focus(); return; }
+  const qty = qtyEl.value.trim();
+  const recipe = recipes.find(r => r.id === recipeId);
+  if (!recipe) return;
+  const updated = [...(recipe.ingredients || []), { name, qty }];
+  await updateDoc(doc(db, "recipes", recipeId), { ingredients: updated });
+  nameEl.value = "";
+  qtyEl.value = "";
+  nameEl.focus();
+};
+
+window.removeIngredient = async function(recipeId, idx) {
+  const recipe = recipes.find(r => r.id === recipeId);
+  if (!recipe) return;
+  const updated = recipe.ingredients.filter((_, i) => i !== idx);
+  await updateDoc(doc(db, "recipes", recipeId), { ingredients: updated });
+};
+
+window.addAllToList = async function(recipeId) {
+  const recipe = recipes.find(r => r.id === recipeId);
+  if (!recipe || !recipe.ingredients.length) { showToast("No ingredients to add!"); return; }
+
+  const store = "Walmart"; // default store for recipe items
+  let added = 0;
+
+  for (const ing of recipe.ingredients) {
+    const normKey = normalize(ing.name);
+    const already = items.find(i => normalize(i.name) === normKey && !i.checked);
+    if (already) continue; // skip if already on list unchecked
+
+    const cat = smartCategorize(ing.name) || "Other";
+    await setDoc(doc(db, "categoryMappings", normKey), { category: cat });
+    mapping[normKey] = cat;
+    await addDoc(listRef, {
+      name: ing.qty ? `${ing.name} (${ing.qty})` : ing.name,
+      normalizedName: normKey,
+      category: cat,
+      store,
+      checked: false,
+      createdAt: Date.now()
+    });
+    added++;
   }
+
+  showToast(added > 0 ? `Added ${added} item${added !== 1 ? "s" : ""} to list!` : "All items already on list");
+  // Switch to list tab
+  switchTab("list");
+};
+
+window.deleteRecipe = async function(recipeId) {
+  if (!confirm("Delete this recipe?")) return;
+  await deleteDoc(doc(db, "recipes", recipeId));
+};
+
+// ── STORE MAP ──
+window.openMap = function() {
+  document.getElementById("mapPanel").classList.add("open");
+  buildMapStoreTabs();
+  renderMapContent(activeMapStore);
+};
+
+window.closeMap = function() {
+  document.getElementById("mapPanel").classList.remove("open");
+};
+
+function buildMapStoreTabs() {
+  const tabBar = document.getElementById("mapStoreTabs");
+  tabBar.innerHTML = "";
+  Object.keys(AISLE_DATA).forEach(storeName => {
+    const s = STORES[storeName] || {};
+    const btn = document.createElement("button");
+    btn.className = "map-store-tab" + (storeName === activeMapStore ? " active" : "");
+    btn.innerHTML = `<span style="display:inline-flex;width:18px;height:18px;border-radius:4px;background:${s.bg||"#8E8E93"};color:${s.fg||"#fff"};align-items:center;justify-content:center;font-size:10px;font-weight:900">${s.icon||storeName[0]}</span> ${storeName}`;
+    btn.addEventListener("click", () => {
+      activeMapStore = storeName;
+      document.querySelectorAll(".map-store-tab").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderMapContent(storeName);
+    });
+    tabBar.appendChild(btn);
+  });
 }
 
-function confirmResetSurprise() {
-  if (confirm('Start a completely new surprise day? This will erase the current plan.')) {
-    resetSurpriseAndHome();
+function renderMapContent(storeName) {
+  const content = document.getElementById("mapContent");
+  const zones = AISLE_DATA[storeName] || [];
+  content.innerHTML = "";
+
+  zones.forEach(zone => {
+    const sec = document.createElement("div");
+    sec.className = "aisle-section";
+
+    // Check if we have items on the list in this zone
+    const myItemsHere = items.filter(i => {
+      if (i.store !== storeName && storeFilter !== "All") return false;
+      const a = getAisle(i.name, storeName);
+      return a && a.num === zone.num && !i.checked;
+    });
+    const myCount = myItemsHere.length;
+
+    sec.innerHTML = `
+      <div class="aisle-section-header" onclick="this.parentElement.classList.toggle('open')">
+        <div class="aisle-num" style="background:${zone.light};color:${zone.color}">${zone.num}</div>
+        <div style="flex:1;min-width:0">
+          <div class="aisle-zone-name">${zone.zone}</div>
+          ${myCount > 0 ? `<div style="font-size:11px;color:${zone.color};font-weight:700;margin-top:1px">📋 ${myCount} on your list</div>` : ""}
+        </div>
+        <span class="cat-chevron" style="color:var(--muted);font-size:12px;font-weight:800;transition:transform 0.25s">›</span>
+      </div>
+      <div class="aisle-section-body">
+        <div class="aisle-items-list">
+          ${zone.items.map(item => `<span class="aisle-item-tag">${item}</span>`).join("")}
+          ${myCount > 0 ? myItemsHere.map(i => `<span class="aisle-item-tag" style="background:${zone.light};color:${zone.color};font-weight:800">✓ ${i.name}</span>`).join("") : ""}
+        </div>
+      </div>
+    `;
+
+    // chevron rotate on open
+    sec.querySelector(".aisle-section-header").addEventListener("click", () => {
+      const chevron = sec.querySelector(".cat-chevron");
+      chevron.style.transform = sec.classList.contains("open") ? "rotate(90deg)" : "";
+    });
+
+    content.appendChild(sec);
+  });
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+// ── ITEM ACTIONS ──
+window.toggleItem = async function(id, checked) {
+  await updateDoc(doc(db, "items", id), { checked: !checked });
+};
+
+window.confirmDelete = async function(id) {
+  const row = document.getElementById("item-" + id);
+  if (row) row.classList.add("deleting");
+  setTimeout(async () => { await deleteDoc(doc(db, "items", id)); }, 200);
+};
+
+window.clearCompleted = function() {
+  if (!items.some(i => i.checked)) return;
+  if (confirm("Remove all completed items?")) {
+    items.filter(i => i.checked).forEach(i => deleteDoc(doc(db, "items", i.id)));
   }
-}
+};
 
-function resetSurpriseAndHome() {
-  clearSurpriseState();
-  document.getElementById('savedNotice').classList.remove('show');
-  goTo('homeScreen');
-}
+// ── SHEET ──
+window.openSheet = function() {
+  document.getElementById("itemName").value = "";
+  document.getElementById("sheet").classList.add("open");
+  document.getElementById("overlay").classList.add("open");
+  setTimeout(() => document.getElementById("itemName").focus(), 400);
+};
 
-/* ================================================
-   CONFETTI
-================================================ */
-const confettiCanvas = document.getElementById('confettiCanvas');
-const confettiInst   = confetti.create(confettiCanvas, { resize: true, useWorker: true });
+window.closeSheet = function() {
+  document.getElementById("sheet").classList.remove("open");
+  document.getElementById("overlay").classList.remove("open");
+};
 
-function fireConfetti(size) {
-  const count = size === 'big' ? 70 : 20;
-  const spread = size === 'big' ? 100 : 60;
-  const velocity = size === 'big' ? 75 : 55;
-  
-  // Top-left corner, shooting right and down
-  confettiInst({
-    particleCount: count,
-    spread: spread,
-    startVelocity: velocity,
-    angle: 315, // Shoot down-right
-    origin: { x: 0, y: 0 }
-  });
-  
-  // Top-right corner, shooting left and down
-  confettiInst({
-    particleCount: count,
-    spread: spread,
-    startVelocity: velocity,
-    angle: 225, // Shoot down-left
-    origin: { x: 1, y: 0 }
-  });
-  
-  // Bottom-left corner, shooting right and up
-  confettiInst({
-    particleCount: count,
-    spread: spread,
-    startVelocity: velocity,
-    angle: 45, // Shoot up-right
-    origin: { x: 0, y: 1 }
-  });
-  
-  // Bottom-right corner, shooting left and up
-  confettiInst({
-    particleCount: count,
-    spread: spread,
-    startVelocity: velocity,
-    angle: 135, // Shoot up-left
-    origin: { x: 1, y: 1 }
-  });
-}
-
-/* ================================================
-   ON LOAD — check for saved surprise day
-================================================ */
-window.addEventListener('load', () => {
-  const saved = checkSavedSurprise();
-  if (saved) document.getElementById('savedNotice').classList.add('show');
+document.getElementById("itemName").addEventListener("keydown", e => {
+  if (e.key === "Enter") addItem();
 });
+
+document.getElementById("itemName").addEventListener("input", function() {
+  const val = this.value.trim();
+  if (!val) return;
+  const cat = smartCategorize(val);
+  if (cat) {
+    selectedCategory = cat;
+    document.querySelectorAll(".cat-pick-btn").forEach(b => {
+      b.classList.toggle("selected", b.dataset.catId === cat);
+    });
+  }
+});
+
+// ── BUILD CATEGORY PICKER ──
+function buildCategoryPicker() {
+  const picker = document.getElementById("catPicker");
+  CATEGORIES.forEach(cat => {
+    const btn = document.createElement("button");
+    btn.className = "cat-pick-btn" + (cat.id === "Other" ? " selected" : "");
+    btn.dataset.catId = cat.id;
+    btn.innerHTML = `<span class="cpb-emoji">${cat.emoji}</span><span class="cpb-label">${cat.label}</span>`;
+    btn.onclick = () => {
+      document.querySelectorAll(".cat-pick-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      selectedCategory = cat.id;
+    };
+    picker.appendChild(btn);
+  });
+}
+
+// ── INIT ──
+loadMappings();
+buildCategoryPicker();
 </script>
 </body>
 </html>
