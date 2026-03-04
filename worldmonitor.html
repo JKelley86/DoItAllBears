@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Monitor — Global Intelligence Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root {
+    --bg: #080c14;
+    --surface: #0d1520;
+    --border: #1a2640;
+    --accent: #00e5ff;
+    --accent2: #ff3d6b;
+    --accent3: #a259ff;
+    --accent4: #00ff9d;
+    --text: #c8d8f0;
+    --muted: #4a6080;
+    --outage: #ff3d6b;
+    --dc: #00e5ff;
+    --natural: #ffb830;
+    --startup: #a259ff;
+    --event: #00ff9d;
+    --panel-bg: rgba(8,12,20,0.92);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    cursor: default;
+  }
+
+  /* ── MAP ── */
+  #map {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: var(--bg);
+  }
+
+  .leaflet-container { background: #060a10 !important; }
+  .leaflet-tile { filter: brightness(0.55) saturate(0.6) hue-rotate(200deg); }
+  .leaflet-control-attribution { display: none !important; }
+  .leaflet-control-zoom { display: none !important; }
+
+  /* ── SCAN LINE OVERLAY ── */
+  #scanlines {
+    position: fixed; inset: 0; z-index: 1;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 3px,
+      rgba(0,229,255,0.018) 3px,
+      rgba(0,229,255,0.018) 4px
+    );
+  }
+
+  /* ── VIGNETTE ── */
+  #vignette {
+    position: fixed; inset: 0; z-index: 2;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center,
+      transparent 50%,
+      rgba(4,8,16,0.7) 100%
+    );
+  }
+
+  /* ── HEADER ── */
+  #header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 56px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    background: linear-gradient(180deg, rgba(8,12,20,0.98) 0%, rgba(8,12,20,0) 100%);
+    gap: 20px;
+  }
+
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+
+  .logo-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%,100% { opacity:1; box-shadow: 0 0 10px var(--accent); }
+    50% { opacity:0.5; box-shadow: 0 0 4px var(--accent); }
+  }
+
+  .header-sep {
+    width: 1px; height: 24px;
+    background: var(--border);
+  }
+
+  .live-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 2px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+    animation: blink 1.5s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%,100% { opacity:1; } 50% { opacity:0.3; }
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 24px;
+    margin-left: auto;
+  }
+
+  .hstat {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .hstat span {
+    color: var(--text);
+    font-size: 12px;
+  }
+
+  /* ── SIDE PANEL (Layers) ── */
+  #side-panel {
+    position: fixed;
+    top: 72px;
+    left: 16px;
+    width: 240px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .panel-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 16px;
+    backdrop-filter: blur(12px);
+  }
+
+  .panel-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  /* Layer toggles */
+  .layer-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .layer-row:hover { opacity: 0.8; }
+
+  .layer-icon {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .layer-label {
+    font-size: 12px;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .layer-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .toggle {
+    width: 28px; height: 16px;
+    border-radius: 8px;
+    background: var(--border);
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .toggle::after {
+    content:'';
+    position: absolute;
+    left: 2px; top: 2px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: all 0.2s;
+  }
+
+  .toggle.on { background: rgba(0,229,255,0.25); }
+  .toggle.on::after { left: 14px; background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+
+  /* Time range */
+  .time-buttons {
+    display: flex;
+    gap: 4px;
+  }
+
+  .tbtn {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.05em;
+  }
+
+  .tbtn:hover { border-color: var(--accent); color: var(--accent); }
+  .tbtn.active { background: rgba(0,229,255,0.12); border-color: var(--accent); color: var(--accent); }
+
+  /* ── BOTTOM STATS BAR ── */
+  #bottom-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 44px;
+    z-index: 100;
+    background: linear-gradient(0deg, rgba(8,12,20,0.98) 0%, rgba(8,12,20,0) 100%);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 32px;
+  }
+
+  .bstat {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .bstat-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+  }
+
+  .bstat span { color: var(--text); }
+
+  #coords {
+    margin-left: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  /* ── INFO PANEL (right side) ── */
+  #info-panel {
+    position: fixed;
+    top: 72px;
+    right: 16px;
+    width: 260px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .event-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 340px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .event-item {
+    display: flex;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(26,38,64,0.5);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .event-item:last-child { border-bottom: none; }
+
+  .event-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+
+  .event-body { flex: 1; }
+
+  .event-title {
+    font-size: 11px;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .event-meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* ── POPUP STYLE ── */
+  .leaflet-popup-content-wrapper {
+    background: rgba(8,12,20,0.96) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 4px !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
+    backdrop-filter: blur(16px);
+  }
+
+  .leaflet-popup-tip { background: var(--border) !important; }
+
+  .popup-inner { padding: 4px; }
+
+  .popup-type {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .popup-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .popup-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .popup-meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── ZOOM CONTROLS ── */
+  #zoom-ctrl {
+    position: fixed;
+    bottom: 60px;
+    right: 16px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .zcbtn {
+    width: 32px; height: 32px;
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    backdrop-filter: blur(12px);
+    font-family: monospace;
+    line-height: 1;
+  }
+
+  .zcbtn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── VIEW SWITCHER ── */
+  #view-switch {
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    gap: 4px;
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px;
+    backdrop-filter: blur(12px);
+  }
+
+  .vbtn {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 5px 14px;
+    border-radius: 2px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.06em;
+  }
+
+  .vbtn:hover { color: var(--text); }
+  .vbtn.active { background: rgba(0,229,255,0.1); color: var(--accent); }
+
+  /* ── LOADING OVERLAY ── */
+  #loader {
+    position: fixed; inset: 0;
+    z-index: 999;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    transition: opacity 0.6s;
+  }
+
+  .loader-logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+  }
+
+  .loader-bar-wrap {
+    width: 200px;
+    height: 2px;
+    background: var(--border);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+
+  .loader-bar {
+    height: 100%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+    width: 0%;
+    animation: load-progress 1.6s ease forwards;
+  }
+
+  @keyframes load-progress {
+    0% { width: 0%; }
+    60% { width: 80%; }
+    100% { width: 100%; }
+  }
+
+  .loader-msg {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes ping {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.5); opacity: 0; }
+  }
+
+  .marker-ping {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .marker-ping::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    animation: ping 1.8s ease-out infinite;
+    opacity: 0;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  @media (max-width: 768px) {
+    #side-panel { display: none; }
+    #info-panel { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Loader -->
+<div id="loader">
+  <div class="loader-logo">WORLD MONITOR</div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+  <div class="loader-msg">INITIALIZING GLOBAL INTELLIGENCE FEED...</div>
+</div>
+
+<!-- Map -->
+<div id="map"></div>
+<div id="scanlines"></div>
+<div id="vignette"></div>
+
+<!-- Header -->
+<div id="header">
+  <div class="logo">
+    <div class="logo-dot"></div>
+    WORLD MONITOR
+  </div>
+  <div class="live-badge">● LIVE</div>
+  <div class="header-sep"></div>
+  <div class="header-stats">
+    <div class="hstat">INCIDENTS <span id="h-incidents">—</span></div>
+    <div class="hstat">DATACENTERS <span id="h-dc">—</span></div>
+    <div class="hstat">EVENTS <span id="h-events">—</span></div>
+    <div class="hstat">UTC <span id="h-time">—</span></div>
+  </div>
+</div>
+
+<!-- Left Panel -->
+<div id="side-panel">
+  <div class="panel-card">
+    <div class="panel-title">Layers</div>
+    <div class="layer-row" onclick="toggleLayer('outages')">
+      <div class="layer-icon" style="background:var(--outage); box-shadow:0 0 6px var(--outage)"></div>
+      <div class="layer-label">Outages</div>
+      <div class="layer-count" id="cnt-outages">0</div>
+      <div class="toggle on" id="tog-outages"></div>
+    </div>
+    <div class="layer-row" onclick="toggleLayer('datacenters')">
+      <div class="layer-icon" style="background:var(--dc); box-shadow:0 0 6px var(--dc)"></div>
+      <div class="layer-label">Datacenters</div>
+      <div class="layer-count" id="cnt-datacenters">0</div>
+      <div class="toggle on" id="tog-datacenters"></div>
+    </div>
+    <div class="layer-row" onclick="toggleLayer('natural')">
+      <div class="layer-icon" style="background:var(--natural); box-shadow:0 0 6px var(--natural)"></div>
+      <div class="layer-label">Natural Events</div>
+      <div class="layer-count" id="cnt-natural">0</div>
+      <div class="toggle on" id="tog-natural"></div>
+    </div>
+    <div class="layer-row" onclick="toggleLayer('startupHubs')">
+      <div class="layer-icon" style="background:var(--startup); box-shadow:0 0 6px var(--startup)"></div>
+      <div class="layer-label">Startup Hubs</div>
+      <div class="layer-count" id="cnt-startupHubs">0</div>
+      <div class="toggle on" id="tog-startupHubs"></div>
+    </div>
+    <div class="layer-row" onclick="toggleLayer('techEvents')">
+      <div class="layer-icon" style="background:var(--event); box-shadow:0 0 6px var(--event)"></div>
+      <div class="layer-label">Tech Events</div>
+      <div class="layer-count" id="cnt-techEvents">0</div>
+      <div class="toggle on" id="tog-techEvents"></div>
+    </div>
+  </div>
+
+  <div class="panel-card">
+    <div class="panel-title">Time Range</div>
+    <div class="time-buttons">
+      <button class="tbtn" onclick="setTime('1d',this)">1D</button>
+      <button class="tbtn" onclick="setTime('3d',this)">3D</button>
+      <button class="tbtn active" onclick="setTime('7d',this)">7D</button>
+      <button class="tbtn" onclick="setTime('30d',this)">30D</button>
+      <button class="tbtn" onclick="setTime('all',this)">ALL</button>
+    </div>
+  </div>
+
+  <div class="panel-card">
+    <div class="panel-title">Legend</div>
+    <div style="display:flex;flex-direction:column;gap:7px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" fill="none" stroke="var(--outage)" stroke-width="1.5"/><circle cx="7" cy="7" r="2" fill="var(--outage)"/></svg>
+        <span style="font-size:11px;color:var(--muted)">Outage / Incident</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="14" height="14" viewBox="0 0 14 14"><rect x="2" y="2" width="10" height="10" rx="1" fill="none" stroke="var(--dc)" stroke-width="1.5"/><circle cx="7" cy="7" r="2" fill="var(--dc)"/></svg>
+        <span style="font-size:11px;color:var(--muted)">Data Center</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="14" height="14" viewBox="0 0 14 14"><polygon points="7,1 9,5 13,5.5 10,8.5 10.8,13 7,11 3.2,13 4,8.5 1,5.5 5,5" fill="none" stroke="var(--natural)" stroke-width="1.2"/></svg>
+        <span style="font-size:11px;color:var(--muted)">Natural Event</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7,2 L8.5,6H13L9.5,8.5L11,13L7,10.5L3,13L4.5,8.5L1,6H5.5Z" fill="none" stroke="var(--startup)" stroke-width="1.2"/></svg>
+        <span style="font-size:11px;color:var(--muted)">Startup Hub</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="14" height="14" viewBox="0 0 14 14"><polygon points="7,1 13,13 1,13" fill="none" stroke="var(--event)" stroke-width="1.5"/></svg>
+        <span style="font-size:11px;color:var(--muted)">Tech Event</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Right Panel - Feed -->
+<div id="info-panel">
+  <div class="panel-card">
+    <div class="panel-title">Live Feed</div>
+    <div class="event-list" id="event-feed"></div>
+  </div>
+</div>
+
+<!-- View Switcher -->
+<div id="view-switch">
+  <button class="vbtn" onclick="setView('world',this)">WORLD</button>
+  <button class="vbtn active" onclick="setView('america',this)">AMERICAS</button>
+  <button class="vbtn" onclick="setView('europe',this)">EUROPE</button>
+  <button class="vbtn" onclick="setView('asia',this)">ASIA</button>
+  <button class="vbtn" onclick="setView('africa',this)">AFRICA</button>
+</div>
+
+<!-- Zoom Controls -->
+<div id="zoom-ctrl">
+  <button class="zcbtn" onclick="map.zoomIn()">+</button>
+  <button class="zcbtn" onclick="map.zoomOut()">−</button>
+</div>
+
+<!-- Bottom Bar -->
+<div id="bottom-bar">
+  <div class="bstat"><div class="bstat-dot" style="background:var(--outage);box-shadow:0 0 6px var(--outage)"></div>OUTAGES <span id="b-outages">0</span></div>
+  <div class="bstat"><div class="bstat-dot" style="background:var(--dc);box-shadow:0 0 6px var(--dc)"></div>DATACENTERS <span id="b-dc">0</span></div>
+  <div class="bstat"><div class="bstat-dot" style="background:var(--natural);box-shadow:0 0 6px var(--natural)"></div>NATURAL <span id="b-natural">0</span></div>
+  <div class="bstat"><div class="bstat-dot" style="background:var(--startup);box-shadow:0 0 6px var(--startup)"></div>STARTUP HUBS <span id="b-startup">0</span></div>
+  <div class="bstat"><div class="bstat-dot" style="background:var(--event);box-shadow:0 0 6px var(--event)"></div>TECH EVENTS <span id="b-events">0</span></div>
+  <div id="coords">LAT — LON —</div>
+</div>
+
+<script>
+// ─────────────────────────────────────────
+// DATA (Curated global dataset)
+// ─────────────────────────────────────────
+const DATA = {
+  outages: [
+    { lat:37.77, lon:-122.41, title:"AWS US-West-1 Degraded", desc:"Elevated error rates in EC2 and S3. Partial restoration underway.", severity:"high", ago:"2h ago" },
+    { lat:51.5,  lon:-0.12,   title:"Cloudflare UK Incident", desc:"DNS resolution failures affecting London PoP nodes.", severity:"med", ago:"5h ago" },
+    { lat:35.68, lon:139.69,  title:"AWS ap-northeast-1 Latency", desc:"Increased latency on RDS instances. Investigation active.", severity:"low", ago:"8h ago" },
+    { lat:48.85, lon:2.35,    title:"OVHCloud Paris Outage", desc:"Datacenter fire suppression triggered, cooling offline.", severity:"high", ago:"1d ago" },
+    { lat:-33.86,lon:151.2,   title:"Azure Australia East", desc:"Storage account access failures. Mitigation in progress.", severity:"med", ago:"3h ago" },
+    { lat:19.07, lon:72.87,   title:"Jio Fiber Disruption", desc:"Backbone routing issue affecting Mumbai metro area.", severity:"high", ago:"30m ago" },
+    { lat:55.75, lon:37.61,   title:"Yandex Cloud Moscow", desc:"Partial service degradation across compute instances.", severity:"low", ago:"6h ago" },
+    { lat:1.35,  lon:103.82,  title:"Singtel Network Alert", desc:"BGP route leak causing traffic rerouting in SEA region.", severity:"med", ago:"4h ago" },
+    { lat:40.71, lon:-74.00,  title:"Verizon NYC Packet Loss", desc:"Fiber cut on cross-Hudson route. Redundancy active.", severity:"high", ago:"45m ago" },
+    { lat:-23.54,lon:-46.63,  title:"GCP Southamerica-east1", desc:"Load balancer anomaly detected. Auto-scaling triggered.", severity:"low", ago:"2d ago" },
+  ],
+  datacenters: [
+    { lat:37.77, lon:-122.41, title:"AWS US-West-1", desc:"Amazon Web Services Northern California. 3 AZs.", tier:"Tier IV", capacity:"500MW" },
+    { lat:39.04, lon:-77.49,  title:"AWS US-East-1", desc:"Amazon's flagship region. First AWS region globally.", tier:"Tier IV", capacity:"1.2GW" },
+    { lat:51.5,  lon:-0.12,   title:"AWS EU-West-2 (London)", desc:"Amazon London datacenter cluster.", tier:"Tier III", capacity:"200MW" },
+    { lat:53.34, lon:-6.26,   title:"AWS EU-West-1 (Dublin)", desc:"AWS primary European hub since 2007.", tier:"Tier IV", capacity:"300MW" },
+    { lat:48.85, lon:2.35,    title:"Google Cloud europe-west1", desc:"Google's St. Ghislain & Paris facilities.", tier:"Tier IV", capacity:"400MW" },
+    { lat:35.68, lon:139.69,  title:"Google Cloud asia-northeast1", desc:"Tokyo GCP region. 3 zones, ultra-low latency.", tier:"Tier III", capacity:"180MW" },
+    { lat:22.39, lon:114.11,  title:"Alibaba Cloud Hong Kong", desc:"Alibaba's global gateway to APAC markets.", tier:"Tier IV", capacity:"250MW" },
+    { lat:1.35,  lon:103.82,  title:"AWS ap-southeast-1 (Singapore)", desc:"AWS Singapore hub serving SEA and Oceania.", tier:"Tier IV", capacity:"350MW" },
+    { lat:-33.86,lon:151.2,   title:"Azure Australia East (Sydney)", desc:"Microsoft Azure primary Australian region.", tier:"Tier III", capacity:"120MW" },
+    { lat:40.71, lon:-74.00,  title:"Equinix NY4 (Secaucus NJ)", desc:"World's most connected datacenter campus.", tier:"Tier IV", capacity:"600MW" },
+    { lat:19.07, lon:72.87,   title:"Microsoft Azure India West", desc:"Azure Mumbai datacenter. 3 AZ configuration.", tier:"Tier III", capacity:"160MW" },
+    { lat:50.11, lon:8.68,    title:"Deutsche Telekom Frankfurt", desc:"DE-CIX peering hub. Highest traffic volume exchange.", tier:"Tier IV", capacity:"280MW" },
+    { lat:55.75, lon:37.61,   title:"Yandex DataCenter Msk", desc:"Russia's largest cloud infrastructure node.", tier:"Tier III", capacity:"200MW" },
+    { lat:-23.54,lon:-46.63,  title:"GCP Southamerica-east1 (SP)", desc:"Google's first South American region.", tier:"Tier III", capacity:"140MW" },
+    { lat:60.17, lon:24.94,   title:"CSC Espoo Helsinki", desc:"Suomi national research & education network hub.", tier:"Tier III", capacity:"80MW" },
+  ],
+  natural: [
+    { lat:19.5,  lon:-155.5, title:"Kīlauea Eruption Activity", desc:"Ongoing lava flow on Hawaii's Big Island. Aviation ORANGE.", type:"Volcano", ago:"Active" },
+    { lat:35.0,  lon:137.0,  title:"Tōkai Seismic Activity", desc:"M4.2 swarm near Shizuoka. JMA monitoring active.", type:"Earthquake", ago:"18h ago" },
+    { lat:14.0,  lon:-90.0,  title:"Tropical Storm Beryl Remnants", desc:"Post-tropical system bringing heavy rain to Central America.", type:"Storm", ago:"2d ago" },
+    { lat:-38.0, lon:145.0,  title:"Victoria Bushfire Alert", desc:"Total fire ban declared. 3 active fronts near Gippsland.", type:"Wildfire", ago:"1d ago" },
+    { lat:27.7,  lon:85.3,   title:"Nepal Flash Flooding", desc:"Monsoon-triggered floods affecting Kathmandu Valley.", type:"Flood", ago:"3d ago" },
+    { lat:-3.5,  lon:102.0,  title:"Sumatra M5.8 Quake", desc:"Shallow 12km depth earthquake. Tsunami alert not issued.", type:"Earthquake", ago:"6h ago" },
+    { lat:38.0,  lon:15.0,   title:"Etna Strombolian Activity", desc:"Eruption columns reaching 4km. Catania airport on alert.", type:"Volcano", ago:"5h ago" },
+    { lat:29.5,  lon:-95.0,  title:"Texas Severe Thunderstorms", desc:"PDS tornado watch in effect for Houston metro area.", type:"Storm", ago:"1h ago" },
+    { lat:64.0,  lon:-19.0,  title:"Iceland Volcanic Unrest", desc:"Reykjanes Peninsula fissure eruption. Roads closed.", type:"Volcano", ago:"12h ago" },
+    { lat:-15.0, lon:-75.0,  title:"Peru M6.1 Earthquake", desc:"Ica region affected. Structural damage reports incoming.", type:"Earthquake", ago:"4h ago" },
+  ],
+  startupHubs: [
+    { lat:37.40, lon:-122.00, title:"Silicon Valley", desc:"World's premier tech cluster. Home to Google, Apple, Meta, Netflix.", cos:"2,800+ startups", vcum:"$45B/yr" },
+    { lat:40.71, lon:-74.00,  title:"New York City", desc:"Fintech, media, and adtech epicenter. NYC Tech talent surging.", cos:"1,900+ startups", vcum:"$18B/yr" },
+    { lat:51.51, lon:-0.12,   title:"London Tech City", desc:"Largest tech hub in Europe. Fintech capital of the world.", cos:"1,600+ startups", vcum:"£12B/yr" },
+    { lat:52.37, lon:4.90,    title:"Amsterdam", desc:"Booking.com, ASML, Adyen birthplace. EU gateway hub.", cos:"900+ startups", vcum:"€4B/yr" },
+    { lat:59.33, lon:18.06,   title:"Stockholm", desc:"Spotify, Klarna, King HQ. Unicorn factory per capita.", cos:"700+ startups", vcum:"€3.5B/yr" },
+    { lat:28.61, lon:77.20,   title:"Delhi NCR", desc:"Noida & Gurgaon corridors. Fastest growing startup scene in Asia.", cos:"1,200+ startups", vcum:"$8B/yr" },
+    { lat:12.97, lon:77.59,   title:"Bengaluru", desc:"India's Silicon Valley. ISRO, Infosys, Wipro origins.", cos:"2,100+ startups", vcum:"$12B/yr" },
+    { lat:31.22, lon:121.47,  title:"Shanghai", desc:"China's finance + tech fusion. 5 unicorns launched in 2024.", cos:"3,000+ startups", vcum:"¥200B/yr" },
+    { lat:22.39, lon:114.11,  title:"Hong Kong", desc:"Bridge between China tech and global capital markets.", cos:"800+ startups", vcum:"$5B/yr" },
+    { lat:-33.86,lon:151.2,   title:"Sydney", desc:"Australia's dominant tech scene. Strong fintech and blockchain.", cos:"600+ startups", vcum:"A$3B/yr" },
+    { lat:52.52, lon:13.40,   title:"Berlin", desc:"EU's startup capital. Zalando, DeliveryHero, N26 origins.", cos:"1,100+ startups", vcum:"€5B/yr" },
+    { lat:-23.54,lon:-46.63,  title:"São Paulo", desc:"Latin America's tech powerhouse. Nubank, iFood, VTEX.", cos:"1,300+ startups", vcum:"R$15B/yr" },
+    { lat:32.08, lon:34.78,   title:"Tel Aviv", desc:"'Startup Nation' capital. Highest VC per capita globally.", cos:"1,000+ startups", vcum:"$10B/yr" },
+    { lat:37.77, lon:-122.41, title:"San Francisco", desc:"AI startup epicenter. OpenAI, Anthropic, xAI all HQ here.", cos:"1,700+ startups", vcum:"$30B/yr" },
+    { lat:43.65, lon:-79.38,  title:"Toronto", desc:"Canada's MaRS District. AI + autonomous vehicles cluster.", cos:"700+ startups", vcum:"C$4B/yr" },
+  ],
+  techEvents: [
+    { lat:37.40, lon:-122.00, title:"Google I/O 2025", desc:"Google's annual developer conference. AI, Android, Chrome announcements.", date:"May 20–22", type:"Conference" },
+    { lat:51.51, lon:-0.12,   title:"IP EXPO Europe", desc:"Europe's top enterprise tech show at ExCeL London.", date:"Oct 1–2", type:"Expo" },
+    { lat:48.85, lon:2.35,    title:"VivaTech Paris", desc:"Largest European startup & tech event. 150K+ attendees.", date:"Jun 11–14", type:"Summit" },
+    { lat:40.71, lon:-74.00,  title:"AWS re:Invent (NYC Side Talks)", desc:"Community sessions alongside re:Invent remote streaming.", date:"Dec 1–5", type:"Conference" },
+    { lat:35.68, lon:139.69,  title:"Tokyo Game Show 2025", desc:"World's biggest gaming expo. 300K+ attendees expected.", date:"Sep 25–28", type:"Expo" },
+    { lat:52.52, lon:13.40,   title:"Berlin Web3 Summit", desc:"Blockchain, DeFi, and decentralized infrastructure.", date:"Aug 14–16", type:"Summit" },
+    { lat:1.35,  lon:103.82,  title:"Singapore FinTech Festival", desc:"World's largest fintech festival. 60K+ participants.", date:"Nov 6–8", type:"Festival" },
+    { lat:37.77, lon:-122.41, title:"Salesforce Dreamforce", desc:"Largest software conference on Earth. AI features preview.", date:"Sep 16–19", type:"Conference" },
+    { lat:30.27, lon:-97.74,  title:"SXSW 2026", desc:"Austin's tech, film & music convergence festival.", date:"Mar 13–22", type:"Festival" },
+    { lat:22.39, lon:114.11,  title:"RISE Conference HK", desc:"Asia's leading tech conference. 20K+ attendees.", date:"Oct 22–24", type:"Conference" },
+    { lat:-33.86,lon:151.2,   title:"YOW! Australia", desc:"Developer conference across Sydney, Brisbane, Melbourne.", date:"Dec 4–6", type:"Conference" },
+    { lat:55.75, lon:37.61,   title:"Moscow ML Summit", desc:"Russia's premier machine learning and AI gathering.", date:"Nov 15–17", type:"Summit" },
+  ]
+};
+
+// ─────────────────────────────────────────
+// MAP INIT
+// ─────────────────────────────────────────
+const map = L.map('map', {
+  center: [-8.27, 65.59],
+  zoom: 2,
+  zoomControl: false,
+  attributionControl: false,
+  worldCopyJump: false,
+  maxBounds: [[-90,-200],[90,200]],
+  minZoom: 2, maxZoom: 10
+});
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19
+}).addTo(map);
+
+// ─────────────────────────────────────────
+// LAYER STATE
+// ─────────────────────────────────────────
+const layerGroups = {};
+const layerState = { outages:true, datacenters:true, natural:true, startupHubs:true, techEvents:true };
+
+function makeIcon(color, shape='circle', size=10) {
+  const svg = shape === 'circle' ? `
+    <svg xmlns="http://www.w3.org/2000/svg" width="${size+10}" height="${size+10}" viewBox="0 0 ${size+10} ${size+10}">
+      <circle cx="${(size+10)/2}" cy="${(size+10)/2}" r="${size/2+1}" fill="none" stroke="${color}" stroke-width="1" opacity="0.4"/>
+      <circle cx="${(size+10)/2}" cy="${(size+10)/2}" r="${size/2-1}" fill="${color}" opacity="0.9"/>
+    </svg>` :
+  shape === 'square' ? `
+    <svg xmlns="http://www.w3.org/2000/svg" width="${size+6}" height="${size+6}" viewBox="0 0 ${size+6} ${size+6}">
+      <rect x="2" y="2" width="${size+2}" height="${size+2}" rx="1" fill="none" stroke="${color}" stroke-width="1" opacity="0.5"/>
+      <rect x="4" y="4" width="${size-2}" height="${size-2}" rx="1" fill="${color}" opacity="0.85"/>
+    </svg>` :
+  shape === 'star' ? `
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+      <polygon points="9,1 11,7 17,7 12,11 14,17 9,13 4,17 6,11 1,7 7,7" fill="${color}" opacity="0.85"/>
+    </svg>` :
+  shape === 'triangle' ? `
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+      <polygon points="8,1 15,15 1,15" fill="none" stroke="${color}" stroke-width="1.5" opacity="0.5"/>
+      <polygon points="8,3 13,13 3,13" fill="${color}" opacity="0.85"/>
+    </svg>` : '';
+
+  return L.divIcon({
+    html: svg,
+    className: '',
+    iconSize: [size+10, size+10],
+    iconAnchor: [(size+10)/2, (size+10)/2]
+  });
+}
+
+// Pulsing icon for high-severity outages
+function makePulseIcon(color) {
+  const html = `
+    <div style="position:relative;width:20px;height:20px;">
+      <div style="position:absolute;inset:0;border-radius:50%;background:${color};opacity:0.15;animation:ping 1.4s ease-out infinite;"></div>
+      <div style="position:absolute;inset:3px;border-radius:50%;background:${color};opacity:0.3;animation:ping 1.4s ease-out infinite 0.3s;"></div>
+      <div style="position:absolute;inset:6px;border-radius:50%;background:${color};box-shadow:0 0 8px ${color};"></div>
+    </div>
+    <style>@keyframes ping{0%{transform:scale(1);opacity:0.4}100%{transform:scale(2.2);opacity:0}}</style>`;
+  return L.divIcon({ html, className:'', iconSize:[20,20], iconAnchor:[10,10] });
+}
+
+function buildPopup(type, item) {
+  const colors = { outages:'var(--outage)', datacenters:'var(--dc)', natural:'var(--natural)', startupHubs:'var(--startup)', techEvents:'var(--event)' };
+  const labels = { outages:'OUTAGE', datacenters:'DATACENTER', natural:'NATURAL EVENT', startupHubs:'STARTUP HUB', techEvents:'TECH EVENT' };
+  const col = colors[type];
+  const lab = labels[type];
+
+  let extra = '';
+  if (type==='outages') extra = `<div class="popup-meta">Severity: ${item.severity?.toUpperCase()||'UNKNOWN'} &nbsp;·&nbsp; ${item.ago||''}</div>`;
+  if (type==='datacenters') extra = `<div class="popup-meta">Tier: ${item.tier||'—'} &nbsp;·&nbsp; Capacity: ${item.capacity||'—'}</div>`;
+  if (type==='natural') extra = `<div class="popup-meta">Type: ${item.type||'—'} &nbsp;·&nbsp; ${item.ago||''}</div>`;
+  if (type==='startupHubs') extra = `<div class="popup-meta">${item.cos||'—'} &nbsp;·&nbsp; ${item.vcum||''}</div>`;
+  if (type==='techEvents') extra = `<div class="popup-meta">${item.type||'—'} &nbsp;·&nbsp; ${item.date||''}</div>`;
+
+  return `<div class="popup-inner">
+    <div class="popup-type" style="color:${col}">${lab}</div>
+    <div class="popup-title">${item.title}</div>
+    <div class="popup-desc">${item.desc}</div>
+    ${extra}
+  </div>`;
+}
+
+function buildLayer(type) {
+  const colorMap = { outages:'#ff3d6b', datacenters:'#00e5ff', natural:'#ffb830', startupHubs:'#a259ff', techEvents:'#00ff9d' };
+  const col = colorMap[type];
+  const group = L.layerGroup();
+  const items = DATA[type];
+
+  items.forEach(item => {
+    let icon;
+    if (type==='outages') icon = item.severity==='high' ? makePulseIcon(col) : makeIcon(col,'circle',8);
+    else if (type==='datacenters') icon = makeIcon(col,'square',9);
+    else if (type==='natural') icon = makeIcon(col,'circle',10);
+    else if (type==='startupHubs') icon = makeIcon(col,'star',10);
+    else icon = makeIcon(col,'triangle',10);
+
+    const marker = L.marker([item.lat, item.lon], { icon })
+      .bindPopup(buildPopup(type, item), {
+        className:'wm-popup',
+        maxWidth:280,
+        closeButton:false
+      });
+    group.addLayer(marker);
+  });
+
+  return group;
+}
+
+function initLayers() {
+  ['outages','datacenters','natural','startupHubs','techEvents'].forEach(t => {
+    layerGroups[t] = buildLayer(t);
+    layerGroups[t].addTo(map);
+    document.getElementById('cnt-'+t).textContent = DATA[t].length;
+  });
+  updateStats();
+  buildFeed();
+}
+
+function toggleLayer(name) {
+  layerState[name] = !layerState[name];
+  const tog = document.getElementById('tog-'+name);
+  if (layerState[name]) {
+    tog.classList.add('on');
+    layerGroups[name].addTo(map);
+  } else {
+    tog.classList.remove('on');
+    map.removeLayer(layerGroups[name]);
+  }
+  updateStats();
+}
+
+function updateStats() {
+  const active = name => layerState[name] ? DATA[name].length : 0;
+  document.getElementById('h-incidents').textContent = active('outages');
+  document.getElementById('h-dc').textContent = active('datacenters');
+  document.getElementById('h-events').textContent = active('techEvents') + active('natural');
+  document.getElementById('b-outages').textContent = active('outages');
+  document.getElementById('b-dc').textContent = active('datacenters');
+  document.getElementById('b-natural').textContent = active('natural');
+  document.getElementById('b-startup').textContent = active('startupHubs');
+  document.getElementById('b-events').textContent = active('techEvents');
+}
+
+// ─────────────────────────────────────────
+// LIVE FEED
+// ─────────────────────────────────────────
+function buildFeed() {
+  const feed = document.getElementById('event-feed');
+  const all = [
+    ...DATA.outages.map(i => ({...i, type:'outages', col:'var(--outage)'})),
+    ...DATA.natural.map(i => ({...i, type:'natural', col:'var(--natural)'})),
+    ...DATA.techEvents.map(i => ({...i, type:'techEvents', col:'var(--event)'})),
+  ];
+  all.sort(() => Math.random()-0.5);
+  feed.innerHTML = all.slice(0,14).map(i => `
+    <div class="event-item" onclick="flyTo(${i.lat},${i.lon})">
+      <div class="event-dot" style="background:${i.col};box-shadow:0 0 5px ${i.col}"></div>
+      <div class="event-body">
+        <div class="event-title">${i.title}</div>
+        <div class="event-meta">${i.ago||i.date||''}</div>
+      </div>
+    </div>`).join('');
+}
+
+function flyTo(lat, lon) {
+  map.flyTo([lat, lon], 5, { duration: 1.2 });
+}
+
+// ─────────────────────────────────────────
+// TIME RANGE (visual only for static data)
+// ─────────────────────────────────────────
+function setTime(range, btn) {
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ─────────────────────────────────────────
+// VIEW PRESETS
+// ─────────────────────────────────────────
+const VIEWS = {
+  world:   { lat:20,    lon:10,    zoom:2 },
+  america: { lat:10,    lon:-80,   zoom:3 },
+  europe:  { lat:52,    lon:12,    zoom:4 },
+  asia:    { lat:25,    lon:100,   zoom:3 },
+  africa:  { lat:5,     lon:20,    zoom:3 }
+};
+
+function setView(name, btn) {
+  document.querySelectorAll('.vbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const v = VIEWS[name];
+  map.flyTo([v.lat, v.lon], v.zoom, { duration: 1.4 });
+}
+
+// ─────────────────────────────────────────
+// COORDS DISPLAY
+// ─────────────────────────────────────────
+map.on('mousemove', e => {
+  document.getElementById('coords').textContent =
+    `LAT ${e.latlng.lat.toFixed(3)}  LON ${e.latlng.lng.toFixed(3)}`;
+});
+
+// ─────────────────────────────────────────
+// CLOCK
+// ─────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById('h-time').textContent =
+    now.toUTCString().slice(17,22) + ' UTC';
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ─────────────────────────────────────────
+// GRID OVERLAY (subtle lat/lon lines vibe)
+// ─────────────────────────────────────────
+const gridStyle = { color:'#1a2640', weight:0.5, opacity:0.4, dashArray:'3,6', interactive:false };
+// Latitude lines
+[-60,-30,0,30,60].forEach(lat => {
+  L.polyline([[lat,-180],[lat,180]], gridStyle).addTo(map);
+});
+// Longitude lines
+[-150,-120,-90,-60,-30,0,30,60,90,120,150].forEach(lon => {
+  L.polyline([[-90,lon],[90,lon]], gridStyle).addTo(map);
+});
+
+// ─────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────
+setTimeout(() => {
+  initLayers();
+  // Hide loader
+  const loader = document.getElementById('loader');
+  loader.style.opacity = '0';
+  setTimeout(() => loader.style.display = 'none', 600);
+}, 1800);
+
+// URL param support for sharing
+function applyUrlParams() {
+  const p = new URLSearchParams(location.search);
+  if (p.get('lat') && p.get('lon')) {
+    const zoom = parseFloat(p.get('zoom')) || 3;
+    map.setView([parseFloat(p.get('lat')), parseFloat(p.get('lon'))], Math.max(2, Math.round(zoom * 6)));
+  }
+  if (p.get('layers')) {
+    const active = p.get('layers').split(',');
+    Object.keys(layerState).forEach(k => {
+      if (!active.includes(k)) {
+        layerState[k] = true; // will toggle off below
+        setTimeout(() => {
+          if (!active.includes(k)) toggleLayer(k);
+        }, 2000);
+      }
+    });
+  }
+  if (p.get('view')) {
+    const vMap = { america:'america', europe:'europe', asia:'asia', africa:'africa', world:'world' };
+    const v = vMap[p.get('view')];
+    if (v) {
+      document.querySelectorAll('.vbtn').forEach(b => {
+        b.classList.toggle('active', b.textContent.toLowerCase() === v);
+      });
+    }
+  }
+}
+applyUrlParams();
+</script>
+</body>
+</html>
