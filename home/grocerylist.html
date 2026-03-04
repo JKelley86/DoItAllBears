@@ -278,6 +278,26 @@ body {
 }
 
 /* ── ITEM ROW ── */
+.item-outer {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.item-delete-bg {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 80px;
+  background: var(--danger);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  gap: 2px;
+  border-radius: 12px;
+  pointer-events: none;
+}
+.item-delete-bg .del-icon { font-size: 17px; line-height: 1; }
+.item-delete-bg .del-label { font-size: 10px; font-weight: 800; color: #fff; letter-spacing: 0.04em; }
+
 .item-row {
   display: flex;
   align-items: center;
@@ -285,14 +305,20 @@ body {
   padding: 12px 14px;
   background: var(--card2);
   border-radius: 12px;
-  transition: all 0.2s;
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.2s;
   position: relative;
-  overflow: hidden;
+  cursor: pointer;
+  z-index: 1;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
+.item-row.swiped { transform: translateX(-80px); }
+
 .item-row.deleting {
-  transform: translateX(-100%);
+  transform: translateX(-110%);
   opacity: 0;
+  transition: transform 0.22s ease-in, opacity 0.22s;
 }
 
 .item-check {
@@ -302,10 +328,10 @@ body {
   background: transparent;
   flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
   transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
   color: transparent;
   font-size: 13px;
+  pointer-events: none;
 }
 
 .item-row.checked .item-check {
@@ -314,7 +340,7 @@ body {
   color: white;
 }
 
-.item-body { flex: 1; min-width: 0; }
+.item-body { flex: 1; min-width: 0; pointer-events: none; }
 .item-name {
   font-size: 15px;
   font-weight: 700;
@@ -335,22 +361,6 @@ body {
   font-weight: 600;
   margin-top: 1px;
 }
-
-.item-delete {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  background: var(--danger-light);
-  border: none;
-  color: var(--danger);
-  font-size: 14px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.15s;
-  flex-shrink: 0;
-}
-.item-row:hover .item-delete,
-.item-row.show-delete .item-delete { opacity: 1; }
 
 /* Empty state */
 .empty-state {
@@ -694,9 +704,19 @@ let selectedCategory = "Other";
 // Expose globals
 window.toggleTheme = () => {
   document.body.classList.toggle("dark");
-  const btn = document.querySelector(".theme-btn");
-  btn.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+  const isDark = document.body.classList.contains("dark");
+  localStorage.setItem("theme", isDark ? "dark" : "light");
+  document.querySelector(".theme-btn").textContent = isDark ? "☀️" : "🌙";
 };
+
+// Apply saved theme immediately
+(function() {
+  const saved = localStorage.getItem("theme");
+  if (saved === "dark") {
+    document.body.classList.add("dark");
+    document.querySelector(".theme-btn").textContent = "☀️";
+  }
+})();
 
 window.setStoreFilter = (store, btn) => {
   storeFilter = store;
@@ -716,15 +736,273 @@ async function loadMappings() {
   snap.forEach(d => mapping[d.id] = d.data().category);
 }
 
-// ── NORMALIZE: use the FULL trimmed lowercase name, not just first word ──
+// Full trimmed lowercase key
 function normalize(text) {
   return text.trim().toLowerCase();
 }
 
+// ── SMART CATEGORIZATION ENGINE ──
+// Priority 1: CONTEXT OVERRIDES — these words anywhere in the name change everything
+const CONTEXT_OVERRIDES = [
+  // "frozen X" always → Frozen, regardless of what X normally is
+  { pattern: /\bfrozen\b/i,       category: "Frozen" },
+  { pattern: /\bfr\.\s/i,         category: "Frozen" },
+  // "fresh X" hints toward Produce or Dairy (handled below)
+];
+
+// Priority 2: EXACT or strong phrase matches (full name)
+const PHRASE_MAP = [
+  // Dairy — specific phrases first to beat partial matches
+  { phrase: /\bmilk\b/i,                  category: "Dairy" },
+  { phrase: /\bchocolate milk\b/i,         category: "Dairy" },
+  { phrase: /\bwhole milk\b/i,             category: "Dairy" },
+  { phrase: /\b2%\b/i,                     category: "Dairy" },
+  { phrase: /\balmond milk\b/i,            category: "Dairy" },
+  { phrase: /\boat milk\b/i,               category: "Dairy" },
+  { phrase: /\bcream\b/i,                  category: "Dairy" },
+  { phrase: /\bheavy cream\b/i,            category: "Dairy" },
+  { phrase: /\bsour cream\b/i,             category: "Dairy" },
+  { phrase: /\bcheese\b/i,                 category: "Dairy" },
+  { phrase: /\bsliced cheese\b/i,          category: "Dairy" },
+  { phrase: /\bshredded cheese\b/i,        category: "Dairy" },
+  { phrase: /\bcream cheese\b/i,           category: "Dairy" },
+  { phrase: /\bcottage cheese\b/i,         category: "Dairy" },
+  { phrase: /\bparmesan\b/i,               category: "Dairy" },
+  { phrase: /\bcheddar\b/i,                category: "Dairy" },
+  { phrase: /\bmozzarella\b/i,             category: "Dairy" },
+  { phrase: /\byogurt\b/i,                 category: "Dairy" },
+  { phrase: /\bgreek yogurt\b/i,           category: "Dairy" },
+  { phrase: /\bbutter\b/i,                 category: "Dairy" },
+  { phrase: /\beggs?\b/i,                  category: "Dairy" },
+  { phrase: /\bwhipped cream\b/i,          category: "Dairy" },
+  { phrase: /\bkefir\b/i,                  category: "Dairy" },
+  { phrase: /\bhalf and half\b/i,          category: "Dairy" },
+
+  // Produce
+  { phrase: /\bbroccoli\b/i,               category: "Produce" },
+  { phrase: /\bspinach\b/i,                category: "Produce" },
+  { phrase: /\bkale\b/i,                   category: "Produce" },
+  { phrase: /\blettuce\b/i,                category: "Produce" },
+  { phrase: /\bromaine\b/i,                category: "Produce" },
+  { phrase: /\baruugla\b/i,                category: "Produce" },
+  { phrase: /\bcabbage\b/i,                category: "Produce" },
+  { phrase: /\bbag salad\b/i,              category: "Produce" },
+  { phrase: /\bsalad mix\b/i,              category: "Produce" },
+  { phrase: /\btomato(es)?\b/i,            category: "Produce" },
+  { phrase: /\bonion(s)?\b/i,              category: "Produce" },
+  { phrase: /\bgarlic\b/i,                 category: "Produce" },
+  { phrase: /\bcarrot(s)?\b/i,             category: "Produce" },
+  { phrase: /\bcelery\b/i,                 category: "Produce" },
+  { phrase: /\bcucumber\b/i,               category: "Produce" },
+  { phrase: /\bbell pepper\b/i,            category: "Produce" },
+  { phrase: /\bpepper(s)?\b/i,             category: "Produce" },
+  { phrase: /\bavocado\b/i,                category: "Produce" },
+  { phrase: /\bbanana(s)?\b/i,             category: "Produce" },
+  { phrase: /\bapple(s)?\b/i,              category: "Produce" },
+  { phrase: /\borange(s)?\b/i,             category: "Produce" },
+  { phrase: /\blemon(s)?\b/i,              category: "Produce" },
+  { phrase: /\blime(s)?\b/i,               category: "Produce" },
+  { phrase: /\bstrawberr/i,                category: "Produce" },
+  { phrase: /\bblueberr/i,                 category: "Produce" },
+  { phrase: /\bgrapes?\b/i,                category: "Produce" },
+  { phrase: /\bwatermelon\b/i,             category: "Produce" },
+  { phrase: /\bpeach(es)?\b/i,             category: "Produce" },
+  { phrase: /\bpear(s)?\b/i,               category: "Produce" },
+  { phrase: /\bpotato(es)?\b/i,            category: "Produce" },
+  { phrase: /\bsweet potato\b/i,           category: "Produce" },
+  { phrase: /\bzucchini\b/i,               category: "Produce" },
+  { phrase: /\basparagus\b/i,              category: "Produce" },
+  { phrase: /\bbeets?\b/i,                 category: "Produce" },
+  { phrase: /\bmushroom(s)?\b/i,           category: "Produce" },
+  { phrase: /\bcorn\b/i,                   category: "Produce" },
+  { phrase: /\bgreen bean(s)?\b/i,         category: "Produce" },
+  { phrase: /\bpeas?\b/i,                  category: "Produce" },
+  { phrase: /\bherb(s)?\b/i,              category: "Produce" },
+  { phrase: /\bcilantro\b/i,               category: "Produce" },
+  { phrase: /\bparsley\b/i,                category: "Produce" },
+  { phrase: /\bbasil\b/i,                  category: "Produce" },
+  { phrase: /\bginger\b/i,                 category: "Produce" },
+
+  // Meat
+  { phrase: /\bchicken\b/i,                category: "Meat" },
+  { phrase: /\bground beef\b/i,            category: "Meat" },
+  { phrase: /\bground turkey\b/i,          category: "Meat" },
+  { phrase: /\bsteak\b/i,                  category: "Meat" },
+  { phrase: /\bpork\b/i,                   category: "Meat" },
+  { phrase: /\bbacon\b/i,                  category: "Meat" },
+  { phrase: /\bham\b/i,                    category: "Meat" },
+  { phrase: /\bturkey\b/i,                 category: "Meat" },
+  { phrase: /\bsalmon\b/i,                 category: "Meat" },
+  { phrase: /\btilapia\b/i,                category: "Meat" },
+  { phrase: /\bshrimp\b/i,                 category: "Meat" },
+  { phrase: /\bsausage\b/i,                category: "Meat" },
+  { phrase: /\bbrats?\b/i,                 category: "Meat" },
+  { phrase: /\bhot dog(s)?\b/i,            category: "Meat" },
+  { phrase: /\bdeli meat\b/i,              category: "Meat" },
+  { phrase: /\blunch ?meat\b/i,            category: "Meat" },
+  { phrase: /\bsalami\b/i,                 category: "Meat" },
+  { phrase: /\bpepperoni\b/i,              category: "Meat" },
+  { phrase: /\bribs?\b/i,                  category: "Meat" },
+  { phrase: /\blamb\b/i,                   category: "Meat" },
+  { phrase: /\btuna\b/i,                   category: "Meat" },
+
+  // Frozen (non-prefix — e.g. "pizza rolls", "ice cream")
+  { phrase: /\bice cream\b/i,              category: "Frozen" },
+  { phrase: /\bsorbet\b/i,                 category: "Frozen" },
+  { phrase: /\bgelato\b/i,                 category: "Frozen" },
+  { phrase: /\bfrozen pizza\b/i,           category: "Frozen" },
+  { phrase: /\bpizza rolls\b/i,            category: "Frozen" },
+  { phrase: /\bpopsicle\b/i,              category: "Frozen" },
+  { phrase: /\bfro.?yo\b/i,               category: "Frozen" },
+  { phrase: /\bfrozen meal\b/i,            category: "Frozen" },
+  { phrase: /\bfrozen dinner\b/i,          category: "Frozen" },
+  { phrase: /\bbagel bites?\b/i,           category: "Frozen" },
+  { phrase: /\bedamame\b/i,               category: "Frozen" },
+
+  // Bread / Bakery
+  { phrase: /\bbread\b/i,                  category: "Bread" },
+  { phrase: /\bwhole wheat\b/i,            category: "Bread" },
+  { phrase: /\bsourdough\b/i,              category: "Bread" },
+  { phrase: /\bbagel(s)?\b/i,              category: "Bread" },
+  { phrase: /\benglish muffin\b/i,         category: "Bread" },
+  { phrase: /\btortilla(s)?\b/i,           category: "Bread" },
+  { phrase: /\bwrap(s)?\b/i,               category: "Bread" },
+  { phrase: /\bpita\b/i,                   category: "Bread" },
+  { phrase: /\bnaan\b/i,                   category: "Bread" },
+  { phrase: /\bcroissant\b/i,              category: "Bread" },
+  { phrase: /\bmuffin(s)?\b/i,             category: "Bread" },
+  { phrase: /\bdinner roll\b/i,            category: "Bread" },
+  { phrase: /\bbuns?\b/i,                  category: "Bread" },
+  { phrase: /\bhamburger bun\b/i,          category: "Bread" },
+  { phrase: /\bhotdog bun\b/i,             category: "Bread" },
+  { phrase: /\bcake\b/i,                   category: "Bread" },
+  { phrase: /\bpie\b/i,                    category: "Bread" },
+  { phrase: /\bcookies?\b/i,               category: "Snacks" },
+
+  // Drinks
+  { phrase: /\bjuice\b/i,                  category: "Drinks" },
+  { phrase: /\borange juice\b/i,           category: "Drinks" },
+  { phrase: /\bapple juice\b/i,            category: "Drinks" },
+  { phrase: /\bsoda\b/i,                   category: "Drinks" },
+  { phrase: /\bpop\b/i,                    category: "Drinks" },
+  { phrase: /\bcoke\b/i,                   category: "Drinks" },
+  { phrase: /\bpepsi\b/i,                  category: "Drinks" },
+  { phrase: /\bsprite\b/i,                 category: "Drinks" },
+  { phrase: /\bwater\b/i,                  category: "Drinks" },
+  { phrase: /\bsparkling water\b/i,        category: "Drinks" },
+  { phrase: /\benergy drink\b/i,           category: "Drinks" },
+  { phrase: /\bred bull\b/i,               category: "Drinks" },
+  { phrase: /\bmonster\b/i,                category: "Drinks" },
+  { phrase: /\bcoffee\b/i,                 category: "Drinks" },
+  { phrase: /\bespresso\b/i,               category: "Drinks" },
+  { phrase: /\btea\b/i,                    category: "Drinks" },
+  { phrase: /\bkombucha\b/i,               category: "Drinks" },
+  { phrase: /\bprotein shake\b/i,          category: "Drinks" },
+  { phrase: /\bpowerade\b/i,               category: "Drinks" },
+  { phrase: /\bgatorade\b/i,               category: "Drinks" },
+  { phrase: /\blemonade\b/i,               category: "Drinks" },
+  { phrase: /\bcider\b/i,                  category: "Drinks" },
+  { phrase: /\beer\b/i,                    category: "Drinks" },
+  { phrase: /\bwine\b/i,                   category: "Drinks" },
+  { phrase: /\bliquor\b/i,                 category: "Drinks" },
+
+  // Snacks
+  { phrase: /\bchips?\b/i,                 category: "Snacks" },
+  { phrase: /\bpotato chips?\b/i,          category: "Snacks" },
+  { phrase: /\btortilla chips?\b/i,        category: "Snacks" },
+  { phrase: /\bpretzels?\b/i,              category: "Snacks" },
+  { phrase: /\bpopcorn\b/i,               category: "Snacks" },
+  { phrase: /\bcrackers?\b/i,              category: "Snacks" },
+  { phrase: /\bgranola bar\b/i,            category: "Snacks" },
+  { phrase: /\btrail mix\b/i,              category: "Snacks" },
+  { phrase: /\bnuts?\b/i,                  category: "Snacks" },
+  { phrase: /\balmonds?\b/i,               category: "Snacks" },
+  { phrase: /\bcashews?\b/i,               category: "Snacks" },
+  { phrase: /\bpeanuts?\b/i,               category: "Snacks" },
+  { phrase: /\bpeanut butter\b/i,          category: "Snacks" },
+  { phrase: /\bcandy\b/i,                  category: "Snacks" },
+  { phrase: /\bchocolate\b/i,              category: "Snacks" },
+  { phrase: /\bgummy\b/i,                  category: "Snacks" },
+  { phrase: /\bfruits? snack\b/i,          category: "Snacks" },
+  { phrase: /\brice cake\b/i,              category: "Snacks" },
+  { phrase: /\bhummus\b/i,                 category: "Snacks" },
+  { phrase: /\bsalsa\b/i,                  category: "Snacks" },
+  { phrase: /\bguacamole\b/i,              category: "Snacks" },
+
+  // Household
+  { phrase: /\bpaper towel\b/i,            category: "Household" },
+  { phrase: /\btoilet paper\b/i,           category: "Household" },
+  { phrase: /\btissue(s)?\b/i,             category: "Household" },
+  { phrase: /\blaundry\b/i,                category: "Household" },
+  { phrase: /\bdetergent\b/i,              category: "Household" },
+  { phrase: /\bdish soap\b/i,              category: "Household" },
+  { phrase: /\bhand soap\b/i,              category: "Household" },
+  { phrase: /\bsponge(s)?\b/i,             category: "Household" },
+  { phrase: /\btrash bag(s)?\b/i,          category: "Household" },
+  { phrase: /\bgarbage bag(s)?\b/i,        category: "Household" },
+  { phrase: /\bziploc\b/i,                 category: "Household" },
+  { phrase: /\bplastic bag\b/i,            category: "Household" },
+  { phrase: /\bfoil\b/i,                   category: "Household" },
+  { phrase: /\bsaran wrap\b/i,             category: "Household" },
+  { phrase: /\bplastic wrap\b/i,           category: "Household" },
+  { phrase: /\bcleaner\b/i,                category: "Household" },
+  { phrase: /\bbleach\b/i,                 category: "Household" },
+  { phrase: /\bwindex\b/i,                 category: "Household" },
+  { phrase: /\bshampoo\b/i,                category: "Household" },
+  { phrase: /\bconditioner\b/i,            category: "Household" },
+  { phrase: /\bbody wash\b/i,              category: "Household" },
+  { phrase: /\btoothpaste\b/i,             category: "Household" },
+  { phrase: /\btoothbrush\b/i,             category: "Household" },
+  { phrase: /\bdeodorant\b/i,              category: "Household" },
+  { phrase: /\bsunscreen\b/i,              category: "Household" },
+  { phrase: /\bbattery\b/i,                category: "Household" },
+  { phrase: /\bbatteries\b/i,              category: "Household" },
+  { phrase: /\blight bulb\b/i,             category: "Household" },
+  { phrase: /\bcandles?\b/i,               category: "Household" },
+  { phrase: /\bdiapers?\b/i,               category: "Household" },
+  { phrase: /\bbaby wipes?\b/i,            category: "Household" },
+  { phrase: /\bpet food\b/i,               category: "Household" },
+  { phrase: /\bdog food\b/i,               category: "Household" },
+  { phrase: /\bcat food\b/i,               category: "Household" },
+];
+
+/**
+ * Smart categorization:
+ * 1. Check user's saved Firebase mappings first (their explicit choices win)
+ * 2. Apply context overrides (e.g. "frozen" prefix beats everything)
+ * 3. Match against phrase map (longest/most specific match wins)
+ * 4. Fall back to null (user picks manually)
+ */
+function smartCategorize(fullName) {
+  const name = fullName.trim();
+
+  // Step 1: exact saved mapping
+  const savedKey = name.toLowerCase();
+  if (mapping[savedKey]) return mapping[savedKey];
+
+  // Step 2: context overrides (check word presence)
+  for (const override of CONTEXT_OVERRIDES) {
+    if (override.pattern.test(name)) return override.category;
+  }
+
+  // Step 3: phrase map — find ALL matches, pick highest specificity
+  // Specificity = length of the matched portion (longer = more specific)
+  let bestMatch = null;
+  let bestLen = 0;
+  for (const entry of PHRASE_MAP) {
+    const m = name.match(entry.phrase);
+    if (m && m[0].length > bestLen) {
+      bestLen = m[0].length;
+      bestMatch = entry.category;
+    }
+  }
+  if (bestMatch) return bestMatch;
+
+  return null; // unknown
+}
+
 async function getCategory(fullName) {
-  const key = normalize(fullName);
-  if (mapping[key]) return mapping[key];
-  return null; // null = needs user to pick
+  return smartCategorize(fullName);
 }
 
 // ── ADD ITEM ──
@@ -800,6 +1078,12 @@ function render() {
 
     const unchecked = catItems.filter(i => !i.checked).length;
 
+    const countText = catItems.length + ' item' + (catItems.length !== 1 ? 's' : '') +
+      (unchecked > 0 ? ' · ' + unchecked + ' remaining' : catItems.length > 0 ? ' · all done!' : '');
+    const badgeHtml = unchecked > 0
+      ? `<div class="cat-badge" style="background:${cat.light};color:${cat.color}">${unchecked}</div>`
+      : '';
+
     section.innerHTML = `
       <div class="category-header" onclick="this.parentElement.classList.toggle('open')">
         <div class="cat-emoji" style="background:${cat.light}">
@@ -807,9 +1091,9 @@ function render() {
         </div>
         <div class="cat-info">
           <div class="cat-name">${cat.label}</div>
-          <div class="cat-count">${catItems.length} item${catItems.length !== 1 ? "s" : ""}${unchecked > 0 ? ` · ${unchecked} remaining` : catItems.length > 0 ? " · all done!" : ""}</div>
+          <div class="cat-count">${countText}</div>
         </div>
-        ${unchecked > 0 ? `<div class="cat-badge" style="background:${cat.light};color:${cat.color}">${unchecked}</div>` : ""}
+        ${badgeHtml}
         <span class="cat-chevron">›</span>
       </div>
       <div class="items-list">
@@ -827,44 +1111,105 @@ function render() {
     }
 
     catItems.forEach(item => {
+      // Outer wrapper holds both the red delete bg and the sliding row
+      const outer = document.createElement("div");
+      outer.className = "item-outer";
+      outer.id = "outer-" + item.id;
+
+      // Red delete zone behind
+      const deleteBg = document.createElement("div");
+      deleteBg.className = "item-delete-bg";
+      deleteBg.innerHTML = `<span class="del-icon">🗑</span><span class="del-label">DELETE</span>`;
+      deleteBg.addEventListener("click", () => confirmDelete(item.id));
+
       const row = document.createElement("div");
       row.className = "item-row" + (item.checked ? " checked" : "");
       row.id = "item-" + item.id;
       row.innerHTML = `
-        <div class="item-check" onclick="toggleItem('${item.id}',${item.checked})">
-          ${item.checked ? "✓" : ""}
-        </div>
+        <div class="item-check">${item.checked ? "✓" : ""}</div>
         <div class="item-body">
           <div class="item-name">${item.name}</div>
           <div class="item-store">${item.store}</div>
         </div>
-        <button class="item-delete" onclick="deleteItem('${item.id}')">✕</button>
       `;
 
-      // Long press to reveal delete on iOS
-      let pressTimer;
-      row.addEventListener("touchstart", () => {
-        pressTimer = setTimeout(() => row.classList.add("show-delete"), 500);
-      }, { passive: true });
-      row.addEventListener("touchend", () => clearTimeout(pressTimer));
-      row.addEventListener("touchmove", () => clearTimeout(pressTimer), { passive: true });
+      outer.appendChild(deleteBg);
+      outer.appendChild(row);
 
-      // Swipe left to delete
-      let startX, startY;
+      // ── TAP TO COMPLETE ──
+      // Distinguish tap from swipe: only toggle if horizontal movement was tiny
+      let tapStartX, tapStartY, didSwipe = false;
+
       row.addEventListener("touchstart", e => {
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
+        tapStartX = e.touches[0].clientX;
+        tapStartY = e.touches[0].clientY;
+        didSwipe = false;
       }, { passive: true });
+
+      row.addEventListener("touchmove", e => {
+        const dx = Math.abs(e.touches[0].clientX - tapStartX);
+        const dy = Math.abs(e.touches[0].clientY - tapStartY);
+        if (dx > 8 || dy > 8) didSwipe = true;
+      }, { passive: true });
+
       row.addEventListener("touchend", e => {
-        const dx = e.changedTouches[0].clientX - startX;
-        const dy = Math.abs(e.changedTouches[0].clientY - startY);
-        if (dx < -60 && dy < 30) {
-          row.classList.add("deleting");
-          setTimeout(() => deleteItem(item.id), 200);
-        }
+        if (didSwipe) return;
+        // It was a tap — toggle complete
+        toggleItem(item.id, item.checked);
       });
 
-      inner.appendChild(row);
+      // Fallback for non-touch (desktop/preview)
+      row.addEventListener("click", e => {
+        if (didSwipe) return;
+        toggleItem(item.id, item.checked);
+      });
+
+      // ── SWIPE LEFT → REVEAL DELETE ──
+      let swipeStartX, swipeStartY, tracking = false;
+
+      row.addEventListener("touchstart", e => {
+        swipeStartX = e.touches[0].clientX;
+        swipeStartY = e.touches[0].clientY;
+        tracking = true;
+      }, { passive: true });
+
+      row.addEventListener("touchmove", e => {
+        if (!tracking) return;
+        const dx = e.touches[0].clientX - swipeStartX;
+        const dy = Math.abs(e.touches[0].clientY - swipeStartY);
+        if (dy > 20) { tracking = false; return; } // vertical scroll, ignore
+        if (dx < -10) {
+          // Live drag feel
+          const clamp = Math.max(-80, Math.min(0, dx));
+          row.style.transition = "none";
+          row.style.transform = `translateX(${clamp}px)`;
+        } else if (dx > 10 && row.classList.contains("swiped")) {
+          // Swiping back right
+          const clamp = Math.max(-80, Math.min(0, -80 + dx));
+          row.style.transition = "none";
+          row.style.transform = `translateX(${clamp}px)`;
+        }
+      }, { passive: true });
+
+      row.addEventListener("touchend", e => {
+        if (!tracking) return;
+        tracking = false;
+        const dx = e.changedTouches[0].clientX - swipeStartX;
+        row.style.transition = "";
+        row.style.transform = "";
+
+        if (dx < -40) {
+          // Swiped far enough left — reveal delete
+          row.classList.add("swiped");
+          didSwipe = true;
+        } else if (dx > 20) {
+          // Swiped back right — hide delete
+          row.classList.remove("swiped");
+        }
+        // If in-between, snap back
+      });
+
+      inner.appendChild(outer);
     });
   });
 }
@@ -874,14 +1219,25 @@ window.toggleItem = async function(id, checked) {
   await updateDoc(doc(db, "items", id), { checked: !checked });
 };
 
-window.deleteItem = async function(id) {
+window.confirmDelete = async function(id) {
+  const outer = document.getElementById("outer-" + id);
   const row = document.getElementById("item-" + id);
-  if (row) {
-    row.classList.add("deleting");
-    await new Promise(r => setTimeout(r, 200));
-  }
-  await deleteDoc(doc(db, "items", id));
+  if (row) row.classList.add("deleting");
+  setTimeout(async () => {
+    await deleteDoc(doc(db, "items", id));
+  }, 220);
 };
+
+window.deleteItem = window.confirmDelete;
+
+// Tapping anywhere outside a swiped row closes it
+document.addEventListener("touchstart", e => {
+  document.querySelectorAll(".item-row.swiped").forEach(r => {
+    if (!r.contains(e.target)) {
+      r.classList.remove("swiped");
+    }
+  });
+}, { passive: true });
 
 window.clearCompleted = function() {
   if (!items.some(i => i.checked)) return;
@@ -926,12 +1282,11 @@ function buildCategoryPicker() {
   });
 }
 
-// ── SMART CATEGORY SUGGESTION ──
-document.getElementById("itemName").addEventListener("input", async function() {
+// ── SMART CATEGORY SUGGESTION on typing ──
+document.getElementById("itemName").addEventListener("input", function() {
   const val = this.value.trim();
   if (!val) return;
-  const key = normalize(val);
-  const cat = await getCategory(key);
+  const cat = smartCategorize(val);
   if (cat) {
     selectedCategory = cat;
     document.querySelectorAll(".cat-pick-btn").forEach(b => {
