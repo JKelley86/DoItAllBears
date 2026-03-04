@@ -24,6 +24,8 @@
     --natural: #ffb830;
     --startup: #a259ff;
     --event: #00ff9d;
+    --conflict: #ff6b00;
+    --crime: #e0c040;
     --panel-bg: rgba(8,12,20,0.92);
   }
 
@@ -595,6 +597,18 @@
       <div class="layer-count" id="cnt-techEvents">0</div>
       <div class="toggle on" id="tog-techEvents"></div>
     </div>
+    <div class="layer-row" onclick="toggleLayer('conflicts')">
+      <div class="layer-icon" style="background:var(--conflict); box-shadow:0 0 6px var(--conflict)"></div>
+      <div class="layer-label">Conflicts</div>
+      <div class="layer-count" id="cnt-conflicts">0</div>
+      <div class="toggle on" id="tog-conflicts"></div>
+    </div>
+    <div class="layer-row" onclick="toggleLayer('crimes')">
+      <div class="layer-icon" style="background:var(--crime); box-shadow:0 0 6px var(--crime)"></div>
+      <div class="layer-label">Major Crimes</div>
+      <div class="layer-count" id="cnt-crimes">0</div>
+      <div class="toggle on" id="tog-crimes"></div>
+    </div>
   </div>
 
   <div class="panel-card">
@@ -631,6 +645,14 @@
         <svg width="14" height="14" viewBox="0 0 14 14"><polygon points="7,1 13,13 1,13" fill="none" stroke="var(--event)" stroke-width="1.5"/></svg>
         <span style="font-size:11px;color:var(--muted)">Tech Event</span>
       </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7,1 L13,7 L7,13 L1,7 Z" fill="none" stroke="var(--conflict)" stroke-width="1.5"/><circle cx="7" cy="7" r="2" fill="var(--conflict)"/></svg>
+        <span style="font-size:11px;color:var(--muted)">Conflict Zone</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="14" height="14" viewBox="0 0 14 14"><rect x="1" y="4" width="12" height="8" rx="1" fill="none" stroke="var(--crime)" stroke-width="1.4"/><path d="M4,4 L4,2.5 Q7,0.5 10,2.5 L10,4" fill="none" stroke="var(--crime)" stroke-width="1.4"/></svg>
+        <span style="font-size:11px;color:var(--muted)">Major Crime</span>
+      </div>
     </div>
   </div>
 </div>
@@ -665,6 +687,8 @@
   <div class="bstat"><div class="bstat-dot" style="background:var(--natural);box-shadow:0 0 6px var(--natural)"></div>NATURAL <span id="b-natural">0</span></div>
   <div class="bstat"><div class="bstat-dot" style="background:var(--startup);box-shadow:0 0 6px var(--startup)"></div>STARTUP HUBS <span id="b-startup">0</span></div>
   <div class="bstat"><div class="bstat-dot" style="background:var(--event);box-shadow:0 0 6px var(--event)"></div>TECH EVENTS <span id="b-events">0</span></div>
+  <div class="bstat"><div class="bstat-dot" style="background:var(--conflict);box-shadow:0 0 6px var(--conflict)"></div>CONFLICTS <span id="b-conflicts">0</span></div>
+  <div class="bstat"><div class="bstat-dot" style="background:var(--crime);box-shadow:0 0 6px var(--crime)"></div>CRIMES <span id="b-crimes">0</span></div>
   <div id="coords">LAT — LON —</div>
 </div>
 
@@ -744,6 +768,38 @@ const DATA = {
     { lat:22.39, lon:114.11,  title:"RISE Conference HK", desc:"Asia's leading tech conference. 20K+ attendees.", date:"Oct 22–24", type:"Conference" },
     { lat:-33.86,lon:151.2,   title:"YOW! Australia", desc:"Developer conference across Sydney, Brisbane, Melbourne.", date:"Dec 4–6", type:"Conference" },
     { lat:55.75, lon:37.61,   title:"Moscow ML Summit", desc:"Russia's premier machine learning and AI gathering.", date:"Nov 15–17", type:"Summit" },
+  ],
+  conflicts: [
+    { lat:48.50, lon:31.30,  title:"Russia–Ukraine War", desc:"Large-scale conventional warfare across eastern and southern Ukraine. Ongoing frontline operations in Donetsk, Zaporizhzhia, and Kherson oblasts.", status:"Active", parties:"Russia vs Ukraine", since:"Feb 2022" },
+    { lat:31.50, lon:34.47,  title:"Gaza Conflict", desc:"Israeli military operations in Gaza following the October 7 Hamas attacks. Significant humanitarian crisis with international mediation efforts ongoing.", status:"Active", parties:"Israel vs Hamas / PIJ", since:"Oct 2023" },
+    { lat:15.50, lon:32.50,  title:"Sudan Civil War", desc:"Armed conflict between the Sudanese Armed Forces and Rapid Support Forces. Widespread atrocities reported in Darfur and Khartoum.", status:"Active", parties:"SAF vs RSF", since:"Apr 2023" },
+    { lat:14.00, lon:40.50,  title:"Tigray / Ethiopian Conflict Aftershocks", desc:"Post-peace agreement instability in northern Ethiopia. Sporadic clashes and humanitarian access issues persist.", status:"Low-intensity", parties:"Ethiopia / ENDF vs TDF remnants", since:"Nov 2020" },
+    { lat:33.90, lon:67.70,  title:"Afghanistan — Taliban Rule & IS-K", desc:"Taliban governance with ongoing IS-Khorasan Province attacks targeting civilians and foreign nationals. Persistent insurgency in eastern provinces.", status:"Active", parties:"Taliban vs ISKP", since:"Aug 2021" },
+    { lat:15.35, lon:44.20,  title:"Yemen Civil War", desc:"Houthi forces controlling northern Yemen, continued Red Sea shipping attacks. Coalition airstrike exchanges ongoing.", status:"Active", parties:"Houthis vs Saudi-led Coalition", since:"Mar 2015" },
+    { lat:4.85,  lon:31.60,  title:"South Sudan Intercommunal Violence", desc:"Ethnic and resource-based clashes in Greater Upper Nile and Jonglei. Aid workers targeted. UN peacekeepers deployed.", status:"Active", parties:"Multiple armed factions", since:"2013" },
+    { lat:12.36, lon:15.04,  title:"Lake Chad Basin — Boko Haram / ISWAP", desc:"ISWAP operations across Nigeria, Niger, Chad and Cameroon. Multiple attacks on military installations in Q1 2025.", status:"Active", parties:"ISWAP / Boko Haram vs MNJTF", since:"2009" },
+    { lat:6.30,  lon:-2.00,  title:"Sahel — JNIM Operations", desc:"JNIM affiliate attacks surging in Burkina Faso and Mali. Several towns under siege. French forces withdrawn.", status:"Escalating", parties:"JNIM vs G5 Sahel forces", since:"2017" },
+    { lat:24.00, lon:54.00,  title:"Middle East Regional Escalation", desc:"Proxy conflicts and missile exchanges across Lebanon, Syria and Iraq. US and allied forces on elevated alert.", status:"Elevated", parties:"Iran axis vs Israel / US", since:"Oct 2023" },
+    { lat:7.00,  lon:81.00,  title:"Sri Lanka–NTJ Residual Threat", desc:"Post-Easter bombing security operations continue. Radicalisation monitoring active across eastern provinces.", status:"Low-intensity", parties:"Security forces vs NTJ remnants", since:"2019" },
+    { lat:37.50, lon:43.00,  title:"Turkey–PKK Operations", desc:"Turkish military operations in northern Iraq and Syria targeting PKK positions. Cross-border airstrikes ongoing.", status:"Active", parties:"Turkey vs PKK", since:"1984" },
+    { lat:16.00, lon:-1.00,  title:"Mali — MINUSMA Withdrawal Zone", desc:"Rapid security deterioration following MINUSMA exit. Wagner Group / Africa Corps presence reported in central Mali.", status:"Escalating", parties:"JNIM / ISGS vs Mali Armed Forces", since:"2012" },
+    { lat:1.50,  lon:37.00,  title:"Kenya–Ethiopia Border Clashes", desc:"Pastoral and territorial disputes escalating into armed confrontations in Moyale and Mandera regions.", status:"Low-intensity", parties:"Cross-border armed groups", since:"2022" },
+  ],
+  crimes: [
+    { lat:19.43, lon:-99.13, title:"Sinaloa Cartel Leadership Fracture", desc:"Armed conflict between Chapito and Mayos factions following CJNG peace breakdown. 300+ homicides in Culiacán metro since January.", category:"Organized Crime", org:"Sinaloa Cartel", ago:"Ongoing" },
+    { lat:18.55, lon:-72.34, title:"Haiti Gang Control Crisis", desc:"G9 and Viv Ansanm coalition controls 85% of Port-au-Prince. MSS multinational security mission struggling to restore order.", category:"Gang Warfare", org:"G9 / Viv Ansanm", ago:"Ongoing" },
+    { lat:13.51, lon:2.12,   title:"Sahel Artisanal Mine Smuggling", desc:"UN Panel reports systematic gold smuggling from conflict zones funding JNIM and ISGS operations in Mali and Niger.", category:"Resource Trafficking", org:"Armed factions / Smuggling networks", ago:"Ongoing" },
+    { lat:52.22, lon:21.01,  title:"Eastern Europe Cybercrime Hub", desc:"Europol operation ENDGAME dismantled IcedID and Smokeloader botnets. Arrest warrants issued for 8 suspects across Poland and Ukraine.", category:"Cybercrime", org:"REvil / LockBit affiliates", ago:"3 months ago" },
+    { lat:35.69, lon:51.39,  title:"Tehran Crypto Money Laundering", desc:"OFAC sanctioned network funneling $1.2B through crypto exchanges for IRGC procurement. Dozens of wallets frozen.", category:"Financial Crime", org:"IRGC procurement network", ago:"6 months ago" },
+    { lat:22.35, lon:114.15, title:"Hong Kong — Transnational Fraud Syndicates", desc:"'Pig butchering' romance scam operations traced to compounds in Myanmar and Cambodia. $3B in losses reported by US victims alone in 2024.", category:"Cyber Fraud", org:"Myanmar scam compounds", ago:"Ongoing" },
+    { lat:16.80, lon:96.15,  title:"Myanmar Scam Compound Operations", desc:"KK Park and similar compounds hold an estimated 120,000 forced workers running international cyber fraud schemes. ASEAN task force active.", category:"Human Trafficking / Cyber Fraud", org:"Chinese crime syndicates", ago:"Ongoing" },
+    { lat:40.85, lon:14.27,  title:"Naples — Camorra Clan Conflict", desc:"Escalating turf war between Secondigliano Alliance and Scissionisti di Secondigliano. 14 shootings in 6 weeks across Naples metro.", category:"Organized Crime", org:"Camorra", ago:"2 months ago" },
+    { lat:6.37,  lon:2.42,   title:"Lagos — Black Axe / NNPP Fraud", desc:"Interpol Operation Jackal III targeted Black Axe and related BEC syndicates. $40M in assets seized across 21 countries.", category:"Fraud / Organized Crime", org:"Black Axe Confraternity", ago:"4 months ago" },
+    { lat:-34.61,lon:-58.38, title:"Buenos Aires — Narco-tunnels Discovery", desc:"Argentine Federal Police dismantled cross-border cocaine smuggling tunnels linking Formosa to Bolivia. 2.4 tons seized.", category:"Drug Trafficking", org:"Bolivian cartel affiliates", ago:"1 month ago" },
+    { lat:50.85, lon:4.35,   title:"Brussels — EU Carbon Credit Fraud", desc:"Europol operation uncovered €650M carbon credit VAT carousel fraud spanning 10 EU member states.", category:"Financial Crime", org:"Organised crime syndicates", ago:"5 months ago" },
+    { lat:1.29,  lon:103.85, title:"Singapore — Largest Money Laundering Case", desc:"$2.8B laundered by 10 foreign nationals linked to Myanmar and Fujian crime networks. All convicted; assets seized.", category:"Money Laundering", org:"Transnational network", ago:"Sentenced 2024" },
+    { lat:55.76, lon:37.62,  title:"Moscow — Solntsevskaya Bratva Operations", desc:"Russian intelligence links confirmed between Solntsevskaya leadership and state-adjacent arms and cyber operations.", category:"Organized Crime", org:"Solntsevskaya Bratva", ago:"Ongoing" },
+    { lat:25.77, lon:-80.19, title:"Miami — Fentanyl Distribution Network", desc:"DEA Operation Dark Web dismantled a 14-state fentanyl network sourcing precursors from China via Mexico. 42 arrested.", category:"Drug Trafficking", org:"Sinaloa-linked network", ago:"2 months ago" },
   ]
 };
 
@@ -768,7 +824,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // LAYER STATE
 // ─────────────────────────────────────────
 const layerGroups = {};
-const layerState = { outages:true, datacenters:true, natural:true, startupHubs:true, techEvents:true };
+const layerState = { outages:true, datacenters:true, natural:true, startupHubs:true, techEvents:true, conflicts:true, crimes:true };
 
 function makeIcon(color, shape='circle', size=10) {
   const svg = shape === 'circle' ? `
@@ -812,8 +868,8 @@ function makePulseIcon(color) {
 }
 
 function buildPopup(type, item) {
-  const colors = { outages:'var(--outage)', datacenters:'var(--dc)', natural:'var(--natural)', startupHubs:'var(--startup)', techEvents:'var(--event)' };
-  const labels = { outages:'OUTAGE', datacenters:'DATACENTER', natural:'NATURAL EVENT', startupHubs:'STARTUP HUB', techEvents:'TECH EVENT' };
+  const colors = { outages:'var(--outage)', datacenters:'var(--dc)', natural:'var(--natural)', startupHubs:'var(--startup)', techEvents:'var(--event)', conflicts:'var(--conflict)', crimes:'var(--crime)' };
+  const labels = { outages:'OUTAGE', datacenters:'DATACENTER', natural:'NATURAL EVENT', startupHubs:'STARTUP HUB', techEvents:'TECH EVENT', conflicts:'CONFLICT ZONE', crimes:'MAJOR CRIME' };
   const col = colors[type];
   const lab = labels[type];
 
@@ -823,6 +879,8 @@ function buildPopup(type, item) {
   if (type==='natural') extra = `<div class="popup-meta">Type: ${item.type||'—'} &nbsp;·&nbsp; ${item.ago||''}</div>`;
   if (type==='startupHubs') extra = `<div class="popup-meta">${item.cos||'—'} &nbsp;·&nbsp; ${item.vcum||''}</div>`;
   if (type==='techEvents') extra = `<div class="popup-meta">${item.type||'—'} &nbsp;·&nbsp; ${item.date||''}</div>`;
+  if (type==='conflicts') extra = `<div class="popup-meta">Status: ${item.status||'—'} &nbsp;·&nbsp; Since ${item.since||'—'}<br>${item.parties||''}</div>`;
+  if (type==='crimes') extra = `<div class="popup-meta">${item.category||'—'} &nbsp;·&nbsp; ${item.ago||''}<br>${item.org||''}</div>`;
 
   return `<div class="popup-inner">
     <div class="popup-type" style="color:${col}">${lab}</div>
@@ -832,34 +890,48 @@ function buildPopup(type, item) {
   </div>`;
 }
 
+function makeConflictIcon(color) {
+  const html = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22"><polygon points="11,1 21,11 11,21 1,11" fill="none" stroke="${color}" stroke-width="1.5" opacity="0.5"/><polygon points="11,4 18,11 11,18 4,11" fill="${color}" opacity="0.9"/></svg>`;
+  return L.divIcon({ html, className:'', iconSize:[22,22], iconAnchor:[11,11] });
+}
+
+function makeCrimeIcon(color) {
+  const html = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" viewBox="0 0 18 20"><rect x="1" y="8" width="16" height="11" rx="2" fill="${color}" opacity="0.2" stroke="${color}" stroke-width="1.4"/><path d="M5,8 L5,5.5 C5,2.5 13,2.5 13,5.5 L13,8" fill="none" stroke="${color}" stroke-width="1.5"/><circle cx="9" cy="13.5" r="2" fill="${color}"/></svg>`;
+  return L.divIcon({ html, className:'', iconSize:[18,20], iconAnchor:[9,10] });
+}
+
 function buildLayer(type) {
-  const colorMap = { outages:'#ff3d6b', datacenters:'#00e5ff', natural:'#ffb830', startupHubs:'#a259ff', techEvents:'#00ff9d' };
+  const colorMap = { outages:'#ff3d6b', datacenters:'#00e5ff', natural:'#ffb830', startupHubs:'#a259ff', techEvents:'#00ff9d', conflicts:'#ff6b00', crimes:'#e0c040' };
   const col = colorMap[type];
   const group = L.layerGroup();
   const items = DATA[type];
 
   items.forEach(item => {
-    let icon;
-    if (type==='outages') icon = item.severity==='high' ? makePulseIcon(col) : makeIcon(col,'circle',8);
-    else if (type==='datacenters') icon = makeIcon(col,'square',9);
-    else if (type==='natural') icon = makeIcon(col,'circle',10);
-    else if (type==='startupHubs') icon = makeIcon(col,'star',10);
-    else icon = makeIcon(col,'triangle',10);
+    try {
+      let icon;
+      if (type==='outages') icon = item.severity==='high' ? makePulseIcon(col) : makeIcon(col,'circle',8);
+      else if (type==='datacenters') icon = makeIcon(col,'square',9);
+      else if (type==='natural') icon = makeIcon(col,'circle',10);
+      else if (type==='startupHubs') icon = makeIcon(col,'star',10);
+      else if (type==='conflicts') icon = makeConflictIcon(col);
+      else if (type==='crimes') icon = makeCrimeIcon(col);
+      else icon = makeIcon(col,'triangle',10);
 
-    const marker = L.marker([item.lat, item.lon], { icon })
-      .bindPopup(buildPopup(type, item), {
-        className:'wm-popup',
-        maxWidth:280,
-        closeButton:false
-      });
-    group.addLayer(marker);
+      const marker = L.marker([item.lat, item.lon], { icon })
+        .bindPopup(buildPopup(type, item), {
+          className:'wm-popup',
+          maxWidth:300,
+          closeButton:false
+        });
+      group.addLayer(marker);
+    } catch(e) { console.error('Marker error', type, item.title, e); }
   });
 
   return group;
 }
 
 function initLayers() {
-  ['outages','datacenters','natural','startupHubs','techEvents'].forEach(t => {
+  ['outages','datacenters','natural','startupHubs','techEvents','conflicts','crimes'].forEach(t => {
     layerGroups[t] = buildLayer(t);
     layerGroups[t].addTo(map);
     document.getElementById('cnt-'+t).textContent = DATA[t].length;
@@ -883,7 +955,7 @@ function toggleLayer(name) {
 
 function updateStats() {
   const active = name => layerState[name] ? DATA[name].length : 0;
-  document.getElementById('h-incidents').textContent = active('outages');
+  document.getElementById('h-incidents').textContent = active('outages') + active('conflicts');
   document.getElementById('h-dc').textContent = active('datacenters');
   document.getElementById('h-events').textContent = active('techEvents') + active('natural');
   document.getElementById('b-outages').textContent = active('outages');
@@ -891,6 +963,8 @@ function updateStats() {
   document.getElementById('b-natural').textContent = active('natural');
   document.getElementById('b-startup').textContent = active('startupHubs');
   document.getElementById('b-events').textContent = active('techEvents');
+  document.getElementById('b-conflicts').textContent = active('conflicts');
+  document.getElementById('b-crimes').textContent = active('crimes');
 }
 
 // ─────────────────────────────────────────
@@ -902,14 +976,16 @@ function buildFeed() {
     ...DATA.outages.map(i => ({...i, type:'outages', col:'var(--outage)'})),
     ...DATA.natural.map(i => ({...i, type:'natural', col:'var(--natural)'})),
     ...DATA.techEvents.map(i => ({...i, type:'techEvents', col:'var(--event)'})),
+    ...DATA.conflicts.map(i => ({...i, type:'conflicts', col:'var(--conflict)'})),
+    ...DATA.crimes.map(i => ({...i, type:'crimes', col:'var(--crime)'})),
   ];
   all.sort(() => Math.random()-0.5);
-  feed.innerHTML = all.slice(0,14).map(i => `
+  feed.innerHTML = all.slice(0,18).map(i => `
     <div class="event-item" onclick="flyTo(${i.lat},${i.lon})">
       <div class="event-dot" style="background:${i.col};box-shadow:0 0 5px ${i.col}"></div>
       <div class="event-body">
         <div class="event-title">${i.title}</div>
-        <div class="event-meta">${i.ago||i.date||''}</div>
+        <div class="event-meta">${i.status||i.category||i.ago||i.date||''}</div>
       </div>
     </div>`).join('');
 }
@@ -995,13 +1071,12 @@ function applyUrlParams() {
     map.setView([parseFloat(p.get('lat')), parseFloat(p.get('lon'))], Math.max(2, Math.round(zoom * 6)));
   }
   if (p.get('layers')) {
-    const active = p.get('layers').split(',');
-    Object.keys(layerState).forEach(k => {
-      if (!active.includes(k)) {
-        layerState[k] = true; // will toggle off below
-        setTimeout(() => {
-          if (!active.includes(k)) toggleLayer(k);
-        }, 2000);
+    const requested = p.get('layers').split(',');
+    // Only hide layers that were explicitly excluded AND are in the original legacy layer set
+    const legacyLayers = ['outages','datacenters','natural','startupHubs','techEvents'];
+    legacyLayers.forEach(k => {
+      if (!requested.includes(k)) {
+        setTimeout(() => { toggleLayer(k); }, 2000);
       }
     });
   }
