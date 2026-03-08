@@ -1,538 +1,336 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>MindFuel — Learn Daily</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<title>MindFuel</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body { background: #0A0A0F; color: #F0F0F8; font-family: system-ui,-apple-system,sans-serif; height: 100%; overflow-x: hidden; -webkit-font-smoothing: antialiased; overscroll-behavior: none; }
-  #root { max-width: 430px; margin: 0 auto; min-height: 100dvh; }
-  ::-webkit-scrollbar { display: none; }
-  @keyframes shimmer { to { background-position: -200% 0; } }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-  .fade-up { animation: fadeUp 0.3s ease; }
-  input::placeholder { color: #606078; }
-  input { color: #F0F0F8; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { background: #0A0A0F; color: #F0F0F8; font-family: system-ui,-apple-system,sans-serif; min-height: 100%; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+::-webkit-scrollbar { display: none; }
+input, textarea, button { font-family: inherit; }
+input::placeholder, textarea::placeholder { color: #404058; }
+
+#app { max-width: 430px; margin: 0 auto; min-height: 100vh; padding-bottom: 80px; position: relative; }
+.header { padding: 16px 20px 14px; background: rgba(10,10,15,0.94); border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(20px); }
+.app-name { font-size: 22px; font-weight: 800; background: linear-gradient(135deg,#A594F9,#F472B6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.header-sub { font-size: 13px; color: #606078; margin-top: 3px; }
+.streak-badge { display: flex; align-items: center; gap: 6px; background: #1C1C26; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; color: #FB923C; }
+.page { padding: 16px; }
+
+.nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; padding: 10px 16px 20px; background: rgba(10,10,15,0.96); border-top: 1px solid rgba(255,255,255,0.06); display: flex; gap: 4px; z-index: 100; }
+.nav-btn { flex: 1; padding: 8px 4px; border-radius: 14px; border: none; background: transparent; color: #606078; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.nav-btn.active { background: rgba(123,110,246,0.15); color: #A594F9; }
+
+.card { background: #13131A; border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 22px; margin-bottom: 14px; }
+.topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+.topic-card { background: #13131A; border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 16px; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.15s; }
+.topic-card:active { transform: scale(0.97); }
+
+.section-title { font-size: 16px; font-weight: 700; color: #F0F0F8; margin-bottom: 12px; }
+.lesson-title { font-size: 20px; font-weight: 700; color: #F0F0F8; margin-bottom: 16px; line-height: 1.3; }
+.sec-heading { font-size: 11px; font-weight: 700; color: #A594F9; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; margin-top: 18px; }
+.sec-body { font-size: 15px; line-height: 1.75; color: #A0A0B8; }
+.takeaways-box { background: #13131A; border: 1px solid rgba(52,211,153,0.15); border-radius: 16px; padding: 18px; margin-bottom: 14px; }
+
+.btn-primary { background: linear-gradient(135deg,#7B6EF6,#A594F9); color: #fff; border: none; border-radius: 14px; padding: 13px 16px; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%; box-shadow: 0 4px 20px rgba(123,110,246,0.3); }
+.btn-secondary { background: #1C1C26; color: #A0A0B8; border: none; border-radius: 14px; padding: 13px 16px; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%; }
+.btn-row { display: flex; gap: 10px; }
+.back-btn { width: 38px; height: 38px; border-radius: 50%; background: #1C1C26; border: none; color: #F0F0F8; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+.mode-tabs { display: flex; gap: 6px; background: #13131A; border-radius: 14px; padding: 4px; margin-bottom: 16px; }
+.mode-tab { flex: 1; padding: 9px 4px; border-radius: 10px; border: none; background: transparent; color: #606078; font-size: 13px; font-weight: 600; cursor: pointer; }
+.mode-tab.active { background: #252533; color: #F0F0F8; }
+
+.subtopic-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; scrollbar-width: none; }
+.subtopic-pill { flex-shrink: 0; padding: 7px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.06); background: #13131A; color: #A0A0B8; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.subtopic-pill.active { color: #fff; }
+
+.quiz-q { font-size: 17px; font-weight: 700; color: #F0F0F8; margin-bottom: 20px; line-height: 1.4; }
+.quiz-opt { padding: 14px 16px; border-radius: 14px; cursor: pointer; border: 1.5px solid rgba(255,255,255,0.06); background: #1C1C26; color: #F0F0F8; font-size: 15px; font-weight: 500; width: 100%; text-align: left; margin-bottom: 10px; }
+.quiz-opt.correct { border-color: #34D399 !important; background: rgba(52,211,153,0.1) !important; }
+.quiz-opt.wrong { border-color: #EF4444 !important; background: rgba(239,68,68,0.1) !important; }
+.progress-bar { height: 3px; background: #1C1C26; border-radius: 2px; margin-bottom: 16px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg,#7B6EF6,#A594F9); transition: width 0.4s; }
+
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+.stat-card { background: #13131A; border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 18px; text-align: center; }
+.hist-item { display: flex; align-items: center; gap: 12px; padding: 14px; background: #13131A; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; margin-bottom: 8px; }
+
+.edit-banner { background: rgba(123,110,246,0.1); border: 1px solid rgba(123,110,246,0.25); border-radius: 14px; padding: 14px 16px; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 10px; }
+.edit-label { font-size: 11px; font-weight: 700; color: #606078; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+.edit-input { width: 100%; background: #13131A; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #F0F0F8; outline: none; }
+.edit-input:focus { border-color: rgba(165,148,249,0.5); }
+.edit-textarea { width: 100%; background: #13131A; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #F0F0F8; outline: none; resize: vertical; min-height: 80px; line-height: 1.6; }
+.edit-textarea:focus { border-color: rgba(165,148,249,0.5); }
+.ef-group { margin-bottom: 14px; }
+.divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 18px 0; }
+.q-block { background: #0A0A0F; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+.q-block-label { font-size: 11px; font-weight: 700; color: #F472B6; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 12px; }
+
+.empty-state { text-align: center; padding: 32px 20px; }
+.save-toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #34D399; color: #0A0A0F; font-size: 13px; font-weight: 700; padding: 10px 20px; border-radius: 20px; z-index: 200; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+.save-toast.show { opacity: 1; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.fade-up { animation: fadeUp 0.25s ease; }
 </style>
 </head>
 <body>
-<div id="root"></div>
+<div id="app">
+  <div style="position:fixed;top:-200px;left:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(123,110,246,0.07) 0%,transparent 70%);pointer-events:none;z-index:0;"></div>
 
-<script type="text/babel">
-const { useState, useEffect, useRef } = React;
+  <div class="header">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div class="app-name">MindFuel ⚡</div>
+        <div class="header-sub" id="header-sub">What will you learn today?</div>
+      </div>
+      <div class="streak-badge">🔥 <span id="streak-count">0</span> day</div>
+    </div>
+  </div>
 
-// ─────────────────────────────────────────────
-// TOPICS
-// ─────────────────────────────────────────────
+  <div id="page-home" class="page" style="position:relative;z-index:1;"></div>
+  <div id="page-lesson" class="page" style="display:none;position:relative;z-index:1;"></div>
+  <div id="page-profile" class="page" style="display:none;position:relative;z-index:1;"></div>
+
+  <div class="nav">
+    <button class="nav-btn active" id="nav-home" onclick="showPage('home')"><span style="font-size:22px;">🏠</span>Home</button>
+    <button class="nav-btn" id="nav-profile" onclick="showPage('profile')"><span style="font-size:22px;">👤</span>Profile</button>
+  </div>
+
+  <div class="save-toast" id="save-toast">✓ Saved!</div>
+</div>
+
+<script>
 const TOPICS = [
-  { id:"history",   name:"History",                   icon:"🏛️", color:"#FB923C", glow:"rgba(251,146,60,0.15)",
-    subtopics:["Ancient Civilizations","World Wars","American History","Medieval Period","Scientific Revolution","Cold War","Ancient Rome","The Renaissance"] },
-  { id:"science",   name:"Science & Biology",          icon:"🧬", color:"#34D399", glow:"rgba(52,211,153,0.15)",
-    subtopics:["Cell Biology","Evolution","Genetics","Ecosystems","Human Body","Microbiology","Chemistry Basics","Neuroscience"] },
-  { id:"math",      name:"Math",                      icon:"📐", color:"#A594F9", glow:"rgba(165,148,249,0.15)",
-    subtopics:["Algebra","Geometry","Calculus","Statistics","Number Theory","Trigonometry","Probability","Linear Algebra"] },
-  { id:"art",       name:"Art & Culture",              icon:"🎨", color:"#F472B6", glow:"rgba(244,114,182,0.15)",
-    subtopics:["Art History","Music Theory","Architecture","Film","Literature","Cultural Movements","Design","Philosophy of Art"] },
-  { id:"finance",   name:"Finance & Business",         icon:"📈", color:"#FBBF24", glow:"rgba(251,191,36,0.15)",
-    subtopics:["Investing Basics","Stock Market","Personal Finance","Entrepreneurship","Economics","Cryptocurrency","Real Estate","Budgeting"] },
-  { id:"philosophy",name:"Philosophy",                 icon:"🧠", color:"#C084FC", glow:"rgba(192,132,252,0.15)",
-    subtopics:["Ethics","Stoicism","Logic","Epistemology","Existentialism","Eastern Philosophy","Political Philosophy","Metaphysics"] },
-  { id:"technology",name:"Technology",                 icon:"💻", color:"#38BDF8", glow:"rgba(56,189,248,0.15)",
-    subtopics:["AI & Machine Learning","How the Internet Works","Cybersecurity","Programming Concepts","Operating Systems","Databases","Networking","Cloud Computing"] },
-  { id:"mechanics", name:"Physics — Mechanics",        icon:"⚙️", color:"#F97316", glow:"rgba(249,115,22,0.15)",
-    subtopics:["Newton's Laws","Levers & Torque","Forces & Motion","Energy & Work","Momentum","Friction","Simple Machines","Center of Mass"] },
-  { id:"fluids",    name:"Physics — Fluids",           icon:"💧", color:"#0EA5E9", glow:"rgba(14,165,233,0.15)",
-    subtopics:["Water Pressure","Buoyancy","Flow Rate","Bernoulli's Principle","Hydraulics","Surface Tension","Viscosity","Pascal's Law"] },
-  { id:"gravity",   name:"Physics — Weight & Gravity", icon:"🪨", color:"#94A3B8", glow:"rgba(148,163,184,0.15)",
-    subtopics:["Gravity Basics","Weight vs Mass","Free Fall","Center of Gravity","Tipping Points","Load Distribution","Gravitational Fields","Structural Load"] },
-  { id:"energy",    name:"Physics — Energy & Waves",   icon:"⚡", color:"#FBBF24", glow:"rgba(251,191,36,0.15)",
-    subtopics:["Kinetic & Potential Energy","Conservation of Energy","Thermodynamics","Sound Waves","Light & Optics","Heat Transfer","Electromagnetic Spectrum","Resonance"] },
-  { id:"plc",       name:"PLC Coding",                 icon:"🔧", color:"#34D399", glow:"rgba(52,211,153,0.15)",
-    subtopics:["Ladder Logic Basics","Inputs & Outputs","Timers & Counters","Coils & Contacts","Program Flow","HMI Basics","Safety Systems","Troubleshooting PLCs"] },
-  { id:"electrical",name:"Electrical",                 icon:"🔌", color:"#FBBF24", glow:"rgba(251,191,36,0.15)",
-    subtopics:["Ohm's Law","AC vs DC","Series & Parallel Circuits","Reading Wiring Diagrams","Transformers","Motors & Relays","Electrical Safety","NEC Basics"] },
+  {id:"mechanics",name:"Physics — Mechanics",icon:"⚙️",color:"#F97316",glow:"rgba(249,115,22,0.15)",subtopics:["Newton's Laws","Levers & Torque","Forces & Motion","Energy & Work","Momentum","Friction","Simple Machines","Center of Mass"]},
+  {id:"fluids",name:"Physics — Fluids",icon:"💧",color:"#0EA5E9",glow:"rgba(14,165,233,0.15)",subtopics:["Water Pressure","Buoyancy","Flow Rate","Bernoulli's Principle","Hydraulics","Surface Tension","Viscosity","Pascal's Law"]},
+  {id:"gravity",name:"Physics — Weight & Gravity",icon:"🪨",color:"#94A3B8",glow:"rgba(148,163,184,0.15)",subtopics:["Gravity Basics","Weight vs Mass","Free Fall","Center of Gravity","Tipping Points","Load Distribution","Gravitational Fields","Structural Load"]},
+  {id:"energy",name:"Physics — Energy & Waves",icon:"⚡",color:"#FBBF24",glow:"rgba(251,191,36,0.15)",subtopics:["Kinetic & Potential Energy","Conservation of Energy","Thermodynamics","Sound Waves","Light & Optics","Heat Transfer","Electromagnetic Spectrum","Resonance"]},
+  {id:"plc",name:"PLC Coding",icon:"🔧",color:"#34D399",glow:"rgba(52,211,153,0.15)",subtopics:["Ladder Logic Basics","Inputs & Outputs","Timers & Counters","Coils & Contacts","Program Flow","HMI Basics","Safety Systems","Troubleshooting PLCs"]},
+  {id:"electrical",name:"Electrical",icon:"🔌",color:"#FBBF24",glow:"rgba(251,191,36,0.15)",subtopics:["Ohm's Law","AC vs DC","Series & Parallel Circuits","Reading Wiring Diagrams","Transformers","Motors & Relays","Electrical Safety","NEC Basics"]},
+  {id:"history",name:"History",icon:"🏛️",color:"#FB923C",glow:"rgba(251,146,60,0.15)",subtopics:["Ancient Civilizations","World Wars","American History","Medieval Period","Scientific Revolution","Cold War","Ancient Rome","The Renaissance"]},
+  {id:"science",name:"Science & Biology",icon:"🧬",color:"#34D399",glow:"rgba(52,211,153,0.15)",subtopics:["Cell Biology","Evolution","Genetics","Ecosystems","Human Body","Microbiology","Chemistry Basics","Neuroscience"]},
+  {id:"math",name:"Math",icon:"📐",color:"#A594F9",glow:"rgba(165,148,249,0.15)",subtopics:["Algebra","Geometry","Calculus","Statistics","Number Theory","Trigonometry","Probability","Linear Algebra"]},
+  {id:"finance",name:"Finance & Business",icon:"📈",color:"#FBBF24",glow:"rgba(251,191,36,0.15)",subtopics:["Investing Basics","Stock Market","Personal Finance","Entrepreneurship","Economics","Cryptocurrency","Real Estate","Budgeting"]},
+  {id:"philosophy",name:"Philosophy",icon:"🧠",color:"#C084FC",glow:"rgba(192,132,252,0.15)",subtopics:["Ethics","Stoicism","Logic","Epistemology","Existentialism","Eastern Philosophy","Political Philosophy","Metaphysics"]},
+  {id:"technology",name:"Technology",icon:"💻",color:"#38BDF8",glow:"rgba(56,189,248,0.15)",subtopics:["AI & Machine Learning","How the Internet Works","Cybersecurity","Programming Concepts","Operating Systems","Databases","Networking","Cloud Computing"]},
+  {id:"art",name:"Art & Culture",icon:"🎨",color:"#F472B6",glow:"rgba(244,114,182,0.15)",subtopics:["Art History","Music Theory","Architecture","Film","Literature","Cultural Movements","Design","Philosophy of Art"]},
 ];
 
-const DAILY = [
-  {id:"mechanics",sub:"Levers & Torque"},
-  {id:"fluids",sub:"Water Pressure"},
-  {id:"plc",sub:"Ladder Logic Basics"},
-  {id:"electrical",sub:"Ohm's Law"},
-  {id:"history",sub:"Ancient Rome"},
-  {id:"finance",sub:"Investing Basics"},
-  {id:"science",sub:"Neuroscience"},
-];
+function skey(tid,st,type){ return 'mf_'+tid+'__'+st.replace(/\W+/g,'_')+'__'+type; }
+function loadL(tid,st){ try{var r=localStorage.getItem(skey(tid,st,'lesson'));return r?JSON.parse(r):null;}catch{return null;} }
+function saveL(tid,st,d){ localStorage.setItem(skey(tid,st,'lesson'),JSON.stringify(d)); }
+function loadQ(tid,st){ try{var r=localStorage.getItem(skey(tid,st,'quiz'));return r?JSON.parse(r):null;}catch{return null;} }
+function saveQ(tid,st,d){ localStorage.setItem(skey(tid,st,'quiz'),JSON.stringify(d)); }
+function loadStats(){ try{return JSON.parse(localStorage.getItem('mf_stats')||'{}');}catch{return{};} }
+function saveStats(s){ localStorage.setItem('mf_stats',JSON.stringify(s)); }
 
-// ─────────────────────────────────────────────
-// API — requires your Anthropic API key
-// ─────────────────────────────────────────────
-const API_KEY = "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"; // <-- paste your key here
+var stats=loadStats(), curTopic=null, curSub=null, curMode='lesson';
+var qState={idx:0,sel:null,correct:0,done:false};
 
-async function callClaude(prompt) {
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": API_KEY,
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-allow-all": "true"
-    },
-    body: JSON.stringify({
-      model: "claude-opus-4-6",
-      max_tokens: 1000,
-      messages: [{ role: "user", content: prompt }]
-    })
+// streak
+(function(){
+  var today=new Date().toDateString();
+  if(stats.lastDate!==today){
+    var yest=new Date(Date.now()-86400000).toDateString();
+    stats.streak=stats.lastDate===yest?(stats.streak||0)+1:1;
+    stats.lastDate=today; saveStats(stats);
+  }
+  document.getElementById('streak-count').textContent=stats.streak||0;
+})();
+
+function showPage(p){
+  ['home','lesson','profile'].forEach(function(x){
+    document.getElementById('page-'+x).style.display=x===p?'':'none';
   });
-  const data = await res.json();
-  if (data.error) throw new Error(data.error.message);
-  const text = data.content?.[0]?.text || "";
-  const clean = text.replace(/```json|```/g, "").trim();
-  return JSON.parse(clean);
+  document.getElementById('nav-home').className='nav-btn'+(p==='home'?' active':'');
+  document.getElementById('nav-profile').className='nav-btn'+(p==='profile'?' active':'');
+  document.getElementById('header-sub').textContent=p==='lesson'&&curTopic?curTopic.name:'What will you learn today?';
 }
 
-function buildLessonPrompt(topicName, sub) {
-  return `You are an expert teacher. Create a concise engaging lesson about "${sub}" in "${topicName}".
-Return ONLY valid JSON, no markdown fences:
-{"title":"string","sections":[{"heading":"string","body":"string"}],"takeaways":["string","string","string","string"]}
-Each section.body is plain text (no HTML). Include 3-4 sections, 60-90 words each. Make it practical and genuinely interesting.`;
-}
-
-function buildQuizPrompt(topicName, sub) {
-  return `Create a 3-question multiple choice quiz about "${sub}" in "${topicName}".
-Return ONLY valid JSON, no markdown fences:
-{"questions":[{"q":"string","options":["A","B","C","D"],"answer":0,"explain":"string"}]}
-"answer" is 0-based index of correct option.`;
-}
-
-function buildDeepPrompt(topicName, sub) {
-  return `Give an expert deep-dive on "${sub}" in "${topicName}". Real mechanisms, history, nuance.
-Return ONLY valid JSON, no markdown fences:
-{"title":"string","sections":[{"heading":"string","body":"string"}],"takeaways":["string","string","string","string","string"]}
-Include 4-5 sections, 80-110 words each. Cover real science/mechanics beyond basics.`;
-}
-
-function buildAskPrompt(q) {
-  return `Answer this learning question engagingly: "${q}"
-Return ONLY valid JSON, no markdown fences:
-{"title":"string","answer":"3-5 paragraphs separated by newlines. No HTML. Clear and interesting."}`;
-}
-
-// ─────────────────────────────────────────────
-// STYLES
-// ─────────────────────────────────────────────
-const S = {
-  app: { background:"#0A0A0F", minHeight:"100vh", paddingBottom:80, position:"relative", overflowX:"hidden" },
-  header: { padding:"16px 20px 14px", background:"rgba(10,10,15,0.94)", borderBottom:"1px solid rgba(255,255,255,0.06)", position:"sticky", top:0, zIndex:50, backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)" },
-  appName: { fontSize:22, fontWeight:800, background:"linear-gradient(135deg,#A594F9,#F472B6)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" },
-  streak: { display:"flex", alignItems:"center", gap:6, background:"#1C1C26", padding:"6px 12px", borderRadius:20, fontSize:13, fontWeight:600, color:"#FB923C" },
-  nav: { position:"fixed", bottom:0, left:"50%", transform:"translateX(-50%)", width:"100%", maxWidth:430, padding:"10px 16px 20px", background:"rgba(10,10,15,0.96)", borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", gap:4, zIndex:100 },
-  navBtn: (a) => ({ flex:1, padding:"8px 4px", borderRadius:14, border:"none", background:a?"rgba(123,110,246,0.15)":"transparent", color:a?"#A594F9":"#606078", fontSize:11, fontWeight:600, cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:4 }),
-  page: { padding:"16px 16px 0" },
-  dailyCard: { background:"linear-gradient(135deg,#1a1535,#1C1C26)", border:"1px solid rgba(123,110,246,0.2)", borderRadius:20, padding:22, marginBottom:20, position:"relative", overflow:"hidden" },
-  topicGrid: { display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:24 },
-  topicCard: { background:"#13131A", border:"1px solid rgba(255,255,255,0.06)", borderRadius:16, padding:16, cursor:"pointer", position:"relative", overflow:"hidden", transition:"transform 0.15s" },
-  sectionTitle: { fontSize:16, fontWeight:700, color:"#F0F0F8", marginBottom:12 },
-  card: { background:"#13131A", border:"1px solid rgba(255,255,255,0.06)", borderRadius:20, padding:22, marginBottom:14 },
-  lessonTitle: { fontSize:20, fontWeight:700, color:"#F0F0F8", marginBottom:16, lineHeight:1.3 },
-  sectionHeading: { fontSize:11, fontWeight:700, color:"#A594F9", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:8, marginTop:18 },
-  sectionBody: { fontSize:15, lineHeight:1.75, color:"#A0A0B8" },
-  takeawaysBox: { background:"#13131A", border:"1px solid rgba(52,211,153,0.15)", borderRadius:16, padding:18, marginBottom:14 },
-  takeawaysTitle: { fontSize:11, fontWeight:700, color:"#34D399", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:12 },
-  primaryBtn: { background:"linear-gradient(135deg,#7B6EF6,#A594F9)", color:"#fff", border:"none", borderRadius:14, padding:"13px 16px", fontSize:14, fontWeight:700, cursor:"pointer", width:"100%", boxShadow:"0 4px 20px rgba(123,110,246,0.3)" },
-  secondaryBtn: { background:"#1C1C26", color:"#A0A0B8", border:"none", borderRadius:14, padding:"13px 16px", fontSize:14, fontWeight:700, cursor:"pointer", width:"100%" },
-  backBtn: { width:38, height:38, borderRadius:"50%", background:"#1C1C26", border:"none", color:"#F0F0F8", fontSize:22, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 },
-  modeTabs: { display:"flex", gap:6, background:"#13131A", borderRadius:14, padding:4, marginBottom:16 },
-  modeTab: (a) => ({ flex:1, padding:"9px 4px", borderRadius:10, border:"none", background:a?"#252533":"transparent", color:a?"#F0F0F8":"#606078", fontSize:13, fontWeight:600, cursor:"pointer" }),
-  subtopicRow: { display:"flex", gap:8, overflowX:"auto", paddingBottom:4, marginBottom:16 },
-  pill: (a, color) => ({ flexShrink:0, padding:"7px 14px", borderRadius:20, border:a?`1px solid ${color}`:"1px solid rgba(255,255,255,0.06)", background:a?color:"#13131A", color:a?"#fff":"#A0A0B8", fontSize:13, fontWeight:600, cursor:"pointer", whiteSpace:"nowrap" }),
-  quizQ: { fontSize:17, fontWeight:700, color:"#F0F0F8", marginBottom:20, lineHeight:1.4 },
-  quizOpt: (state) => ({ padding:"14px 16px", borderRadius:14, cursor:state?"not-allowed":"pointer", border:state==="correct"?"1.5px solid #34D399":state==="wrong"?"1.5px solid #EF4444":"1.5px solid rgba(255,255,255,0.06)", background:state==="correct"?"rgba(52,211,153,0.1)":state==="wrong"?"rgba(239,68,68,0.1)":"#1C1C26", color:"#F0F0F8", fontSize:15, fontWeight:500, width:"100%", textAlign:"left", marginBottom:10, fontFamily:"inherit" }),
-  progressBar: { height:3, background:"#1C1C26", borderRadius:2, marginBottom:16, overflow:"hidden" },
-  skel: { background:"linear-gradient(90deg,#13131A 25%,#1C1C26 50%,#13131A 75%)", backgroundSize:"200% 100%", animation:"shimmer 1.4s infinite", borderRadius:8 },
-  searchBox: { display:"flex", alignItems:"center", gap:10, background:"#13131A", border:"1px solid rgba(255,255,255,0.06)", borderRadius:14, padding:"12px 16px", marginBottom:20 },
-  searchInput: { flex:1, background:"none", border:"none", outline:"none", fontFamily:"inherit", fontSize:15, color:"#F0F0F8" },
-  statGrid: { display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:24 },
-  statCard: { background:"#13131A", border:"1px solid rgba(255,255,255,0.06)", borderRadius:16, padding:18, textAlign:"center" },
-  histItem: { display:"flex", alignItems:"center", gap:12, padding:14, background:"#13131A", border:"1px solid rgba(255,255,255,0.06)", borderRadius:14, marginBottom:8 },
-  error: { background:"rgba(239,68,68,0.1)", border:"1px solid rgba(239,68,68,0.2)", borderRadius:14, padding:16, color:"#FCA5A5", fontSize:14, lineHeight:1.6, marginBottom:14 },
-};
-
-// ─────────────────────────────────────────────
-// SKELETON
-// ─────────────────────────────────────────────
-function Skeleton() {
-  return (
-    <div style={S.card}>
-      <div style={{...S.skel, height:24, width:"75%", marginBottom:16}}/>
-      {[90,75,90,60,85,70].map((w,i) => (
-        <div key={i} style={{...S.skel, height:14, width:`${w}%`, marginBottom:10}}/>
-      ))}
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// LESSON VIEW
-// ─────────────────────────────────────────────
-function LessonView({ data, onQuiz, onDeep }) {
-  return (
-    <div className="fade-up">
-      <div style={S.card}>
-        <div style={S.lessonTitle}>{data.title}</div>
-        {(data.sections || []).map((s, i) => (
-          <div key={i}>
-            <div style={S.sectionHeading}>{s.heading}</div>
-            <div style={S.sectionBody}>{s.body}</div>
-          </div>
-        ))}
-      </div>
-      {data.takeaways && data.takeaways.length > 0 && (
-        <div style={S.takeawaysBox}>
-          <div style={S.takeawaysTitle}>✅ Key Takeaways</div>
-          {data.takeaways.map((t, i) => (
-            <div key={i} style={{display:"flex", gap:10, alignItems:"flex-start", marginBottom:10}}>
-              <div style={{width:6, height:6, borderRadius:"50%", background:"#34D399", flexShrink:0, marginTop:8}}/>
-              <div style={{fontSize:14, color:"#A0A0B8", lineHeight:1.5}}>{t}</div>
-            </div>
-          ))}
-        </div>
-      )}
-      <div style={{display:"flex", gap:10}}>
-        <button style={S.secondaryBtn} onClick={onQuiz}>🧠 Take a Quiz</button>
-        <button style={S.primaryBtn} onClick={onDeep}>🔬 Go Deeper</button>
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// QUIZ VIEW
-// ─────────────────────────────────────────────
-function QuizView({ questions, onDone }) {
-  const [idx, setIdx] = useState(0);
-  const [selected, setSelected] = useState(null);
-  const [correct, setCorrect] = useState(0);
-  const [finished, setFinished] = useState(false);
-
-  if (finished || idx >= questions.length) {
-    const pct = Math.round((correct / questions.length) * 100);
-    return (
-      <div style={{...S.card, textAlign:"center"}} className="fade-up">
-        <div style={{fontSize:48, marginBottom:12}}>{pct>=80?"🏆":pct>=60?"⭐":"📖"}</div>
-        <div style={{fontSize:17, fontWeight:700, color:"#F0F0F8", marginBottom:8}}>
-          {pct>=80?"Excellent!":pct>=60?"Good job!":"Keep studying!"}
-        </div>
-        <div style={{fontSize:40, fontWeight:800, color:"#A594F9", margin:"12px 0"}}>{pct}%</div>
-        <div style={{color:"#606078", fontSize:14, marginBottom:20}}>{correct} of {questions.length} correct</div>
-        <div style={{display:"flex", gap:10}}>
-          <button style={S.secondaryBtn} onClick={() => { setIdx(0); setSelected(null); setCorrect(0); setFinished(false); }}>↺ Retry</button>
-          <button style={S.primaryBtn} onClick={onDone}>📖 Back to Lesson</button>
-        </div>
-      </div>
-    );
-  }
-
-  const q = questions[idx];
-  const answered = selected !== null;
-
-  function pick(i) {
-    if (answered) return;
-    setSelected(i);
-    if (i === q.answer) setCorrect(c => c + 1);
-  }
-
-  function next() {
-    if (idx + 1 >= questions.length) setFinished(true);
-    else { setIdx(i => i + 1); setSelected(null); }
-  }
-
-  return (
-    <div className="fade-up">
-      <div style={S.progressBar}>
-        <div style={{height:"100%", borderRadius:2, background:"linear-gradient(90deg,#7B6EF6,#A594F9)", width:`${(idx/questions.length)*100}%`, transition:"width 0.4s"}}/>
-      </div>
-      <div style={{fontSize:12, color:"#606078", marginBottom:14, fontWeight:600}}>
-        Question {idx+1} of {questions.length}
-      </div>
-      <div style={S.card}>
-        <div style={S.quizQ}>{q.q}</div>
-        {q.options.map((opt, i) => {
-          const state = !answered ? null : i===q.answer ? "correct" : i===selected ? "wrong" : null;
-          return (
-            <button key={i} style={S.quizOpt(state)} onClick={() => pick(i)}>{opt}</button>
-          );
-        })}
-        {answered && (
-          <div style={{marginTop:12, padding:14, background:"#1C1C26", borderRadius:12, fontSize:14, color:"#A0A0B8", lineHeight:1.6}}>
-            {q.explain}
-          </div>
-        )}
-        {answered && (
-          <button style={{...S.primaryBtn, marginTop:14}} onClick={next}>
-            {idx+1 < questions.length ? "Next Question →" : "See Results →"}
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// MAIN APP
-// ─────────────────────────────────────────────
-function App() {
-  const [page, setPage] = useState("home");
-  const [topic, setTopic] = useState(null);
-  const [subtopic, setSubtopic] = useState(null);
-  const [mode, setMode] = useState("lesson");
-  const [loading, setLoading] = useState(false);
-  const [content, setContent] = useState(null);
-  const [error, setError] = useState(null);
-  const cache = useRef({});
-  const [askQ, setAskQ] = useState("");
-  const [askResult, setAskResult] = useState(null);
-  const [askLoading, setAskLoading] = useState(false);
-  const [stats, setStats] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("mf3_stats") || "{}"); } catch { return {}; }
+function renderHome(){
+  var h='<div class="section-title">Browse Topics</div><div class="topic-grid">';
+  TOPICS.forEach(function(t){
+    h+='<div class="topic-card" onclick="openTopic(\''+t.id+'\')"><div style="position:absolute;bottom:-20px;right:-20px;width:70px;height:70px;border-radius:50%;background:'+t.glow+';pointer-events:none;"></div><div style="font-size:28px;margin-bottom:8px;line-height:1;">'+t.icon+'</div><div style="font-size:13px;font-weight:700;color:#F0F0F8;line-height:1.3;">'+t.name+'</div><div style="font-size:11px;color:#606078;margin-top:3px;">'+t.subtopics.length+' lessons</div></div>';
   });
-
-  function saveStats(s) { setStats(s); localStorage.setItem("mf3_stats", JSON.stringify(s)); }
-
-  useEffect(() => {
-    const today = new Date().toDateString();
-    if (stats.lastDate !== today) {
-      const yest = new Date(Date.now() - 86400000).toDateString();
-      saveStats({...stats, lastDate:today, streak: stats.lastDate===yest ? (stats.streak||0)+1 : 1});
-    }
-  }, []);
-
-  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(),0,0)) / 86400000);
-  const daily = DAILY[dayOfYear % DAILY.length];
-  const dailyTopic = TOPICS.find(t => t.id === daily.id);
-
-  async function loadContent(tp, st, md) {
-    const key = `${tp.id}__${st}__${md}`;
-    if (cache.current[key]) { setContent(cache.current[key]); setError(null); return; }
-    setLoading(true); setContent(null); setError(null);
-    try {
-      let prompt;
-      if (md === "lesson") prompt = buildLessonPrompt(tp.name, st);
-      else if (md === "quiz") prompt = buildQuizPrompt(tp.name, st);
-      else prompt = buildDeepPrompt(tp.name, st);
-      const data = await callClaude(prompt);
-      cache.current[key] = data;
-      setContent(data);
-      if (md !== "quiz") {
-        const ns = {...stats, lessons:(stats.lessons||0)+1,
-          history:[{title:data.title||st, topic:tp.name, icon:tp.icon, mode:md, date:new Date().toLocaleDateString()}, ...(stats.history||[])].slice(0,20)};
-        saveStats(ns);
-      }
-    } catch(e) {
-      setError("Couldn't generate this lesson. Check your API key in the file, then retry.");
-    }
-    setLoading(false);
-  }
-
-  function openTopic(tp, st) {
-    setTopic(tp); setSubtopic(st || tp.subtopics[0]); setMode("lesson");
-    setContent(null); setError(null); setPage("lesson");
-    loadContent(tp, st || tp.subtopics[0], "lesson");
-  }
-
-  function changeSubtopic(st) { setSubtopic(st); setContent(null); setError(null); loadContent(topic, st, mode); }
-  function changeMode(md) { setMode(md); setContent(null); setError(null); loadContent(topic, subtopic, md); }
-
-  async function doAsk() {
-    if (!askQ.trim()) return;
-    setAskLoading(true); setAskResult(null);
-    try { setAskResult(await callClaude(buildAskPrompt(askQ))); }
-    catch(e) { setAskResult({title:"Error", answer:"Couldn't get an answer. Please try again."}); }
-    setAskLoading(false);
-  }
-
-  // ── HOME ──
-  function renderHome() {
-    return (
-      <div style={S.page} className="fade-up">
-        <div style={S.dailyCard}>
-          <div style={{position:"absolute", top:-40, right:-40, width:120, height:120, borderRadius:"50%", background:"rgba(123,110,246,0.15)", pointerEvents:"none"}}/>
-          <div style={{fontSize:10, fontWeight:700, letterSpacing:"0.1em", color:"#A594F9", textTransform:"uppercase", marginBottom:8}}>⚡ Today's Pick</div>
-          <div style={{fontSize:20, fontWeight:700, color:"#F0F0F8", lineHeight:1.3, marginBottom:12}}>{daily.sub}</div>
-          <div style={{display:"flex", gap:10, alignItems:"center", marginBottom:16}}>
-            <span style={{fontSize:11, fontWeight:600, padding:"4px 10px", borderRadius:20, background:dailyTopic?.glow, color:dailyTopic?.color}}>{dailyTopic?.name}</span>
-            <span style={{fontSize:11, color:"#606078"}}>~5 min read</span>
-          </div>
-          <button style={S.primaryBtn} onClick={() => openTopic(dailyTopic, daily.sub)}>Start Today's Lesson →</button>
-        </div>
-        <div style={S.sectionTitle}>Browse Topics</div>
-        <div style={S.topicGrid}>
-          {TOPICS.map(t => (
-            <div key={t.id} style={S.topicCard} onClick={() => openTopic(t)}
-              onMouseOver={e => e.currentTarget.style.transform="scale(1.02)"}
-              onMouseOut={e => e.currentTarget.style.transform="scale(1)"}>
-              <div style={{position:"absolute", bottom:-20, right:-20, width:70, height:70, borderRadius:"50%", background:t.glow, pointerEvents:"none"}}/>
-              <div style={{fontSize:28, marginBottom:8, lineHeight:1}}>{t.icon}</div>
-              <div style={{fontSize:13, fontWeight:700, color:"#F0F0F8", lineHeight:1.3}}>{t.name}</div>
-              <div style={{fontSize:11, color:"#606078", marginTop:3}}>{t.subtopics.length} lessons</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // ── LESSON ──
-  function renderLesson() {
-    return (
-      <div style={S.page}>
-        <div style={{display:"flex", alignItems:"center", gap:12, marginBottom:16}}>
-          <button style={S.backBtn} onClick={() => { setPage("home"); setContent(null); }}>‹</button>
-          <span style={{fontSize:11, fontWeight:700, padding:"5px 12px", borderRadius:20, letterSpacing:"0.05em", textTransform:"uppercase", background:topic?.glow, color:topic?.color}}>
-            {topic?.icon} {topic?.name}
-          </span>
-        </div>
-        <div style={S.modeTabs}>
-          {[["lesson","📖 Lesson"],["quiz","🧠 Quiz"],["deep","🔬 Deep Dive"]].map(([m,label]) => (
-            <button key={m} style={S.modeTab(mode===m)} onClick={() => changeMode(m)}>{label}</button>
-          ))}
-        </div>
-        <div style={S.subtopicRow}>
-          {topic?.subtopics.map(st => (
-            <button key={st} style={S.pill(st===subtopic, topic.color)} onClick={() => changeSubtopic(st)}>{st}</button>
-          ))}
-        </div>
-        {loading && <Skeleton/>}
-        {error && !loading && (
-          <>
-            <div style={S.error}>⚠️ {error}</div>
-            <button style={S.secondaryBtn} onClick={() => loadContent(topic, subtopic, mode)}>↺ Retry</button>
-          </>
-        )}
-        {!loading && !error && content && (
-          mode === "quiz"
-            ? <QuizView questions={content.questions} onDone={() => changeMode("lesson")}/>
-            : <LessonView data={content} onQuiz={() => changeMode("quiz")} onDeep={() => changeMode("deep")}/>
-        )}
-      </div>
-    );
-  }
-
-  // ── EXPLORE ──
-  function renderExplore() {
-    return (
-      <div style={S.page} className="fade-up">
-        <div style={S.sectionTitle}>Ask Anything</div>
-        <div style={S.searchBox}>
-          <span style={{fontSize:18, color:"#606078"}}>🔍</span>
-          <input style={S.searchInput} placeholder="Ask about any topic…"
-            value={askQ} onChange={e => setAskQ(e.target.value)}
-            onKeyDown={e => e.key==="Enter" && doAsk()}/>
-          <button style={{padding:"8px 14px", borderRadius:10, border:"none", background:"#7B6EF6", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer"}} onClick={doAsk}>Ask</button>
-        </div>
-        {askLoading && (
-          <div style={S.card}>
-            {[90,75,90,60,80].map((w,i) => <div key={i} style={{...S.skel, height:14, width:`${w}%`, marginBottom:10}}/>)}
-          </div>
-        )}
-        {askResult && !askLoading && (
-          <div style={S.card} className="fade-up">
-            <div style={{fontSize:16, fontWeight:700, color:"#F0F0F8", marginBottom:14}}>💡 {askResult.title}</div>
-            {(askResult.answer||"").split("\n\n").map((p,i) => (
-              <div key={i} style={{fontSize:15, lineHeight:1.75, color:"#A0A0B8", marginBottom:12}}>{p}</div>
-            ))}
-          </div>
-        )}
-        <div style={{...S.sectionTitle, marginTop:24}}>Browse Topics</div>
-        <div style={S.topicGrid}>
-          {TOPICS.map(t => (
-            <div key={t.id} style={S.topicCard} onClick={() => openTopic(t)}
-              onMouseOver={e => e.currentTarget.style.transform="scale(1.02)"}
-              onMouseOut={e => e.currentTarget.style.transform="scale(1)"}>
-              <div style={{position:"absolute", bottom:-20, right:-20, width:70, height:70, borderRadius:"50%", background:t.glow, pointerEvents:"none"}}/>
-              <div style={{fontSize:28, marginBottom:8, lineHeight:1}}>{t.icon}</div>
-              <div style={{fontSize:13, fontWeight:700, color:"#F0F0F8", lineHeight:1.3}}>{t.name}</div>
-              <div style={{fontSize:11, color:"#606078", marginTop:3}}>{t.subtopics.length} lessons</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // ── PROFILE ──
-  function renderProfile() {
-    const scores = stats.scores||[];
-    const avg = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length)+"%" : "—";
-    return (
-      <div style={S.page} className="fade-up">
-        <div style={S.sectionTitle}>Your Progress</div>
-        <div style={S.statGrid}>
-          {[[stats.lessons||0,"Lessons Done","#A594F9"],[stats.streak||0,"Day Streak 🔥","#FB923C"],[stats.quizzes||0,"Quizzes Taken","#34D399"],[avg,"Avg Score","#F472B6"]].map(([val,label,color]) => (
-            <div key={label} style={S.statCard}>
-              <div style={{fontSize:32, fontWeight:800, color, lineHeight:1}}>{val}</div>
-              <div style={{fontSize:12, color:"#606078", marginTop:6}}>{label}</div>
-            </div>
-          ))}
-        </div>
-        <div style={S.sectionTitle}>Recent Activity</div>
-        {!(stats.history?.length) && <div style={{color:"#606078", fontSize:14, padding:"8px 0"}}>No lessons yet — start learning!</div>}
-        {(stats.history||[]).slice(0,10).map((h,i) => (
-          <div key={i} style={S.histItem}>
-            <div style={{fontSize:22}}>{h.icon}</div>
-            <div style={{flex:1, minWidth:0}}>
-              <div style={{fontSize:14, fontWeight:600, color:"#F0F0F8", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis"}}>{h.title}</div>
-              <div style={{fontSize:12, color:"#606078", marginTop:2}}>{h.topic} · {h.date}</div>
-            </div>
-            <div style={{fontSize:12, fontWeight:700, color:"#34D399", background:"rgba(52,211,153,0.1)", padding:"4px 10px", borderRadius:10}}>
-              {h.mode==="quiz"?"Quiz":h.mode==="deep"?"Deep":"Read"}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  const pages = {home:renderHome, lesson:renderLesson, explore:renderExplore, profile:renderProfile};
-
-  return (
-    <div style={S.app}>
-      <div style={{position:"fixed", top:-200, left:-100, width:500, height:500, background:"radial-gradient(circle,rgba(123,110,246,0.08) 0%,transparent 70%)", pointerEvents:"none", zIndex:0}}/>
-      <div style={S.header}>
-        <div style={{display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-          <div>
-            <div style={S.appName}>MindFuel ⚡</div>
-            <div style={{fontSize:13, color:"#606078", marginTop:3}}>
-              {page==="lesson" && topic ? topic.name : "What will you learn today?"}
-            </div>
-          </div>
-          <div style={S.streak}>🔥 {stats.streak||0} day</div>
-        </div>
-      </div>
-      <div style={{position:"relative", zIndex:1}}>
-        {pages[page]?.()}
-      </div>
-      {page !== "lesson" && (
-        <div style={S.nav}>
-          {[["home","🏠","Home"],["explore","🔍","Explore"],["profile","👤","Profile"]].map(([p,icon,label]) => (
-            <button key={p} style={S.navBtn(page===p)} onClick={() => setPage(p)}>
-              <span style={{fontSize:22}}>{icon}</span>{label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  h+='</div>';
+  document.getElementById('page-home').innerHTML=h;
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+function openTopic(tid,st){
+  curTopic=TOPICS.find(function(t){return t.id===tid;});
+  curSub=st||curTopic.subtopics[0];
+  curMode='lesson';
+  renderLessonShell();
+  showPage('lesson');
+}
+
+function renderLessonShell(){
+  var t=curTopic;
+  var pills=t.subtopics.map(function(st){
+    var active=st===curSub;
+    var style=active?'background:'+t.color+';border-color:'+t.color+';color:#fff;':'';
+    return '<button class="subtopic-pill'+(active?' active':'')+'" style="'+style+'" onclick="changeSub(\''+st.replace(/'/g,"\\'")+'\')">' +st+'</button>';
+  }).join('');
+  document.getElementById('page-lesson').innerHTML=
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">'+
+    '<button class="back-btn" onclick="showPage(\'home\')">&#8249;</button>'+
+    '<span style="display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;letter-spacing:0.05em;text-transform:uppercase;background:'+t.glow+';color:'+t.color+';">'+t.icon+' '+t.name+'</span>'+
+    '</div>'+
+    '<div class="mode-tabs">'+
+    '<button class="mode-tab'+(curMode==='lesson'?' active':'')+'" onclick="setMode(\'lesson\')">📖 Lesson</button>'+
+    '<button class="mode-tab'+(curMode==='quiz'?' active':'')+'" onclick="setMode(\'quiz\')">🧠 Quiz</button>'+
+    '</div>'+
+    '<div class="subtopic-row">'+pills+'</div>'+
+    '<div id="lc"></div>';
+  renderContent();
+}
+
+function changeSub(st){ curSub=st; renderLessonShell(); }
+function setMode(m){ curMode=m; renderLessonShell(); }
+
+function renderContent(){
+  if(curMode==='lesson') renderLesson();
+  else if(curMode==='quiz') renderQuiz();
+  else if(curMode==='edit-lesson') renderEditLesson();
+  else if(curMode==='edit-quiz') renderEditQuiz();
+}
+
+function renderLesson(){
+  var d=loadL(curTopic.id,curSub);
+  var c=document.getElementById('lc');
+  if(!d){
+    c.innerHTML='<div class="empty-state"><div style="font-size:48px;margin-bottom:12px;">📝</div><div style="font-size:16px;font-weight:600;color:#606078;margin-bottom:8px;">No lesson yet</div><div style="font-size:14px;color:#404058;margin-bottom:24px;">Write your lesson for <strong style="color:#A594F9;">'+curSub+'</strong></div></div><button class="btn-primary" onclick="setMode(\'edit-lesson\')">✏️ Write This Lesson</button>';
+    return;
+  }
+  var secs=(d.sections||[]).map(function(s){return s.heading||s.body?'<div class="sec-heading">'+esc(s.heading)+'</div><div class="sec-body">'+esc(s.body)+'</div>':''}).join('');
+  var tks=(d.takeaways||[]).filter(function(x){return x.trim();}).map(function(t){return '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;"><div style="width:6px;height:6px;border-radius:50%;background:#34D399;flex-shrink:0;margin-top:8px;"></div><div style="font-size:14px;color:#A0A0B8;line-height:1.5;">'+esc(t)+'</div></div>';}).join('');
+  c.innerHTML='<div class="card fade-up"><div class="lesson-title">'+esc(d.title||curSub)+'</div>'+secs+'</div>'+(tks?'<div class="takeaways-box fade-up"><div style="font-size:11px;font-weight:700;color:#34D399;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px;">✅ Key Takeaways</div>'+tks+'</div>':'')+'<div class="btn-row"><button class="btn-secondary" onclick="setMode(\'quiz\')">🧠 Take Quiz</button><button class="btn-primary" onclick="setMode(\'edit-lesson\')">✏️ Edit</button></div>';
+  trackRead(d.title||curSub);
+}
+
+function renderQuiz(){
+  var d=loadQ(curTopic.id,curSub);
+  var c=document.getElementById('lc');
+  if(!d||!d.questions||!d.questions.length){
+    c.innerHTML='<div class="empty-state"><div style="font-size:48px;margin-bottom:12px;">🧠</div><div style="font-size:16px;font-weight:600;color:#606078;margin-bottom:8px;">No quiz yet</div><div style="font-size:14px;color:#404058;margin-bottom:24px;">Write quiz questions for <strong style="color:#A594F9;">'+curSub+'</strong></div></div><button class="btn-primary" onclick="setMode(\'edit-quiz\')">✏️ Write Quiz</button>';
+    return;
+  }
+  qState={idx:0,sel:null,correct:0,done:false};
+  showQuizQ(d);
+}
+
+function showQuizQ(d){
+  var c=document.getElementById('lc');
+  var qs=d.questions;
+  if(qState.done||qState.idx>=qs.length){
+    var pct=Math.round((qState.correct/qs.length)*100);
+    c.innerHTML='<div class="card fade-up" style="text-align:center;"><div style="font-size:48px;margin-bottom:12px;">'+(pct>=80?'🏆':pct>=60?'⭐':'📖')+'</div><div style="font-size:17px;font-weight:700;color:#F0F0F8;margin-bottom:8px;">'+(pct>=80?'Excellent!':pct>=60?'Good job!':'Keep studying!')+'</div><div style="font-size:40px;font-weight:800;color:#A594F9;margin:12px 0;">'+pct+'%</div><div style="color:#606078;font-size:14px;margin-bottom:20px;">'+qState.correct+' of '+qs.length+' correct</div><div class="btn-row"><button class="btn-secondary" onclick="qState={idx:0,sel:null,correct:0,done:false};showQuizQ(window.__qd)">↺ Retry</button><button class="btn-primary" onclick="setMode(\'lesson\')">📖 Back</button></div></div>';
+    return;
+  }
+  window.__qd=d;
+  var q=qs[qState.idx];
+  var pct=(qState.idx/qs.length)*100;
+  var opts=q.options.map(function(o,i){return '<button class="quiz-opt" id="qo'+i+'" onclick="pickA('+i+','+q.answer+')">'+esc(o)+'</button>';}).join('');
+  c.innerHTML='<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div><div style="font-size:12px;color:#606078;margin-bottom:14px;font-weight:600;">Question '+(qState.idx+1)+' of '+qs.length+'</div><div class="card fade-up"><div class="quiz-q">'+esc(q.q)+'</div>'+opts+'<div id="qexp" style="display:none;margin-top:12px;padding:14px;background:#1C1C26;border-radius:12px;font-size:14px;color:#A0A0B8;line-height:1.6;"></div><button id="qnxt" style="display:none;margin-top:14px;" class="btn-primary" onclick="nextQ()">'+((qState.idx+1)<qs.length?'Next →':'See Results →')+'</button></div>';
+}
+
+function pickA(chosen,correct){
+  if(qState.sel!==null)return;
+  qState.sel=chosen;
+  if(chosen===correct)qState.correct++;
+  for(var i=0;i<4;i++){var b=document.getElementById('qo'+i);if(!b)continue;b.style.pointerEvents='none';if(i===correct)b.classList.add('correct');else if(i===chosen)b.classList.add('wrong');}
+  var q=window.__qd.questions[qState.idx];
+  var ex=document.getElementById('qexp');
+  if(ex&&q.explain){ex.textContent=q.explain;ex.style.display='';}
+  var nx=document.getElementById('qnxt');
+  if(nx)nx.style.display='';
+}
+
+function nextQ(){qState.idx++;qState.sel=null;showQuizQ(window.__qd);}
+
+function renderEditLesson(){
+  var ex=loadL(curTopic.id,curSub)||{title:curSub,sections:[{heading:'',body:''},{heading:'',body:''},{heading:'',body:''},{heading:'',body:''}],takeaways:['','','','']};
+  var secs=[0,1,2,3].map(function(i){
+    return '<hr class="divider"><div style="font-size:12px;font-weight:700;color:#A594F9;margin-bottom:12px;">SECTION '+(i+1)+'</div><div class="ef-group"><div class="edit-label">Heading</div><input class="edit-input" id="es'+i+'" placeholder="Section heading..." value="'+esc2((ex.sections[i]||{}).heading||'')+'"></div><div class="ef-group"><div class="edit-label">Content</div><textarea class="edit-textarea" id="eb'+i+'" placeholder="Write lesson content here...">'+esc2((ex.sections[i]||{}).body||'')+'</textarea></div>';
+  }).join('');
+  var tks=[0,1,2,3].map(function(i){
+    return '<div class="ef-group"><div class="edit-label">Takeaway '+(i+1)+'</div><input class="edit-input" id="et'+i+'" placeholder="One key thing to remember..." value="'+esc2((ex.takeaways||[])[i]||'')+'"></div>';
+  }).join('');
+  document.getElementById('lc').innerHTML=
+    '<div class="edit-banner"><span style="font-size:20px;flex-shrink:0;">✏️</span><div style="font-size:13px;color:#A594F9;line-height:1.5;">Fill in your lesson for <strong>'+curSub+'</strong>. Saves to this device.</div></div>'+
+    '<div class="ef-group"><div class="edit-label">Lesson Title</div><input class="edit-input" id="etitle" value="'+esc2(ex.title||curSub)+'" placeholder="Lesson title..."></div>'+
+    secs+
+    '<hr class="divider"><div style="font-size:12px;font-weight:700;color:#34D399;margin-bottom:12px;">KEY TAKEAWAYS</div>'+tks+
+    '<div class="btn-row" style="margin-top:8px;"><button class="btn-secondary" onclick="setMode(\'lesson\')">Cancel</button><button class="btn-primary" onclick="doSaveLesson()">💾 Save Lesson</button></div>';
+}
+
+function doSaveLesson(){
+  var d={
+    title:document.getElementById('etitle').value.trim()||curSub,
+    sections:[0,1,2,3].map(function(i){return{heading:document.getElementById('es'+i).value.trim(),body:document.getElementById('eb'+i).value.trim()};}).filter(function(s){return s.heading||s.body;}),
+    takeaways:[0,1,2,3].map(function(i){return document.getElementById('et'+i).value.trim();}).filter(Boolean)
+  };
+  saveL(curTopic.id,curSub,d);
+  toast(); curMode='lesson'; renderLessonShell();
+}
+
+function renderEditQuiz(){
+  var ex=loadQ(curTopic.id,curSub)||{questions:[{q:'',options:['','','',''],answer:0,explain:''},{q:'',options:['','','',''],answer:0,explain:''},{q:'',options:['','','',''],answer:0,explain:''}]};
+  var blocks=[0,1,2].map(function(i){
+    var q=ex.questions[i]||{q:'',options:['','','',''],answer:0,explain:''};
+    var opts=['A','B','C','D'].map(function(ltr,j){
+      return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span style="font-size:13px;font-weight:700;color:#606078;width:16px;flex-shrink:0;">'+ltr+'</span><input class="edit-input" style="flex:1;" id="qo'+i+'_'+j+'" placeholder="Option '+ltr+'..." value="'+esc2((q.options||[])[j]||'')+'"><label style="display:flex;align-items:center;gap:5px;cursor:pointer;flex-shrink:0;"><input type="radio" name="ca'+i+'" value="'+j+'"'+(q.answer===j?' checked':'')+' style="accent-color:#A594F9;"><span style="font-size:11px;color:#34D399;font-weight:600;white-space:nowrap;">Correct</span></label></div>';
+    }).join('');
+    return '<div class="q-block"><div class="q-block-label">Question '+(i+1)+'</div><div class="ef-group"><div class="edit-label">Question</div><textarea class="edit-textarea" id="qq'+i+'" style="min-height:60px;" placeholder="Write your question...">'+esc2(q.q)+'</textarea></div>'+opts+'<div class="ef-group"><div class="edit-label">Explanation</div><textarea class="edit-textarea" id="qe'+i+'" style="min-height:60px;" placeholder="Why is this the right answer?">'+esc2(q.explain)+'</textarea></div></div>';
+  }).join('');
+  document.getElementById('lc').innerHTML=
+    '<div class="edit-banner"><span style="font-size:20px;flex-shrink:0;">🧠</span><div style="font-size:13px;color:#A594F9;line-height:1.5;">Write 3 questions for <strong>'+curSub+'</strong>. Pick the correct answer with the radio button.</div></div>'+
+    blocks+
+    '<div class="btn-row" style="margin-top:8px;"><button class="btn-secondary" onclick="setMode(\'quiz\')">Cancel</button><button class="btn-primary" onclick="doSaveQuiz()">💾 Save Quiz</button></div>';
+}
+
+function doSaveQuiz(){
+  var qs=[0,1,2].map(function(i){
+    var radios=document.querySelectorAll('input[name="ca'+i+'"]');
+    var ans=0; radios.forEach(function(r,j){if(r.checked)ans=j;});
+    return{q:document.getElementById('qq'+i).value.trim(),options:[0,1,2,3].map(function(j){return document.getElementById('qo'+i+'_'+j).value.trim();}),answer:ans,explain:document.getElementById('qe'+i).value.trim()};
+  }).filter(function(q){return q.q;});
+  saveQ(curTopic.id,curSub,{questions:qs});
+  toast(); curMode='quiz'; renderLessonShell();
+}
+
+function renderProfile(){
+  var filled=0,total=0;
+  TOPICS.forEach(function(t){t.subtopics.forEach(function(st){total++;if(loadL(t.id,st))filled++;});});
+  var hist=(stats.history||[]);
+  var histHTML=hist.length?hist.slice(0,10).map(function(h){return'<div class="hist-item"><div style="font-size:22px;">'+h.icon+'</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;color:#F0F0F8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(h.title)+'</div><div style="font-size:12px;color:#606078;margin-top:2px;">'+esc(h.topic)+' · '+h.date+'</div></div><div style="font-size:12px;font-weight:700;color:#34D399;background:rgba(52,211,153,0.1);padding:4px 10px;border-radius:10px;">Read</div></div>';}).join(''):'<div style="color:#606078;font-size:14px;padding:8px 0;">No activity yet.</div>';
+  document.getElementById('page-profile').innerHTML=
+    '<div class="section-title">Your Progress</div>'+
+    '<div class="stat-grid">'+
+    '<div class="stat-card"><div style="font-size:32px;font-weight:800;color:#A594F9;line-height:1;">'+filled+'</div><div style="font-size:12px;color:#606078;margin-top:6px;">Lessons Written</div></div>'+
+    '<div class="stat-card"><div style="font-size:32px;font-weight:800;color:#FB923C;line-height:1;">'+(stats.streak||0)+' 🔥</div><div style="font-size:12px;color:#606078;margin-top:6px;">Day Streak</div></div>'+
+    '<div class="stat-card"><div style="font-size:32px;font-weight:800;color:#34D399;line-height:1;">'+(stats.reads||0)+'</div><div style="font-size:12px;color:#606078;margin-top:6px;">Lessons Read</div></div>'+
+    '<div class="stat-card"><div style="font-size:32px;font-weight:800;color:#38BDF8;line-height:1;">'+filled+'/'+total+'</div><div style="font-size:12px;color:#606078;margin-top:6px;">Content Filled</div></div>'+
+    '</div>'+
+    '<div class="section-title">Recent Activity</div>'+histHTML;
+}
+
+function trackRead(title){
+  stats.reads=(stats.reads||0)+1;
+  stats.history=[{title:title,topic:curTopic.name,icon:curTopic.icon,date:new Date().toLocaleDateString()},...(stats.history||[])].slice(0,20);
+  saveStats(stats);
+}
+
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function esc2(s){return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function toast(){var t=document.getElementById('save-toast');t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2000);}
+
+renderHome();
+renderProfile();
 </script>
-
 </body>
 </html>
