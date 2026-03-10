@@ -916,38 +916,613 @@ const CONTENT = {
     }
   }, // end fluids
 
+  // ─── PHYSICS — WEIGHT & GRAVITY ─────────────────────────────────
   gravity: {
-    "Gravity Basics": { lesson: { title: "Gravity Basics", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Weight vs Mass": { lesson: { title: "Weight vs Mass", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Free Fall": { lesson: { title: "Free Fall", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Center of Gravity": { lesson: { title: "Center of Gravity", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Tipping Points": { lesson: { title: "Tipping Points", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Load Distribution": { lesson: { title: "Load Distribution", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Gravitational Fields": { lesson: { title: "Gravitational Fields", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Structural Load": { lesson: { title: "Structural Load", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } }
-  },
+    "Gravity Basics": {
+      lesson: {
+        title: "Gravity Basics: The Force That Holds Everything Down",
+        sections: [
+          { heading: "What Is Gravity?", body: "Gravity is a fundamental attractive force between any two objects that have mass. The more mass, the stronger the pull. Earth's gravity accelerates all objects downward at 9.81 m/s² (often rounded to 9.8 or 10 for quick calculations) regardless of their mass — a feather and a bowling ball fall at identical rates in a vacuum. This constant, called g, is the single most important number in applied mechanics because every load calculation on Earth starts with it." },
+          { heading: "Newton's Law of Universal Gravitation", body: "Newton's formula: F = G × (m1 × m2) ÷ r². G is the gravitational constant (6.674 × 10⁻¹¹), m1 and m2 are the two masses, and r is the distance between their centers. Double the distance, gravity drops to one-quarter. This inverse-square relationship explains why gravity weakens with altitude but never fully disappears. On Earth's surface, this simplifies to F = mg because the planet's mass and radius are constant." },
+          { heading: "Gravity on Different Planets", body: "Gravitational acceleration varies by planet. Mars: 3.72 m/s² (38% of Earth). Moon: 1.62 m/s² (16.5%). Jupiter: 24.8 m/s² (2.5× Earth). A 100kg person weighs 981N on Earth, 372N on Mars, 163N on the Moon, and 2,479N on Jupiter — yet their mass stays 100kg everywhere. Space missions must account for these differences in landing systems, structural design, and propulsion requirements." },
+          { heading: "Why Gravity Matters in Industry", body: "Every structural calculation, every crane lift, every foundation design starts with gravity. Dead loads (permanent weight of structure and equipment) and live loads (variable loads from people, materials, moving machinery) both originate from gravity acting on mass. Gravity drives material flow in hoppers and chutes, creates pressure in hydraulic systems through fluid head, and is the primary hazard in any work-at-height situation. Understanding gravity is the starting point for all mechanical engineering." }
+        ],
+        takeaways: [
+          "g = 9.81 m/s² on Earth's surface — all falling objects accelerate at this rate in vacuum",
+          "F = Gm1m2/r² — gravity weakens with the square of distance between masses",
+          "Mass stays constant everywhere; weight changes with local gravitational acceleration",
+          "Every structural, lifting, and fluid pressure calculation is fundamentally a gravity calculation"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "Two identical objects are dropped simultaneously in a vacuum — one weighs 1kg, the other 100kg. Which hits the ground first?", options: ["The 100kg object", "The 1kg object", "They hit at the same time", "Depends on shape"], answer: 2, explain: "In a vacuum, both fall at exactly g = 9.81 m/s² regardless of mass. Galileo proved this by dropping objects from the Tower of Pisa. Air resistance (not gravity) causes lighter objects to fall slower in real air — vacuum removes that variable." },
+          { q: "A satellite moves from distance r to r/2 from Earth's center. What happens to the gravitational force on it?", options: ["Force doubles", "Force halves", "Force quadruples", "Force stays the same"], answer: 2, explain: "Gravity follows an inverse-square law: F ∝ 1/r². Halving r means r² decreases by 4, so force increases 4×. This is why satellites in low orbit travel much faster than those in high orbit." },
+          { q: "A 50kg object on Earth weighs 490.5N. What does it weigh on the Moon where g = 1.62 m/s²?", options: ["50N", "81N", "490.5N", "302N"], answer: 1, explain: "Weight = mg = 50 × 1.62 = 81N on the Moon. The object's mass (50kg) is unchanged — mass is an intrinsic property. Weight is a force dependent on the local gravitational field. This distinction is critical in space engineering." }
+        ]
+      }
+    },
 
+    "Weight vs Mass": {
+      lesson: {
+        title: "Weight vs Mass: Two Very Different Things",
+        sections: [
+          { heading: "Mass: The Fundamental Property", body: "Mass is the amount of matter in an object — measured in kilograms (kg). It is an intrinsic property that never changes regardless of location. A 500kg machine has 500kg of mass on Earth, on the Moon, in deep space, everywhere. Mass determines inertia (resistance to acceleration — F = ma) and gravitational attraction. You cannot change an object's mass without physically adding or removing matter from it." },
+          { heading: "Weight: A Force, Not a Property", body: "Weight is the gravitational force acting on a mass: W = mg. It is measured in Newtons (N), not kilograms. On Earth, a 100kg object has weight W = 100 × 9.81 = 981N. Colloquially people say something 'weighs 100 kilograms,' but technically they mean its mass is 100kg and its weight is 981N. This distinction becomes critical in engineering calculations — force equations require Newtons, not kilograms." },
+          { heading: "Why the Confusion?", body: "In everyday life we use weighing scales calibrated in kg, which actually measure force and then back-calculate mass assuming g = 9.81. This works perfectly on Earth's surface. The confusion deepens in Imperial units where the pound can mean either a unit of force (pound-force, lbf) or a unit of mass (pound-mass, lbm). This ambiguity has caused real disasters — the Mars Climate Orbiter was lost in 1999 because one team used pound-force and another used Newtons in the same calculation, with no one catching the mismatch." },
+          { heading: "Practical Implications", body: "In structural engineering, loads are given in kN (kilonewtons) or kPa (kilopascals). A floor rated at 5 kPa supports 5,000N per square meter — about 510kg per m². Equipment datasheets list mass in kg; multiply by 9.81 to get force in Newtons for structural calculations. Crane load charts list in tonnes (1 tonne = 1,000kg = 9,810N ≈ 9.81kN). Always confirm whether a number represents mass or force before using it in calculations." }
+        ],
+        takeaways: [
+          "Mass (kg) is the amount of matter — constant everywhere, determines inertia",
+          "Weight (N) is a force = mg — changes with local gravitational field strength",
+          "On Earth: 1 kg of mass has a weight of 9.81N",
+          "Engineering calculations require force in Newtons — always convert kg × 9.81 = N"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A 200kg motor is being lifted by a crane. What force must the crane cable support?", options: ["200N", "200kg", "1962N", "20.4N"], answer: 2, explain: "Force = mg = 200 × 9.81 = 1,962N ≈ 1.96kN. The crane must support this weight force. Crane ratings are in force units (kN or tonnes-force). The 200kg is mass — you need Newtons for any force or structural calculation." },
+          { q: "An astronaut has mass 80kg on Earth. What is their mass on the Moon?", options: ["13.2kg", "80kg", "480kg", "784.8kg"], answer: 1, explain: "Mass never changes with location — it is an intrinsic property of matter. The astronaut's mass is 80kg everywhere. Their weight changes: 784.8N on Earth, 129.6N on the Moon. Mass determines how hard they are to accelerate; weight determines how hard the surface must push up on them." },
+          { q: "A structural engineer is sizing a beam to support a 5,000kg machine. What load should they design for?", options: ["5,000 kg", "49,050 N", "500 N", "5,000 N"], answer: 1, explain: "Structural design uses force (Newtons). Load = mg = 5,000 × 9.81 = 49,050N = 49.05kN. The Mars Climate Orbiter crashed because this exact type of unit confusion went unchecked between two engineering teams." }
+        ]
+      }
+    },
+
+    "Free Fall": {
+      lesson: {
+        title: "Free Fall: Motion Under Gravity Alone",
+        sections: [
+          { heading: "What Is Free Fall?", body: "Free fall is motion under gravity's influence alone — no other forces acting. In true free fall, every part of an object experiences the same gravitational acceleration, creating the sensation of weightlessness. Astronauts in orbit are in continuous free fall — they are falling toward Earth but moving horizontally so fast they keep missing it. Skydivers are not in true free fall because air resistance acts against them, limiting their speed." },
+          { heading: "Equations of Motion Under Gravity", body: "Starting from rest, a freely falling object follows: velocity v = gt, distance fallen d = ½gt², and v² = 2gd. With g = 9.81 m/s²: after 1 second, v = 9.81 m/s and d = 4.9m. After 2 seconds: v = 19.62 m/s and d = 19.6m. Distance increases with the square of time — falling gets faster and covers more distance each second. These same equations apply upward: an object thrown up at 20 m/s reaches maximum height at t = 20/9.81 = 2.04 seconds." },
+          { heading: "Terminal Velocity", body: "In air, drag force increases as speed increases. Terminal velocity is reached when drag equals gravity — net force is zero, acceleration stops, and speed becomes constant. A skydiver in spread-eagle position reaches approximately 55 m/s (200 km/h). In head-down position: approximately 90 m/s (320 km/h). A small steel ball bearing might only reach 9 m/s due to high drag-to-weight ratio. Parachutes dramatically increase drag area to lower terminal velocity to safe landing speeds of around 5-6 m/s." },
+          { heading: "Free Fall in Industry", body: "Free fall analysis is critical in safety engineering. A 1kg tool dropped from 10 meters hits with velocity v = √(2 × 9.81 × 10) = 14 m/s and kinetic energy of ½ × 1 × 14² = 98J — enough to penetrate a hard hat. This is why dropped object prevention is a major safety program in construction and offshore industries. Gravitational drop testing also uses free fall to deliver precise, repeatable impact energy for component durability testing." }
+        ],
+        takeaways: [
+          "Free fall: gravity only — all objects accelerate at g = 9.81 m/s² regardless of mass",
+          "v = gt and d = ½gt² — distance grows with the square of time",
+          "Terminal velocity occurs when drag equals gravity — speed stops increasing",
+          "A 1kg tool falling 10m reaches 14 m/s and carries 98J — a lethal dropped object hazard"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "An object is dropped from rest. How far has it fallen after 3 seconds? (g = 9.81 m/s²)", options: ["29.4m", "44.1m", "88.3m", "9.81m"], answer: 1, explain: "d = ½gt² = ½ × 9.81 × 9 = 44.1m. It fell only 4.9m in the first second but 44.1m total in three — distance grows with the square of time, so falling accelerates dramatically the longer it continues." },
+          { q: "What is terminal velocity, and when is it reached?", options: ["Maximum possible speed in any conditions", "Speed when drag force equals gravitational force so net acceleration is zero", "Speed of sound through air", "Speed reached after exactly 10 seconds of falling"], answer: 1, explain: "Terminal velocity is the constant speed reached when air drag exactly equals gravitational force. Net force = 0, so acceleration = 0, and speed holds constant. Heavier, denser objects have higher terminal velocities; larger, less dense objects reach it at lower speeds." },
+          { q: "A 2kg wrench is dropped from 20m. What is its velocity just before impact? (g = 9.81 m/s²)", options: ["9.81 m/s", "14 m/s", "19.8 m/s", "196.2 m/s"], answer: 2, explain: "v² = 2gd = 2 × 9.81 × 20 = 392.4, so v = √392.4 ≈ 19.8 m/s (about 71 km/h). KE = ½ × 2 × 19.8² = 392J. This is why exclusion zones under elevated work are mandatory — falling tools carry enormous, lethal energy." }
+        ]
+      }
+    },
+
+    "Center of Gravity": {
+      lesson: {
+        title: "Center of Gravity: Where Gravity Effectively Acts",
+        sections: [
+          { heading: "Center of Gravity vs Center of Mass", body: "Center of gravity (COG) is the point where gravity's total torque on an object is zero — where you could balance it on a single point. For objects on Earth where the gravitational field is essentially uniform, COG and center of mass are the same point. They differ only in very large objects where gravitational field strength varies across the object. In all practical industrial applications, treat COG and center of mass as identical." },
+          { heading: "Finding COG Experimentally", body: "For flat irregular shapes, hang the object from any point and draw a vertical plumb line — the COG lies somewhere on that line. Hang from a different point and draw another line. Where the two lines intersect is the COG. For three-dimensional objects the same principle applies in multiple planes. This is how engineers historically located COG on ship hulls, aircraft wings, and vehicle bodies before computer modeling made direct calculation practical." },
+          { heading: "COG Height and Stability", body: "COG height above the base determines stability. A low COG makes an object stable — a vehicle with heavy batteries in the floor sits low and resists rollover. A high COG makes an object unstable — a tall crane loaded at the top tips easily. The righting moment (restoring torque when tilted) equals weight multiplied by the horizontal distance from COG to the tipping edge. As tilt increases, this distance shrinks until it reaches zero at the tipping point — then gravity becomes a destabilizing force." },
+          { heading: "COG in Lifting Operations", body: "Crane lifts require knowing the load's COG precisely. If the sling attachment point is not directly above the COG, the load tilts — potentially dangerously. Rigging engineers calculate COG from equipment drawings or mark it on the load before rigging. For asymmetric loads, multiple sling legs of different lengths or an offset crane hook position allow controlled tilt angles. Incorrect COG estimation is a leading cause of crane lift accidents." }
+        ],
+        takeaways: [
+          "COG is the balance point — gravity effectively acts at this single location",
+          "On Earth, COG equals center of mass for all practical engineering purposes",
+          "Lower COG = more stable; righting moment decreases as tilt increases toward tipping",
+          "Crane sling attachment must be directly above COG — offset causes dangerous tilting"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A forklift carries a load with its COG higher than expected. What is the effect on stability?", options: ["More stable — higher COG adds momentum to recover", "Less stable — higher COG reduces the righting moment", "No effect — stability only depends on base width", "More stable if moving forward"], answer: 1, explain: "A higher COG means less righting moment for a given tilt angle — the machine is closer to its tipping threshold at all times. This is why forklift rated capacity decreases as lift height increases: raising the load raises the combined system COG." },
+          { q: "You hang an irregular plate from two different points. The plumb lines intersect. What does the intersection represent?", options: ["The heaviest point", "The center of gravity", "The geometric center", "Where to drill a mounting hole"], answer: 1, explain: "The intersection of plumb lines from two different hang points is the COG. The COG must lie directly below any suspension point — two different plumb lines can only intersect at one location, which is the COG." },
+          { q: "A 2,000kg machine has its COG 1.2m to the right of its geometric center. Where should the crane attach the single lift sling?", options: ["At the geometric center", "1.2m to the right, directly above the COG", "1.2m to the left to counterbalance", "At the heaviest corner"], answer: 1, explain: "The lift point must be directly above the COG. Any horizontal offset creates a torque couple that tilts the load. A suspended load always orients with its COG directly below the attachment point — offset attachment causes uncontrolled tilting." }
+        ]
+      }
+    },
+
+    "Tipping Points": {
+      lesson: {
+        title: "Tipping Points: When Stability Fails",
+        sections: [
+          { heading: "The Mechanics of Tipping", body: "An object tips when its center of gravity moves outside the boundary of its base of support. At that moment, the gravitational torque about the tipping edge reverses — instead of rotating the object back to upright, gravity now accelerates it toward falling. Before the tipping point, the restoring torque = W × d, where d is the horizontal distance from COG to the tipping edge. As the object tilts, d decreases until it reaches zero — the tipping point. Past this, recovery without external force is impossible." },
+          { heading: "Calculating Tipping Load", body: "For a machine on a flat surface, tipping occurs when the overturning moment equals the stabilizing moment. For a 1,000kg cabinet 0.5m wide and 1.5m tall, a horizontal force F at the top tips it when F × 1.5 = 1000 × 9.81 × 0.25 (half the base width). F_tip = 2,452 ÷ 1.5 = 1,635N. Below this it rocks and recovers; above it tips over. This calculation drives anti-tip hardware requirements for tall storage and machinery." },
+          { heading: "Forklift Stability Triangle", body: "Forklifts are supported on three effective contact points forming a triangle: the two front drive wheels and the single rear steering axle center point. The combined COG of forklift and load must stay inside this triangle for stability. As the load is raised, the combined COG rises and shifts forward — shrinking the margin before forward tipping. As the forklift turns, lateral COG shift can cause side tipping. Exceeding rated capacity or lifting too high moves the COG outside the triangle." },
+          { heading: "Anti-Tip Strategies", body: "Designers manage tipping through: lowering COG (heavy components mounted low, ballast at base), widening the base (outriggers on cranes and aerial lifts, stabilizer legs on machinery), load and height limits (crane load charts, forklift data plates reduce capacity at height), interlocks that prevent unsafe configurations, and physical restraints (wall anchoring of tall cabinets per seismic codes). Every tall piece of industrial equipment requires a formal tipping analysis." }
+        ],
+        takeaways: [
+          "Tipping occurs when COG leaves the base footprint — gravity then accelerates the fall",
+          "Overturning moment = stabilizing moment at the tipping threshold: F×h = W×(base/2)",
+          "Forklift stability triangle — COG of load plus truck must stay inside the three-point footprint",
+          "Counter tipping with: lower COG, wider base, outriggers, load limits, and physical anchoring"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A 500kg shelving unit is 0.6m wide and 2m tall. What horizontal force at the top will cause it to tip?", options: ["735N", "981N", "1471N", "2452N"], answer: 0, explain: "Stabilizing moment = W × (base/2) = 500 × 9.81 × 0.3 = 1,471.5 N·m. Tip when F × 2 = 1,471.5, so F = 735.75N ≈ 735N. A force less than the weight of a 75kg person at the top tips this unit — exactly why tall shelving requires wall anchoring." },
+          { q: "A forklift's rated capacity decreases as lift height increases. Why?", options: ["Motor loses power at height", "Raising the load raises the combined COG, shrinking stability margin inside the triangle", "Hydraulic pressure drops with height", "The mast flexes at high loads"], answer: 1, explain: "Higher lift raises the combined system COG, bringing it closer to the front tipping edge of the stability triangle. Less additional tilt or load shift is needed to cause tipping. Manufacturers derate capacity at height to maintain a safe stability margin." },
+          { q: "What is the first correct action when a loaded forklift begins to tip forward?", options: ["Apply brakes hard", "Jump off the forklift", "Lower the forks and tilt the mast back", "Turn sharply to shift the load"], answer: 2, explain: "Lowering the forks drops the COG and tilting the mast back shifts load weight rearward — both move the combined COG back inside the stability triangle. Hard braking shifts weight forward and makes tipping worse. Jumping off is extremely dangerous with a tipping forklift." }
+        ]
+      }
+    },
+
+    "Load Distribution": {
+      lesson: {
+        title: "Load Distribution: How Weight Spreads Through Structures",
+        sections: [
+          { heading: "What Is Load Distribution?", body: "Load distribution describes how a force or weight spreads through a structure to reach the supports. A load applied at one point doesn't stay there — it travels through beams, columns, walls, and floors to the foundation. Understanding the load path is fundamental to structural design. Every structural element along that path must be sized for the force passing through it. Removing or weakening any element in the load path can cause catastrophic progressive collapse." },
+          { heading: "Reactions at Supports", body: "For a beam supported at both ends carrying a load, equilibrium determines the reaction force at each support. For an asymmetric point load P at distance 'a' from the left support on a total span L: Left reaction R_L = P × (L-a)/L, Right reaction R_R = P × a/L. The closer the load to a support, the more that support carries. This is why you position a floor jack as close as possible to the wheel when changing a tire — the jack carries nearly all the load with minimal effort." },
+          { heading: "Point Loads vs Distributed Loads", body: "A point load is a concentrated force at a single location — a column on a beam, a machine on a floor. A distributed load spreads over a length or area — the beam's own weight, snow on a roof, fluid pressure on a tank wall. Distributed loads convert to an equivalent point load at their centroid for reaction calculations: a uniform load of w N/m over length L equals total load wL acting at the midpoint L/2. Floors are designed for distributed live loads in kPa, while equipment footings create point loads that require separate concentrated load checks." },
+          { heading: "Load Spreading in Practice", body: "Heavy equipment on floors often requires a spreader plate under machine feet to distribute a concentrated point load over a larger floor area, reducing pressure to within the floor's capacity. A 5,000kg machine on four small feet creates enormous local pressure far exceeding concrete capacity. The same machine on a 1m × 1m steel baseplate: pressure = (5000 × 9.81) ÷ 1 = 49kPa — well within a standard 150mm slab rated at 75kPa. Spreading load is one of the most practical and cost-effective structural interventions." }
+        ],
+        takeaways: [
+          "Loads follow a load path through structure to foundations — size every element in the path",
+          "Asymmetric beam load: R = P × (opposite distance) ÷ span — load closer to a support means more reaction there",
+          "Distributed loads convert to equivalent point load at the centroid for calculations",
+          "Spreader plates reduce contact pressure — force ÷ area must stay within floor capacity"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A 6m beam is supported at each end. A 10,000N load sits 2m from the left support. What is the right support reaction?", options: ["3,333N", "5,000N", "6,667N", "10,000N"], answer: 0, explain: "R_right = P × a/L = 10,000 × 2/6 = 3,333N. R_left = 10,000 × 4/6 = 6,667N. Check: 3,333 + 6,667 = 10,000N ✓. The left support is closer to the load and carries two-thirds of the total." },
+          { q: "A floor is rated for 5 kPa. A 2,000kg machine sits on a 0.5m × 0.5m base. Does it exceed the floor rating?", options: ["No — 2,000kg is well within limits", "Yes — the pressure is 78.5 kPa, far exceeding 5 kPa", "No — it is exactly at the limit", "Cannot be determined without beam data"], answer: 1, explain: "Weight = 2,000 × 9.81 = 19,620N. Area = 0.25m². Pressure = 19,620 ÷ 0.25 = 78,480 Pa = 78.5 kPa — nearly 16× the floor rating. A larger base plate or structural reinforcement is required before placing this machine." },
+          { q: "A uniform beam weighs 2,400N and spans 8m between two equal supports. How much does each support carry from the beam's self-weight?", options: ["2,400N each", "1,200N each", "600N each", "Depends on beam material"], answer: 1, explain: "A uniform distributed load has its resultant at midspan. With symmetric loading and symmetric supports, each carries half: 2,400 ÷ 2 = 1,200N each. This self-weight is always added to live loads when sizing supports and foundations." }
+        ]
+      }
+    },
+
+    "Gravitational Fields": {
+      lesson: {
+        title: "Gravitational Fields: Gravity as a Field in Space",
+        sections: [
+          { heading: "What Is a Gravitational Field?", body: "A gravitational field is a region of space where a mass experiences a gravitational force. Every mass creates a gravitational field extending infinitely in all directions, weakening with the square of distance. Field strength g at any point is defined as the force per unit mass: g = GM/r², measured in N/kg (equivalent to m/s²). Earth's field strength at the surface is 9.81 N/kg — meaning every kilogram of mass experiences 9.81N of gravitational force pulling toward Earth's center." },
+          { heading: "Field Strength Variation on Earth", body: "Earth's gravitational field is not perfectly uniform. It varies with altitude (weaker farther from center — at 400km altitude g ≈ 8.69 m/s²), latitude (Earth's rotation creates centrifugal effect — g is slightly less at the equator than poles), and local geology (dense rock locally increases g; low-density formations decrease it). Gravimeters measure these variations to map underground geology for mining and oil exploration. GPS satellites must correct for gravitational field variation in their precision timing calculations." },
+          { heading: "Gravitational Potential Energy at Scale", body: "Gravitational potential energy near Earth's surface: GPE = mgh. For large distances from Earth, GPE = -GMm/r (negative because work must be done against gravity to move away). Escape velocity is the minimum launch speed to leave Earth's gravitational field entirely: v_escape = √(2GM/r) = 11.2 km/s at Earth's surface. Below this speed, any unpowered projectile eventually returns. Above it, the object escapes with kinetic energy remaining at infinite distance." },
+          { heading: "Field Concepts in Engineering", body: "Gravitational field concepts appear in precision engineering constantly. Surveying uses levels and plumb bobs that align with the local gravitational field direction. Precision machining requires leveling to align surfaces perpendicular to gravity. Fluid systems use gravitational head pressure: P = ρgh, where fluid density × g × height gives pressure in Pascals. Every water tower, fire suppression system, and gravity-fed process line depends on this. Ten meters of water head equals approximately 98kPa — enough to supply a typical building water system without a pump." }
+        ],
+        takeaways: [
+          "Field strength g = GM/r² in N/kg — equivalent to gravitational acceleration m/s²",
+          "g varies with altitude, latitude, and local geology — critical for precision instrumentation",
+          "Escape velocity from Earth is 11.2 km/s — below this, any unpowered object returns",
+          "Fluid head pressure P = ρgh — every 10m of water height adds ~98 kPa of pressure"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A water tank has its outlet 15m below the water surface. What gauge pressure exists at the outlet? (ρ = 1000 kg/m³, g = 9.81 m/s²)", options: ["14.7 kPa", "98.1 kPa", "147.2 kPa", "9.81 kPa"], answer: 2, explain: "P = ρgh = 1000 × 9.81 × 15 = 147,150 Pa = 147.2 kPa ≈ 1.47 bar ≈ 21 PSI. Every 10m of water depth adds ~98.1kPa. This is the basis for sizing pipes, valves, and pressure ratings in all gravity-fed water systems." },
+          { q: "Why does Earth's gravitational field strength vary slightly between the equator and the poles?", options: ["Earth is hotter at the equator", "Earth is flattened at the poles, putting polar surface closer to Earth's center, and rotation adds centrifugal effect at equator", "Different rock composition at the equator", "The Moon's influence is stronger at the equator"], answer: 1, explain: "Two effects combine: Earth's oblate shape puts polar surfaces about 21km closer to the center (stronger gravity), and Earth's rotation creates a centrifugal effect at the equator that partially opposes gravity. Combined, g at poles is about 0.5% higher — negligible for most engineering but critical for precision measurement and ballistic calculations." },
+          { q: "An object is launched at exactly escape velocity (11.2 km/s). What happens?", options: ["It orbits Earth", "It reaches a maximum height then falls back", "It escapes Earth's gravity and travels to infinity", "It burns up from air resistance"], answer: 2, explain: "At escape velocity, the object has exactly enough kinetic energy to overcome all remaining gravitational potential energy to infinity. It slows continuously but never stops — asymptotically approaching zero velocity at infinite distance. Any speed below escape velocity results in the object eventually returning." }
+        ]
+      }
+    },
+
+    "Structural Load": {
+      lesson: {
+        title: "Structural Load: How Buildings and Machines Bear Weight",
+        sections: [
+          { heading: "Types of Structural Loads", body: "Dead loads are permanent and constant — the self-weight of the structure, permanently attached equipment, fixed piping. Live loads are variable — people, movable equipment, stored materials, vehicles. Environmental loads include wind (lateral force on structures), snow (distributed vertical load on roofs), seismic (dynamic horizontal forces from ground acceleration), and thermal loads (expansion and contraction stresses from temperature changes). Every structure must be designed for the worst credible combination of all applicable load types acting simultaneously." },
+          { heading: "Load Combinations and Safety Factors", body: "Structural codes specify load combinations: typically 1.2 × Dead + 1.6 × Live for strength design (LRFD method) or checking that stress under (Dead + Live) stays below allowable stress divided by a safety factor (ASD method). Safety factors of 2-4 are common in mechanical design; buildings use 1.5-2 for steel, 3-5 for concrete in compression. These factors account for material variability, load estimation uncertainty, dynamic effects not captured in static analysis, and the consequences of failure." },
+          { heading: "Tension, Compression, Shear, and Bending", body: "Structural members fail in four fundamental ways. Tension: being pulled apart — bolts, cables, and hangers primarily carry tension. Compression: being crushed — columns and struts carry compression; slender members also risk buckling. Shear: parallel forces cutting across a section — welds, pins, and beams near supports experience high shear. Bending: combined tension and compression across a cross-section — beams sag under load, putting the bottom face in tension and top in compression. Most real structural failures involve combined bending and shear." },
+          { heading: "Stress and Deflection Limits", body: "Stress = Force ÷ Area (σ = F/A), measured in Pascals or MPa. Structural steel yields at about 250 MPa — below this it springs back; above it permanently deforms. Deflection of beams is as important as stress: a beam strong enough to carry the load but deflecting excessively may damage connected equipment, cause drainage problems, or create an unsafe feel. Maximum allowable deflection is typically L/360 for floors or L/240 for general structures, where L is the span length in the same units." }
+        ],
+        takeaways: [
+          "Dead loads are permanent; live loads vary — design for worst combination plus environmental loads",
+          "Safety factors of 1.5-5 applied depending on material, failure consequence, and uncertainty",
+          "Four failure modes: tension (pulling apart), compression/buckling, shear (cutting), and bending",
+          "Stress = F/A must stay below yield; deflection must stay below L/360 for floors"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A 30mm diameter steel bolt carries 50,000N of tensile load. What is the tensile stress? (Area = π/4 × 0.03² ≈ 7.07 × 10⁻⁴ m²)", options: ["1.77 MPa", "17.7 MPa", "70.7 MPa", "707 MPa"], answer: 2, explain: "Stress = F/A = 50,000 ÷ 7.07 × 10⁻⁴ = 70.7 × 10⁶ Pa = 70.7 MPa. Below steel's 250 MPa yield — but with a safety factor of 3, allowable stress is 83 MPa, leaving a slim margin. Always verify against the specific bolt grade rating." },
+          { q: "A floor beam spans 6m. What is the maximum allowable deflection using L/360?", options: ["6mm", "16.7mm", "25mm", "36mm"], answer: 1, explain: "Max deflection = L/360 = 6,000mm ÷ 360 = 16.7mm. This limit prevents cracking of attached finishes (plaster, tile) and ensures the floor feels solid underfoot. Long-span floors often govern on deflection even when stress is well within limits." },
+          { q: "A slender column carries only compressive load. What additional failure mode must be checked beyond crushing?", options: ["Tension fracture", "Shear along the base", "Buckling — sudden lateral collapse at loads below crushing stress", "Bending from self-weight"], answer: 2, explain: "Slender columns fail by buckling — sudden lateral instability at loads well below material compressive strength. Euler's buckling load depends on length, end conditions, and cross-section shape. A slender column might buckle at 10% of its crushing load — which is why structural columns are kept short or laterally braced." }
+        ]
+      }
+    }
+  }, // end gravity
+
+// ─── PHYSICS — ENERGY & WAVES ────────────────────────────────────
   energy: {
-    "Kinetic & Potential Energy": { lesson: { title: "Kinetic & Potential Energy", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Conservation of Energy": { lesson: { title: "Conservation of Energy", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Thermodynamics": { lesson: { title: "Thermodynamics", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Sound Waves": { lesson: { title: "Sound Waves", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Light & Optics": { lesson: { title: "Light & Optics", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Heat Transfer": { lesson: { title: "Heat Transfer", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Electromagnetic Spectrum": { lesson: { title: "Electromagnetic Spectrum", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Resonance": { lesson: { title: "Resonance", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } }
-  },
+    "Kinetic & Potential Energy": {
+      lesson: {
+        title: "Kinetic & Potential Energy: The Two Faces of Mechanical Energy",
+        sections: [
+          { heading: "Kinetic Energy: Energy of Motion", body: "Kinetic energy (KE) is the energy an object possesses due to its motion: KE = ½mv². Mass is in kg, velocity in m/s, and KE is in Joules. The velocity term is squared — doubling speed quadruples kinetic energy. A vehicle at 60 mph has four times the KE of the same vehicle at 30 mph, which is why stopping distances increase so dramatically at highway speeds. In rotating machinery, rotational KE = ½Iω², where I is moment of inertia and ω is angular velocity in rad/s." },
+          { heading: "Potential Energy: Stored Energy", body: "Potential energy is energy stored by virtue of position or configuration, ready to do work when released. Gravitational PE = mgh — a raised load stores energy equal to the work done lifting it. Elastic PE = ½kx² — a compressed spring stores energy proportional to the square of its compression, where k is spring stiffness. Chemical PE is stored in fuel and batteries. Every compressed gas cylinder, wound spring, elevated load, and charged capacitor is a potential energy store — and a hazard if released uncontrolled." },
+          { heading: "Units and Scale", body: "Energy is measured in Joules (J). One Joule is the work done by 1N over 1 meter — small by industrial standards. A 1,000kg load raised 10m stores 98,100J = 98.1kJ. A 1kg object moving at 100 m/s carries 5,000J. Industrial energy use is measured in kWh (kilowatt-hours): 1 kWh = 3,600,000J = 3.6MJ. A 1HP motor running for one hour delivers 746 × 3600 = 2.68MJ of work. Understanding scale helps sanity-check calculations — a Joule is tiny; a megajoule is significant." },
+          { heading: "Converting Between KE and PE", body: "KE and PE continuously interconvert in mechanical systems. A roller coaster converts PE to KE on the descent and back to PE on the ascent. A pile driver raises a mass (PE) then drops it (KE at impact). Flywheel energy storage converts electrical energy to rotational KE for later retrieval. In each case, the total mechanical energy (KE + PE) stays constant if there is no friction — any shortfall is accounted for by heat generated from friction or air resistance. Tracking energy conversions reveals efficiency losses in any system." }
+        ],
+        takeaways: [
+          "KE = ½mv² — doubling speed quadruples kinetic energy, not just doubles it",
+          "PE = mgh (gravitational) or ½kx² (elastic) — stored energy ready to be released",
+          "1 kWh = 3.6 MJ — industrial energy use is millions of Joules, not single Joules",
+          "KE and PE continuously interconvert — total mechanical energy is conserved without friction"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A 2,000kg vehicle moves at 20 m/s. What is its kinetic energy?", options: ["40,000J", "400,000J", "800,000J", "20,000J"], answer: 1, explain: "KE = ½mv² = ½ × 2000 × 20² = ½ × 2000 × 400 = 400,000J = 400kJ. All of this energy must be converted to heat in the brakes to stop the vehicle. At 40 m/s (double the speed), KE = 1,600kJ — four times as much stopping energy required." },
+          { q: "A spring has stiffness k = 5,000 N/m and is compressed 0.1m. How much elastic potential energy is stored?", options: ["500J", "250J", "25J", "50J"], answer: 2, explain: "PE = ½kx² = ½ × 5,000 × 0.1² = ½ × 5,000 × 0.01 = 25J. Note the x² term — compressing the same spring 0.2m stores 100J, four times as much despite only double the compression. This nonlinear relationship means springs become dramatically more energetic at larger deflections." },
+          { q: "A 500kg load is raised 8m by a crane. It then falls freely back to its starting height. What is its speed just before it hits the ground?", options: ["9.81 m/s", "12.5 m/s", "78.5 m/s", "39.2 m/s"], answer: 1, explain: "All PE converts to KE: mgh = ½mv². gh = ½v². v² = 2gh = 2 × 9.81 × 8 = 156.96. v = √156.96 ≈ 12.5 m/s. Mass cancels — any object falling 8m reaches 12.5 m/s regardless of how heavy it is." }
+        ]
+      }
+    },
 
+    "Conservation of Energy": {
+      lesson: {
+        title: "Conservation of Energy: Energy Is Never Created or Destroyed",
+        sections: [
+          { heading: "The First Law of Thermodynamics", body: "Energy cannot be created or destroyed — it can only be converted from one form to another. This is one of the most fundamental and well-tested laws in physics. The total energy of an isolated system remains constant. In a machine: electrical energy in = mechanical work out + heat from friction + heat from electrical resistance + sound from vibration. Every last Joule of input energy is accounted for somewhere in the output — nothing disappears, but much of it becomes useless heat." },
+          { heading: "Efficiency: Useful Energy vs Total Energy", body: "Efficiency = useful energy output ÷ total energy input × 100%. A motor rated at 90% efficiency converts 90% of electrical input to shaft mechanical output and wastes 10% as heat. A pump system might have motor efficiency 92%, coupling efficiency 99%, pump efficiency 85%: overall system efficiency = 0.92 × 0.99 × 0.85 = 77.4%. Efficiencies in series multiply — and each loss stage makes the combined system significantly less efficient than any individual component." },
+          { heading: "Energy Degradation", body: "While total energy is conserved, its quality degrades. High-quality energy (electricity, mechanical) can be fully converted to any other form. Low-quality energy (diffuse heat at low temperature) cannot be fully converted back to useful work — it requires a temperature difference to do work at all. This is why you cannot recover all the heat from friction and use it to run the machine again. Every energy conversion process increases entropy — the universe's disorder. Perpetual motion machines are impossible because they would violate energy conservation or entropy laws." },
+          { heading: "Energy Conservation in Machine Design", body: "Energy conservation principles drive machine efficiency design. Reducing friction (better bearings, lubrication, alignment) reduces heat losses. Recovering energy that would otherwise be wasted: regenerative braking converts vehicle KE back to electrical energy instead of heating brake pads. Variable frequency drives match motor speed to actual demand, avoiding the energy waste of throttling at full speed. Heat exchangers recover waste heat from one process to preheat another. Every percentage point of efficiency improvement represents real energy cost savings in continuous industrial operation." }
+        ],
+        takeaways: [
+          "Energy is never created or destroyed — all input energy is accounted for in outputs and losses",
+          "Efficiency = useful output ÷ total input — series efficiencies multiply, losses compound quickly",
+          "Energy degrades in quality — diffuse low-temperature heat cannot be fully converted back to work",
+          "Regenerative braking, VFDs, and heat exchangers all recover energy that would otherwise be lost"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A motor takes 10,000W electrical input and delivers 8,500W of mechanical output. What is its efficiency?", options: ["115%", "85%", "15%", "80%"], answer: 1, explain: "Efficiency = useful out ÷ total in = 8,500 ÷ 10,000 = 0.85 = 85%. The remaining 1,500W becomes heat in the motor windings, core, and bearings. This heat must be dissipated — a major factor in motor enclosure and cooling design." },
+          { q: "A system has motor efficiency 90%, gearbox efficiency 95%, and pump efficiency 80%. What is the overall system efficiency?", options: ["88.3%", "68.4%", "265%", "75%"], answer: 1, explain: "Overall = 0.90 × 0.95 × 0.80 = 0.684 = 68.4%. Three components each above 80% efficiency produce a combined system only 68% efficient. This is why system-level efficiency analysis is critical — individual component specs can be misleading about real-world performance." },
+          { q: "A car's brakes convert kinetic energy to heat when stopping. Where does that energy go?", options: ["It is destroyed in the braking process", "It heats the brake pads and rotors, then dissipates into the air", "It returns to the fuel tank", "It is stored for the next acceleration"], answer: 1, explain: "Energy is conserved — it is converted to heat in the brakes, which then radiates and convects into the surrounding air, warming it slightly. The energy is not destroyed but becomes diffuse low-temperature heat that cannot practically be recovered for useful work." }
+        ]
+      }
+    },
+
+    "Thermodynamics": {
+      lesson: {
+        title: "Thermodynamics: The Science of Heat and Energy",
+        sections: [
+          { heading: "The Four Laws", body: "Zeroth Law: if two systems are each in thermal equilibrium with a third, they are in equilibrium with each other — this defines temperature as a meaningful property. First Law: energy is conserved (covered in detail separately). Second Law: heat flows spontaneously from hot to cold, never the reverse; every natural process increases total entropy. Third Law: absolute zero (0 Kelvin = -273.15°C) cannot be reached by any finite number of steps. These four laws govern every heat engine, refrigerator, and thermal system ever built." },
+          { heading: "Heat Engines and the Carnot Limit", body: "A heat engine converts heat into work by moving heat from a hot reservoir to a cold reservoir. Maximum theoretical efficiency = 1 - (T_cold/T_hot), where temperatures are in Kelvin. A steam turbine with steam at 600°C (873K) exhausting at 40°C (313K): max efficiency = 1 - 313/873 = 64.2%. No real engine achieves this — friction, heat losses, and irreversibilities reduce it further. A car engine might achieve 25-35% thermal efficiency. The rest is waste heat in the exhaust and coolant." },
+          { heading: "Temperature Scales", body: "Celsius (°C): water freezes at 0°C, boils at 100°C. Fahrenheit (°F): water freezes at 32°F, boils at 212°F. Conversion: °F = (°C × 9/5) + 32. Kelvin (K): absolute scale, K = °C + 273.15. Zero Kelvin is absolute zero — no molecular motion. Thermodynamic calculations always use Kelvin. Industrial process temperatures range from cryogenic storage at -196°C (liquid nitrogen) through typical manufacturing at 20-300°C up to steel furnaces at 1,600°C." },
+          { heading: "Thermal Expansion", body: "Materials expand when heated and contract when cooled. Linear expansion: ΔL = α × L₀ × ΔT, where α is the coefficient of linear expansion. Steel: α ≈ 12 × 10⁻⁶ /°C. A 100m steel bridge heated 40°C expands ΔL = 12 × 10⁻⁶ × 100 × 40 = 0.048m = 48mm. Expansion joints in bridges, pipework expansion loops, and gap allowances in rail tracks all accommodate thermal expansion. Ignoring it causes buckling, binding, and structural cracking. Bimetallic strips use differential thermal expansion between two bonded metals to create mechanical movement — used in thermostats and circuit breakers." }
+        ],
+        takeaways: [
+          "Second Law: heat flows hot to cold spontaneously; all real processes increase entropy",
+          "Carnot efficiency limit = 1 - T_cold/T_hot (Kelvin) — no engine can exceed this",
+          "Always use Kelvin for thermodynamic calculations: K = °C + 273.15",
+          "Thermal expansion ΔL = αL₀ΔT — steel expands 12mm per 100m per 10°C temperature rise"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A heat engine operates between 800K (hot) and 300K (cold). What is the maximum possible efficiency?", options: ["37.5%", "62.5%", "80%", "27%"], answer: 1, explain: "Carnot efficiency = 1 - T_cold/T_hot = 1 - 300/800 = 1 - 0.375 = 0.625 = 62.5%. No real engine can exceed this theoretical limit. Actual engines fall short due to friction, heat leaks, and irreversible processes." },
+          { q: "A 50m steel pipeline is installed at 10°C. It heats to 70°C in summer. How much does it expand? (α = 12 × 10⁻⁶ /°C)", options: ["3.6mm", "36mm", "360mm", "0.36mm"], answer: 1, explain: "ΔL = α × L₀ × ΔT = 12 × 10⁻⁶ × 50 × 60 = 0.036m = 36mm. A 36mm expansion on a rigidly mounted pipe creates enormous stress. Expansion loops, bellows, or sliding supports must accommodate this movement or the pipe will buckle or crack its fittings." },
+          { q: "Why can a refrigerator not cool a room by leaving its door open?", options: ["The compressor is not powerful enough", "The refrigerator moves heat from inside to outside via the coils at the back, warming the room net", "Cold air escapes too quickly", "The refrigerator only works in enclosed spaces"], answer: 1, explain: "A refrigerator moves heat from inside to its rear coils, where it dumps heat into the room. With the door open, it moves heat from the room air into the room via the coils — plus adds waste heat from the motor. Net result: the room gets warmer, not cooler. The Second Law at work." }
+        ]
+      }
+    },
+
+    "Sound Waves": {
+      lesson: {
+        title: "Sound Waves: Mechanical Vibration Through Matter",
+        sections: [
+          { heading: "What Is Sound?", body: "Sound is a longitudinal mechanical wave — a series of compressions and rarefactions (pressure variations) propagating through a medium. Unlike light, sound requires a medium to travel through: it cannot travel through a vacuum. Speed of sound depends on the medium's elasticity and density. In air at 20°C: 343 m/s (1,235 km/h). In water: ~1,480 m/s. In steel: ~5,120 m/s. Sound travels much faster in denser, stiffer materials because the molecules transmit vibrations more efficiently." },
+          { heading: "Frequency, Wavelength, and Amplitude", body: "Frequency (Hz) is the number of pressure cycles per second — determines pitch. Human hearing range: 20 Hz to 20,000 Hz. Infrasound (<20 Hz) and ultrasound (>20,000 Hz) are beyond normal hearing. Wavelength = speed ÷ frequency. At 343 m/s, a 1,000 Hz tone has wavelength = 0.343m. Amplitude is the pressure variation magnitude — determines loudness. Doubling amplitude does not double perceived loudness; the decibel scale is logarithmic because human hearing is logarithmic." },
+          { heading: "The Decibel Scale", body: "Sound pressure level (SPL) in decibels: dB = 20 × log₁₀(P/P_ref), where P_ref = 20 μPa (threshold of hearing). Every 20dB increase represents a 10× increase in sound pressure. Every 10dB increase is perceived as roughly twice as loud. Reference points: 0dB (threshold of hearing), 30dB (quiet room), 65dB (normal conversation), 85dB (prolonged exposure causes hearing damage), 110dB (power tools), 140dB (jet engine nearby, threshold of pain). OSHA requires hearing protection above 85dB for 8-hour exposure." },
+          { heading: "Sound in Industry", body: "Ultrasonic testing (UT) uses high-frequency sound (0.5-25 MHz) to detect internal flaws in welds, castings, and materials without cutting them open. Sound velocity and reflection patterns reveal cracks, voids, and inclusions. Ultrasonic flow meters measure fluid velocity by timing sound pulses upstream and downstream — with no moving parts and no contact with the fluid. Vibration analysis listens to machine bearing and gear frequencies to detect developing faults before failure. Noise control in industrial facilities involves absorption (soft materials), barriers (mass blocking direct path), isolation (vibration isolators under machines), and enclosures." }
+        ],
+        takeaways: [
+          "Sound is a longitudinal pressure wave — requires a medium, cannot travel through vacuum",
+          "Speed of sound in air = 343 m/s; in steel = 5,120 m/s — denser, stiffer materials transmit faster",
+          "Decibel scale is logarithmic — 20dB = 10× pressure; 85dB threshold for hearing damage",
+          "Ultrasonic testing finds internal material flaws; vibration analysis detects bearing and gear faults"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A sound level increases from 70dB to 90dB. How much has the sound pressure changed?", options: ["1.3× increase", "2× increase", "10× increase", "20× increase"], answer: 2, explain: "A 20dB increase = 10× pressure increase (dB = 20log₁₀ of pressure ratio; 10^(20/20) = 10). The sound is perceived as roughly 4× louder by human hearing despite being 10× the pressure. This logarithmic compression is how our ears handle the enormous range of sound levels we encounter." },
+          { q: "What type of sound wave is used in ultrasonic weld inspection?", options: ["Infrasound below 20 Hz", "Audible sound at 1,000 Hz", "Ultrasound above 20,000 Hz", "Radio waves"], answer: 2, explain: "Ultrasonic testing uses frequencies of 0.5-25 MHz — far above human hearing. High frequencies give short wavelengths, enabling detection of small flaws. The waves reflect off internal discontinuities (cracks, voids, inclusions) and the return signal is analyzed to map the flaw's location and size." },
+          { q: "Why does sound travel faster in steel than in air?", options: ["Steel is denser and heavier", "Steel is stiffer — its molecular bonds transmit vibrations much more efficiently than air molecules", "Steel channels sound like a pipe", "Sound slows down in air due to humidity"], answer: 1, explain: "Speed of sound = √(stiffness/density). Steel is far stiffer (higher elastic modulus) than air. Despite also being denser, the stiffness increase dominates — steel transmits vibrations about 15 times faster than air. This is why you can hear a train on rails long before you hear it through the air." }
+        ]
+      }
+    },
+
+    "Light & Optics": {
+      lesson: {
+        title: "Light & Optics: The Behavior of Electromagnetic Radiation",
+        sections: [
+          { heading: "What Is Light?", body: "Light is electromagnetic radiation — oscillating electric and magnetic fields propagating through space. Unlike sound, it requires no medium and travels through vacuum at c = 299,792,458 m/s (approximately 3 × 10⁸ m/s). This is the universal speed limit — nothing with mass can reach it. Light exhibits wave-particle duality: it behaves as a wave in interference and diffraction experiments, and as discrete particles (photons) in photoelectric and quantum phenomena. Visible light is only a tiny slice of the full electromagnetic spectrum." },
+          { heading: "Reflection and Refraction", body: "Reflection: light bouncing off a surface. Angle of incidence = angle of reflection (measured from the normal to the surface). Mirrors, retroreflectors, and safety tape all use controlled reflection. Refraction: light bending when it crosses a boundary between materials with different refractive indices. Snell's Law: n₁ × sin(θ₁) = n₂ × sin(θ₂). Glass has n ≈ 1.5 — light slows to c/1.5 and bends toward the normal when entering glass. Fiber optic cables use total internal reflection: light stays trapped inside the fiber when angle exceeds the critical angle." },
+          { heading: "Lenses and Focal Length", body: "Converging (convex) lenses focus parallel light to a focal point. Diverging (concave) lenses spread light out. The focal length f determines how strongly a lens bends light. Lens formula: 1/f = 1/do + 1/di, where do is object distance and di is image distance. Magnification = -di/do. Cameras, microscopes, telescopes, and corrective eyeglasses all use combinations of lenses to form focused images. Industrial machine vision systems use precisely calculated optics to maintain focus and magnification across the inspection field." },
+          { heading: "Lasers and Industrial Optics", body: "Lasers emit coherent, monochromatic, collimated light — all photons same wavelength, same phase, traveling in the same direction. This allows extreme intensity over small spots and precise targeting. Industrial applications: laser cutting (CO₂ lasers cut steel, fiber lasers cut reflective metals), laser welding, laser measurement (LiDAR, laser trackers for large-scale metrology), barcode scanning, and fiber optic data transmission. Laser safety classes (1-4) define hazard level. Class 4 lasers (cutting, welding) can instantly blind and cause skin burns — strict enclosure and interlock requirements apply." }
+        ],
+        takeaways: [
+          "Light speed in vacuum = 3 × 10⁸ m/s — the universal speed limit, requires no medium",
+          "Reflection: angle in = angle out; Refraction: light bends at material boundaries per Snell's Law",
+          "Fiber optics use total internal reflection to trap light inside — the basis of modern data networks",
+          "Lasers emit coherent, collimated light — used in cutting, welding, measurement, and communications"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "Light traveling in air (n=1.0) hits glass (n=1.5) at 30° from the normal. In which direction does it bend?", options: ["Away from the normal — it speeds up in glass", "Toward the normal — it slows down in glass", "It does not bend at 30°", "It reflects completely"], answer: 1, explain: "When light enters a denser medium (higher n), it slows down and bends toward the normal (smaller angle). When exiting to a less dense medium, it speeds up and bends away from the normal. This is why a spoon appears bent in a glass of water — refraction at the water-air interface." },
+          { q: "Why can fiber optic cables transmit data as light without the light escaping through the cable walls?", options: ["The cable walls are perfectly reflective metal", "Total internal reflection traps light inside when it hits the wall at a shallow enough angle", "The light is compressed into a beam too narrow to escape", "The glass absorbs and re-emits the light forward"], answer: 1, explain: "Total internal reflection occurs when light hits a boundary from the denser side at an angle greater than the critical angle — 100% of the light reflects back inside. Fiber optic cores have higher refractive index than the cladding, trapping light in the core through thousands of kilometers of bends." },
+          { q: "Why do industrial laser cutters require strict interlocks and enclosures?", options: ["Lasers are noisy and disturb other equipment", "Class 4 lasers can instantly cause blindness and skin burns even from reflections", "Lasers produce harmful gases during operation", "Laser light interferes with PLC communications"], answer: 1, explain: "Class 4 laser beams (and their specular reflections) have enough intensity to instantly damage the retina and cause severe skin burns. A momentary direct or reflected exposure can cause permanent blindness — interlocks ensure the beam path is fully enclosed before firing and instantly shut down if the enclosure is breached." }
+        ]
+      }
+    },
+
+    "Heat Transfer": {
+      lesson: {
+        title: "Heat Transfer: How Thermal Energy Moves",
+        sections: [
+          { heading: "Three Mechanisms of Heat Transfer", body: "Heat transfers from hot to cold by three mechanisms. Conduction: direct contact — energy passes between molecules in contact. Convection: bulk fluid movement carries heat — hot fluid rises (natural convection) or is pumped (forced convection). Radiation: electromagnetic emission — all objects above absolute zero emit thermal radiation proportional to T⁴ (Stefan-Boltzmann Law). Real engineering problems usually involve combinations of all three — a heat exchanger uses conduction through the wall plus convection on both fluid sides." },
+          { heading: "Conduction: Fourier's Law", body: "Heat flow by conduction: Q/t = k × A × ΔT / L, where k is thermal conductivity (W/m·K), A is cross-sectional area, ΔT is temperature difference, and L is thickness. Copper: k = 385 W/m·K. Steel: k = 50. Concrete: k = 1.7. Fiberglass insulation: k = 0.04. A higher k means faster heat flow. Doubling insulation thickness halves heat flow. This equation sizes heat sinks, calculates building heat loss, and determines whether a motor casing can dissipate its internal losses without overheating." },
+          { heading: "Convection and Heat Exchangers", body: "Convection heat transfer: Q = h × A × ΔT, where h is the convective heat transfer coefficient (W/m²·K). Forced convection (fans, pumps) gives h 10-100× higher than natural convection — why cooling fans dramatically improve heat dissipation in electronics and motors. Heat exchangers transfer heat between two fluid streams without mixing them. Shell-and-tube, plate, and fin-and-tube designs maximize surface area (A) to maximize heat transfer. Fouling — deposits building on heat exchanger surfaces — reduces effective k and is a major maintenance issue in industrial facilities." },
+          { heading: "Thermal Resistance and Insulation", body: "Thermal resistance R = L/(k×A) — analogous to electrical resistance. Heat flow = ΔT ÷ R_total, just as current = voltage ÷ resistance. For layered materials (insulation, wall, cladding), thermal resistances add in series. R-value in building insulation is thermal resistance per unit area. Doubling insulation thickness doubles R-value and halves heat loss. Industrial pipe insulation reduces heat loss in steam systems, prevents condensation on cold lines, and protects personnel from contact burns on hot surfaces — OSHA considers surfaces above 60°C a burn hazard requiring guarding or insulation." }
+        ],
+        takeaways: [
+          "Three mechanisms: conduction (contact), convection (fluid flow), radiation (electromagnetic waves)",
+          "Conduction rate = k × A × ΔT / L — higher conductivity, larger area, bigger ΔT means more heat flow",
+          "Thermal resistance = L/(kA) — layers add in series, just like electrical resistance",
+          "Surfaces above 60°C require insulation or guarding — OSHA burn hazard threshold"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "Doubling the thickness of insulation on a pipe does what to the heat loss?", options: ["Doubles it", "Halves it", "Quarters it", "Has no effect"], answer: 1, explain: "Heat flow Q = k × A × ΔT / L. Doubling L (thickness) halves Q directly — simple inverse relationship. This assumes flat geometry. For cylindrical pipes the relationship is logarithmic, but doubling thickness still cuts heat loss significantly — typically 40-50% reduction for pipes." },
+          { q: "A motor casing has poor thermal contact between windings and casing. What is the primary heat transfer mechanism that is impaired?", options: ["Radiation", "Convection", "Conduction", "Induction"], answer: 2, explain: "Heat from motor windings must conduct through the insulation, winding mass, and casing wall to reach the cooling air outside. Poor contact creates high thermal resistance in the conductive path — heat builds up in the windings. Forced-air cooling (convection) on the outside is irrelevant if heat cannot first conduct to the surface." },
+          { q: "Why does a fan dramatically improve cooling of an electronic component even though the fan itself generates heat?", options: ["The fan's motor absorbs component heat", "Forced convection gives 10-100× higher heat transfer coefficient than still air", "Moving air is cooler than still air", "The fan creates a vacuum that pulls heat away"], answer: 1, explain: "Forced convection dramatically increases the convective heat transfer coefficient h. Replacing still air (h ≈ 5-25 W/m²·K) with moving air (h ≈ 25-250 W/m²·K) means the same surface temperature can dissipate 10× more heat — far outweighing the small heat added by the fan motor." }
+        ]
+      }
+    },
+
+    "Electromagnetic Spectrum": {
+      lesson: {
+        title: "Electromagnetic Spectrum: The Full Range of Light",
+        sections: [
+          { heading: "What Is the EM Spectrum?", body: "The electromagnetic spectrum is the complete range of electromagnetic radiation ordered by frequency (or wavelength). All EM waves travel at c = 3 × 10⁸ m/s in vacuum and are transverse waves of oscillating electric and magnetic fields requiring no medium. From lowest to highest frequency: radio waves, microwaves, infrared, visible light, ultraviolet, X-rays, gamma rays. Higher frequency means shorter wavelength and higher photon energy. The relationship: c = f × λ, where f is frequency and λ is wavelength." },
+          { heading: "Low-Frequency End: Radio to Infrared", body: "Radio waves (kHz-GHz) carry communications — AM/FM radio, WiFi, Bluetooth, cellular, radar. Wavelengths from kilometers to centimeters. Microwaves (GHz) heat food via molecular rotation of water, and enable radar, satellite communications, and WiFi. Infrared (IR) radiation is thermal radiation — all objects above absolute zero emit IR proportional to their temperature. Thermal cameras detect IR emissions to find heat sources — used for electrical panel hot spot detection, building energy audits, and predictive maintenance on rotating machinery." },
+          { heading: "Visible and UV: The Middle Range", body: "Visible light occupies a tiny band from ~400nm (violet) to ~700nm (red) — the range human eyes evolved to detect because it matches peak solar output. Ultraviolet (UV, 10-400nm) carries enough energy to damage DNA and cause sunburn. Industrial UV applications: UV curing of adhesives and coatings (photoinitiators harden on UV exposure), UV sterilization of water and air, UV leak detection (fluorescent dye visible under UV), and spectroscopic material analysis. UV-C (100-280nm) is germicidal and used in hospital air treatment systems." },
+          { heading: "High-Frequency End: X-Rays and Gamma Rays", body: "X-rays (0.01-10nm wavelength) penetrate soft tissue but are absorbed by dense materials — enabling medical and industrial radiography. Industrial X-ray and gamma-ray radiography inspects welds, castings, and structures for internal defects without disassembly. Gamma rays originate from nuclear decay — higher energy than X-rays, more penetrating. Both are ionizing radiation: high enough photon energy to eject electrons from atoms and damage biological tissue. Exposure is controlled by time, distance (intensity follows inverse-square law), and shielding (lead and dense concrete for X-ray and gamma)." }
+        ],
+        takeaways: [
+          "EM spectrum from low to high frequency: radio, microwave, infrared, visible, UV, X-ray, gamma",
+          "c = f × λ — all EM waves travel at 3 × 10⁸ m/s; higher frequency means shorter wavelength",
+          "IR cameras detect thermal emissions — used for electrical hot-spot and machinery fault detection",
+          "X-ray and gamma radiation are ionizing — control exposure with time, distance, and shielding"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "An infrared thermal camera shows a bright spot on an electrical panel. What does this indicate?", options: ["A cold connection drawing no current", "A high-resistance connection generating excess heat — a potential fire hazard", "Normal operating temperature", "A ground fault"], answer: 1, explain: "A hot spot in an electrical panel indicates a high-resistance connection — loose terminal, corroded contact, or undersized conductor. Excess resistance = excess heat (P = I²R). Thermal imaging finds these faults before they cause fires or failures, making it a standard predictive maintenance tool." },
+          { q: "A UV lamp is used to inspect a weld for leaks using fluorescent dye. Which UV band is typically used?", options: ["UV-C (germicidal, 200-280nm)", "UV-A (365nm, near visible, 'black light')", "X-ray wavelengths", "Infrared adjacent to UV"], answer: 1, explain: "UV-A (315-400nm, peak ~365nm) is the 'black light' range used in fluorescent dye penetrant inspection (FPI). The fluorescent dye absorbs UV-A and emits visible light, making cracks visible in darkness. UV-C is used for sterilization, not inspection — and it's more hazardous to skin and eyes." },
+          { q: "Why does doubling the distance from an X-ray source reduce radiation intensity to one-quarter?", options: ["X-rays decay over distance", "Radiation follows the inverse-square law — intensity is proportional to 1/r²", "Air absorbs half the radiation per meter", "X-ray machines lose power over longer distances"], answer: 1, explain: "Radiation spreads spherically. The same total energy spreads over a surface area proportional to r². Doubling distance means 4× the surface area, so intensity (power per area) drops to 1/4. This is the inverse-square law — the primary reason distance is the cheapest and most effective radiation protection." }
+        ]
+      }
+    },
+
+    "Resonance": {
+      lesson: {
+        title: "Resonance: When Frequency Matches and Energy Builds",
+        sections: [
+          { heading: "What Is Resonance?", body: "Every physical system has one or more natural frequencies at which it vibrates when disturbed. When an external driving force matches a natural frequency, the system is in resonance — each energy input adds to the existing vibration rather than being absorbed. Amplitude builds until it is limited by damping or structural failure. A child pumping a swing at exactly its natural frequency builds large oscillations with small inputs. The same principle destroyed the Tacoma Narrows Bridge in 1940 when wind-induced vortices matched the bridge's torsional natural frequency." },
+          { heading: "Natural Frequency", body: "For a simple spring-mass system: natural frequency f_n = (1/2π) × √(k/m), where k is stiffness and m is mass. Higher stiffness = higher natural frequency. Higher mass = lower natural frequency. For a cantilever beam, natural frequency depends on beam stiffness and the ratio of beam mass to tip mass. These calculations identify frequencies to avoid in machine design — if a rotating component runs at a speed matching a structural natural frequency, destructive resonance occurs. This is the basis of critical speed analysis for rotating shafts." },
+          { heading: "Damping", body: "Damping dissipates vibration energy, converting it to heat. Without damping, resonance builds without limit until failure. With high damping, resonance amplitude is controlled. Damping ratio ζ (zeta) describes how quickly oscillations decay. Underdamped (ζ < 1): oscillates with decreasing amplitude. Critically damped (ζ = 1): returns to rest in minimum time without oscillating. Overdamped (ζ > 1): returns slowly without oscillating. Shock absorbers are designed for slight underdamping to give both good control and reasonable comfort. Rubber isolation mounts add damping to reduce resonant peaks in machinery." },
+          { heading: "Resonance in Industry", body: "Rotating machinery must avoid operating at or near critical speeds — shaft rotation speeds at which the rotational frequency matches a structural natural frequency. Turbochargers, pumps, and motors operating through their critical speed must pass through it quickly during startup, not linger there. Vibration analysis identifies natural frequencies through impact testing or operating data. Piping systems can resonate with pump pulsations — catastrophic piping failures have been caused by acoustic resonance in long piping runs. Tuned mass dampers (weighted pendulums) in tall buildings counteract wind-induced building resonance." }
+        ],
+        takeaways: [
+          "Resonance occurs when driving frequency matches natural frequency — amplitude builds until limited by damping or failure",
+          "Natural frequency f_n = (1/2π)√(k/m) — stiffer means higher, heavier means lower",
+          "Damping dissipates energy and limits resonant amplitude — critical for vibration control",
+          "Rotating machinery must avoid critical speeds — the shaft speed at which rotational frequency matches a structural natural frequency"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A machine's natural frequency is 25 Hz. A motor driving it runs at 1,500 RPM. Is there a resonance risk?", options: ["No — 1,500 RPM is too fast to matter", "Yes — 1,500 RPM = 25 Hz exactly matches the natural frequency", "No — only large machines have resonance issues", "Yes — but only if the motor vibrates"], answer: 1, explain: "1,500 RPM ÷ 60 = 25 Hz. The motor's rotational frequency exactly matches the structure's natural frequency — resonance will occur. The solution is to change the operating speed, stiffen the structure (raise natural frequency), add mass (lower it), or add damping to limit amplitude." },
+          { q: "Stiffening a beam (increasing k) while keeping mass constant does what to its natural frequency?", options: ["Lowers it", "Raises it", "Has no effect", "Doubles it regardless of how much k increases"], answer: 1, explain: "f_n = (1/2π)√(k/m). Increasing k increases the value under the square root, raising f_n. This is a design tool — if a structure resonates at a troublesome frequency, stiffening it raises the natural frequency away from the excitation. Alternatively, adding mass lowers the natural frequency." },
+          { q: "The Tacoma Narrows Bridge collapsed due to resonance. What was the energy source that drove the oscillation?", options: ["Heavy truck traffic on the bridge", "Wind-induced aerodynamic vortices matching the bridge's torsional natural frequency", "Thermal expansion and contraction cycles", "Seismic activity in the ground"], answer: 1, explain: "The bridge's deck shape caused wind to shed vortices alternately above and below at a frequency matching the bridge's torsional natural frequency. Each vortex added a small twist — resonance built the amplitude over hours until the bridge tore itself apart. It is the most famous engineering resonance failure in history." }
+        ]
+      }
+    }
+  }, // end energy
+  // ─── HISTORY ────────────────────────────────────────────────────
   history: {
-    "Ancient Civilizations": { lesson: { title: "Ancient Civilizations", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "World Wars": { lesson: { title: "World Wars", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "American History": { lesson: { title: "American History", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Medieval Period": { lesson: { title: "Medieval Period", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Scientific Revolution": { lesson: { title: "Scientific Revolution", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Cold War": { lesson: { title: "Cold War", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "Ancient Rome": { lesson: { title: "Ancient Rome", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
-    "The Renaissance": { lesson: { title: "The Renaissance", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } }
-  },
+    "Ancient Civilizations": {
+      lesson: {
+        title: "Ancient Civilizations: The Foundations of Human Society",
+        sections: [
+          { heading: "Mesopotamia: Civilization's Cradle", body: "The world's first cities emerged in Mesopotamia (modern Iraq) around 3500 BCE in the fertile land between the Tigris and Euphrates rivers. The Sumerians developed cuneiform writing — one of humanity's earliest writing systems — to track grain storage and trade. They built towering ziggurats as temples, developed the concept of law codes, and organized the first large-scale irrigation systems. The city of Ur had an estimated 65,000 residents by 2000 BCE. Later the Babylonians under Hammurabi (1792 BCE) codified 282 laws into the famous Code of Hammurabi — one of the oldest written legal systems, establishing principles like an eye for an eye." },
+          { heading: "Ancient Egypt: The Gift of the Nile", body: "Egypt's civilization lasted over 3,000 years — longer than the time separating us from ancient Rome. The annual Nile flood deposited rich silt, creating the agricultural surplus that supported a complex state. Pharaohs ruled as god-kings; their power is visible in the Great Pyramid of Giza (2560 BCE), built with an estimated 2.3 million stone blocks averaging 2.5 tonnes each. Egyptians developed hieroglyphic writing, a solar calendar of 365 days, advanced mathematics for surveying and construction, and mummification to preserve bodies for the afterlife. The New Kingdom (1550-1070 BCE) under pharaohs like Ramesses II represented Egypt's peak military and cultural power." },
+          { heading: "Ancient China and the Indus Valley", body: "China's Yellow River valley saw civilizations emerge around 2000 BCE. The Shang dynasty (1600-1046 BCE) produced sophisticated bronze work, oracle bone writing, and early Chinese characters still recognizable today. China's geography — protected by deserts, mountains, and ocean — allowed a distinct civilization to develop with continuity unmatched anywhere else. Meanwhile, the Indus Valley civilization (2600-1900 BCE) in modern Pakistan built remarkable planned cities including Mohenjo-daro and Harappa, with straight streets on a grid, standardized brick sizes, covered sewage systems, and indoor plumbing — infrastructure not seen again in that region for centuries after its mysterious collapse." },
+          { heading: "Ancient Greece: Democracy and Philosophy", body: "Ancient Greece (800-146 BCE) gave the modern world democracy, philosophy, and the foundations of Western science. Athens under Pericles (461-429 BCE) pioneered democratic governance — though limited to male citizens, it was revolutionary. Greek philosophers including Socrates, Plato, and Aristotle asked fundamental questions about knowledge, reality, ethics, and governance that still shape modern thought. Alexander the Great (356-323 BCE) spread Greek culture from Egypt to India in just 13 years. Greek mathematics (Euclid, Pythagoras), astronomy (Aristarchus proposed heliocentrism in 270 BCE), and medicine (Hippocrates) formed the intellectual foundation on which later civilizations built." }
+        ],
+        takeaways: [
+          "Mesopotamia produced the world's first cities, writing systems, and formal law codes by 3500 BCE",
+          "Egypt's 3,000-year civilization was powered by Nile agriculture and ruled by god-king pharaohs",
+          "The Indus Valley built planned cities with sewage and plumbing that disappeared for millennia after collapse",
+          "Ancient Greece pioneered democracy, philosophy, and scientific inquiry that foundations Western civilization"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "What was the primary purpose of cuneiform writing when it was first developed in Mesopotamia?", options: ["Religious ceremonies and prayer", "Tracking grain storage and trade transactions", "Recording military victories", "Astronomical observations"], answer: 1, explain: "The earliest cuneiform tablets (c. 3400 BCE) were accounting records — tracking quantities of grain, cattle, and goods in and out of temple storehouses. Writing developed from an economic need to manage complex trade and storage, not from literary or religious impulse." },
+          { q: "Which ancient civilization built planned cities with covered sewage systems and indoor plumbing around 2600 BCE?", options: ["Ancient Egypt", "Mesopotamia", "Indus Valley civilization", "Ancient Greece"], answer: 2, explain: "Mohenjo-daro and Harappa in the Indus Valley (modern Pakistan) featured remarkably advanced urban planning — grid streets, standardized bricks, and covered drainage systems not matched elsewhere for centuries. The civilization collapsed around 1900 BCE, possibly due to climate change or river course shifts." },
+          { q: "Which Greek philosopher's student conquered an empire stretching from Egypt to India by age 32?", options: ["Socrates", "Plato", "Aristotle", "Euclid"], answer: 2, explain: "Aristotle tutored Alexander the Great from age 13 to 16. Alexander then proceeded to conquer the Persian Empire, Egypt, and parts of India between 334-323 BCE, dying at 32. He spread Greek (Hellenic) culture across an enormous territory — the Hellenistic period that followed transformed the ancient world." }
+        ]
+      }
+    },
+
+    "World Wars": {
+      lesson: {
+        title: "World Wars: The Conflicts That Reshaped the Modern World",
+        sections: [
+          { heading: "World War I: The War to End All Wars (1914-1918)", body: "WWI began with the assassination of Archduke Franz Ferdinand of Austria-Hungary in Sarajevo on June 28, 1914 — a single gunshot that triggered a chain of alliance obligations pulling in all major European powers within weeks. Industrialized warfare introduced machine guns, poison gas, artillery barrages, tanks, and aircraft on a massive scale. Trench warfare on the Western Front created a 700-kilometer static line of trenches from the English Channel to Switzerland. The Battle of the Somme (1916) saw 57,470 British casualties on the first day alone. By the armistice on November 11, 1918, approximately 20 million had died. The war destroyed four empires: Ottoman, Austro-Hungarian, Russian, and German." },
+          { heading: "The Interwar Period and Rise of Fascism", body: "The Treaty of Versailles (1919) imposed harsh reparations and territorial losses on Germany, creating humiliation and economic devastation that became fertile ground for extremism. The Great Depression (1929) caused mass unemployment across the industrialized world. Adolf Hitler rose to power in Germany in 1933 promising national restoration, blaming Jews and communists for Germany's problems. Mussolini had already established fascist rule in Italy in 1922. Japan pursued imperial expansion in Asia, invading Manchuria in 1931 and China in 1937. The League of Nations, created to prevent another war, proved powerless to stop any of these aggressions." },
+          { heading: "World War II: Global Conflict (1939-1945)", body: "Germany invaded Poland on September 1, 1939, triggering declarations of war from Britain and France. Hitler's Blitzkrieg (lightning war) tactics — combined arms of tanks, aircraft, and motorized infantry — rapidly conquered France in six weeks (1940). Germany then invaded the Soviet Union in June 1941 in Operation Barbarossa, the largest military operation in history with over 3 million troops. Japan's attack on Pearl Harbor on December 7, 1941 brought the United States into the war. The Holocaust — Nazi Germany's systematic murder of six million Jews and millions of others — represents one of history's greatest atrocities. Allied victory in Europe came May 8, 1945; in the Pacific, atomic bombs on Hiroshima and Nagasaki on August 6 and 9, 1945 led to Japan's surrender on September 2." },
+          { heading: "Legacy and Consequences", body: "WWII killed an estimated 70-85 million people — about 3% of the 1940 world population. The United States and Soviet Union emerged as superpowers, replacing European dominance. The United Nations replaced the failed League of Nations. The Marshall Plan provided $13 billion to rebuild Western Europe, preventing the poverty-to-extremism cycle that followed WWI. Decolonization accelerated as European empires weakened. The Cold War rivalry between the US and USSR defined the next 45 years. The atomic bomb fundamentally changed warfare and geopolitics — nuclear deterrence meant great powers could no longer fight each other directly." }
+        ],
+        takeaways: [
+          "WWI killed 20 million; trench warfare and industrial weapons defined the conflict",
+          "Versailles Treaty's harsh terms fueled German resentment that enabled Hitler's rise",
+          "WWII killed 70-85 million people — the Holocaust murdered 6 million Jews systematically",
+          "WWII created the US-Soviet superpower rivalry, the UN, and the nuclear age"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "What immediate event triggered the chain of alliance obligations that started World War I?", options: ["Germany's invasion of Belgium", "The assassination of Archduke Franz Ferdinand in Sarajevo", "Austria's declaration of war on Russia", "Britain's naval blockade of Germany"], answer: 1, explain: "The assassination of Austro-Hungarian Archduke Franz Ferdinand by Gavrilo Princip on June 28, 1914 triggered a cascade of alliance activations. Austria-Hungary declared war on Serbia, Russia mobilized, Germany declared war on Russia then France, Britain entered when Germany invaded Belgium — from assassination to world war in 37 days." },
+          { q: "What made Germany's Blitzkrieg tactics revolutionary at the start of WWII?", options: ["Larger army sizes than any previous war", "Combined use of fast tanks, aircraft, and motorized infantry acting together", "Use of nuclear weapons in Poland", "Complete reliance on naval power"], answer: 1, explain: "Blitzkrieg combined armor, close air support, motorized infantry, and artillery in coordinated fast-moving attacks — bypassing strongpoints and disrupting enemy command. This shattered the static WWI-style defense France had prepared. France fell in six weeks; the same tactics allowed rapid conquest of most of Western Europe." },
+          { q: "What was the primary strategic purpose of dropping atomic bombs on Hiroshima and Nagasaki?", options: ["To destroy Japan's navy", "To force Japanese surrender without a costly land invasion estimated to cost millions of lives", "To demonstrate US power to the Soviet Union only", "To retaliate for Pearl Harbor"], answer: 1, explain: "US planners estimated Operation Downfall — an invasion of the Japanese home islands — would cost 250,000 to over 1 million American casualties and millions of Japanese. The atomic bombs were chosen to force surrender without invasion. Japan surrendered September 2, 1945, 24 days after the first bomb." }
+        ]
+      }
+    },
+
+    "American History": {
+      lesson: {
+        title: "American History: From Colony to Superpower",
+        sections: [
+          { heading: "Colonial Era and Revolution (1607-1783)", body: "English colonists established the first permanent settlement at Jamestown, Virginia in 1607. By 1733, thirteen colonies stretched along the Atlantic coast. British taxation without parliamentary representation — through acts like the Stamp Act (1765) and Townshend Acts (1767) — fueled colonial resentment. The Boston Massacre (1770) and Boston Tea Party (1773) escalated tensions. The Continental Congress declared independence on July 4, 1776, with Thomas Jefferson's Declaration asserting that all men are created equal with unalienable rights to life, liberty, and the pursuit of happiness. The Revolutionary War ended with the Treaty of Paris in 1783, Britain recognizing the United States as an independent nation." },
+          { heading: "Building a Nation (1783-1860)", body: "The Constitution, ratified in 1788, created a federal government with separation of powers and checks and balances — revolutionary in concept. The Bill of Rights (1791) protected individual freedoms. President Thomas Jefferson doubled the nation's size with the Louisiana Purchase from France in 1803 for $15 million. The Lewis and Clark Expedition (1804-1806) explored the new territory. The Industrial Revolution reached America, with textile mills in New England and later railroads transforming commerce. The contradiction at the nation's heart — declaring freedom while practicing slavery — grew as slave states and free states clashed over the expansion of slavery into new territories, building toward civil war." },
+          { heading: "Civil War to World Power (1861-1945)", body: "The Civil War (1861-1865) between Union (North) and Confederacy (South) claimed approximately 620,000 military lives — more than all other American wars combined to that point. Lincoln's Emancipation Proclamation (1863) reframed the war as a fight to end slavery. Union victory preserved the nation and abolished slavery via the 13th Amendment (1865). The Gilded Age (1870-1900) saw explosive industrialization — steel, railroads, oil — creating massive fortunes and massive inequality. The US entered WWI in 1917, tipping the balance to Allied victory. The Great Depression (1929) hit America hardest; FDR's New Deal expanded federal government's role in the economy. WWII mobilization fully industrialized America and ended the Depression, emerging the US as the world's dominant economic and military power." },
+          { heading: "Cold War to Present (1945-Today)", body: "Post-WWII America entered a tense rivalry with the Soviet Union. The Marshall Plan (1948) rebuilt Western Europe and extended American influence. The Korean War (1950-1953) and Vietnam War (1955-1975) were proxy conflicts against communist expansion. The Civil Rights Movement forced America to confront its racial injustice — Rosa Parks' 1955 bus boycott, Martin Luther King Jr.'s leadership, and the Civil Rights Act of 1964 and Voting Rights Act of 1965 dismantled legal segregation. The Moon landing (July 20, 1969) represented the apex of Cold War technological competition. The Soviet collapse in 1991 left America as the sole superpower. September 11, 2001 launched a new era of counterterrorism and reshaped American foreign policy for the following decades." }
+        ],
+        takeaways: [
+          "The Declaration of Independence (1776) and Constitution (1788) established principles that influenced democracies worldwide",
+          "The Civil War (1861-1865) preserved the Union and abolished slavery — 620,000 military deaths",
+          "WWII mobilization made America the world's dominant economic and military power",
+          "The Civil Rights Movement (1955-1968) dismantled legal racial segregation through nonviolent protest and legislation"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "What was the central grievance that led American colonists to revolution against Britain?", options: ["Religious persecution by the Church of England", "Taxation without representation — being taxed by a parliament they had no voice in", "Britain's refusal to allow westward expansion", "Forced military service in British armies"], answer: 1, explain: "'No taxation without representation' captured colonists' core objection. Britain imposed taxes like the Stamp Act (1765) on the colonies to pay debts from the French and Indian War, but colonists had no elected representatives in Parliament. The principle that citizens must consent to taxation became foundational to American democracy." },
+          { q: "Why did the Civil War result in so many more American deaths than previous wars?", options: ["It was fought on two fronts simultaneously", "Industrial-era weapons (rifles, artillery, railroads supplying large armies) combined with outdated massed infantry tactics", "Both sides used chemical weapons", "It lasted over 20 years"], answer: 1, explain: "The Civil War coincided with a weapons revolution — rifled muskets accurate at 300 yards replaced smoothbores accurate at 50 yards, while tactics still called for massed infantry charges. Artillery and early machine guns added to carnage. Disease killed more than combat. Approximately 620,000 military deaths, with some estimates reaching 750,000." },
+          { q: "Which legislation is most directly credited with ending legal racial segregation in the United States?", options: ["The 13th Amendment (1865)", "The 19th Amendment (1920)", "The Civil Rights Act of 1964", "Executive Order 9981 (1948)"], answer: 2, explain: "The Civil Rights Act of 1964 prohibited discrimination based on race, color, religion, sex, or national origin in employment and public accommodations — making Jim Crow segregation laws illegal. The 13th Amendment abolished slavery, the 19th gave women the vote, and EO 9981 desegregated the military — all important but the Civil Rights Act was the broadest anti-segregation law." }
+        ]
+      }
+    },
+
+    "Medieval Period": {
+      lesson: {
+        title: "The Medieval Period: Europe's Middle Ages",
+        sections: [
+          { heading: "The Early Middle Ages (476-1000 CE)", body: "The fall of the Western Roman Empire in 476 CE fragmented Europe into numerous Germanic kingdoms. Trade collapsed, cities shrank, and literacy declined dramatically outside the Church. The Catholic Church became the primary institution preserving learning, providing social services, and unifying fragmented Europe under shared belief. Charlemagne united much of Western Europe by 800 CE and was crowned Holy Roman Emperor by the Pope — establishing the entanglement of church and secular power that defined medieval politics. Viking raids from Scandinavia (793-1066 CE) destabilized coastal and river-adjacent communities across Europe, but Vikings also established trade routes, founded settlements, and eventually integrated into European society." },
+          { heading: "Feudalism and the Social Order", body: "Medieval society operated under feudalism — a hierarchical system of land grants in exchange for military service and loyalty. The king granted land (fiefs) to nobles (lords), who granted portions to knights, who provided military service. Peasants (serfs) worked the land in exchange for protection, bound to the land and unable to leave without permission. This system provided local security in an era without strong central states but created rigid social stratification. The manor — a lord's estate — was the basic economic unit, largely self-sufficient. By the High Middle Ages (1000-1300), a growing merchant class and expanding trade were already eroding pure feudalism from below." },
+          { heading: "The Church, Crusades, and Culture", body: "The Catholic Church held enormous power — controlling education, marriage, inheritance, and salvation itself. The Pope could excommunicate kings, removing subjects' obligation to obey them. The Crusades (1096-1291) were a series of military campaigns to recapture the Holy Land from Muslim control. The First Crusade (1096-1099) succeeded in capturing Jerusalem. Subsequent crusades largely failed, but the Crusades intensified contact between Europe and the more advanced Islamic world, transmitting mathematics, philosophy, medicine, and preserved Greek texts back to Europe. Gothic cathedrals — with their soaring pointed arches, flying buttresses, and stained glass — represent the High Middle Ages' greatest cultural achievement." },
+          { heading: "The Black Death and Late Medieval Crisis", body: "The Black Death (bubonic plague) struck Europe beginning in 1347, killing an estimated 30-60% of Europe's population within five years — roughly 25-50 million people. It spread along trade routes from Central Asia via rat fleas. The demographic collapse disrupted the feudal order: with labor suddenly scarce, surviving peasants could demand better wages and conditions, accelerating the decline of serfdom. The plague also devastated trust in the Church, which had no explanation or cure. The Hundred Years' War (1337-1453) between England and France exhausted both kingdoms. By 1500, the medieval world was giving way to the Renaissance, Reformation, and early modern era." }
+        ],
+        takeaways: [
+          "The Catholic Church was the primary institution preserving learning and unifying Europe after Rome's fall",
+          "Feudalism exchanged land for military loyalty — serfs worked land in return for protection",
+          "The Crusades (1096-1291) transmitted Islamic and Greek knowledge back to Europe",
+          "The Black Death (1347) killed 30-60% of Europe's population and accelerated the decline of feudalism"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "What made feudalism the dominant social structure in medieval Europe?", options: ["It was required by the Catholic Church", "It provided local security and governance in the absence of strong central states", "It was inherited directly from the Roman Empire", "It was imposed by Charlemagne across all of Europe"], answer: 1, explain: "After Rome's collapse, no central authority could protect people or enforce order. Feudalism's exchange of land for military protection and service filled this vacuum locally. Lords could defend their manors; kings were too distant and weak. Feudalism declined as monarchies strengthened and trade created alternative sources of wealth and security." },
+          { q: "What was an unintended consequence of the Crusades for European intellectual history?", options: ["Destruction of all Islamic learning in the Holy Land", "Transmission of Islamic scholarship, mathematics, and preserved Greek texts back to Europe", "Establishment of European universities in Jerusalem", "Conversion of the entire Muslim world to Christianity"], answer: 1, explain: "Contact with the Islamic world — which had preserved and expanded on Greek philosophy, mathematics, and medicine during Europe's dark ages — transmitted this knowledge to European scholars. Algebra, Arabic numerals, Aristotle's complete works, and advances in medicine all entered Europe significantly through Crusader contact and the fall of Toledo (1085)." },
+          { q: "How did the Black Death change medieval social structure?", options: ["It strengthened the feudal system by making lords more valuable", "Labor became scarce, giving surviving peasants bargaining power to demand better conditions and wages", "It caused the Catholic Church to gain more political power", "It had no lasting social effects after the plague ended"], answer: 1, explain: "With 30-60% of Europe dead, surviving laborers were suddenly scarce and valuable. Peasants could demand wages, refuse bad conditions, or move — choices unavailable under strict feudalism. Lords who refused were simply abandoned for better ones. This labor market shift was a major driver of feudalism's decline over the following century." }
+        ]
+      }
+    },
+
+    "Scientific Revolution": {
+      lesson: {
+        title: "The Scientific Revolution: How Humans Learned to Learn",
+        sections: [
+          { heading: "What Was the Scientific Revolution?", body: "The Scientific Revolution (roughly 1543-1687) was the emergence of modern science as a methodology — a shift from accepting ancient authority (especially Aristotle) to testing ideas against observation and experiment. Before it, educated Europeans largely accepted Aristotle's physics (which were mostly wrong) and Ptolemy's geocentric astronomy. After it, science was established as a self-correcting process: form hypotheses, test them, revise based on results. This was arguably the most consequential intellectual transformation in human history, eventually producing the technology of the modern world." },
+          { heading: "Copernicus, Galileo, and the Heliocentric Revolution", body: "Nicolaus Copernicus published his heliocentric model (Sun at center) in 1543, the same year he died — having sat on the work for decades fearing Church reaction. Galileo Galilei (1564-1642) used his telescope (1609) to observe Jupiter's moons, Venus's phases, and lunar craters — all contradicting geocentric models. His mechanics work established that falling objects accelerate uniformly regardless of mass (contradicting Aristotle) and invented the concept of inertia. Galileo was tried by the Inquisition in 1633 and forced to recant heliocentrism, spending his last years under house arrest — illustrating the conflict between emerging science and religious authority." },
+          { heading: "Kepler, Newton, and the Laws of Nature", body: "Johannes Kepler (1571-1630) analyzed Tycho Brahe's precise astronomical data and discovered that planets move in ellipses (not circles), with mathematical laws governing their speeds. Isaac Newton (1643-1727) synthesized everything: his Principia Mathematica (1687) presented the laws of motion and universal gravitation, showing that the same force causing apples to fall governed planetary orbits. Newton invented calculus (simultaneously with Leibniz) to solve the problems. His framework could predict planetary positions, tides, and projectile motion with unprecedented accuracy — demonstrating that nature operates by mathematical laws accessible to human reason." },
+          { heading: "Francis Bacon and the Scientific Method", body: "Francis Bacon (1561-1626) articulated the inductive scientific method: accumulate observations, identify patterns, form general principles, then test them. This was a direct challenge to deductive reasoning from first principles (stating what must be true from axioms) that characterized ancient and medieval thought. René Descartes (1596-1650) contributed the framework of systematic doubt — question everything that cannot be demonstrated. Together they established that knowledge must be earned through evidence, not inherited from authority. By 1660, the Royal Society of London was founded for experimental natural philosophy — institutionalizing science as a collaborative, cumulative, self-correcting enterprise." }
+        ],
+        takeaways: [
+          "The Scientific Revolution (1543-1687) established testing against observation as the basis for knowledge",
+          "Copernicus and Galileo moved Earth from the center — Galileo was tried by the Inquisition for it",
+          "Newton's Principia (1687) unified terrestrial and celestial motion under mathematical laws",
+          "Bacon and Descartes established the scientific method: evidence over authority, test everything"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "What specific astronomical observations did Galileo make that contradicted the geocentric model?", options: ["He observed the Sun was much larger than Earth", "He observed Jupiter's moons, Venus's phases, and lunar craters — showing not everything orbited Earth", "He measured the distance to the nearest stars", "He discovered that stars were other suns"], answer: 1, explain: "Jupiter's four large moons (now called Galilean moons) clearly orbited Jupiter, not Earth — proving not everything in the sky circled Earth. Venus showed a full cycle of phases like the Moon, only possible if it orbited the Sun inside Earth's orbit. These directly falsified the Ptolemaic geocentric model." },
+          { q: "What made Newton's Principia Mathematica so revolutionary?", options: ["It described atoms for the first time", "It unified terrestrial and celestial motion under the same mathematical laws of gravity", "It proved the heliocentric model using a telescope", "It invented the scientific method"], answer: 1, explain: "Before Newton, separate explanations were needed for why objects fall on Earth and why planets orbit the Sun. Newton showed a single mathematical law (F = Gm1m2/r²) explained both. The same gravity pulling an apple downward kept the Moon in orbit. This unified mathematical description of nature was genuinely unprecedented." },
+          { q: "Why was Francis Bacon's inductive method a departure from medieval intellectual tradition?", options: ["He rejected mathematics entirely", "Medieval thought deduced conclusions from accepted authorities; Bacon argued knowledge must come from accumulated observations", "He believed the Church should control science", "He rejected Aristotle's logic completely"], answer: 1, explain: "Medieval scholars largely deduced conclusions by reasoning from accepted texts (Aristotle, Scripture). If Aristotle said heavy objects fall faster, that was accepted without testing. Bacon insisted on gathering actual observations first, then inferring general principles. This reversed the direction of reasoning and made empirical testing the foundation of knowledge." }
+        ]
+      }
+    },
+
+    "Cold War": {
+      lesson: {
+        title: "The Cold War: Superpower Rivalry Without Direct Combat",
+        sections: [
+          { heading: "Origins and Division of Europe (1945-1950)", body: "The Cold War began immediately after WWII as the wartime alliance between the US and Soviet Union fractured over Europe's future. The USSR occupied Eastern Europe and installed communist governments; the US and Western allies established democratic governments in Western Europe. Churchill's 1946 speech described an 'iron curtain' dividing the continent. The Truman Doctrine (1947) committed the US to containing Soviet expansion. The Marshall Plan (1948) invested $13 billion to rebuild Western Europe economically — both preventing communist appeal to desperate populations and binding Western Europe to American economic interests. Germany was divided, and Berlin — deep inside Soviet-controlled East Germany — became a flashpoint." },
+          { heading: "Nuclear Arms Race and Mutual Assured Destruction", body: "The Soviet Union tested its first atomic bomb in 1949, years ahead of American estimates. Both superpowers rapidly expanded nuclear arsenals. The hydrogen bomb (1952-53) was a thousand times more powerful than the Hiroshima bomb. By the 1960s, both sides had enough nuclear warheads to destroy civilization multiple times over. Mutual Assured Destruction (MAD) emerged as doctrine: any nuclear first strike would guarantee devastating retaliation, so neither side could rationally strike first. This balance of terror was both stabilizing (preventing direct war) and terrifying (the world was always hours from annihilation). The Cuban Missile Crisis (1962) brought the world to the closest it came to nuclear war." },
+          { heading: "Proxy Wars and the Space Race", body: "Unable to fight each other directly (nuclear deterrence), the superpowers fought through proxy conflicts. Korea (1950-1953) ended in stalemate at enormous cost. Vietnam (1955-1975) ended in American withdrawal and communist reunification — a profound blow to US prestige and military confidence. The Soviet Union supported independence movements and communist insurgencies across Africa, Asia, and Latin America; the CIA supported right-wing governments and coups. The Space Race was a technological competition with propaganda value: Sputnik (1957), the first satellite, shocked Americans. Yuri Gagarin became the first human in space (1961). The US answered with Apollo 11, landing Neil Armstrong on the Moon on July 20, 1969." },
+          { heading: "Détente, Collapse, and Legacy (1970-1991)", body: "The 1970s brought détente — reduced tensions through diplomacy. Nixon's 1972 visit to China was a strategic masterstroke, splitting the communist bloc. SALT treaties limited nuclear arsenals. But Reagan's presidency (1981-1989) escalated competition with massive defense spending, including the Strategic Defense Initiative ('Star Wars'). The Soviet economy struggled to keep up. Mikhail Gorbachev's reforms (glasnost and perestroika) intended to modernize the USSR instead unleashed forces it couldn't control. The Berlin Wall fell November 9, 1989, as East Germans streamed through. By December 25, 1991, the Soviet Union had dissolved into 15 independent states. The Cold War ended not with a bang but with an economic and political collapse." }
+        ],
+        takeaways: [
+          "The Cold War was an ideological and geopolitical rivalry between the US and USSR from 1947-1991",
+          "Nuclear MAD doctrine prevented direct superpower war but kept the world perpetually close to annihilation",
+          "Proxy wars in Korea, Vietnam, and elsewhere were the Cold War fought at arm's length",
+          "The Soviet Union collapsed in 1991 from economic strain and internal reform — not military defeat"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "What was Mutual Assured Destruction (MAD) and why did it prevent direct US-Soviet war?", options: ["A treaty limiting nuclear weapons", "The doctrine that any nuclear first strike guarantees devastating retaliation, making nuclear war irrational for both sides", "A US military strategy for winning a nuclear exchange", "The UN policy for nuclear disarmament"], answer: 1, explain: "With both superpowers having thousands of nuclear warheads and reliable second-strike capability (submarines, dispersed missiles), no first strike could prevent devastating retaliation. Since both sides would be destroyed, neither could rationally start a nuclear war. This 'balance of terror' held for 45 years — the nuclear peace was preserved by mutual fear of annihilation." },
+          { q: "Why was the Soviet Union's 1957 Sputnik launch so alarming to Americans?", options: ["It carried nuclear warheads", "It demonstrated the USSR could put objects in orbit — meaning missiles could reach American cities", "It was the first manned spaceflight", "It proved Soviet radar could track American aircraft"], answer: 1, explain: "A satellite in orbit requires the same rocket technology as an intercontinental ballistic missile. Sputnik proved the Soviets had the technology to reach any point on Earth with a nuclear warhead. The psychological impact was enormous — driving massive US investment in science education, NASA, and military technology." },
+          { q: "What ultimately caused the Soviet Union to collapse in 1991?", options: ["Military defeat by the United States", "A coup by communist hardliners", "Economic stagnation, the strain of military competition, and political reform unleashing uncontrollable pressures", "A natural disaster affecting Soviet agricultural output"], answer: 2, explain: "The Soviet economy stagnated under central planning while military spending consumed enormous resources. Gorbachev's reforms (glasnost — openness; perestroika — restructuring) were intended to modernize the USSR, but glasnost allowed public criticism and perestroika disrupted the command economy. Nationalist movements in Soviet republics and Eastern Europe accelerated, and the USSR fragmented into 15 states by December 1991." }
+        ]
+      }
+    },
+
+    "Ancient Rome": {
+      lesson: {
+        title: "Ancient Rome: From City-State to Empire",
+        sections: [
+          { heading: "The Roman Republic (509-27 BCE)", body: "According to Roman tradition, the Republic was founded in 509 BCE after the last king was expelled. Rome developed a sophisticated system of government: two annually elected consuls sharing executive power, the Senate of elite patricians guiding policy, and assemblies giving plebeians (common citizens) increasing voice through centuries of class struggle. Rome conquered the Italian peninsula through a combination of military superiority and incorporation — conquered peoples often received citizenship rights, making them stakeholders in Rome's success. The Punic Wars against Carthage (264-146 BCE) established Rome as Mediterranean's dominant power, culminating in Carthage's total destruction." },
+          { heading: "Julius Caesar and the Republic's Fall", body: "The late Republic was torn by civil wars between powerful generals whose legions were loyal to them personally rather than to the state. Gaius Julius Caesar (100-44 BCE) conquered Gaul (modern France) in eight years (58-50 BCE), making his legions wealthy and devoted. When ordered to disband his army, he crossed the Rubicon river into Italy in 49 BCE — a declaration of civil war. He won, declared himself dictator perpetuo (dictator in perpetuity), and began reforming Rome before being assassinated on the Ides of March (March 15), 44 BCE by senators fearing monarchy. His assassination triggered another round of civil wars, ultimately ending the Republic." },
+          { heading: "The Roman Empire (27 BCE - 476 CE)", body: "Caesar's adopted heir Octavian defeated rivals Mark Antony and Cleopatra at the Battle of Actium (31 BCE) and became Augustus Caesar, Rome's first emperor, in 27 BCE. The Pax Romana (Roman Peace, 27 BCE - 180 CE) was a period of relative stability and prosperity across an empire of 70 million people. Roman infrastructure was extraordinary: 80,000 km of roads, aqueducts supplying cities with clean water, concrete construction techniques, and uniform law from Britain to Mesopotamia. At its peak under Trajan (98-117 CE), the empire stretched from Scotland to Iraq. Roman law, Latin language, Christianity (legalized 313 CE, state religion 380 CE), and engineering techniques all profoundly shaped the civilizations that followed." },
+          { heading: "Decline and Fall", body: "Rome's decline had multiple causes: military overextension, reliance on foreign mercenary soldiers with weaker loyalty, currency debasement causing inflation, plague, political instability (in the Crisis of the Third Century, 235-284 CE, there were 26 emperors in 50 years), and mounting pressure from Germanic tribes. Emperor Diocletian divided the empire in 285 CE; Constantine moved the capital east to Constantinople in 330 CE. The Western Empire suffered repeated Germanic invasions and in 410 CE Rome itself was sacked by Visigoths for the first time in 800 years — a psychological catastrophe. The last Western Roman Emperor was deposed in 476 CE. The Eastern Empire (Byzantine) continued until 1453 CE, over 1,000 years longer." }
+        ],
+        takeaways: [
+          "The Roman Republic (509-27 BCE) developed checks and balances, annual elections, and incorporated conquered peoples",
+          "Julius Caesar's crossing the Rubicon (49 BCE) and assassination (44 BCE) ended the Republic",
+          "The Pax Romana (27 BCE-180 CE) brought 200 years of stability to 70 million people across a vast empire",
+          "Rome's fall (476 CE) had multiple causes: overextension, weak military loyalty, inflation, and Germanic invasions"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "Why did Rome's practice of extending citizenship to conquered peoples strengthen its empire?", options: ["It reduced the number of enemies Rome had to fight", "Conquered peoples became stakeholders in Rome's success, providing loyal soldiers and taxpayers rather than permanent rebels", "It was required by Roman religious law", "It reduced administrative costs"], answer: 1, explain: "Unlike most ancient empires that ruled conquered peoples as subjects, Rome often extended Latin rights or full citizenship. This gave conquered peoples a stake in Rome's survival — their prosperity was tied to Rome's. This created a snowball effect of loyal incorporation rather than perpetual occupation. Roman allies often fought harder than conscripts because they shared in the benefits of Roman victories." },
+          { q: "What made Julius Caesar's crossing of the Rubicon in 49 BCE significant?", options: ["It was the first time a Roman general used cavalry effectively", "Roman law forbade armed commanders from entering Italy — crossing was an act of war against the Roman state", "The Rubicon was the border between Rome and Gaul", "It was the deepest river crossing attempted by a Roman army"], answer: 1, explain: "Roman law explicitly prohibited generals from bringing armed forces south of the Rubicon river into the Italian heartland — designed to prevent military coups. When Caesar crossed with his army, he was declaring war on the Roman Senate and Republic. The phrase 'crossing the Rubicon' entered the language as a metaphor for making an irrevocable, decisive commitment." },
+          { q: "When did the Eastern Roman (Byzantine) Empire fall, and what does this reveal about Rome's legacy?", options: ["476 CE, same as the Western Empire", "800 CE when Charlemagne was crowned", "1066 CE with the Norman Conquest", "1453 CE, nearly a thousand years after the Western Empire fell"], answer: 3, explain: "The Eastern Roman Empire, with its capital at Constantinople (modern Istanbul), survived until 1453 CE when it fell to Ottoman Turks. This means Roman imperial government continued in an unbroken line for nearly 2,000 years from 27 BCE. 'Byzantine' is a modern historian's term — they called themselves Romans until the end." }
+        ]
+      }
+    },
+
+    "The Renaissance": {
+      lesson: {
+        title: "The Renaissance: Rebirth of Human Potential",
+        sections: [
+          { heading: "What Was the Renaissance?", body: "The Renaissance (French for 'rebirth') was a cultural and intellectual movement beginning in Italian city-states around 1350 and spreading through Europe until roughly 1600. It represented a rediscovery and celebration of classical Greek and Roman art, literature, and philosophy — combined with new humanist ideas placing human beings and their potential at the center of intellectual life rather than God's plan alone. This was not a rejection of Christianity but a broadening of what intellectual life could include. The fall of Constantinople (1453) brought Greek scholars and manuscripts to Italy, accelerating the movement." },
+          { heading: "Italian City-States and Patronage", body: "The Renaissance began in wealthy Italian city-states — Florence, Venice, Milan, Rome — because they had the wealth, the merchant class, and the exposure to classical ruins and manuscripts. Florence under the Medici banking family became the epicenter. Lorenzo de' Medici (1449-1492) spent lavishly on artists, architects, and scholars — not merely for piety but for prestige and civic glory. This patronage system funded Leonardo da Vinci, Michelangelo, Botticelli, and Donatello among others. Wealthy patrons competed for association with the greatest artists, driving an extraordinary concentration of talent and production in a small geographic area over roughly 150 years." },
+          { heading: "Art, Science, and the Polymath Ideal", body: "Renaissance art developed linear perspective — the mathematical technique for depicting three-dimensional space on a flat surface, pioneered by Filippo Brunelleschi around 1420. Painters and sculptors studied human anatomy by dissecting corpses to depict the body accurately — a radical empiricism for the era. Leonardo da Vinci (1452-1519) embodied the Renaissance ideal of the 'universal man': painter (Mona Lisa, Last Supper), sculptor, architect, engineer, anatomist, mathematician, musician, and inventor. His notebooks contain designs for flying machines, tanks, solar power, and hydraulic machines centuries before their realization. Michelangelo (1475-1564) produced the Sistine Chapel ceiling, the statue of David, and designed the dome of St. Peter's Basilica." },
+          { heading: "The Printing Press and Spread of Ideas", body: "Johannes Gutenberg's movable type printing press (c. 1440) was the Renaissance's most transformative technology. Before printing, books were laboriously hand-copied by monks — expensive, slow, and controlled by the Church. Gutenberg's press could produce 3,600 pages per day versus a scribe's few pages. By 1500, over 20 million printed books existed in Europe. This democratized information: humanist ideas, scientific discoveries, and eventually Martin Luther's 95 Theses (1517) spread faster than authorities could suppress them. The Protestant Reformation, the Scientific Revolution, and eventually the Enlightenment all depended on the printing press to spread ideas beyond scholarly elites to broader literate populations." }
+        ],
+        takeaways: [
+          "The Renaissance (1350-1600) revived classical learning and placed human potential at the center of intellectual life",
+          "Medici patronage in Florence concentrated an extraordinary generation of artists and thinkers",
+          "Linear perspective and anatomical study transformed art; Leonardo embodied the 'universal man' ideal",
+          "Gutenberg's printing press (c. 1440) democratized information and enabled the Reformation and Scientific Revolution"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "Why did the Renaissance begin in Italian city-states rather than elsewhere in Europe?", options: ["Italy had the best climate for creative work", "Italian city-states had wealth from trade, merchant classes with disposable income, proximity to classical ruins, and access to Greek manuscripts", "The Pope commanded Italian artists to revive classical styles", "Italy was the only region unaffected by the Black Death"], answer: 1, explain: "Conditions aligned in Italian cities: Mediterranean trade created wealthy merchant families with money to spend on prestige projects; classical Roman ruins were literally everywhere; the fall of Constantinople (1453) brought Greek scholars with manuscripts; and a competitive culture among city-states made artistic patronage a tool of civic rivalry." },
+          { q: "What was the significance of Gutenberg's printing press for the spread of Renaissance ideas?", options: ["It made books waterproof for the first time", "It reduced book production costs dramatically, making ideas accessible beyond Church-controlled manuscripts", "It allowed color printing of religious artwork", "It was primarily used for maps and navigation"], answer: 1, explain: "Before the press, books cost roughly as much as a house and were mostly owned by monasteries and universities under Church influence. The press reduced costs 300-fold and increased production dramatically. Within decades, humanist texts, scientific works, and controversial religious ideas spread faster than any authority could suppress — directly enabling the Protestant Reformation." },
+          { q: "Leonardo da Vinci's notebooks contained designs for inventions centuries ahead of their time. What does this reveal about Renaissance thinking?", options: ["Renaissance thinkers rejected practical applications of knowledge", "The Renaissance's cross-disciplinary empirical approach — observing nature, testing ideas — generated insights that transcended the era's technology to realize", "Leonardo secretly had access to future technology", "Most Renaissance thinkers had similar prophetic abilities"], answer: 1, explain: "Leonardo's approach — exhaustive observation of nature, anatomical dissection, mathematical analysis of mechanics — was the same methodology that would become modern science. His flying machine designs correctly identified wing principles; his hydraulic pump designs work. The ideas were sound; the materials and manufacturing precision were not yet available. This empirical cross-disciplinary thinking was the Renaissance's most enduring contribution." }
+        ]
+      }
+    }
+  }, // end history
 
   science: {
     "Cell Biology": { lesson: { title: "Cell Biology", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
