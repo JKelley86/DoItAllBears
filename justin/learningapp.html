@@ -4,333 +4,867 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>MindFuel</title>
+<title>MindFuel ⚡</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { background: #0A0A0F; color: #F0F0F8; font-family: system-ui,-apple-system,sans-serif; min-height: 100%; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 ::-webkit-scrollbar { display: none; }
-input, textarea, button { font-family: inherit; }
-input::placeholder, textarea::placeholder { color: #404058; }
-
-#app { max-width: 430px; margin: 0 auto; min-height: 100vh; padding-bottom: 80px; position: relative; }
-.header { padding: 16px 20px 14px; background: rgba(10,10,15,0.94); border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(20px); }
-.app-name { font-size: 22px; font-weight: 800; background: linear-gradient(135deg,#A594F9,#F472B6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.header-sub { font-size: 13px; color: #606078; margin-top: 3px; }
-.streak-badge { display: flex; align-items: center; gap: 6px; background: #1C1C26; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; color: #FB923C; }
-.page { padding: 16px; }
-
-.nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; padding: 10px 16px 20px; background: rgba(10,10,15,0.96); border-top: 1px solid rgba(255,255,255,0.06); display: flex; gap: 4px; z-index: 100; }
-.nav-btn { flex: 1; padding: 8px 4px; border-radius: 14px; border: none; background: transparent; color: #606078; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.nav-btn.active { background: rgba(123,110,246,0.15); color: #A594F9; }
-
-.card { background: #13131A; border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 22px; margin-bottom: 14px; }
-.topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
-.topic-card { background: #13131A; border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 16px; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.15s; }
-.topic-card:active { transform: scale(0.97); }
-
-.section-title { font-size: 16px; font-weight: 700; color: #F0F0F8; margin-bottom: 12px; }
-.lesson-title { font-size: 20px; font-weight: 700; color: #F0F0F8; margin-bottom: 16px; line-height: 1.3; }
-.sec-heading { font-size: 11px; font-weight: 700; color: #A594F9; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; margin-top: 18px; }
-.sec-body { font-size: 15px; line-height: 1.75; color: #A0A0B8; }
-.takeaways-box { background: #13131A; border: 1px solid rgba(52,211,153,0.15); border-radius: 16px; padding: 18px; margin-bottom: 14px; }
-
-.btn-primary { background: linear-gradient(135deg,#7B6EF6,#A594F9); color: #fff; border: none; border-radius: 14px; padding: 13px 16px; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%; box-shadow: 0 4px 20px rgba(123,110,246,0.3); }
-.btn-secondary { background: #1C1C26; color: #A0A0B8; border: none; border-radius: 14px; padding: 13px 16px; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%; }
-.btn-row { display: flex; gap: 10px; }
-.back-btn { width: 38px; height: 38px; border-radius: 50%; background: #1C1C26; border: none; color: #F0F0F8; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-
-.mode-tabs { display: flex; gap: 6px; background: #13131A; border-radius: 14px; padding: 4px; margin-bottom: 16px; }
-.mode-tab { flex: 1; padding: 9px 4px; border-radius: 10px; border: none; background: transparent; color: #606078; font-size: 13px; font-weight: 600; cursor: pointer; }
-.mode-tab.active { background: #252533; color: #F0F0F8; }
-
-.subtopic-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; scrollbar-width: none; }
-.subtopic-pill { flex-shrink: 0; padding: 7px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.06); background: #13131A; color: #A0A0B8; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-.subtopic-pill.active { color: #fff; }
-
-.quiz-q { font-size: 17px; font-weight: 700; color: #F0F0F8; margin-bottom: 20px; line-height: 1.4; }
-.quiz-opt { padding: 14px 16px; border-radius: 14px; cursor: pointer; border: 1.5px solid rgba(255,255,255,0.06); background: #1C1C26; color: #F0F0F8; font-size: 15px; font-weight: 500; width: 100%; text-align: left; margin-bottom: 10px; }
-.quiz-opt.correct { border-color: #34D399 !important; background: rgba(52,211,153,0.1) !important; }
-.quiz-opt.wrong { border-color: #EF4444 !important; background: rgba(239,68,68,0.1) !important; }
-.progress-bar { height: 3px; background: #1C1C26; border-radius: 2px; margin-bottom: 16px; overflow: hidden; }
-.progress-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg,#7B6EF6,#A594F9); transition: width 0.4s; }
-
-.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
-.stat-card { background: #13131A; border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 18px; text-align: center; }
-.hist-item { display: flex; align-items: center; gap: 12px; padding: 14px; background: #13131A; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; margin-bottom: 8px; }
-
-.edit-banner { background: rgba(123,110,246,0.1); border: 1px solid rgba(123,110,246,0.25); border-radius: 14px; padding: 14px 16px; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 10px; }
-.edit-label { font-size: 11px; font-weight: 700; color: #606078; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
-.edit-input { width: 100%; background: #13131A; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #F0F0F8; outline: none; }
-.edit-input:focus { border-color: rgba(165,148,249,0.5); }
-.edit-textarea { width: 100%; background: #13131A; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #F0F0F8; outline: none; resize: vertical; min-height: 80px; line-height: 1.6; }
-.edit-textarea:focus { border-color: rgba(165,148,249,0.5); }
-.ef-group { margin-bottom: 14px; }
-.divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 18px 0; }
-.q-block { background: #0A0A0F; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
-.q-block-label { font-size: 11px; font-weight: 700; color: #F472B6; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 12px; }
-
-.empty-state { text-align: center; padding: 32px 20px; }
-.save-toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #34D399; color: #0A0A0F; font-size: 13px; font-weight: 700; padding: 10px 20px; border-radius: 20px; z-index: 200; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
-.save-toast.show { opacity: 1; }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-.fade-up { animation: fadeUp 0.25s ease; }
+button { font-family: inherit; cursor: pointer; }
+#app { max-width: 430px; margin: 0 auto; min-height: 100vh; padding-bottom: 90px; }
+.hdr { padding: 16px 20px 14px; background: rgba(10,10,15,0.95); border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; }
+.logo { font-size: 22px; font-weight: 800; background: linear-gradient(135deg,#A594F9,#F472B6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hdr-sub { font-size: 12px; color: #606078; margin-top: 2px; }
+.streak { display: flex; align-items: center; gap: 5px; background: #1C1C26; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; color: #FB923C; }
+.pg { padding: 16px; display: none; }
+.pg.active { display: block; }
+.nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; padding: 10px 16px 22px; background: rgba(10,10,15,0.97); border-top: 1px solid rgba(255,255,255,0.06); display: flex; gap: 4px; z-index: 100; }
+.nb { flex: 1; padding: 8px 4px; border-radius: 14px; border: none; background: transparent; color: #606078; font-size: 11px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 3px; transition: all 0.2s; }
+.nb.on { background: rgba(123,110,246,0.15); color: #A594F9; }
+.nb span { font-size: 20px; }
+/* cards */
+.tgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.tcard { background: #13131A; border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 16px; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.15s; border: none; text-align: left; width: 100%; }
+.tcard:active { transform: scale(0.97); }
+.card { background: #13131A; border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 20px; margin-bottom: 14px; }
+.daily { background: linear-gradient(135deg,#1a1535,#1C1C26); border: 1px solid rgba(123,110,246,0.2); border-radius: 20px; padding: 22px; margin-bottom: 20px; position: relative; overflow: hidden; }
+/* text */
+.sec-ttl { font-size: 16px; font-weight: 700; color: #F0F0F8; margin-bottom: 12px; }
+.ls-ttl { font-size: 19px; font-weight: 700; color: #F0F0F8; margin-bottom: 14px; line-height: 1.3; }
+.sh { font-size: 11px; font-weight: 700; color: #A594F9; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; margin-top: 16px; }
+.sb { font-size: 15px; line-height: 1.75; color: #A0A0B8; }
+.tkbox { background: #0f0f18; border: 1px solid rgba(52,211,153,0.15); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
+.tkrow { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 9px; }
+.tkdot { width: 5px; height: 5px; border-radius: 50%; background: #34D399; flex-shrink: 0; margin-top: 9px; }
+/* buttons */
+.btn { border: none; border-radius: 14px; padding: 12px 16px; font-size: 14px; font-weight: 700; width: 100%; }
+.btn-p { background: linear-gradient(135deg,#7B6EF6,#A594F9); color: #fff; box-shadow: 0 4px 18px rgba(123,110,246,0.3); }
+.btn-s { background: #1C1C26; color: #A0A0B8; }
+.brow { display: flex; gap: 10px; }
+.back { width: 36px; height: 36px; border-radius: 50%; background: #1C1C26; border: none; color: #F0F0F8; font-size: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+/* tabs + pills */
+.mtabs { display: flex; gap: 5px; background: #13131A; border-radius: 13px; padding: 4px; margin-bottom: 14px; }
+.mtab { flex: 1; padding: 8px 4px; border-radius: 9px; border: none; background: transparent; color: #606078; font-size: 13px; font-weight: 600; }
+.mtab.on { background: #252533; color: #F0F0F8; }
+.srow { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; scrollbar-width: none; }
+.spill { flex-shrink: 0; padding: 6px 13px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.07); background: #13131A; color: #A0A0B8; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.spill.on { color: #fff; }
+/* quiz */
+.qq { font-size: 16px; font-weight: 700; color: #F0F0F8; margin-bottom: 18px; line-height: 1.4; }
+.qopt { padding: 13px 15px; border-radius: 13px; border: 1.5px solid rgba(255,255,255,0.06); background: #1C1C26; color: #F0F0F8; font-size: 14px; font-weight: 500; width: 100%; text-align: left; margin-bottom: 9px; transition: border-color 0.15s; }
+.qopt.ok { border-color: #34D399 !important; background: rgba(52,211,153,0.1) !important; }
+.qopt.no { border-color: #EF4444 !important; background: rgba(239,68,68,0.1) !important; }
+.pbar { height: 3px; background: #1C1C26; border-radius: 2px; margin-bottom: 14px; overflow: hidden; }
+.pfill { height: 100%; border-radius: 2px; background: linear-gradient(90deg,#7B6EF6,#A594F9); transition: width 0.4s; }
+.qexp { margin-top: 10px; padding: 12px 14px; background: #1C1C26; border-radius: 11px; font-size: 14px; color: #A0A0B8; line-height: 1.6; }
+/* stats */
+.sgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+.scard { background: #13131A; border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 16px; text-align: center; }
+.hitem { display: flex; align-items: center; gap: 11px; padding: 13px; background: #13131A; border: 1px solid rgba(255,255,255,0.06); border-radius: 13px; margin-bottom: 8px; }
+@keyframes fu { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:none} }
+.fu { animation: fu 0.25s ease; }
 </style>
 </head>
 <body>
 <div id="app">
-  <div style="position:fixed;top:-200px;left:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(123,110,246,0.07) 0%,transparent 70%);pointer-events:none;z-index:0;"></div>
 
-  <div class="header">
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-      <div>
-        <div class="app-name">MindFuel ⚡</div>
-        <div class="header-sub" id="header-sub">What will you learn today?</div>
-      </div>
-      <div class="streak-badge">🔥 <span id="streak-count">0</span> day</div>
-    </div>
+<div style="position:fixed;top:-180px;left:-80px;width:450px;height:450px;background:radial-gradient(circle,rgba(123,110,246,0.07) 0%,transparent 70%);pointer-events:none;z-index:0;"></div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div>
+    <div class="logo">MindFuel ⚡</div>
+    <div class="hdr-sub" id="hsub">What will you learn today?</div>
   </div>
-
-  <div id="page-home" class="page" style="position:relative;z-index:1;"></div>
-  <div id="page-lesson" class="page" style="display:none;position:relative;z-index:1;"></div>
-  <div id="page-profile" class="page" style="display:none;position:relative;z-index:1;"></div>
-
-  <div class="nav">
-    <button class="nav-btn active" id="nav-home" onclick="showPage('home')"><span style="font-size:22px;">🏠</span>Home</button>
-    <button class="nav-btn" id="nav-profile" onclick="showPage('profile')"><span style="font-size:22px;">👤</span>Profile</button>
-  </div>
-
-  <div class="save-toast" id="save-toast">✓ Saved!</div>
+  <div class="streak">🔥 <span id="sc">0</span> day</div>
 </div>
 
+<!-- PAGES -->
+<div id="pg-home" class="pg active" style="position:relative;z-index:1;"></div>
+<div id="pg-lesson" class="pg" style="position:relative;z-index:1;"></div>
+<div id="pg-profile" class="pg" style="position:relative;z-index:1;"></div>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="nb on" id="nb-home" onclick="nav('home')"><span>🏠</span>Home</button>
+  <button class="nb" id="nb-profile" onclick="nav('profile')"><span>👤</span>Profile</button>
+</div>
+
+</div><!-- #app -->
 <script>
+// ═══════════════════════════════════════════════════════════════════
+//  CONTENT — Edit your lessons and quizzes here
+//  Structure: CONTENT["topicId"]["Subtopic Name"] = { lesson:{}, quiz:{} }
+//
+//  lesson: { title, sections:[{heading, body}], takeaways:["..."] }
+//  quiz:   { questions:[{ q, options:["A","B","C","D"], answer:0, explain }] }
+//  answer: index of correct option (0=A, 1=B, 2=C, 3=D)
+// ═══════════════════════════════════════════════════════════════════
+const CONTENT = {
+
+  // ─── PLC CODING ─────────────────────────────────────────────────
+  plc: {
+    "Ladder Logic Basics": {
+      lesson: {
+        title: "Ladder Logic: The Language of PLCs",
+        sections: [
+          { heading: "What Is Ladder Logic?", body: "Ladder logic is a graphical programming language designed to look like relay control circuits. Two vertical power rails are connected by horizontal rungs — each rung is a logical condition. Electricians can read it intuitively because it mirrors wiring diagrams they already know. It's the most common PLC programming language in North America." },
+          { heading: "Contacts and Coils", body: "Contacts represent input conditions — a button pressed, a sensor triggered. Coils represent outputs — a motor starting, a valve opening. Current flows left to right across a rung. If all contacts in a rung are TRUE, the coil energizes. Think of contacts as switches in series that must all close before power reaches the light (coil) at the end." },
+          { heading: "Normally Open vs Normally Closed", body: "A Normally Open (NO) contact passes current only when its bit is TRUE (1). A Normally Closed (NC) contact passes current when its bit is FALSE (0) — it blocks when active. Stop buttons are typically wired NC so a broken wire fails safe by stopping the machine automatically." },
+          { heading: "The Scan Cycle", body: "The PLC constantly runs a scan cycle: read all inputs, execute the ladder program top to bottom, then update all outputs. This repeats hundreds of times per second. Changes to outputs mid-scan don't take effect until the output update phase at the end of each scan." }
+        ],
+        takeaways: [
+          "Ladder logic mimics relay wiring — contacts are inputs, coils are outputs",
+          "NO contacts pass on TRUE; NC contacts pass on FALSE",
+          "Current flows left to right — all contacts must be TRUE for the coil to energize",
+          "PLC scan cycle: read inputs → execute logic → update outputs, repeating constantly"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "What does a Normally Closed (NC) contact do when its bit is TRUE?", options: ["Passes current", "Blocks current", "Resets the coil", "Triggers an alarm"], answer: 1, explain: "An NC contact blocks when TRUE and passes when FALSE — the opposite of NO. This is why stop buttons use NC: a wire break (FALSE) stops the machine safely." },
+          { q: "In the PLC scan cycle, what happens LAST?", options: ["Read inputs", "Execute ladder logic", "Update outputs", "Check timers"], answer: 2, explain: "Scan order: read inputs → execute logic → update outputs. Physical outputs only change at scan end, not mid-rung." },
+          { q: "Three NO contacts in series on a rung — when does the output coil energize?", options: ["When any one is TRUE", "When all three are TRUE", "When two of three are TRUE", "When all three are FALSE"], answer: 1, explain: "Series contacts = AND logic. All must be TRUE for current to reach the coil. One FALSE contact breaks the circuit." }
+        ]
+      }
+    },
+
+    "Inputs & Outputs": {
+      lesson: {
+        title: "PLC I/O: Connecting to the Real World",
+        sections: [
+          { heading: "What Are I/O?", body: "Inputs receive signals from sensors, switches, and buttons. Outputs send signals to motors, valves, and lights. Without I/O, the PLC is just a processor with no connection to the machine. Every physical device on your panel wires to an I/O point that maps to a memory address in the PLC." },
+          { heading: "Digital vs Analog", body: "Digital I/O are ON/OFF signals — a limit switch, a pushbutton, a motor contactor feedback. Analog I/O carry variable signals — a 4-20mA pressure sensor, a 0-10V temperature transmitter. Analog signals are converted to numbers internally (0-32767 is typical range). Most industrial I/O is digital." },
+          { heading: "Sourcing vs Sinking", body: "Sinking outputs provide a path to ground — the load connects between +24V and the output. Sourcing outputs provide +24V — the load connects between the output and ground. Mixing up sourcing and sinking when wiring sensors is one of the most common PLC panel wiring mistakes." },
+          { heading: "I/O Addressing", body: "Each I/O point maps to a memory address. Modern PLCs use tag names like 'ConveyorMotor_Run'. Older Allen-Bradley systems use addresses like I:0/3 (input file 0, bit 3). The PLC reads physical inputs into memory at scan start and writes memory to physical outputs at scan end." }
+        ],
+        takeaways: [
+          "Inputs read from the field; outputs drive field devices",
+          "Digital is ON/OFF; analog is a variable range like 4-20mA",
+          "Sourcing provides +V; sinking provides a ground path — must match your devices",
+          "Physical I/O maps to memory addresses updated every scan"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A 4-20mA signal from a pressure sensor is what type of I/O?", options: ["Digital input", "Digital output", "Analog input", "Analog output"], answer: 2, explain: "4-20mA is an analog signal range. It's an input because it sends data TO the PLC from a sensor. The PLC converts the current range to an integer for use in the program." },
+          { q: "What is a sinking output?", options: ["Provides +24V to the load", "Provides a path to ground", "An output that's always OFF", "Used only for analog signals"], answer: 1, explain: "A sinking output provides the ground path. The load connects between the positive supply and the output terminal. Current flows through the load into the output to ground." },
+          { q: "When does the PLC update physical output terminals?", options: ["Immediately when a coil energizes", "At the end of each scan cycle", "Every 100ms on a timer", "Only when manually triggered"], answer: 1, explain: "Physical outputs update only at scan end. The coil state changes in memory during logic execution, but the physical terminal only changes during the output update phase." }
+        ]
+      }
+    },
+
+    "Timers & Counters": {
+      lesson: {
+        title: "Timers & Counters: Controlling Time and Events",
+        sections: [
+          { heading: "Why Timers Matter", body: "Almost every machine sequence involves time. 'Wait 3 seconds before closing the valve.' 'Alarm if the door stays open more than 5 seconds.' PLCs handle this with timer instructions that measure elapsed time with millisecond accuracy — far more reliable than mechanical relay timers that drift over time." },
+          { heading: "TON — Timer On Delay", body: "The most common timer. When the enable rung goes TRUE, the timer starts counting up. When it reaches the preset, the Done (DN) bit activates. If the enable goes FALSE before the preset, the timer resets to zero. Use TON for start delays, minimum run times, and fault timers." },
+          { heading: "TOF — Timer Off Delay", body: "TOF works in reverse. The output is TRUE immediately when enabled, and stays TRUE for the preset time AFTER the enable goes FALSE. Perfect for cooling fans that run 30 seconds after a motor stops, or seal valves that stay open briefly after a pump shuts down." },
+          { heading: "Counters: CTU and CTD", body: "Count Up (CTU) increments each time its rung transitions from FALSE to TRUE. When accumulated value hits the preset, the Done bit activates. Count Down (CTD) decrements. A Reset (RES) instruction clears the count. Use counters to count parts, track cycles, or prompt maintenance alerts." }
+        ],
+        takeaways: [
+          "TON starts counting on enable — Done bit fires at preset, resets if enable drops early",
+          "TOF keeps output ON for preset time AFTER enable goes FALSE",
+          "CTU counts rising edges on its rung up to a preset value",
+          "RES instruction clears timer and counter accumulated values"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A TON timer (5-second preset) has counted 3 seconds when its enable goes FALSE. What happens?", options: ["Done bit activates after 2 more seconds", "Timer resets to 0", "Timer pauses at 3 seconds", "Done bit activates immediately"], answer: 1, explain: "TON resets to zero when the enable drops before reaching preset. It must reach the preset continuously. This is unlike a retentive timer (RTO) which holds its value." },
+          { q: "Which timer keeps a fan running 60 seconds after a motor stops?", options: ["TON", "TOF", "RTO", "CTU"], answer: 1, explain: "TOF (Timer Off Delay) keeps its output TRUE for a set time after enable goes FALSE. When the motor stop signal drops, TOF starts its 60-second countdown while keeping the fan output active." },
+          { q: "A CTU counter has preset 100. After 100 pulses, more pulses arrive. What happens?", options: ["Resets to 0 automatically", "Stays at 100, stops counting", "Continues counting past 100", "Triggers a fault"], answer: 2, explain: "CTU continues incrementing past preset — it doesn't auto-reset. The DN bit stays TRUE as long as accumulated ≥ preset. You must use a RES instruction to clear it." }
+        ]
+      }
+    },
+
+    "Coils & Contacts": {
+      lesson: {
+        title: "Coils & Contacts: The Core of Ladder Logic",
+        sections: [
+          { heading: "The Basic Output Coil", body: "An output coil energizes a bit in PLC memory when the rung conditions are TRUE. The coil address maps to a memory bit — either an output that controls a physical terminal, or an internal bit used only in logic. When the rung goes FALSE, the coil de-energizes and the bit resets to 0." },
+          { heading: "Latching: OTL and OTU", body: "Normal coils reset when their rung goes FALSE. Latch (OTL) sets a bit and it STAYS set even when the rung goes FALSE. Only an Unlatch (OTU) on the same address can reset it. This is how you wire start/stop logic — start button momentarily sets the latch, stop button momentarily unlatches it." },
+          { heading: "XIC and XIO Contacts", body: "Examine If Closed (XIC) is your standard NO contact — passes when the bit is TRUE. Examine If Open (XIO) is your NC contact — passes when the bit is FALSE. These names come from examining relay contact states. XIC/XIO is Allen-Bradley notation you'll see throughout ControlLogix and PLC-5 documentation." },
+          { heading: "One-Shot Contacts (ONS)", body: "A one-shot passes current for exactly ONE scan cycle when input transitions from FALSE to TRUE. This is critical for counters — without ONS, holding a button for 100ms triggers the counter 10+ times. Always use ONS when you want to respond to the leading edge of a signal, not its continuous presence." }
+        ],
+        takeaways: [
+          "Standard coils energize while rung is TRUE and reset when FALSE",
+          "OTL/OTU latching coils maintain state independent of rung condition",
+          "XIC passes when TRUE; XIO passes when FALSE",
+          "ONS fires for exactly one scan on a rising edge — essential before counter instructions"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A latch coil (OTL) is energized. The rung then goes FALSE. What is the coil state?", options: ["Resets to FALSE", "Remains latched TRUE", "Alternates each scan", "Causes a fault"], answer: 1, explain: "OTL is retentive — once set it stays set regardless of rung condition. Only an OTU (unlatch) instruction on the same address can clear it. This is intentional for motor start/stop control." },
+          { q: "Why use a one-shot (ONS) before a counter instruction?", options: ["To speed up the scan", "To prevent counting multiple times while input is held TRUE", "To reset the counter", "To convert analog to digital"], answer: 1, explain: "Without ONS, a held button passes current every scan — potentially hundreds of counts per second. ONS detects only the FALSE-to-TRUE transition, ensuring one press = one count." },
+          { q: "XIO (Examine If Open) passes current when its bit is:", options: ["TRUE (1)", "FALSE (0)", "Changing state", "Greater than preset"], answer: 1, explain: "XIO is Normally Closed equivalent — passes when bit is 0 (FALSE). Used for stop buttons, fault conditions, and interlocks that should block operation unless actively cleared." }
+        ]
+      }
+    },
+
+    "Program Flow": {
+      lesson: {
+        title: "Program Flow: How PLCs Execute Logic",
+        sections: [
+          { heading: "The Main Routine", body: "Every PLC program has a main routine that executes every scan. In Allen-Bradley RSLogix 5000, this is MainRoutine in MainProgram. Keeping it clean with calls to well-named subroutines makes large programs maintainable. A 2,000-rung monolithic program with no organization is nearly impossible to troubleshoot." },
+          { heading: "Subroutines: JSR and RET", body: "Jump to Subroutine (JSR) transfers execution to another routine. Return (RET) sends it back. Subroutines let you organize code logically — one routine per conveyor zone, one for alarms, one for HMI data. You can pass parameters in and out for reusable code blocks." },
+          { heading: "JMP and LBL", body: "JMP (Jump) skips forward to a Label (LBL) instruction, bypassing rungs between them. Use sparingly — overuse creates spaghetti logic. Valid uses: skipping initialization rungs after first scan, bypassing zones in manual mode. Never jump backward — this creates infinite loops that fault the PLC watchdog." },
+          { heading: "MCR: Master Control Reset", body: "MCR zones de-energize all non-retentive outputs within them when the MCR rung is FALSE. Latches hold their state, but standard coils, TON timers, and CTU counters all reset. MCR is often used for emergency stop zones — one rung condition can disable all outputs in that zone simultaneously." }
+        ],
+        takeaways: [
+          "Main routine runs every scan — use subroutines (JSR/RET) to organize by machine section",
+          "JMP skips rungs forward only — backward jumps cause watchdog faults",
+          "MCR zones de-energize all non-retentive outputs when condition is FALSE",
+          "Well-organized programs with named subroutines are dramatically easier to troubleshoot"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "What happens if a JMP instruction jumps backward in the program?", options: ["Executes normally", "PLC faults from watchdog timeout", "Program skips to end", "All outputs reset"], answer: 1, explain: "Jumping backward creates an infinite loop. The watchdog timer detects the scan taking too long and faults the processor. Always jump forward only." },
+          { q: "What is the purpose of passing parameters with a JSR instruction?", options: ["Change the PLC IP address", "Share data values between calling routine and subroutine", "Reset all timers", "Trigger outputs immediately"], answer: 1, explain: "JSR parameters pass tag values into a subroutine and return results. This enables reusable subroutines — one conveyor control routine accepting different tag names for each physical conveyor." },
+          { q: "A latch coil (OTL) is inside an MCR zone. The MCR goes FALSE. What happens to the latch?", options: ["De-energizes", "Retains its state", "Resets to zero", "Causes a fault"], answer: 1, explain: "MCR only de-energizes non-retentive instructions. Latches (OTL) are retentive — they hold state even inside an inactive MCR zone. This is by design." }
+        ]
+      }
+    },
+
+    "HMI Basics": {
+      lesson: {
+        title: "HMI Basics: Your Window Into the Machine",
+        sections: [
+          { heading: "What Is an HMI?", body: "A Human-Machine Interface is the touchscreen or panel display operators use to monitor and control PLC systems. The HMI reads tag values from the PLC and displays them as graphics, numbers, and status indicators. Operators use it to start/stop equipment, enter setpoints, view trends, and acknowledge alarms — without opening the control panel." },
+          { heading: "Tags and Data Exchange", body: "HMIs communicate with PLCs by reading and writing tags. The HMI polls the PLC continuously, updating displayed values. When an operator presses a screen button, the HMI writes to a PLC tag — which the PLC ladder program reads and acts on. Tag update rates vary: critical displays might update every 100ms, trend data every second." },
+          { heading: "Screen Design Principles", body: "Good HMI screens show operators what they need without clutter. Use consistent color conventions: green for running, red for faulted, yellow for warning, grey for off. Show actual process values prominently. A common mistake is building screens that look impressive but bury critical information under multiple menus." },
+          { heading: "Alarm Management", body: "Alarms alert operators to abnormal conditions. Each alarm has a trigger condition, a priority, and a message — and operators must acknowledge them. Alarm floods (hundreds firing simultaneously) cause operators to silence everything and miss critical warnings. Every alarm should require a distinct operator action." }
+        ],
+        takeaways: [
+          "HMIs display PLC tag values and allow operators to write setpoints and commands",
+          "Green = run, red = fault, yellow = warning, grey = off — use consistently",
+          "HMI buttons write to PLC tags; the PLC program controls the actual outputs",
+          "Good alarm design means fewer, meaningful, actionable alarms — not alarm floods"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "An operator presses START on the HMI. What actually happens in the PLC?", options: ["PLC immediately starts the motor", "HMI writes a value to a PLC tag that the ladder program reads", "HMI sends command directly to motor drive", "PLC restarts its scan cycle"], answer: 1, explain: "HMI buttons write to PLC tags. The ladder program monitors those tags and takes action. The HMI never directly controls outputs — the PLC always remains the safety arbiter." },
+          { q: "Why is 500 simultaneous alarms a problem?", options: ["Crashes the HMI", "Operators get overwhelmed and may silence all alarms, missing critical ones", "Uses too much PLC memory", "Slows the PLC scan"], answer: 1, explain: "Alarm floods cause 'alarm fatigue' — operators silence or ignore alarms en masse. This is a documented cause of industrial accidents. Good philosophy: fewer, more meaningful alarms." },
+          { q: "What color should a faulted equipment status display?", options: ["Green", "Blue", "Yellow", "Red"], answer: 3, explain: "Red universally indicates fault/alarm per ISA-101 HMI standards. Green = running/normal, yellow = warning, grey = off/idle, red = fault/alarm. Consistent color coding reduces operator errors." }
+        ]
+      }
+    },
+
+    "Safety Systems": {
+      lesson: {
+        title: "Safety Systems: Engineering Out Risk",
+        sections: [
+          { heading: "Functional Safety Basics", body: "A safety system's job is to bring a machine to a safe state when a hazardous condition is detected. This is different from operational control. Safety functions must work even when components fail — this is the key requirement that separates safety-rated systems from standard control." },
+          { heading: "Safety Integrity Levels (SIL)", body: "SIL is a measure of how reliably a safety function must perform. SIL 1 suits low-risk machines, SIL 3 suits high-hazard applications (nuclear, oil & gas). SIL is determined by risk assessment — considering injury severity, exposure frequency, and ability to avoid the hazard." },
+          { heading: "Dual-Channel Safety Inputs", body: "Safety inputs (E-stops, light curtains, safety gates) use two independent channels wired to separate input points. The safety controller monitors both and only considers the input safe when BOTH channels agree. A discrepancy indicates a wiring fault or stuck contact — the safety system faults and requires manual reset." },
+          { heading: "Safety Relays vs Safety PLCs", body: "Simple machines use safety relays — dedicated hardware modules wired to E-stops and guard switches. Complex machines with many zones use safety PLCs (Pilz PNOZmulti, Rockwell GuardLogix) that run certified safety-rated ladder logic. Safety PLCs offer flexibility: different zones can have different safety responses." }
+        ],
+        takeaways: [
+          "Safety systems must bring the machine to a safe state even when components fail",
+          "SIL levels quantify required reliability — determined by formal risk assessment",
+          "Dual-channel inputs detect faults single-channel systems would completely miss",
+          "Safety PLCs run certified safety logic separate from standard control programs"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A dual-channel E-stop has Channel 1 = TRUE, Channel 2 = FALSE. What should happen?", options: ["Assume safe, allow operation", "Declare a fault requiring manual reset", "Average the two channels", "Switch to single-channel mode"], answer: 1, explain: "Channel discrepancy means a fault — possibly welded contact, broken wire, or mismatched switch. The safety system must fault and require investigation before reset. This is the core protection mechanism." },
+          { q: "Why can't standard PLC ladder logic be used for SIL 2 safety functions?", options: ["Standard PLCs are too slow", "Standard PLCs lack hardware redundancy and self-diagnostics required for SIL 2", "Standard PLCs can't read safety inputs", "Safety functions require relay logic only"], answer: 1, explain: "SIL 2 requires dual processors cross-checking each other, watchdog circuits, and certified software development — none of which standard PLCs provide." },
+          { q: "Why is manual reset required after a safety function activates?", options: ["To restart the PLC", "To ensure an operator physically confirms the hazard is clear before restart", "To clear the fault log", "To recalibrate sensors"], answer: 1, explain: "Manual reset prevents automatic restart. An operator must physically go to the reset location to confirm the danger zone is clear. This prevents restart while someone is still in the hazardous area." }
+        ]
+      }
+    },
+
+    "Troubleshooting PLCs": {
+      lesson: {
+        title: "Troubleshooting PLCs: Finding Faults Fast",
+        sections: [
+          { heading: "Check the Physical Basics First", body: "Before opening software, check: Is the PLC powered? What do the run/fault LEDs show? Are I/O module LEDs indicating problems? Is the communication cable connected? Many 'PLC problems' are actually power supply faults, blown fuses, or loose connectors. A two-minute physical inspection often solves the problem." },
+          { heading: "Online Monitoring", body: "Going online with programming software lets you watch ladder logic execute in real time. Contacts highlight when TRUE, coil states are visible, timer values count live. Trace backward from right to left on the problem rung — the FALSE contact blocking current flow tells you exactly what condition is missing." },
+          { heading: "Forcing I/O", body: "Forcing manually overrides an I/O bit — set an input TRUE even when the physical sensor isn't active, or force an output ON regardless of logic. This isolates problems: force an input to confirm the PLC responds correctly (isolates wiring from logic), or force an output to confirm the field device works. Always clear forces after troubleshooting." },
+          { heading: "Fault Logs", body: "Modern PLCs maintain fault logs with timestamps. A fault log shows exactly when a fault occurred, which instruction caused it, and often why. Common faults: watchdog timeout (scan too long — look for backward JMP), I/O communication loss (check cables and remote I/O power), and math faults (division by zero in data instructions)." }
+        ],
+        takeaways: [
+          "Check power, LEDs, and connectors first — before touching software",
+          "Online monitoring shows live ladder state for immediate visual fault tracing",
+          "Forcing I/O isolates whether the problem is logic, wiring, or the field device",
+          "Always check and clear fault logs — they contain timestamps and exact fault causes"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "You force a proximity sensor input TRUE and the machine responds correctly. What does this tell you?", options: ["PLC program has a bug", "Logic is correct — problem is the sensor or wiring", "Output module is faulty", "HMI needs restart"], answer: 1, explain: "Forcing the input and getting correct response confirms the ladder logic works. Since the real sensor doesn't work but forced bit does, the fault is in the physical sensor, wiring, or input module — not the program." },
+          { q: "A PLC faults with 'watchdog timeout.' Most likely cause?", options: ["Input wiring fault", "Scan cycle taking too long, possibly an infinite loop", "Output module overloaded", "HMI lost communication"], answer: 1, explain: "The watchdog detects a scan taking too long and faults the processor. Most common cause: a backward JMP creating an infinite loop, or a very large data operation added to the program." },
+          { q: "After troubleshooting, you find a forced output left over from a previous repair. Correct action?", options: ["Leave it — it fixed the problem", "Remove it immediately and verify normal operation", "Document it and leave it", "Ask the builder to remove it remotely"], answer: 1, explain: "Forgotten forces are serious safety hazards. An output forced ON may run a motor or open a valve regardless of safety conditions. Always remove all forces after troubleshooting." }
+        ]
+      }
+    }
+  }, // end plc
+
+  // ─── ELECTRICAL ─────────────────────────────────────────────────
+  electrical: {
+    "Ohm's Law": {
+      lesson: {
+        title: "Ohm's Law: The Foundation of Electrical Theory",
+        sections: [
+          { heading: "The Basic Relationship", body: "Ohm's Law: Voltage equals current times resistance — V = IR. Discovered by Georg Ohm in 1827, this holds true for most conductors at constant temperature. Know any two of the three values and you can calculate the third. Double the voltage, double the current. Double the resistance, halve the current." },
+          { heading: "Units and the Water Analogy", body: "Voltage (V) is electrical pressure in Volts. Current (I) is flow of electrons in Amps. Resistance (R) is opposition to flow in Ohms (Ω). Think: voltage is water pressure, current is flow rate, resistance is pipe diameter. High pressure through a narrow pipe gives the same flow as low pressure through a wide pipe." },
+          { heading: "Power: Watt's Law", body: "Power (Watts) = Voltage × Current, or P = VI. Combined with Ohm's Law: P = I²R and P = V²/R. These determine component sizing. A 100Ω resistor with 1A flowing dissipates 100 Watts and gets very hot. Every component selection requires checking both voltage and current ratings." },
+          { heading: "Practical Applications", body: "You use Ohm's Law constantly: sizing resistors for LEDs, checking wire sizing, diagnosing motors drawing excess current. If a 120V circuit has a 15A breaker and measured current is 12A, total circuit resistance is 10Ω (R = V/I). Any deviation from expected values signals a problem to investigate." }
+        ],
+        takeaways: [
+          "V = IR — know any two values, calculate the third",
+          "Voltage is pressure, current is flow, resistance is opposition",
+          "Power = V × I — essential for sizing every electrical component",
+          "Unexpected current readings are your first diagnostic tool"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A 24V circuit has 8 ohms of resistance. What is the current?", options: ["3A", "192A", "0.33A", "16A"], answer: 0, explain: "I = V/R = 24/8 = 3A. Direct Ohm's Law application. In a 24V PLC control circuit, a solenoid with 8Ω coil resistance draws 3A when energized." },
+          { q: "A motor at 240V draws 10A. How much power is it consuming?", options: ["24W", "2400W", "240W", "24000W"], answer: 1, explain: "P = V × I = 240 × 10 = 2,400W = 2.4kW ≈ 3.2 horsepower. Power calculations determine wire sizing, breaker sizing, and power supply capacity." },
+          { q: "You double resistance in a circuit while keeping voltage constant. What happens to current?", options: ["Doubles", "Stays the same", "Halves", "Quadruples"], answer: 2, explain: "I = V/R. With V constant, doubling R halves I. Practically: a motor with increased bearing friction draws MORE current because mechanical load affects back-EMF differently than a simple resistor." }
+        ]
+      }
+    },
+
+    "AC vs DC": {
+      lesson: {
+        title: "AC vs DC: Two Types of Electrical Power",
+        sections: [
+          { heading: "Direct Current (DC)", body: "DC flows continuously in one direction at constant voltage. Batteries produce DC — 9V, 12V, 24V are common. PLC control circuits typically run on 24V DC. DC is easy to store in batteries. The limitation: DC voltage can't be changed efficiently with a simple transformer, making long-distance transmission impractical." },
+          { heading: "Alternating Current (AC)", body: "AC voltage and current reverse direction periodically in a sine wave. In North America, AC reverses 60 times per second (60Hz). In Europe, it's 50Hz. Household outlets are 120V AC (RMS). AC's advantage: transformers step voltage up or down efficiently, enabling high-voltage transmission with minimal losses over long distances." },
+          { heading: "RMS Voltage", body: "AC is measured as RMS (Root Mean Square) — the equivalent DC voltage delivering the same power. For a sine wave, Peak = RMS × 1.414. So 120V RMS peaks at 170V. This matters when selecting capacitors (rated above peak, not RMS) and understanding why 480V circuits actually reach 679V peak." },
+          { heading: "Industrial Power", body: "Industrial facilities use three-phase AC power — three conductors carrying AC voltages 120° apart. Three-phase suits large motors perfectly and delivers smooth power. 480V three-phase is standard for industrial motors in North America. Control panels transform this to 120V single-phase for control circuits, then rectify to 24V DC for PLC I/O." }
+        ],
+        takeaways: [
+          "DC flows in one direction; AC reverses at 60Hz in North America",
+          "Transformers only work on AC — this is why AC won for power distribution",
+          "RMS voltage × 1.414 = peak voltage; components must handle the peak",
+          "Industrial standard: 480V 3-phase for motors, 120V AC or 24V DC for controls"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A 480V AC circuit has what approximate peak voltage?", options: ["480V", "339V", "679V", "240V"], answer: 2, explain: "Peak = RMS × 1.414 = 480 × 1.414 ≈ 679V. Capacitors in 480V circuits must be rated above 679V — typically 800V or 1,000V rated caps." },
+          { q: "Why did AC power win over DC for electrical distribution?", options: ["AC is safer", "AC can be transformed to different voltages; DC cannot", "DC motors don't work", "AC is cheaper to generate"], answer: 1, explain: "Transformers only work on AC. This allowed power to step up to high voltage (lower current, lower losses) for transmission, then step back down at the destination. Edison's DC couldn't do this." },
+          { q: "What converts AC to DC for a 24V PLC control circuit?", options: ["A transformer", "A DC power supply / rectifier", "A contactor", "A circuit breaker"], answer: 1, explain: "A DC power supply contains a transformer (steps down AC), a rectifier (converts to pulsing DC), and filtering (smooths to steady DC). Takes 120V AC in, outputs regulated 24V DC." }
+        ]
+      }
+    },
+
+    "Series & Parallel Circuits": {
+      lesson: {
+        title: "Series & Parallel Circuits: How Current Flows",
+        sections: [
+          { heading: "Series Circuits", body: "In series, components connect end-to-end — only one current path exists. The same current flows through every component. Voltage divides proportional to resistance. Total resistance = sum of all resistances. Critical: if any component opens (breaks), the entire circuit stops. Series wiring means one failure kills all." },
+          { heading: "Parallel Circuits", body: "In parallel, components connect across the same two points — each gets full supply voltage, and current has multiple paths. Total resistance is less than the smallest individual resistor. Critical: one branch fails without affecting others. Home wiring is parallel — one light out doesn't kill other outlets." },
+          { heading: "Calculating Parallel Resistance", body: "Two resistors in parallel: R_total = (R1 × R2) / (R1 + R2). Two equal resistors in parallel = half the value of one. Two 10Ω resistors in parallel = 5Ω. Adding parallel paths gives current more routes — lowering total resistance. Adding loads to a circuit increases total current from the source." },
+          { heading: "Industrial Application", body: "Control circuits blend both. Stop buttons wire in series — any one stop can break the circuit. Start buttons wire in parallel — any one start can complete the circuit. This is why multiple E-stops on a machine all work independently: they're in series, so any one opening kills the control circuit." }
+        ],
+        takeaways: [
+          "Series: same current everywhere, voltage divides, one break stops all",
+          "Parallel: same voltage everywhere, current divides, one failure doesn't stop others",
+          "Parallel resistance is always less than the smallest individual resistor",
+          "Stop buttons wire series (AND); start buttons wire parallel (OR)"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "Three 30Ω resistors in series across 90V — what current flows?", options: ["9A", "3A", "1A", "90A"], answer: 2, explain: "Total R = 30+30+30 = 90Ω. Current = 90V/90Ω = 1A. Same 1A flows through all three. Each drops 30V, totaling 90V — confirming Kirchhoff's Voltage Law." },
+          { q: "Why is household wiring done in parallel rather than series?", options: ["Parallel is cheaper", "Each device gets full voltage and failures are independent", "Series can't handle AC", "Parallel reduces current draw"], answer: 1, explain: "Parallel gives each device full 120V and a failure in one branch doesn't affect others. In series, devices would share voltage unevenly and one failure cuts all power." },
+          { q: "Two resistors (4Ω and 12Ω) in parallel — total resistance?", options: ["16Ω", "8Ω", "3Ω", "48Ω"], answer: 2, explain: "R = (4 × 12)/(4 + 12) = 48/16 = 3Ω. The combination is less than either individual resistor. More parallel paths = less total opposition to current." }
+        ]
+      }
+    },
+
+    "Reading Wiring Diagrams": {
+      lesson: {
+        title: "Reading Wiring Diagrams: Decoding Schematics",
+        sections: [
+          { heading: "Types of Electrical Drawings", body: "Schematics show circuit logic — how components connect electrically regardless of physical location. Wiring diagrams show actual physical connections with wire numbers and terminal labels. Panel layouts show physical component positions. One-line diagrams show power distribution at high level. You need all of them to fully understand a system." },
+          { heading: "Reading Ladder Schematics", body: "Control schematics use two vertical power rails (L1 and L2/Neutral) with horizontal rungs between them. Current flows left to right. Contacts are in the middle; coils and loads are at the right rail. Rungs are numbered on the left. Cross-references show where a relay coil's contacts appear on other rungs." },
+          { heading: "Component Symbols", body: "Standard symbols: NO contact (two vertical lines with gap), NC contact (two lines with diagonal), relay coil (circle), motor (circle with M), fuse (box or S-curve), circuit breaker (box with slash). NEMA symbols (US) differ from IEC symbols (international). Industrial panels often mix both — always check the legend." },
+          { heading: "Wire Numbers", body: "Every wire in a properly documented panel has a unique number appearing throughout all documentation. On the schematic, wire 103 connects terminal TB1-3 to relay coil CR4. In the panel, wire 103 is physically labeled on the actual wire. The wire number is your Rosetta Stone connecting schematic logic to physical wiring." }
+        ],
+        takeaways: [
+          "Schematics show electrical logic; wiring diagrams show physical connections",
+          "Ladder schematics: rails on sides, current left to right, coils at right rail",
+          "Know both NEMA and IEC symbols — industrial panels mix both standards",
+          "Wire numbers are universal IDs connecting drawings to physical wiring"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "Where are output coils typically located on a ladder schematic rung?", options: ["Far left, at L1", "Middle of the rung", "Far right, at L2/Neutral", "Above the rung"], answer: 2, explain: "Output coils are always at the right side, connected to the right power rail. Contacts (conditions) are in the middle. Current must pass all conditions before reaching the coil at right." },
+          { q: "What does contact label 'CR4-3' typically mean on a schematic?", options: ["Contact 4, rung 3", "The 3rd contact of relay CR4", "A 4-pole contactor rated 3A", "Coil on rung 4, page 3"], answer: 1, explain: "CR4-3 identifies relay CR4, contact number 3. Cross-references on the coil symbol show which rungs use that relay's contacts, letting you trace relay control logic across the schematic." },
+          { q: "You find wire number 215 on a schematic. What do you expect on the physical panel?", options: ["A wire labeled '215' between the components shown", "A 215-gauge wire", "215V at that point", "The 215th component"], answer: 0, explain: "Wire numbers are ID labels on physical wires matching the schematic. Every properly documented wire is labeled at each termination, correlating directly to the schematic." }
+        ]
+      }
+    },
+
+    "Transformers": {
+      lesson: {
+        title: "Transformers: Changing Voltage with No Moving Parts",
+        sections: [
+          { heading: "How They Work", body: "A transformer uses electromagnetic induction to transfer energy between two coils without direct electrical contact. AC current in the primary winding creates a changing magnetic field in the iron core, which induces voltage in the secondary winding. No moving parts, no connection between windings. Works only on AC — DC creates a steady field that induces nothing." },
+          { heading: "Turns Ratio", body: "Voltage ratio equals turns ratio: V_secondary / V_primary = N_secondary / N_primary. A transformer with 1,000 primary and 100 secondary turns has a 10:1 step-down — 480V in becomes 48V out. Current transforms inversely: stepping voltage down means stepping current up. Power in ≈ Power out: V1 × I1 = V2 × I2." },
+          { heading: "Transformer Ratings", body: "Transformers are rated in KVA (kilovolt-amps), not KW, because they handle reactive as well as real power. A 75KVA transformer supplies 75,000 VA of apparent power. At 0.8 power factor, only 60KW of real power. Always add up load VA ratings and apply demand factors when sizing transformers." },
+          { heading: "Types in Industry", body: "Control transformers (50-1000VA) power PLC circuits from 480V to 120V — you'll see these in nearly every industrial panel. Distribution transformers (15-2000KVA) feed buildings or large panels. Isolation transformers provide no electrical connection between windings for sensitive equipment. Autotransformers share primary/secondary windings — compact but no isolation." }
+        ],
+        takeaways: [
+          "Transformers use magnetic coupling — AC only, no moving parts",
+          "Turns ratio = voltage ratio; current transforms inversely (power conserved)",
+          "Rated in KVA not KW — they handle reactive loads too",
+          "Control transformers step 480V to 120V; isolation types separate circuits electrically"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A control transformer has a 4:1 turns ratio. 480V primary gives what secondary voltage?", options: ["1920V", "120V", "48V", "480V"], answer: 1, explain: "V_secondary = 480 / 4 = 120V. This is the most common control transformer in North American industrial panels." },
+          { q: "Why do transformers only work with AC, not DC?", options: ["DC voltage is too high", "DC creates a steady field that doesn't induce secondary voltage", "Windings have too much DC resistance", "DC can't travel through iron"], answer: 1, explain: "Induction requires a CHANGING magnetic field. AC creates an alternating field that continuously induces secondary voltage. DC creates a static field — no change, no induction." },
+          { q: "A 480V/120V transformer draws 2A on the primary. What flows in the secondary?", options: ["2A", "0.5A", "8A", "16A"], answer: 2, explain: "Power conservation: V1×I1 = V2×I2. 480×2 = 120×I2. I2 = 960/120 = 8A. Stepping voltage down 4× steps current up 4×." }
+        ]
+      }
+    },
+
+    "Motors & Relays": {
+      lesson: {
+        title: "Motors & Relays: Making Things Move",
+        sections: [
+          { heading: "How Induction Motors Work", body: "Three-phase AC in the stator creates a rotating magnetic field. This field induces current in the rotor's copper bars. That induced current creates its own field, which chases the stator field — spinning the rotor. The rotor always turns slightly slower than the stator field (this slip induces the current). No brushes, no commutator — extremely reliable." },
+          { heading: "Reading the Nameplate", body: "The nameplate is the motor's data sheet. Key values: HP (mechanical output), voltage and phase (must match exactly), FLA (Full Load Amps — used to size overloads), Service Factor (1.15 means 115% HP is possible short-term), RPM (synchronous minus slip), and Frame (physical dimensions). Always reference nameplate for overload sizing." },
+          { heading: "Motor Starters and Contactors", body: "A contactor is a heavy-duty relay for switching motor currents — dozens to hundreds of amps. An overload relay protects the motor from overheating due to excess current. Together they form a motor starter. The contactor's coil (120V AC or 24V DC) is controlled by the PLC. When energized, it closes the main contacts, connecting the motor to power." },
+          { heading: "Control Relays (CR)", body: "Control relays are smaller relays used in control circuits. A coil energizes a magnet that closes or opens multiple contact sets. Used to amplify low-power signals, multiply contacts (one coil, 4 contact sets), interpose between PLC output and high-current loads, and create logic using contact arrangements. Understanding relays is fundamental because PLC ladder logic directly simulates relay circuits." }
+        ],
+        takeaways: [
+          "Induction motors work by electromagnetic induction — no brushes needed",
+          "Nameplate FLA sizes overload protection — always match voltage and phase exactly",
+          "Contactors switch motor power; overload relays provide thermal protection",
+          "Control relays amplify signals, multiply contacts, and interface control to power circuits"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "A motor nameplate shows 460V, 3-phase, 15A FLA. You connect it to 480V. What happens?", options: ["Runs fine — 480V is close enough", "Motor may overheat; windings not designed for 480V", "Runs 4% faster", "Draws less current"], answer: 1, explain: "Motors should operate within ±10% of nameplate voltage. 480V vs 460V is 4.3% over — usually acceptable but confirm with manufacturer. Significant overvoltage causes core saturation and overheating." },
+          { q: "What does the overload relay in a motor starter do?", options: ["Switches motor on/off", "Protects the motor from overheating due to excess current", "Measures motor speed", "Converts 3-phase to single-phase"], answer: 1, explain: "The overload relay monitors motor current. If the motor is mechanically overloaded, it draws excess current. The overload trips after a time-inverse delay, disconnecting the motor before winding insulation fails." },
+          { q: "A control relay coil is de-energized. State of its Normally Open contacts?", options: ["Closed", "Open", "Alternating", "Depends on load"], answer: 1, explain: "With coil de-energized, NO contacts are in their resting state — OPEN. Current can't flow through them. When the coil energizes, magnetic force closes the NO contacts. Fundamental relay operation." }
+        ]
+      }
+    },
+
+    "Electrical Safety": {
+      lesson: {
+        title: "Electrical Safety: Life First, Always",
+        sections: [
+          { heading: "Lockout/Tagout (LOTO)", body: "LOTO is the OSHA-required procedure to isolate energy before working on equipment. Isolate ALL energy sources (electrical, pneumatic, hydraulic, gravity, thermal). Apply your personal lock — only you hold the key. Tag it with your name. Verify zero energy — try to start the equipment, test with a meter. Never remove someone else's lock. Multiple workers = multiple locks." },
+          { heading: "Current Kills, Not Just Voltage", body: "As little as 50mA (0.05A) through the heart can cause ventricular fibrillation. Human body resistance ranges from 500Ω (wet skin) to 100,000Ω (dry). At 120V with wet hands, body current can reach 240mA — potentially lethal. GFCIs trip at just 5mA ground fault current, protecting wet-skin contact before it becomes fatal." },
+          { heading: "Arc Flash Hazards", body: "An arc flash is an explosive energy release from an electrical fault. Arc temperatures reach 35,000°F — four times the surface of the sun. The pressure wave, heat, and molten metal spray cause severe burns from across a room. Arc flash energy in cal/cm² determines required PPE. Working on energized equipment requires arc flash analysis per NFPA 70E." },
+          { heading: "Grounding and Bonding", body: "Grounding connects equipment to earth, providing a fault current path that trips protective devices. Without grounding, a motor fault might energize the motor frame — dangerous until someone touches it. Bonding ensures all metallic parts are at the same potential, eliminating voltage differences between metal items you might touch simultaneously." }
+        ],
+        takeaways: [
+          "LOTO: isolate all energy, your own lock only, verify zero energy before touching",
+          "50mA through the heart is lethal — GFCIs trip at 5mA to protect wet-skin contact",
+          "Arc flash reaches 35,000°F — PPE selection requires incident energy analysis per NFPA 70E",
+          "Grounding provides fault current path; bonding equalizes potential between metal parts"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "During LOTO, a supervisor asks you to remove your lock temporarily for testing. What do you do?", options: ["Remove it as directed", "Refuse — only you can remove your own lock", "Add another lock first", "Transfer lock to supervisor"], answer: 1, explain: "OSHA LOTO is absolute: only the worker who applied a lock may remove it. A supervisor has no authority to demand removal. Workers who comply expose themselves and others to serious injury." },
+          { q: "Body resistance of 1,000Ω in contact with 120V AC — what current flows?", options: ["120mA", "120A", "12mA", "1.2A"], answer: 0, explain: "I = V/R = 120/1000 = 0.12A = 120mA. This is more than double the 50mA fibrillation threshold. Why 120V circuits are genuinely dangerous, not just uncomfortable." },
+          { q: "What does a GFCI protect against?", options: ["Overload current", "Small ground fault currents that could cause electrocution", "Short circuits between phases", "Arc flash events"], answer: 1, explain: "GFCIs detect current imbalance between hot and neutral as small as 5mA, indicating current is finding a path through a person. They trip within milliseconds — fast enough to prevent electrocution in most scenarios." }
+        ]
+      }
+    },
+
+    "NEC Basics": {
+      lesson: {
+        title: "NEC Basics: The National Electrical Code",
+        sections: [
+          { heading: "What Is the NEC?", body: "The National Electrical Code (NFPA 70) is the benchmark standard for safe electrical installations in the US, published every three years and adopted into law by most states. It's a minimum safety standard — not a design guide — telling you the lowest acceptable safety level. Inspectors verify compliance before approving any electrical installation." },
+          { heading: "Article Structure", body: "The NEC organizes into chapters and articles. Chapter 1: general rules. Chapter 2: wiring and protection. Chapter 3: wiring methods. Chapter 4: equipment. Chapters 5-7: special occupancies, equipment, and conditions. Key articles: 210 (branch circuits), 430 (motors), 500 (hazardous locations). Knowing where to look is half the skill." },
+          { heading: "Wire Sizing", body: "NEC Article 310 tables give allowable ampacities. 12AWG copper = 20A, 10AWG = 30A, 8AWG = 40A. These assume 75°C insulation, max 3 current-carrying conductors in conduit, 30°C ambient. More conductors in conduit, higher ambient temperature, or different insulation all require derating. Calculated ampacity must exceed the load current after all corrections." },
+          { heading: "Overcurrent Protection", body: "Every conductor needs an overcurrent device (fuse or breaker) rated no more than the conductor's ampacity. 12AWG wire (20A rating) needs a 20A or smaller breaker — not 30A. The breaker protects the wire, not the load. Motor branch circuits are an exception — Article 430 allows oversized protection for starting current, with overload relays providing thermal protection." }
+        ],
+        takeaways: [
+          "NEC is US minimum safety standard for electrical — adopted into law locally",
+          "Know your articles: 210 for branch circuits, 430 for motors, 500 for hazardous locations",
+          "Wire ampacity requires derating for conduit fill, ambient temp, and insulation rating",
+          "Breakers protect conductors — breaker size must match wire ampacity, not load"
+        ]
+      },
+      quiz: {
+        questions: [
+          { q: "12AWG copper in a conduit with 6 current-carrying conductors. What must you do?", options: ["Use 20A protection — no change", "Derate ampacity per NEC conduit fill tables", "Upgrade to 10AWG", "Use only 4 of the 6 conductors"], answer: 1, explain: "Article 310 requires ampacity derating when more than 3 conductors share a conduit. Six conductors requires 80% derating — 12AWG drops from 20A to 16A. Protection must size accordingly." },
+          { q: "Which NEC article covers motor installations?", options: ["Article 210", "Article 310", "Article 430", "Article 500"], answer: 2, explain: "NEC Article 430 covers motor circuits, controllers, branch circuit sizing (125% of FLA), and overcurrent protection. One of the most complex articles because motors have unique starting current requirements." },
+          { q: "Why must a breaker be sized at or below the conductor's ampacity?", options: ["To save energy", "To prevent the conductor from overheating and causing a fire", "To match the load's current draw", "To comply with OSHA"], answer: 1, explain: "The overcurrent device protects the conductor. An undersized wire with an oversized breaker can carry fault current hot enough to start a fire while the breaker never trips — because current is below its rating." }
+        ]
+      }
+    }
+  }, // end electrical
+
+  // ─── REMAINING TOPICS — Fill in your content here ───────────────
+  // Copy the pattern from above: lesson: { title, sections, takeaways } and quiz: { questions }
+
+  mechanics: {
+    "Newton's Laws": {
+      lesson: { title: "Newton's Laws", sections: [{ heading: "Coming Soon", body: "Add your lesson content here." }], takeaways: ["Fill in your key takeaways"] },
+      quiz: { questions: [{ q: "Sample question?", options: ["Option A", "Option B", "Option C", "Option D"], answer: 0, explain: "Explanation here." }] }
+    },
+    "Levers & Torque": { lesson: { title: "Levers & Torque", sections: [{ heading: "Coming Soon", body: "Add your lesson content here." }], takeaways: ["Fill in your key takeaways"] }, quiz: { questions: [{ q: "Sample question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Forces & Motion": { lesson: { title: "Forces & Motion", sections: [{ heading: "Coming Soon", body: "Add your lesson content here." }], takeaways: ["Fill in your key takeaways"] }, quiz: { questions: [{ q: "Sample question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Energy & Work": { lesson: { title: "Energy & Work", sections: [{ heading: "Coming Soon", body: "Add your lesson content here." }], takeaways: ["Fill in your key takeaways"] }, quiz: { questions: [{ q: "Sample question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Momentum": { lesson: { title: "Momentum", sections: [{ heading: "Coming Soon", body: "Add your lesson content here." }], takeaways: ["Fill in your key takeaways"] }, quiz: { questions: [{ q: "Sample question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Friction": { lesson: { title: "Friction", sections: [{ heading: "Coming Soon", body: "Add your lesson content here." }], takeaways: ["Fill in your key takeaways"] }, quiz: { questions: [{ q: "Sample question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Simple Machines": { lesson: { title: "Simple Machines", sections: [{ heading: "Coming Soon", body: "Add your lesson content here." }], takeaways: ["Fill in your key takeaways"] }, quiz: { questions: [{ q: "Sample question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Center of Mass": { lesson: { title: "Center of Mass", sections: [{ heading: "Coming Soon", body: "Add your lesson content here." }], takeaways: ["Fill in your key takeaways"] }, quiz: { questions: [{ q: "Sample question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } }
+  },
+
+  fluids: {
+    "Water Pressure": { lesson: { title: "Water Pressure", sections: [{ heading: "Coming Soon", body: "Add your lesson content here." }], takeaways: ["Fill in your key takeaways"] }, quiz: { questions: [{ q: "Sample question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Buoyancy": { lesson: { title: "Buoyancy", sections: [{ heading: "Coming Soon", body: "Add your lesson content here." }], takeaways: ["Fill in your key takeaways"] }, quiz: { questions: [{ q: "Sample question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Flow Rate": { lesson: { title: "Flow Rate", sections: [{ heading: "Coming Soon", body: "Add your lesson content here." }], takeaways: ["Fill in your key takeaways"] }, quiz: { questions: [{ q: "Sample question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Bernoulli's Principle": { lesson: { title: "Bernoulli's Principle", sections: [{ heading: "Coming Soon", body: "Add your lesson content here." }], takeaways: ["Fill in your key takeaways"] }, quiz: { questions: [{ q: "Sample question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Hydraulics": { lesson: { title: "Hydraulics", sections: [{ heading: "Coming Soon", body: "Add your lesson content here." }], takeaways: ["Fill in your key takeaways"] }, quiz: { questions: [{ q: "Sample question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Surface Tension": { lesson: { title: "Surface Tension", sections: [{ heading: "Coming Soon", body: "Add your lesson content here." }], takeaways: ["Fill in your key takeaways"] }, quiz: { questions: [{ q: "Sample question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Viscosity": { lesson: { title: "Viscosity", sections: [{ heading: "Coming Soon", body: "Add your lesson content here." }], takeaways: ["Fill in your key takeaways"] }, quiz: { questions: [{ q: "Sample question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Pascal's Law": { lesson: { title: "Pascal's Law", sections: [{ heading: "Coming Soon", body: "Add your lesson content here." }], takeaways: ["Fill in your key takeaways"] }, quiz: { questions: [{ q: "Sample question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } }
+  },
+
+  gravity: {
+    "Gravity Basics": { lesson: { title: "Gravity Basics", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Weight vs Mass": { lesson: { title: "Weight vs Mass", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Free Fall": { lesson: { title: "Free Fall", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Center of Gravity": { lesson: { title: "Center of Gravity", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Tipping Points": { lesson: { title: "Tipping Points", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Load Distribution": { lesson: { title: "Load Distribution", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Gravitational Fields": { lesson: { title: "Gravitational Fields", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Structural Load": { lesson: { title: "Structural Load", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } }
+  },
+
+  energy: {
+    "Kinetic & Potential Energy": { lesson: { title: "Kinetic & Potential Energy", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Conservation of Energy": { lesson: { title: "Conservation of Energy", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Thermodynamics": { lesson: { title: "Thermodynamics", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Sound Waves": { lesson: { title: "Sound Waves", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Light & Optics": { lesson: { title: "Light & Optics", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Heat Transfer": { lesson: { title: "Heat Transfer", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Electromagnetic Spectrum": { lesson: { title: "Electromagnetic Spectrum", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Resonance": { lesson: { title: "Resonance", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } }
+  },
+
+  history: {
+    "Ancient Civilizations": { lesson: { title: "Ancient Civilizations", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "World Wars": { lesson: { title: "World Wars", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "American History": { lesson: { title: "American History", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Medieval Period": { lesson: { title: "Medieval Period", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Scientific Revolution": { lesson: { title: "Scientific Revolution", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Cold War": { lesson: { title: "Cold War", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Ancient Rome": { lesson: { title: "Ancient Rome", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "The Renaissance": { lesson: { title: "The Renaissance", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } }
+  },
+
+  science: {
+    "Cell Biology": { lesson: { title: "Cell Biology", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Evolution": { lesson: { title: "Evolution", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Genetics": { lesson: { title: "Genetics", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Ecosystems": { lesson: { title: "Ecosystems", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Human Body": { lesson: { title: "Human Body", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Microbiology": { lesson: { title: "Microbiology", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Chemistry Basics": { lesson: { title: "Chemistry Basics", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Neuroscience": { lesson: { title: "Neuroscience", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } }
+  },
+
+  math: {
+    "Algebra": { lesson: { title: "Algebra", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Geometry": { lesson: { title: "Geometry", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Calculus": { lesson: { title: "Calculus", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Statistics": { lesson: { title: "Statistics", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Number Theory": { lesson: { title: "Number Theory", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Trigonometry": { lesson: { title: "Trigonometry", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Probability": { lesson: { title: "Probability", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Linear Algebra": { lesson: { title: "Linear Algebra", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } }
+  },
+
+  finance: {
+    "Investing Basics": { lesson: { title: "Investing Basics", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Stock Market": { lesson: { title: "Stock Market", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Personal Finance": { lesson: { title: "Personal Finance", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Entrepreneurship": { lesson: { title: "Entrepreneurship", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Economics": { lesson: { title: "Economics", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Cryptocurrency": { lesson: { title: "Cryptocurrency", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Real Estate": { lesson: { title: "Real Estate", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Budgeting": { lesson: { title: "Budgeting", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } }
+  },
+
+  philosophy: {
+    "Ethics": { lesson: { title: "Ethics", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Stoicism": { lesson: { title: "Stoicism", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Logic": { lesson: { title: "Logic", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Epistemology": { lesson: { title: "Epistemology", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Existentialism": { lesson: { title: "Existentialism", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Eastern Philosophy": { lesson: { title: "Eastern Philosophy", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Political Philosophy": { lesson: { title: "Political Philosophy", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Metaphysics": { lesson: { title: "Metaphysics", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } }
+  },
+
+  technology: {
+    "AI & Machine Learning": { lesson: { title: "AI & Machine Learning", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "How the Internet Works": { lesson: { title: "How the Internet Works", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Cybersecurity": { lesson: { title: "Cybersecurity", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Programming Concepts": { lesson: { title: "Programming Concepts", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Operating Systems": { lesson: { title: "Operating Systems", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Databases": { lesson: { title: "Databases", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Networking": { lesson: { title: "Networking", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Cloud Computing": { lesson: { title: "Cloud Computing", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } }
+  },
+
+  art: {
+    "Art History": { lesson: { title: "Art History", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Music Theory": { lesson: { title: "Music Theory", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Architecture": { lesson: { title: "Architecture", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Film": { lesson: { title: "Film", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Literature": { lesson: { title: "Literature", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Cultural Movements": { lesson: { title: "Cultural Movements", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Design": { lesson: { title: "Design", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } },
+    "Philosophy of Art": { lesson: { title: "Philosophy of Art", sections: [{ heading: "Coming Soon", body: "Add your lesson." }], takeaways: ["Takeaway"] }, quiz: { questions: [{ q: "Question?", options: ["A","B","C","D"], answer: 0, explain: "Explanation." }] } }
+  }
+
+}; // end CONTENT
+
+// ═══════════════════════════════════════════════════════════════════
+//  TOPIC CONFIG — display metadata only (no editing needed)
+// ═══════════════════════════════════════════════════════════════════
 const TOPICS = [
-  {id:"mechanics",name:"Physics — Mechanics",icon:"⚙️",color:"#F97316",glow:"rgba(249,115,22,0.15)",subtopics:["Newton's Laws","Levers & Torque","Forces & Motion","Energy & Work","Momentum","Friction","Simple Machines","Center of Mass"]},
-  {id:"fluids",name:"Physics — Fluids",icon:"💧",color:"#0EA5E9",glow:"rgba(14,165,233,0.15)",subtopics:["Water Pressure","Buoyancy","Flow Rate","Bernoulli's Principle","Hydraulics","Surface Tension","Viscosity","Pascal's Law"]},
-  {id:"gravity",name:"Physics — Weight & Gravity",icon:"🪨",color:"#94A3B8",glow:"rgba(148,163,184,0.15)",subtopics:["Gravity Basics","Weight vs Mass","Free Fall","Center of Gravity","Tipping Points","Load Distribution","Gravitational Fields","Structural Load"]},
-  {id:"energy",name:"Physics — Energy & Waves",icon:"⚡",color:"#FBBF24",glow:"rgba(251,191,36,0.15)",subtopics:["Kinetic & Potential Energy","Conservation of Energy","Thermodynamics","Sound Waves","Light & Optics","Heat Transfer","Electromagnetic Spectrum","Resonance"]},
-  {id:"plc",name:"PLC Coding",icon:"🔧",color:"#34D399",glow:"rgba(52,211,153,0.15)",subtopics:["Ladder Logic Basics","Inputs & Outputs","Timers & Counters","Coils & Contacts","Program Flow","HMI Basics","Safety Systems","Troubleshooting PLCs"]},
-  {id:"electrical",name:"Electrical",icon:"🔌",color:"#FBBF24",glow:"rgba(251,191,36,0.15)",subtopics:["Ohm's Law","AC vs DC","Series & Parallel Circuits","Reading Wiring Diagrams","Transformers","Motors & Relays","Electrical Safety","NEC Basics"]},
-  {id:"history",name:"History",icon:"🏛️",color:"#FB923C",glow:"rgba(251,146,60,0.15)",subtopics:["Ancient Civilizations","World Wars","American History","Medieval Period","Scientific Revolution","Cold War","Ancient Rome","The Renaissance"]},
-  {id:"science",name:"Science & Biology",icon:"🧬",color:"#34D399",glow:"rgba(52,211,153,0.15)",subtopics:["Cell Biology","Evolution","Genetics","Ecosystems","Human Body","Microbiology","Chemistry Basics","Neuroscience"]},
-  {id:"math",name:"Math",icon:"📐",color:"#A594F9",glow:"rgba(165,148,249,0.15)",subtopics:["Algebra","Geometry","Calculus","Statistics","Number Theory","Trigonometry","Probability","Linear Algebra"]},
-  {id:"finance",name:"Finance & Business",icon:"📈",color:"#FBBF24",glow:"rgba(251,191,36,0.15)",subtopics:["Investing Basics","Stock Market","Personal Finance","Entrepreneurship","Economics","Cryptocurrency","Real Estate","Budgeting"]},
-  {id:"philosophy",name:"Philosophy",icon:"🧠",color:"#C084FC",glow:"rgba(192,132,252,0.15)",subtopics:["Ethics","Stoicism","Logic","Epistemology","Existentialism","Eastern Philosophy","Political Philosophy","Metaphysics"]},
-  {id:"technology",name:"Technology",icon:"💻",color:"#38BDF8",glow:"rgba(56,189,248,0.15)",subtopics:["AI & Machine Learning","How the Internet Works","Cybersecurity","Programming Concepts","Operating Systems","Databases","Networking","Cloud Computing"]},
-  {id:"art",name:"Art & Culture",icon:"🎨",color:"#F472B6",glow:"rgba(244,114,182,0.15)",subtopics:["Art History","Music Theory","Architecture","Film","Literature","Cultural Movements","Design","Philosophy of Art"]},
+  {id:"plc",       name:"PLC Coding",                 icon:"🔧", color:"#34D399", glow:"rgba(52,211,153,0.15)"},
+  {id:"electrical",name:"Electrical",                 icon:"🔌", color:"#FBBF24", glow:"rgba(251,191,36,0.15)"},
+  {id:"mechanics", name:"Physics — Mechanics",        icon:"⚙️", color:"#F97316", glow:"rgba(249,115,22,0.15)"},
+  {id:"fluids",    name:"Physics — Fluids",           icon:"💧", color:"#0EA5E9", glow:"rgba(14,165,233,0.15)"},
+  {id:"gravity",   name:"Physics — Weight & Gravity", icon:"🪨", color:"#94A3B8", glow:"rgba(148,163,184,0.15)"},
+  {id:"energy",    name:"Physics — Energy & Waves",   icon:"⚡", color:"#FBBF24", glow:"rgba(251,191,36,0.15)"},
+  {id:"history",   name:"History",                    icon:"🏛️", color:"#FB923C", glow:"rgba(251,146,60,0.15)"},
+  {id:"science",   name:"Science & Biology",          icon:"🧬", color:"#34D399", glow:"rgba(52,211,153,0.15)"},
+  {id:"math",      name:"Math",                       icon:"📐", color:"#A594F9", glow:"rgba(165,148,249,0.15)"},
+  {id:"finance",   name:"Finance & Business",         icon:"📈", color:"#FBBF24", glow:"rgba(251,191,36,0.15)"},
+  {id:"philosophy",name:"Philosophy",                 icon:"🧠", color:"#C084FC", glow:"rgba(192,132,252,0.15)"},
+  {id:"technology",name:"Technology",                 icon:"💻", color:"#38BDF8", glow:"rgba(56,189,248,0.15)"},
+  {id:"art",       name:"Art & Culture",              icon:"🎨", color:"#F472B6", glow:"rgba(244,114,182,0.15)"},
 ];
 
-function skey(tid,st,type){ return 'mf_'+tid+'__'+st.replace(/\W+/g,'_')+'__'+type; }
-function loadL(tid,st){ try{var r=localStorage.getItem(skey(tid,st,'lesson'));return r?JSON.parse(r):null;}catch{return null;} }
-function saveL(tid,st,d){ localStorage.setItem(skey(tid,st,'lesson'),JSON.stringify(d)); }
-function loadQ(tid,st){ try{var r=localStorage.getItem(skey(tid,st,'quiz'));return r?JSON.parse(r):null;}catch{return null;} }
-function saveQ(tid,st,d){ localStorage.setItem(skey(tid,st,'quiz'),JSON.stringify(d)); }
-function loadStats(){ try{return JSON.parse(localStorage.getItem('mf_stats')||'{}');}catch{return{};} }
-function saveStats(s){ localStorage.setItem('mf_stats',JSON.stringify(s)); }
+// ═══════════════════════════════════════════════════════════════════
+//  APP STATE + STORAGE
+// ═══════════════════════════════════════════════════════════════════
+var cT=null,cS=null,cM='lesson';
+var qS={idx:0,sel:null,correct:0,done:false};
 
-var stats=loadStats(), curTopic=null, curSub=null, curMode='lesson';
-var qState={idx:0,sel:null,correct:0,done:false};
+function ls(){try{return JSON.parse(localStorage.getItem('mf_stats')||'{}');}catch{return{};}}
+function ss(d){localStorage.setItem('mf_stats',JSON.stringify(d));}
+var stats=ls();
 
 // streak
 (function(){
   var today=new Date().toDateString();
   if(stats.lastDate!==today){
-    var yest=new Date(Date.now()-86400000).toDateString();
-    stats.streak=stats.lastDate===yest?(stats.streak||0)+1:1;
-    stats.lastDate=today; saveStats(stats);
+    var y=new Date(Date.now()-86400000).toDateString();
+    stats.streak=stats.lastDate===y?(stats.streak||0)+1:1;
+    stats.lastDate=today; ss(stats);
   }
-  document.getElementById('streak-count').textContent=stats.streak||0;
+  document.getElementById('sc').textContent=stats.streak||0;
 })();
 
-function showPage(p){
+// ═══════════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════════════
+function nav(p){
   ['home','lesson','profile'].forEach(function(x){
-    document.getElementById('page-'+x).style.display=x===p?'':'none';
+    var el=document.getElementById('pg-'+x);
+    el.classList.toggle('active',x===p);
   });
-  document.getElementById('nav-home').className='nav-btn'+(p==='home'?' active':'');
-  document.getElementById('nav-profile').className='nav-btn'+(p==='profile'?' active':'');
-  document.getElementById('header-sub').textContent=p==='lesson'&&curTopic?curTopic.name:'What will you learn today?';
+  document.getElementById('nb-home').classList.toggle('on',p==='home');
+  document.getElementById('nb-profile').classList.toggle('on',p==='profile');
+  document.getElementById('hsub').textContent=p==='lesson'&&cT?cT.name:'What will you learn today?';
+  if(p==='profile')renderProfile();
 }
 
+// ═══════════════════════════════════════════════════════════════════
+//  HOME
+// ═══════════════════════════════════════════════════════════════════
 function renderHome(){
-  var h='<div class="section-title">Browse Topics</div><div class="topic-grid">';
+  var h='<div class="sec-ttl">Browse Topics</div><div class="tgrid">';
   TOPICS.forEach(function(t){
-    h+='<div class="topic-card" onclick="openTopic(\''+t.id+'\')"><div style="position:absolute;bottom:-20px;right:-20px;width:70px;height:70px;border-radius:50%;background:'+t.glow+';pointer-events:none;"></div><div style="font-size:28px;margin-bottom:8px;line-height:1;">'+t.icon+'</div><div style="font-size:13px;font-weight:700;color:#F0F0F8;line-height:1.3;">'+t.name+'</div><div style="font-size:11px;color:#606078;margin-top:3px;">'+t.subtopics.length+' lessons</div></div>';
+    var subs=Object.keys(CONTENT[t.id]||{});
+    h+='<button class="tcard" onclick="openTopic(\''+t.id+'\')" style="background:#13131A;">'+
+      '<div style="position:absolute;bottom:-18px;right:-18px;width:65px;height:65px;border-radius:50%;background:'+t.glow+';pointer-events:none;"></div>'+
+      '<div style="font-size:26px;margin-bottom:7px;line-height:1;">'+t.icon+'</div>'+
+      '<div style="font-size:13px;font-weight:700;color:#F0F0F8;line-height:1.3;">'+t.name+'</div>'+
+      '<div style="font-size:11px;color:#606078;margin-top:3px;">'+subs.length+' lessons</div>'+
+      '</button>';
   });
   h+='</div>';
-  document.getElementById('page-home').innerHTML=h;
+  document.getElementById('pg-home').innerHTML=h;
 }
 
-function openTopic(tid,st){
-  curTopic=TOPICS.find(function(t){return t.id===tid;});
-  curSub=st||curTopic.subtopics[0];
-  curMode='lesson';
-  renderLessonShell();
-  showPage('lesson');
+// ═══════════════════════════════════════════════════════════════════
+//  LESSON SHELL
+// ═══════════════════════════════════════════════════════════════════
+function openTopic(tid,sub){
+  cT=TOPICS.find(function(t){return t.id===tid;});
+  var subs=Object.keys(CONTENT[tid]||{});
+  cS=sub||subs[0];
+  cM='lesson';
+  renderShell();
+  nav('lesson');
 }
 
-function renderLessonShell(){
-  var t=curTopic;
-  var pills=t.subtopics.map(function(st){
-    var active=st===curSub;
-    var style=active?'background:'+t.color+';border-color:'+t.color+';color:#fff;':'';
-    return '<button class="subtopic-pill'+(active?' active':'')+'" style="'+style+'" onclick="changeSub(\''+st.replace(/'/g,"\\'")+'\')">' +st+'</button>';
+function renderShell(){
+  var t=cT, subs=Object.keys(CONTENT[t.id]||{});
+  var pills=subs.map(function(st){
+    var on=st===cS;
+    return '<button class="spill'+(on?' on':'')+'" style="'+(on?'background:'+t.color+';border-color:'+t.color+';':'')+'" onclick="changeSub(\''+st.replace(/'/g,"\\'")+'\')">'+(st.length>18?st.substring(0,16)+'…':st)+'</button>';
   }).join('');
-  document.getElementById('page-lesson').innerHTML=
-    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">'+
-    '<button class="back-btn" onclick="showPage(\'home\')">&#8249;</button>'+
-    '<span style="display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;letter-spacing:0.05em;text-transform:uppercase;background:'+t.glow+';color:'+t.color+';">'+t.icon+' '+t.name+'</span>'+
+  document.getElementById('pg-lesson').innerHTML=
+    '<div style="display:flex;align-items:center;gap:11px;margin-bottom:14px;">'+
+    '<button class="back" onclick="nav(\'home\')">&#8249;</button>'+
+    '<span style="font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;letter-spacing:0.05em;text-transform:uppercase;background:'+t.glow+';color:'+t.color+';">'+t.icon+' '+t.name+'</span>'+
     '</div>'+
-    '<div class="mode-tabs">'+
-    '<button class="mode-tab'+(curMode==='lesson'?' active':'')+'" onclick="setMode(\'lesson\')">📖 Lesson</button>'+
-    '<button class="mode-tab'+(curMode==='quiz'?' active':'')+'" onclick="setMode(\'quiz\')">🧠 Quiz</button>'+
+    '<div class="mtabs">'+
+    '<button class="mtab'+(cM==='lesson'?' on':'')+'" onclick="setMode(\'lesson\')">📖 Lesson</button>'+
+    '<button class="mtab'+(cM==='quiz'?' on':'')+'" onclick="setMode(\'quiz\')">🧠 Quiz</button>'+
     '</div>'+
-    '<div class="subtopic-row">'+pills+'</div>'+
+    '<div class="srow">'+pills+'</div>'+
     '<div id="lc"></div>';
   renderContent();
 }
 
-function changeSub(st){ curSub=st; renderLessonShell(); }
-function setMode(m){ curMode=m; renderLessonShell(); }
+function changeSub(st){cS=st;renderShell();}
+function setMode(m){cM=m;renderShell();}
 
+// ═══════════════════════════════════════════════════════════════════
+//  CONTENT RENDERING
+// ═══════════════════════════════════════════════════════════════════
 function renderContent(){
-  if(curMode==='lesson') renderLesson();
-  else if(curMode==='quiz') renderQuiz();
-  else if(curMode==='edit-lesson') renderEditLesson();
-  else if(curMode==='edit-quiz') renderEditQuiz();
+  if(cM==='lesson') showLesson();
+  else showQuiz();
 }
 
-function renderLesson(){
-  var d=loadL(curTopic.id,curSub);
+function showLesson(){
+  var d=(CONTENT[cT.id]||{})[cS];
   var c=document.getElementById('lc');
-  if(!d){
-    c.innerHTML='<div class="empty-state"><div style="font-size:48px;margin-bottom:12px;">📝</div><div style="font-size:16px;font-weight:600;color:#606078;margin-bottom:8px;">No lesson yet</div><div style="font-size:14px;color:#404058;margin-bottom:24px;">Write your lesson for <strong style="color:#A594F9;">'+curSub+'</strong></div></div><button class="btn-primary" onclick="setMode(\'edit-lesson\')">✏️ Write This Lesson</button>';
-    return;
-  }
-  var secs=(d.sections||[]).map(function(s){return s.heading||s.body?'<div class="sec-heading">'+esc(s.heading)+'</div><div class="sec-body">'+esc(s.body)+'</div>':''}).join('');
-  var tks=(d.takeaways||[]).filter(function(x){return x.trim();}).map(function(t){return '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;"><div style="width:6px;height:6px;border-radius:50%;background:#34D399;flex-shrink:0;margin-top:8px;"></div><div style="font-size:14px;color:#A0A0B8;line-height:1.5;">'+esc(t)+'</div></div>';}).join('');
-  c.innerHTML='<div class="card fade-up"><div class="lesson-title">'+esc(d.title||curSub)+'</div>'+secs+'</div>'+(tks?'<div class="takeaways-box fade-up"><div style="font-size:11px;font-weight:700;color:#34D399;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px;">✅ Key Takeaways</div>'+tks+'</div>':'')+'<div class="btn-row"><button class="btn-secondary" onclick="setMode(\'quiz\')">🧠 Take Quiz</button><button class="btn-primary" onclick="setMode(\'edit-lesson\')">✏️ Edit</button></div>';
-  trackRead(d.title||curSub);
+  if(!d||!d.lesson){c.innerHTML='<div style="text-align:center;padding:30px;color:#606078;">No content yet.</div>';return;}
+  var l=d.lesson;
+  var secs=(l.sections||[]).map(function(s){
+    return s.heading||s.body?'<div class="sh">'+esc(s.heading)+'</div><div class="sb">'+esc(s.body)+'</div>':'';
+  }).join('');
+  var tks=(l.takeaways||[]).filter(Boolean).map(function(t){
+    return '<div class="tkrow"><div class="tkdot"></div><div style="font-size:14px;color:#A0A0B8;line-height:1.5;">'+esc(t)+'</div></div>';
+  }).join('');
+  c.innerHTML=
+    '<div class="card fu"><div class="ls-ttl">'+esc(l.title)+'</div>'+secs+'</div>'+
+    (tks?'<div class="tkbox fu"><div style="font-size:11px;font-weight:700;color:#34D399;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:11px;">✅ Key Takeaways</div>'+tks+'</div>':'')+
+    '<button class="btn btn-p" onclick="setMode(\'quiz\')">🧠 Test Yourself</button>';
+  trackRead(l.title);
 }
 
-function renderQuiz(){
-  var d=loadQ(curTopic.id,curSub);
+function showQuiz(){
+  var d=(CONTENT[cT.id]||{})[cS];
   var c=document.getElementById('lc');
-  if(!d||!d.questions||!d.questions.length){
-    c.innerHTML='<div class="empty-state"><div style="font-size:48px;margin-bottom:12px;">🧠</div><div style="font-size:16px;font-weight:600;color:#606078;margin-bottom:8px;">No quiz yet</div><div style="font-size:14px;color:#404058;margin-bottom:24px;">Write quiz questions for <strong style="color:#A594F9;">'+curSub+'</strong></div></div><button class="btn-primary" onclick="setMode(\'edit-quiz\')">✏️ Write Quiz</button>';
-    return;
+  if(!d||!d.quiz||!d.quiz.questions||!d.quiz.questions.length){
+    c.innerHTML='<div style="text-align:center;padding:30px;color:#606078;">No quiz yet.</div>';return;
   }
-  qState={idx:0,sel:null,correct:0,done:false};
-  showQuizQ(d);
+  qS={idx:0,sel:null,correct:0,done:false};
+  window.__qd=d.quiz;
+  showQ();
 }
 
-function showQuizQ(d){
+function showQ(){
   var c=document.getElementById('lc');
-  var qs=d.questions;
-  if(qState.done||qState.idx>=qs.length){
-    var pct=Math.round((qState.correct/qs.length)*100);
-    c.innerHTML='<div class="card fade-up" style="text-align:center;"><div style="font-size:48px;margin-bottom:12px;">'+(pct>=80?'🏆':pct>=60?'⭐':'📖')+'</div><div style="font-size:17px;font-weight:700;color:#F0F0F8;margin-bottom:8px;">'+(pct>=80?'Excellent!':pct>=60?'Good job!':'Keep studying!')+'</div><div style="font-size:40px;font-weight:800;color:#A594F9;margin:12px 0;">'+pct+'%</div><div style="color:#606078;font-size:14px;margin-bottom:20px;">'+qState.correct+' of '+qs.length+' correct</div><div class="btn-row"><button class="btn-secondary" onclick="qState={idx:0,sel:null,correct:0,done:false};showQuizQ(window.__qd)">↺ Retry</button><button class="btn-primary" onclick="setMode(\'lesson\')">📖 Back</button></div></div>';
+  var qs=window.__qd.questions;
+  if(qS.done||qS.idx>=qs.length){
+    var pct=Math.round((qS.correct/qs.length)*100);
+    var score={date:new Date().toLocaleDateString(),topic:cT.name,sub:cS,pct:pct};
+    stats.scores=[score,...(stats.scores||[])].slice(0,50);
+    stats.quizzes=(stats.quizzes||0)+1;
+    ss(stats);
+    c.innerHTML='<div class="card fu" style="text-align:center;">'+
+      '<div style="font-size:46px;margin-bottom:11px;">'+(pct>=80?'🏆':pct>=60?'⭐':'📖')+'</div>'+
+      '<div style="font-size:16px;font-weight:700;color:#F0F0F8;margin-bottom:7px;">'+(pct>=80?'Excellent!':pct>=60?'Good job!':'Keep studying!')+'</div>'+
+      '<div style="font-size:38px;font-weight:800;color:#A594F9;margin:10px 0;">'+pct+'%</div>'+
+      '<div style="color:#606078;font-size:13px;margin-bottom:18px;">'+qS.correct+' of '+qs.length+' correct</div>'+
+      '<div class="brow">'+
+      '<button class="btn btn-s" onclick="qS={idx:0,sel:null,correct:0,done:false};showQ()">↺ Retry</button>'+
+      '<button class="btn btn-p" onclick="setMode(\'lesson\')">📖 Back</button>'+
+      '</div></div>';
     return;
   }
-  window.__qd=d;
-  var q=qs[qState.idx];
-  var pct=(qState.idx/qs.length)*100;
-  var opts=q.options.map(function(o,i){return '<button class="quiz-opt" id="qo'+i+'" onclick="pickA('+i+','+q.answer+')">'+esc(o)+'</button>';}).join('');
-  c.innerHTML='<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div><div style="font-size:12px;color:#606078;margin-bottom:14px;font-weight:600;">Question '+(qState.idx+1)+' of '+qs.length+'</div><div class="card fade-up"><div class="quiz-q">'+esc(q.q)+'</div>'+opts+'<div id="qexp" style="display:none;margin-top:12px;padding:14px;background:#1C1C26;border-radius:12px;font-size:14px;color:#A0A0B8;line-height:1.6;"></div><button id="qnxt" style="display:none;margin-top:14px;" class="btn-primary" onclick="nextQ()">'+((qState.idx+1)<qs.length?'Next →':'See Results →')+'</button></div>';
+  var q=qs[qS.idx];
+  var pct=(qS.idx/qs.length)*100;
+  var opts=q.options.map(function(o,i){
+    return '<button class="qopt" id="o'+i+'" onclick="pickA('+i+','+q.answer+')">'+esc(o)+'</button>';
+  }).join('');
+  c.innerHTML=
+    '<div class="pbar"><div class="pfill" style="width:'+pct+'%"></div></div>'+
+    '<div style="font-size:12px;color:#606078;margin-bottom:12px;font-weight:600;">Question '+(qS.idx+1)+' of '+qs.length+'</div>'+
+    '<div class="card fu"><div class="qq">'+esc(q.q)+'</div>'+opts+
+    '<div id="qexp" style="display:none;" class="qexp"></div>'+
+    '<button id="qnxt" style="display:none;margin-top:12px;" class="btn btn-p" onclick="nextQ()">'+
+    (qS.idx+1<qs.length?'Next →':'See Results →')+'</button></div>';
 }
 
 function pickA(chosen,correct){
-  if(qState.sel!==null)return;
-  qState.sel=chosen;
-  if(chosen===correct)qState.correct++;
-  for(var i=0;i<4;i++){var b=document.getElementById('qo'+i);if(!b)continue;b.style.pointerEvents='none';if(i===correct)b.classList.add('correct');else if(i===chosen)b.classList.add('wrong');}
-  var q=window.__qd.questions[qState.idx];
+  if(qS.sel!==null)return;
+  qS.sel=chosen;
+  if(chosen===correct)qS.correct++;
+  for(var i=0;i<4;i++){var b=document.getElementById('o'+i);if(b){b.style.pointerEvents='none';if(i===correct)b.classList.add('ok');else if(i===chosen)b.classList.add('no');}}
+  var q=window.__qd.questions[qS.idx];
   var ex=document.getElementById('qexp');
   if(ex&&q.explain){ex.textContent=q.explain;ex.style.display='';}
   var nx=document.getElementById('qnxt');
   if(nx)nx.style.display='';
 }
+function nextQ(){qS.idx++;qS.sel=null;showQ();}
 
-function nextQ(){qState.idx++;qState.sel=null;showQuizQ(window.__qd);}
-
-function renderEditLesson(){
-  var ex=loadL(curTopic.id,curSub)||{title:curSub,sections:[{heading:'',body:''},{heading:'',body:''},{heading:'',body:''},{heading:'',body:''}],takeaways:['','','','']};
-  var secs=[0,1,2,3].map(function(i){
-    return '<hr class="divider"><div style="font-size:12px;font-weight:700;color:#A594F9;margin-bottom:12px;">SECTION '+(i+1)+'</div><div class="ef-group"><div class="edit-label">Heading</div><input class="edit-input" id="es'+i+'" placeholder="Section heading..." value="'+esc2((ex.sections[i]||{}).heading||'')+'"></div><div class="ef-group"><div class="edit-label">Content</div><textarea class="edit-textarea" id="eb'+i+'" placeholder="Write lesson content here...">'+esc2((ex.sections[i]||{}).body||'')+'</textarea></div>';
-  }).join('');
-  var tks=[0,1,2,3].map(function(i){
-    return '<div class="ef-group"><div class="edit-label">Takeaway '+(i+1)+'</div><input class="edit-input" id="et'+i+'" placeholder="One key thing to remember..." value="'+esc2((ex.takeaways||[])[i]||'')+'"></div>';
-  }).join('');
-  document.getElementById('lc').innerHTML=
-    '<div class="edit-banner"><span style="font-size:20px;flex-shrink:0;">✏️</span><div style="font-size:13px;color:#A594F9;line-height:1.5;">Fill in your lesson for <strong>'+curSub+'</strong>. Saves to this device.</div></div>'+
-    '<div class="ef-group"><div class="edit-label">Lesson Title</div><input class="edit-input" id="etitle" value="'+esc2(ex.title||curSub)+'" placeholder="Lesson title..."></div>'+
-    secs+
-    '<hr class="divider"><div style="font-size:12px;font-weight:700;color:#34D399;margin-bottom:12px;">KEY TAKEAWAYS</div>'+tks+
-    '<div class="btn-row" style="margin-top:8px;"><button class="btn-secondary" onclick="setMode(\'lesson\')">Cancel</button><button class="btn-primary" onclick="doSaveLesson()">💾 Save Lesson</button></div>';
-}
-
-function doSaveLesson(){
-  var d={
-    title:document.getElementById('etitle').value.trim()||curSub,
-    sections:[0,1,2,3].map(function(i){return{heading:document.getElementById('es'+i).value.trim(),body:document.getElementById('eb'+i).value.trim()};}).filter(function(s){return s.heading||s.body;}),
-    takeaways:[0,1,2,3].map(function(i){return document.getElementById('et'+i).value.trim();}).filter(Boolean)
-  };
-  saveL(curTopic.id,curSub,d);
-  toast(); curMode='lesson'; renderLessonShell();
-}
-
-function renderEditQuiz(){
-  var ex=loadQ(curTopic.id,curSub)||{questions:[{q:'',options:['','','',''],answer:0,explain:''},{q:'',options:['','','',''],answer:0,explain:''},{q:'',options:['','','',''],answer:0,explain:''}]};
-  var blocks=[0,1,2].map(function(i){
-    var q=ex.questions[i]||{q:'',options:['','','',''],answer:0,explain:''};
-    var opts=['A','B','C','D'].map(function(ltr,j){
-      return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span style="font-size:13px;font-weight:700;color:#606078;width:16px;flex-shrink:0;">'+ltr+'</span><input class="edit-input" style="flex:1;" id="qo'+i+'_'+j+'" placeholder="Option '+ltr+'..." value="'+esc2((q.options||[])[j]||'')+'"><label style="display:flex;align-items:center;gap:5px;cursor:pointer;flex-shrink:0;"><input type="radio" name="ca'+i+'" value="'+j+'"'+(q.answer===j?' checked':'')+' style="accent-color:#A594F9;"><span style="font-size:11px;color:#34D399;font-weight:600;white-space:nowrap;">Correct</span></label></div>';
-    }).join('');
-    return '<div class="q-block"><div class="q-block-label">Question '+(i+1)+'</div><div class="ef-group"><div class="edit-label">Question</div><textarea class="edit-textarea" id="qq'+i+'" style="min-height:60px;" placeholder="Write your question...">'+esc2(q.q)+'</textarea></div>'+opts+'<div class="ef-group"><div class="edit-label">Explanation</div><textarea class="edit-textarea" id="qe'+i+'" style="min-height:60px;" placeholder="Why is this the right answer?">'+esc2(q.explain)+'</textarea></div></div>';
-  }).join('');
-  document.getElementById('lc').innerHTML=
-    '<div class="edit-banner"><span style="font-size:20px;flex-shrink:0;">🧠</span><div style="font-size:13px;color:#A594F9;line-height:1.5;">Write 3 questions for <strong>'+curSub+'</strong>. Pick the correct answer with the radio button.</div></div>'+
-    blocks+
-    '<div class="btn-row" style="margin-top:8px;"><button class="btn-secondary" onclick="setMode(\'quiz\')">Cancel</button><button class="btn-primary" onclick="doSaveQuiz()">💾 Save Quiz</button></div>';
-}
-
-function doSaveQuiz(){
-  var qs=[0,1,2].map(function(i){
-    var radios=document.querySelectorAll('input[name="ca'+i+'"]');
-    var ans=0; radios.forEach(function(r,j){if(r.checked)ans=j;});
-    return{q:document.getElementById('qq'+i).value.trim(),options:[0,1,2,3].map(function(j){return document.getElementById('qo'+i+'_'+j).value.trim();}),answer:ans,explain:document.getElementById('qe'+i).value.trim()};
-  }).filter(function(q){return q.q;});
-  saveQ(curTopic.id,curSub,{questions:qs});
-  toast(); curMode='quiz'; renderLessonShell();
-}
-
+// ═══════════════════════════════════════════════════════════════════
+//  PROFILE
+// ═══════════════════════════════════════════════════════════════════
 function renderProfile(){
-  var filled=0,total=0;
-  TOPICS.forEach(function(t){t.subtopics.forEach(function(st){total++;if(loadL(t.id,st))filled++;});});
+  var scores=stats.scores||[];
+  var avg=scores.length?Math.round(scores.reduce(function(a,b){return a+b.pct;},0)/scores.length)+'%':'—';
   var hist=(stats.history||[]);
-  var histHTML=hist.length?hist.slice(0,10).map(function(h){return'<div class="hist-item"><div style="font-size:22px;">'+h.icon+'</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;color:#F0F0F8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(h.title)+'</div><div style="font-size:12px;color:#606078;margin-top:2px;">'+esc(h.topic)+' · '+h.date+'</div></div><div style="font-size:12px;font-weight:700;color:#34D399;background:rgba(52,211,153,0.1);padding:4px 10px;border-radius:10px;">Read</div></div>';}).join(''):'<div style="color:#606078;font-size:14px;padding:8px 0;">No activity yet.</div>';
-  document.getElementById('page-profile').innerHTML=
-    '<div class="section-title">Your Progress</div>'+
-    '<div class="stat-grid">'+
-    '<div class="stat-card"><div style="font-size:32px;font-weight:800;color:#A594F9;line-height:1;">'+filled+'</div><div style="font-size:12px;color:#606078;margin-top:6px;">Lessons Written</div></div>'+
-    '<div class="stat-card"><div style="font-size:32px;font-weight:800;color:#FB923C;line-height:1;">'+(stats.streak||0)+' 🔥</div><div style="font-size:12px;color:#606078;margin-top:6px;">Day Streak</div></div>'+
-    '<div class="stat-card"><div style="font-size:32px;font-weight:800;color:#34D399;line-height:1;">'+(stats.reads||0)+'</div><div style="font-size:12px;color:#606078;margin-top:6px;">Lessons Read</div></div>'+
-    '<div class="stat-card"><div style="font-size:32px;font-weight:800;color:#38BDF8;line-height:1;">'+filled+'/'+total+'</div><div style="font-size:12px;color:#606078;margin-top:6px;">Content Filled</div></div>'+
+  var histH=hist.length?hist.slice(0,10).map(function(h){
+    return '<div class="hitem"><div style="font-size:20px;">'+h.icon+'</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;color:#F0F0F8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(h.title)+'</div><div style="font-size:12px;color:#606078;margin-top:2px;">'+esc(h.topic)+' · '+h.date+'</div></div><div style="font-size:12px;font-weight:700;color:#34D399;background:rgba(52,211,153,0.1);padding:4px 10px;border-radius:10px;white-space:nowrap;">'+h.mode+'</div></div>';
+  }).join(''):'<div style="color:#606078;font-size:14px;padding:8px 0;">No activity yet.</div>';
+  document.getElementById('pg-profile').innerHTML=
+    '<div class="sec-ttl">Your Progress</div>'+
+    '<div class="sgrid">'+
+    '<div class="scard"><div style="font-size:30px;font-weight:800;color:#A594F9;line-height:1;">'+(stats.reads||0)+'</div><div style="font-size:12px;color:#606078;margin-top:5px;">Lessons Read</div></div>'+
+    '<div class="scard"><div style="font-size:30px;font-weight:800;color:#FB923C;line-height:1;">'+(stats.streak||0)+' 🔥</div><div style="font-size:12px;color:#606078;margin-top:5px;">Day Streak</div></div>'+
+    '<div class="scard"><div style="font-size:30px;font-weight:800;color:#34D399;line-height:1;">'+(stats.quizzes||0)+'</div><div style="font-size:12px;color:#606078;margin-top:5px;">Quizzes Taken</div></div>'+
+    '<div class="scard"><div style="font-size:30px;font-weight:800;color:#F472B6;line-height:1;">'+avg+'</div><div style="font-size:12px;color:#606078;margin-top:5px;">Avg Score</div></div>'+
     '</div>'+
-    '<div class="section-title">Recent Activity</div>'+histHTML;
+    (scores.length?'<div class="sec-ttl">Recent Quiz Scores</div>'+scores.slice(0,5).map(function(s){
+      return '<div class="hitem"><div style="font-size:20px;">'+(s.pct>=80?'🏆':s.pct>=60?'⭐':'📖')+'</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;color:#F0F0F8;">'+esc(s.sub)+'</div><div style="font-size:12px;color:#606078;margin-top:2px;">'+esc(s.topic)+' · '+s.date+'</div></div><div style="font-size:18px;font-weight:800;color:#A594F9;">'+s.pct+'%</div></div>';
+    }).join(''):'') +
+    '<div class="sec-ttl" style="margin-top:20px;">Recent Activity</div>'+histH;
 }
 
+// ═══════════════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════════════
 function trackRead(title){
   stats.reads=(stats.reads||0)+1;
-  stats.history=[{title:title,topic:curTopic.name,icon:curTopic.icon,date:new Date().toLocaleDateString()},...(stats.history||[])].slice(0,20);
-  saveStats(stats);
+  stats.history=[{title:title,topic:cT.name,icon:cT.icon,mode:'Read',date:new Date().toLocaleDateString()},...(stats.history||[])].slice(0,30);
+  ss(stats);
 }
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function esc2(s){return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-function toast(){var t=document.getElementById('save-toast');t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2000);}
-
+// ═══════════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════════
 renderHome();
-renderProfile();
 </script>
 </body>
 </html>
