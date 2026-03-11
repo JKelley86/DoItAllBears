@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Voyage — Travel Planner</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/pocketbase@0.21.3/dist/pocketbase.umd.js"></script>
 <style>
 :root {
   --navy: #080c18;
@@ -880,10 +881,10 @@ const POCKETBASE_URL = 'https://tumid-kiltlike-maia.ngrok-free.dev';
 const pb = new PocketBase(POCKETBASE_URL);
 pb.autoCancellation(false);
 
-let currentTrip = null;
-let editingTripId = null;
-let editingRecordId = null;
-let allTrips = [];
+var currentTrip = null;
+var editingTripId = null;
+var editingRecordId = null;
+var allTrips = [];
 
 // ── CONNECTION CHECK ─────────────────────────────────────
 async function checkConnection() {
