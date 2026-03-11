@@ -1029,7 +1029,8 @@ async function saveTrip() {
       showToast('Trip created!');
       closeTripModal();
       await loadTrips();
-      openTrip(rec.id);
+      // Small delay to ensure allTrips is populated
+      setTimeout(() => openTrip(rec.id), 100);
       return;
     }
     closeTripModal();
@@ -1053,9 +1054,9 @@ async function deleteCurrentTrip() {
 }
 
 function openTrip(id) {
-  currentTrip = allTrips.find(t => t.id === id);
-  if (!currentTrip) return;
-  document.getElementById('tripsView').querySelector('.trips-list') ? null : null;
+  const found = allTrips.find(t => t.id === id);
+  if (!found) { console.warn('Trip not found:', id, allTrips); return; }
+  currentTrip = found;
   document.getElementById('tripsView').style.display = 'none';
   document.getElementById('detailView').style.display = 'block';
   renderDetailView();
