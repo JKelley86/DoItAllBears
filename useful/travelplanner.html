@@ -880,6 +880,13 @@ const POCKETBASE_URL = 'https://tumid-kiltlike-maia.ngrok-free.dev';
 
 const pb = new PocketBase(POCKETBASE_URL);
 pb.autoCancellation(false);
+// Required to bypass Ngrok's browser warning page for API calls
+pb.beforeSend = function(url, options) {
+  options.headers = Object.assign({}, options.headers, {
+    'ngrok-skip-browser-warning': 'true'
+  });
+  return { url, options };
+};
 
 var currentTrip = null;
 var editingTripId = null;
