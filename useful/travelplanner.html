@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Voyage — Travel Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --navy: #080c18;
+  --navy-mid: #0f1525;
+  --navy-light: #182035;
+  --gold: #c9a84c;
+  --gold-light: #e8c97a;
+  --gold-pale: rgba(201,168,76,0.12);
+  --cream: #f0ebe0;
+  --text: #ddd8ce;
+  --text-muted: #7a7a8a;
+  --border: rgba(201,168,76,0.18);
+  --card: rgba(15,21,37,0.9);
+  --radius: 2px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--navy);
+  color:var(--text);
+  font-family:'Montserrat',sans-serif;
+  font-weight:300;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(ellipse 100% 60% at 10% 0%, rgba(201,168,76,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 90% 100%, rgba(20,40,100,0.5) 0%, transparent 55%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── HEADER ── */
+header{
+  position:sticky;top:0;z-index:100;
+  padding:1.2rem 3rem;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+  background:rgba(8,12,24,0.85);
+  backdrop-filter:blur(24px);
+}
+.logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.9rem;font-weight:300;letter-spacing:0.25em;
+  color:var(--gold-light);
+  text-transform:uppercase;
+}
+.logo span{font-style:italic;color:var(--cream);}
+.header-actions{display:flex;gap:1rem;align-items:center;}
+.status-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:#4ade80;
+  box-shadow:0 0 8px #4ade80;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.status-text{font-size:0.7rem;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase;}
+
+/* ── BUTTONS ── */
+.btn{
+  font-family:'Montserrat',sans-serif;
+  font-size:0.72rem;font-weight:500;letter-spacing:0.15em;
+  text-transform:uppercase;
+  padding:0.75rem 1.8rem;
+  border:1px solid var(--gold);
+  background:transparent;
+  color:var(--gold-light);
+  cursor:pointer;
+  transition:all 0.3s ease;
+  border-radius:var(--radius);
+  white-space:nowrap;
+}
+.btn:hover{background:var(--gold);color:var(--navy);transform:translateY(-1px);}
+.btn-solid{background:var(--gold);color:var(--navy);font-weight:600;}
+.btn-solid:hover{background:var(--gold-light);}
+.btn-ghost{border-color:rgba(255,255,255,0.15);color:var(--text-muted);}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);background:transparent;}
+.btn-danger{border-color:rgba(239,68,68,0.4);color:#f87171;}
+.btn-danger:hover{background:rgba(239,68,68,0.15);color:#fca5a5;transform:none;}
+.btn-sm{padding:0.5rem 1.1rem;font-size:0.65rem;}
+
+/* ── MAIN LAYOUT ── */
+main{
+  position:relative;z-index:1;
+  max-width:1400px;margin:0 auto;
+  padding:3rem 3rem;
+}
+
+/* ── HERO ── */
+.hero{
+  text-align:center;
+  padding:5rem 2rem 4rem;
+  position:relative;
+}
+.hero-eyebrow{
+  font-size:0.7rem;letter-spacing:0.4em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:1.5rem;
+}
+.hero-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3rem,7vw,6rem);
+  font-weight:300;line-height:1.05;
+  color:var(--cream);margin-bottom:1.5rem;
+}
+.hero-title em{font-style:italic;color:var(--gold-light);}
+.hero-sub{
+  font-size:0.8rem;letter-spacing:0.12em;color:var(--text-muted);
+  margin-bottom:3rem;text-transform:uppercase;
+}
+.hero-line{
+  width:60px;height:1px;background:var(--gold);
+  margin:0 auto 3rem;
+}
+
+/* ── TRIPS GRID ── */
+.section-header{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  margin-bottom:2.5rem;
+  padding-bottom:1.2rem;
+  border-bottom:1px solid var(--border);
+}
+.section-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.2rem;font-weight:300;
+  color:var(--cream);
+}
+.section-title span{
+  display:block;font-size:0.7rem;
+  font-family:'Montserrat',sans-serif;
+  letter-spacing:0.25em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:0.4rem;
+}
+.trips-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
+  gap:1.5rem;
+  margin-bottom:4rem;
+}
+.trip-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  cursor:pointer;
+  transition:all 0.4s ease;
+  position:relative;
+}
+.trip-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(201,168,76,0.05) 0%,transparent 60%);
+  opacity:0;transition:opacity 0.4s;
+  pointer-events:none;
+}
+.trip-card:hover{
+  border-color:var(--gold);
+  transform:translateY(-4px);
+  box-shadow:0 20px 60px rgba(0,0,0,0.5),0 0 30px rgba(201,168,76,0.08);
+}
+.trip-card:hover::before{opacity:1;}
+.trip-card-banner{
+  height:6px;
+  background:linear-gradient(90deg,var(--gold),var(--gold-light),var(--gold));
+}
+.trip-card-body{padding:1.8rem;}
+.trip-card-dest{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.7rem;font-weight:400;
+  color:var(--cream);margin-bottom:0.3rem;
+}
+.trip-card-dates{
+  font-size:0.68rem;letter-spacing:0.15em;
+  text-transform:uppercase;color:var(--gold);
+  margin-bottom:1.2rem;
+}
+.trip-card-chips{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.4rem;}
+.chip{
+  font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;
+  padding:0.3rem 0.8rem;
+  border:1px solid rgba(201,168,76,0.25);
+  color:var(--text-muted);
+  border-radius:20px;
+}
+.chip.has{border-color:rgba(201,168,76,0.5);color:var(--gold);}
+.trip-card-actions{display:flex;gap:0.6rem;justify-content:flex-end;}
+
+/* ── EMPTY STATE ── */
+.empty-state{
+  grid-column:1/-1;
+  text-align:center;padding:6rem 2rem;
+  border:1px dashed var(--border);
+  border-radius:var(--radius);
+}
+.empty-icon{font-size:3rem;margin-bottom:1.5rem;opacity:0.4;}
+.empty-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2rem;color:var(--cream);margin-bottom:0.8rem;
+}
+.empty-sub{font-size:0.8rem;color:var(--text-muted);letter-spacing:0.05em;}
+
+/* ── MODAL OVERLAY ── */
+.overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(4,8,18,0.92);
+  backdrop-filter:blur(12px);
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:2rem;
+  overflow-y:auto;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.3s ease;
+}
+.overlay.active{opacity:1;pointer-events:all;}
+
+.modal{
+  background:var(--navy-mid);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  width:100%;max-width:780px;
+  margin:auto;
+  transform:translateY(20px);
+  transition:transform 0.3s ease;
+  overflow:hidden;
+}
+.overlay.active .modal{transform:translateY(0);}
+
+.modal-header{
+  padding:2rem 2.5rem 1.5rem;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(135deg,rgba(201,168,76,0.05) 0%,transparent 60%);
+}
+.modal-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.8rem;font-weight:300;color:var(--cream);
+}
+.modal-title span{
+  display:block;font-family:'Montserrat',sans-serif;
+  font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:0.3rem;
+}
+.modal-close{
+  width:36px;height:36px;
+  border:1px solid var(--border);
+  background:transparent;color:var(--text-muted);
+  font-size:1.2rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;border-radius:var(--radius);
+  flex-shrink:0;
+}
+.modal-close:hover{border-color:var(--gold);color:var(--gold);}
+.modal-body{padding:2rem 2.5rem;}
+.modal-footer{
+  padding:1.5rem 2.5rem;
+  border-top:1px solid var(--border);
+  display:flex;justify-content:flex-end;gap:1rem;
+}
+
+/* ── FORM ── */
+.form-section{
+  margin-bottom:2rem;
+  padding-bottom:2rem;
+  border-bottom:1px solid rgba(201,168,76,0.1);
+}
+.form-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.form-section-title{
+  font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:1.2rem;
+  display:flex;align-items:center;gap:0.8rem;
+}
+.form-section-title::after{
+  content:'';flex:1;height:1px;background:rgba(201,168,76,0.15);
+}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.form-grid.cols-3{grid-template-columns:1fr 1fr 1fr;}
+.form-grid.cols-1{grid-template-columns:1fr;}
+.form-group{display:flex;flex-direction:column;gap:0.4rem;}
+.form-group.span-2{grid-column:span 2;}
+label{
+  font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--text-muted);
+}
+input,select,textarea{
+  font-family:'Montserrat',sans-serif;
+  font-size:0.82rem;font-weight:300;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  color:var(--text);
+  padding:0.75rem 1rem;
+  border-radius:var(--radius);
+  transition:all 0.2s;
+  width:100%;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none;
+  border-color:var(--gold);
+  background:rgba(201,168,76,0.04);
+  box-shadow:0 0 0 3px rgba(201,168,76,0.08);
+}
+input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.15);}
+select option{background:var(--navy-mid);color:var(--text);}
+textarea{resize:vertical;min-height:80px;}
+
+/* ── TRIP DETAIL VIEW ── */
+.trip-detail{display:none;}
+.trip-detail.active{display:block;}
+.trips-list{display:block;}
+.trips-list.hidden{display:none;}
+
+.detail-hero{
+  position:relative;
+  padding:4rem 0 3rem;
+  margin-bottom:3rem;
+  border-bottom:1px solid var(--border);
+}
+.detail-back{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--text-muted);cursor:pointer;
+  margin-bottom:2rem;
+  transition:color 0.2s;
+  background:none;border:none;
+}
+.detail-back:hover{color:var(--gold);}
+.detail-eyebrow{
+  font-size:0.7rem;letter-spacing:0.35em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:0.8rem;
+}
+.detail-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.5rem,5vw,4.5rem);
+  font-weight:300;color:var(--cream);
+  margin-bottom:0.5rem;
+}
+.detail-dates{
+  font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--text-muted);
+}
+
+/* ── SEGMENTS ── */
+.segments{display:flex;flex-direction:column;gap:1.5rem;}
+.segment{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+}
+.segment-header{
+  padding:1.2rem 1.8rem;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+  transition:background 0.2s;
+  user-select:none;
+}
+.segment-header:hover{background:rgba(201,168,76,0.04);}
+.segment-header-left{display:flex;align-items:center;gap:1rem;}
+.segment-icon{
+  width:38px;height:38px;
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;flex-shrink:0;
+  border-radius:var(--radius);
+}
+.segment-label{
+  font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:0.2rem;
+}
+.segment-name{font-size:1rem;font-weight:400;color:var(--cream);}
+.segment-toggle{
+  font-size:0.7rem;color:var(--text-muted);
+  transition:transform 0.3s;
+}
+.segment.open .segment-toggle{transform:rotate(180deg);}
+.segment-body{
+  padding:1.8rem;
+  display:none;
+}
+.segment.open .segment-body{display:block;}
+
+/* Info grid inside segments */
+.info-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:1.2rem;
+}
+.info-item{}
+.info-label{
+  font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:0.3rem;
+}
+.info-value{
+  font-size:0.88rem;color:var(--cream);font-weight:400;
+}
+.info-value.empty{color:var(--text-muted);font-style:italic;font-size:0.8rem;}
+
+/* Sub-items (multiple hotels, attractions etc) */
+.sub-items{display:flex;flex-direction:column;gap:1rem;}
+.sub-item{
+  padding:1.2rem 1.5rem;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.05);
+  border-radius:var(--radius);
+  position:relative;
+}
+.sub-item-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.2rem;color:var(--cream);margin-bottom:0.8rem;
+}
+.sub-item-actions{
+  position:absolute;top:1rem;right:1rem;
+  display:flex;gap:0.4rem;
+}
+.segment-actions{
+  display:flex;gap:0.6rem;margin-top:1.5rem;
+  padding-top:1.5rem;
+  border-top:1px solid rgba(255,255,255,0.05);
+}
+
+/* ── DIVIDER ── */
+.divider{
+  display:flex;align-items:center;gap:1rem;
+  margin:2.5rem 0;color:var(--text-muted);font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;
+}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:2rem;right:2rem;z-index:999;
+  background:var(--navy-light);
+  border:1px solid var(--border);
+  padding:1rem 1.5rem;
+  border-radius:var(--radius);
+  font-size:0.78rem;
+  transform:translateY(100px);opacity:0;
+  transition:all 0.3s ease;
+  max-width:320px;
+}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{border-color:rgba(74,222,128,0.4);color:#4ade80;}
+.toast.error{border-color:rgba(239,68,68,0.4);color:#f87171;}
+
+/* ── LOADING ── */
+.loading{
+  text-align:center;padding:4rem;
+  font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--text-muted);
+}
+.spinner{
+  width:30px;height:30px;
+  border:2px solid var(--border);
+  border-top-color:var(--gold);
+  border-radius:50%;
+  animation:spin 0.8s linear infinite;
+  margin:0 auto 1rem;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── FLIGHT ROUTE VISUAL ── */
+.flight-route{
+  display:flex;align-items:center;gap:1.5rem;
+  padding:1.5rem;
+  background:rgba(201,168,76,0.04);
+  border:1px solid rgba(201,168,76,0.1);
+  border-radius:var(--radius);
+  margin-bottom:1.5rem;
+}
+.flight-airport{text-align:center;}
+.flight-airport-code{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2rem;color:var(--gold-light);font-weight:300;
+}
+.flight-airport-name{font-size:0.65rem;color:var(--text-muted);letter-spacing:0.1em;}
+.flight-line{
+  flex:1;height:1px;background:linear-gradient(90deg,var(--gold),rgba(201,168,76,0.3));
+  position:relative;display:flex;align-items:center;justify-content:center;
+}
+.flight-plane{font-size:1rem;background:var(--navy-mid);padding:0 0.5rem;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  header{padding:1rem 1.5rem;}
+  main{padding:2rem 1.5rem;}
+  .form-grid{grid-template-columns:1fr;}
+  .form-group.span-2{grid-column:span 1;}
+  .form-grid.cols-3{grid-template-columns:1fr 1fr;}
+  .trips-grid{grid-template-columns:1fr;}
+  .modal{margin:0;}
+  .overlay{padding:0;align-items:flex-end;}
+  .modal{border-radius:12px 12px 0 0;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Vo<span>yage</span></div>
+  <div class="header-actions">
+    <div style="display:flex;align-items:center;gap:0.5rem;">
+      <div class="status-dot" id="statusDot" style="background:#ef4444;box-shadow:0 0 8px #ef4444;"></div>
+      <span class="status-text" id="statusText">Connecting...</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- TRIPS LIST VIEW -->
+  <div class="trips-list" id="tripsView">
+    <div class="hero">
+      <div class="hero-eyebrow">Your Journey Awaits</div>
+      <h1 class="hero-title">Plan Your <em>Perfect</em><br/>Adventure</h1>
+      <div class="hero-line"></div>
+      <div class="hero-sub">Flights · Hotels · Attractions · Restaurants</div>
+      <button class="btn btn-solid" onclick="openNewTripModal()">＋ &nbsp;New Trip</button>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">
+        <span>Your Itineraries</span>
+        Trips
+      </div>
+    </div>
+
+    <div class="trips-grid" id="tripsGrid">
+      <div class="loading"><div class="spinner"></div>Loading your trips...</div>
+    </div>
+  </div>
+
+  <!-- TRIP DETAIL VIEW -->
+  <div class="trip-detail" id="detailView">
+    <button class="detail-back" onclick="backToTrips()">← Back to all trips</button>
+    <div class="detail-hero">
+      <div class="detail-eyebrow" id="detailEyebrow">Your Trip</div>
+      <h2 class="detail-title" id="detailTitle">—</h2>
+      <div class="detail-dates" id="detailDates">—</div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:1rem;margin-bottom:2rem;">
+      <button class="btn btn-ghost btn-sm" onclick="openEditTripModal()">Edit Trip</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteCurrentTrip()">Delete Trip</button>
+    </div>
+
+    <div class="segments" id="segmentsContainer"></div>
+  </div>
+</main>
+
+<!-- NEW/EDIT TRIP MODAL -->
+<div class="overlay" id="tripModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">
+        <span id="tripModalEyebrow">New Journey</span>
+        <span id="tripModalTitle">Trip Details</span>
+      </div>
+      <button class="modal-close" onclick="closeTripModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-section">
+        <div class="form-section-title">Destination</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" id="tripCity" placeholder="New York"/>
+          </div>
+          <div class="form-group">
+            <label>State / Country</label>
+            <input type="text" id="tripState" placeholder="NY"/>
+          </div>
+          <div class="form-group">
+            <label>Departure Date</label>
+            <input type="date" id="tripStart"/>
+          </div>
+          <div class="form-group">
+            <label>Return Date</label>
+            <input type="date" id="tripEnd"/>
+          </div>
+          <div class="form-group span-2">
+            <label>Notes</label>
+            <textarea id="tripNotes" placeholder="Any notes about this trip..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeTripModal()">Cancel</button>
+      <button class="btn btn-solid" onclick="saveTrip()">Save Trip</button>
+    </div>
+  </div>
+</div>
+
+<!-- FLIGHT MODAL -->
+<div class="overlay" id="flightModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><span>Flight Info</span>Add Flight</div>
+      <button class="modal-close" onclick="closeModal('flightModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-section">
+        <div class="form-section-title">Departure</div>
+        <div class="form-grid cols-3">
+          <div class="form-group">
+            <label>Airport Code</label>
+            <input type="text" id="fDepCode" placeholder="JFK" maxlength="4"/>
+          </div>
+          <div class="form-group">
+            <label>Airport Name</label>
+            <input type="text" id="fDepName" placeholder="John F. Kennedy"/>
+          </div>
+          <div class="form-group">
+            <label>Terminal</label>
+            <input type="text" id="fDepTerminal" placeholder="Terminal 4"/>
+          </div>
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="fDepDate"/>
+          </div>
+          <div class="form-group">
+            <label>Boarding Time</label>
+            <input type="time" id="fBoardingTime"/>
+          </div>
+          <div class="form-group">
+            <label>Takeoff Time</label>
+            <input type="time" id="fTakeoffTime"/>
+          </div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">Arrival</div>
+        <div class="form-grid cols-3">
+          <div class="form-group">
+            <label>Airport Code</label>
+            <input type="text" id="fArrCode" placeholder="LAX" maxlength="4"/>
+          </div>
+          <div class="form-group">
+            <label>Airport Name</label>
+            <input type="text" id="fArrName" placeholder="Los Angeles Intl."/>
+          </div>
+          <div class="form-group">
+            <label>Terminal</label>
+            <input type="text" id="fArrTerminal" placeholder="Terminal 2"/>
+          </div>
+          <div class="form-group">
+            <label>Arrival Date</label>
+            <input type="date" id="fArrDate"/>
+          </div>
+          <div class="form-group">
+            <label>Landing Time</label>
+            <input type="time" id="fLandingTime"/>
+          </div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">Airline & Seat</div>
+        <div class="form-grid cols-3">
+          <div class="form-group">
+            <label>Airline</label>
+            <input type="text" id="fAirline" placeholder="Delta"/>
+          </div>
+          <div class="form-group">
+            <label>Flight Number</label>
+            <input type="text" id="fFlightNum" placeholder="DL 204"/>
+          </div>
+          <div class="form-group">
+            <label>Seat</label>
+            <input type="text" id="fSeat" placeholder="12A"/>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('flightModal')">Cancel</button>
+      <button class="btn btn-solid" onclick="saveFlight()">Save Flight</button>
+    </div>
+  </div>
+</div>
+
+<!-- CAR RENTAL MODAL -->
+<div class="overlay" id="carModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><span>Ground Transport</span>Car Rental</div>
+      <button class="modal-close" onclick="closeModal('carModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Rental Company</label>
+          <input type="text" id="carCompany" placeholder="Enterprise"/>
+        </div>
+        <div class="form-group">
+          <label>Car Type</label>
+          <input type="text" id="carType" placeholder="SUV, Sedan..."/>
+        </div>
+        <div class="form-group">
+          <label>Pickup Date & Time</label>
+          <input type="datetime-local" id="carPickup"/>
+        </div>
+        <div class="form-group">
+          <label>Dropoff Date & Time</label>
+          <input type="datetime-local" id="carDropoff"/>
+        </div>
+        <div class="form-group span-2">
+          <label>Pickup / Dropoff Address</label>
+          <input type="text" id="carAddress" placeholder="123 Airport Blvd, Los Angeles, CA"/>
+        </div>
+        <div class="form-group">
+          <label>Confirmation #</label>
+          <input type="text" id="carConfirmation" placeholder="ABC123456"/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('carModal')">Cancel</button>
+      <button class="btn btn-solid" onclick="saveCarRental()">Save Rental</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOTEL MODAL -->
+<div class="overlay" id="hotelModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><span>Accommodation</span>Hotel</div>
+      <button class="modal-close" onclick="closeModal('hotelModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Hotel Name</label>
+          <input type="text" id="hotelName" placeholder="The Ritz-Carlton"/>
+        </div>
+        <div class="form-group">
+          <label>Parent Company / Brand</label>
+          <input type="text" id="hotelBrand" placeholder="Marriott International"/>
+        </div>
+        <div class="form-group span-2">
+          <label>Address</label>
+          <input type="text" id="hotelAddress" placeholder="50 Central Park South, New York, NY"/>
+        </div>
+        <div class="form-group">
+          <label>Check-in Date & Time</label>
+          <input type="datetime-local" id="hotelCheckin"/>
+        </div>
+        <div class="form-group">
+          <label>Check-out Date & Time</label>
+          <input type="datetime-local" id="hotelCheckout"/>
+        </div>
+        <div class="form-group">
+          <label>Confirmation #</label>
+          <input type="text" id="hotelConfirmation" placeholder="HTL-789012"/>
+        </div>
+        <div class="form-group">
+          <label>Room Type</label>
+          <input type="text" id="hotelRoom" placeholder="King Suite"/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('hotelModal')">Cancel</button>
+      <button class="btn btn-solid" onclick="saveHotel()">Save Hotel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ATTRACTION MODAL -->
+<div class="overlay" id="attractionModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><span>Experience</span>Attraction</div>
+      <button class="modal-close" onclick="closeModal('attractionModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Attraction Name</label>
+          <input type="text" id="attrName" placeholder="Central Park"/>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="attrDate"/>
+        </div>
+        <div class="form-group span-2">
+          <label>Address</label>
+          <input type="text" id="attrAddress" placeholder="59th to 110th St, New York, NY"/>
+        </div>
+        <div class="form-group">
+          <label>Time</label>
+          <input type="time" id="attrTime"/>
+        </div>
+        <div class="form-group">
+          <label>Confirmation / Ticket #</label>
+          <input type="text" id="attrConfirmation" placeholder="Optional"/>
+        </div>
+        <div class="form-group span-2">
+          <label>Notes</label>
+          <textarea id="attrNotes" placeholder="Pre-book tickets, dress code, etc."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('attractionModal')">Cancel</button>
+      <button class="btn btn-solid" onclick="saveAttraction()">Save Attraction</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESTAURANT MODAL -->
+<div class="overlay" id="restaurantModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><span>Dining</span>Restaurant</div>
+      <button class="modal-close" onclick="closeModal('restaurantModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Restaurant Name</label>
+          <input type="text" id="restName" placeholder="Le Bernardin"/>
+        </div>
+        <div class="form-group">
+          <label>Cuisine Type</label>
+          <input type="text" id="restCuisine" placeholder="French Seafood"/>
+        </div>
+        <div class="form-group span-2">
+          <label>Address</label>
+          <input type="text" id="restAddress" placeholder="155 W 51st St, New York, NY"/>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="restDate"/>
+        </div>
+        <div class="form-group">
+          <label>Reservation Time</label>
+          <input type="time" id="restTime"/>
+        </div>
+        <div class="form-group">
+          <label>Reservation # / Name</label>
+          <input type="text" id="restConfirmation" placeholder="Under Smith, party of 2"/>
+        </div>
+        <div class="form-group">
+          <label>Price Range</label>
+          <select id="restPrice">
+            <option value="">Select...</option>
+            <option>$ — Budget</option>
+            <option>$$ — Moderate</option>
+            <option>$$$ — Upscale</option>
+            <option>$$$$ — Fine Dining</option>
+          </select>
+        </div>
+        <div class="form-group span-2">
+          <label>Notes</label>
+          <textarea id="restNotes" placeholder="Dress code, dietary restrictions, etc."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('restaurantModal')">Cancel</button>
+      <button class="btn btn-solid" onclick="saveRestaurant()">Save Restaurant</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────
+const POCKETBASE_URL = 'https://tumid-kiltlike-maia.ngrok-free.dev';
+// ────────────────────────────────────────────────────────
+
+const pb = new PocketBase(POCKETBASE_URL);
+pb.autoCancellation(false);
+
+let currentTrip = null;
+let editingTripId = null;
+let editingRecordId = null;
+let allTrips = [];
+
+// ── CONNECTION CHECK ─────────────────────────────────────
+async function checkConnection() {
+  try {
+    await pb.health.check();
+    document.getElementById('statusDot').style.background = '#4ade80';
+    document.getElementById('statusDot').style.boxShadow = '0 0 8px #4ade80';
+    document.getElementById('statusText').textContent = 'Connected';
+  } catch {
+    document.getElementById('statusDot').style.background = '#f87171';
+    document.getElementById('statusDot').style.boxShadow = '0 0 8px #f87171';
+    document.getElementById('statusText').textContent = 'Offline';
+  }
+}
+
+// ── TOAST ────────────────────────────────────────────────
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// ── MODAL HELPERS ────────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+  document.body.style.overflow = '';
+  editingRecordId = null;
+}
+function closeTripModal() { closeModal('tripModal'); editingTripId = null; }
+
+// Close on backdrop click
+document.querySelectorAll('.overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) {
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+      editingTripId = null;
+      editingRecordId = null;
+    }
+  });
+});
+
+// ── TRIPS ────────────────────────────────────────────────
+async function loadTrips() {
+  try {
+    allTrips = await pb.collection('trips').getFullList({ sort: 'start_date' });
+    renderTrips();
+  } catch(e) {
+    document.getElementById('tripsGrid').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <div class="empty-title">Connection Error</div>
+        <div class="empty-sub">Make sure PocketBase is running and collections are created.</div>
+      </div>`;
+  }
+}
+
+function renderTrips() {
+  const grid = document.getElementById('tripsGrid');
+  if (!allTrips.length) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">✈️</div>
+        <div class="empty-title">No Trips Yet</div>
+        <div class="empty-sub">Create your first trip to get started.</div>
+      </div>`;
+    return;
+  }
+  grid.innerHTML = allTrips.map(trip => {
+    const data = trip.data || {};
+    const hasFlights = data.flights?.length;
+    const hasCar = data.car;
+    const hasHotels = data.hotels?.length;
+    const hasAttr = data.attractions?.length;
+    const hasRest = data.restaurants?.length;
+    const start = trip.start_date ? new Date(trip.start_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+    const end = trip.end_date ? new Date(trip.end_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+    return `
+      <div class="trip-card" onclick="openTrip('${trip.id}')">
+        <div class="trip-card-banner"></div>
+        <div class="trip-card-body">
+          <div class="trip-card-dest">${trip.city || 'Unnamed'}${trip.state ? ', '+trip.state : ''}</div>
+          <div class="trip-card-dates">${start} — ${end}</div>
+          <div class="trip-card-chips">
+            <div class="chip ${hasFlights?'has':''}">✈ Flights</div>
+            <div class="chip ${hasCar?'has':''}">🚗 Car</div>
+            <div class="chip ${hasHotels?'has':''}">🏨 Hotels</div>
+            <div class="chip ${hasAttr?'has':''}">🗺 Attractions</div>
+            <div class="chip ${hasRest?'has':''}">🍽 Dining</div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function openNewTripModal() {
+  editingTripId = null;
+  document.getElementById('tripModalEyebrow').textContent = 'New Journey';
+  document.getElementById('tripModalTitle').textContent = 'Trip Details';
+  ['tripCity','tripState','tripNotes'].forEach(id => document.getElementById(id).value = '');
+  ['tripStart','tripEnd'].forEach(id => document.getElementById(id).value = '');
+  openModal('tripModal');
+}
+
+function openEditTripModal() {
+  if (!currentTrip) return;
+  editingTripId = currentTrip.id;
+  document.getElementById('tripModalEyebrow').textContent = 'Edit Journey';
+  document.getElementById('tripModalTitle').textContent = 'Trip Details';
+  document.getElementById('tripCity').value = currentTrip.city || '';
+  document.getElementById('tripState').value = currentTrip.state || '';
+  document.getElementById('tripStart').value = currentTrip.start_date?.slice(0,10) || '';
+  document.getElementById('tripEnd').value = currentTrip.end_date?.slice(0,10) || '';
+  document.getElementById('tripNotes').value = currentTrip.notes || '';
+  openModal('tripModal');
+}
+
+async function saveTrip() {
+  const city = document.getElementById('tripCity').value.trim();
+  if (!city) { showToast('Please enter a destination city.', 'error'); return; }
+  const payload = {
+    city,
+    state: document.getElementById('tripState').value.trim(),
+    start_date: document.getElementById('tripStart').value || null,
+    end_date: document.getElementById('tripEnd').value || null,
+    notes: document.getElementById('tripNotes').value.trim(),
+    data: editingTripId ? currentTrip.data : {}
+  };
+  try {
+    if (editingTripId) {
+      const updated = await pb.collection('trips').update(editingTripId, payload);
+      currentTrip = updated;
+      showToast('Trip updated!');
+      renderDetailView();
+    } else {
+      const rec = await pb.collection('trips').create(payload);
+      showToast('Trip created!');
+      closeTripModal();
+      await loadTrips();
+      openTrip(rec.id);
+      return;
+    }
+    closeTripModal();
+    await loadTrips();
+  } catch(e) {
+    showToast('Error saving trip. Check PocketBase collections.', 'error');
+    console.error(e);
+  }
+}
+
+async function deleteCurrentTrip() {
+  if (!currentTrip || !confirm(`Delete trip to ${currentTrip.city}? This cannot be undone.`)) return;
+  try {
+    await pb.collection('trips').delete(currentTrip.id);
+    showToast('Trip deleted.');
+    backToTrips();
+    await loadTrips();
+  } catch(e) {
+    showToast('Error deleting trip.', 'error');
+  }
+}
+
+function openTrip(id) {
+  currentTrip = allTrips.find(t => t.id === id);
+  if (!currentTrip) return;
+  document.getElementById('tripsView').querySelector('.trips-list') ? null : null;
+  document.getElementById('tripsView').style.display = 'none';
+  document.getElementById('detailView').style.display = 'block';
+  renderDetailView();
+  window.scrollTo(0,0);
+}
+
+function backToTrips() {
+  currentTrip = null;
+  document.getElementById('tripsView').style.display = 'block';
+  document.getElementById('detailView').style.display = 'none';
+}
+
+function renderDetailView() {
+  const t = currentTrip;
+  const data = t.data || {};
+  document.getElementById('detailEyebrow').textContent = t.state ? `${t.state}` : 'Your Trip';
+  document.getElementById('detailTitle').textContent = t.city || 'Unnamed Trip';
+  const start = t.start_date ? new Date(t.start_date).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '—';
+  const end = t.end_date ? new Date(t.end_date).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '—';
+  document.getElementById('detailDates').textContent = `${start} — ${end}`;
+
+  const c = document.getElementById('segmentsContainer');
+  c.innerHTML = '';
+
+  c.appendChild(makeFlightsSegment(data.flights || []));
+  c.appendChild(makeCarSegment(data.car || null));
+  c.appendChild(makeHotelsSegment(data.hotels || []));
+  c.appendChild(makeAttractionsSegment(data.attractions || []));
+  c.appendChild(makeRestaurantsSegment(data.restaurants || []));
+}
+
+// ── DATA HELPERS ─────────────────────────────────────────
+function val(v) {
+  return v ? `<span class="info-value">${v}</span>` : `<span class="info-value empty">—</span>`;
+}
+function infoItem(label, value) {
+  return `<div class="info-item"><div class="info-label">${label}</div>${val(value)}</div>`;
+}
+function fmt(dt, type='date') {
+  if (!dt) return null;
+  try {
+    if (type === 'datetime') return new Date(dt).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+    if (type === 'time') { const [h,m] = dt.split(':'); const d=new Date(); d.setHours(h,m); return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); }
+    return new Date(dt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  } catch { return dt; }
+}
+
+function makeSegment(icon, label, name, bodyHTML) {
+  const seg = document.createElement('div');
+  seg.className = 'segment';
+  seg.innerHTML = `
+    <div class="segment-header" onclick="this.parentElement.classList.toggle('open')">
+      <div class="segment-header-left">
+        <div class="segment-icon">${icon}</div>
+        <div>
+          <div class="segment-label">${label}</div>
+          <div class="segment-name">${name}</div>
+        </div>
+      </div>
+      <div class="segment-toggle">▼</div>
+    </div>
+    <div class="segment-body">${bodyHTML}</div>`;
+  return seg;
+}
+
+// ── FLIGHTS ──────────────────────────────────────────────
+function makeFlightsSegment(flights) {
+  let body = '';
+  if (flights.length) {
+    body += `<div class="sub-items">` + flights.map((f,i) => `
+      <div class="sub-item">
+        <div class="sub-item-actions">
+          <button class="btn btn-ghost btn-sm" onclick="editFlight(${i})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteFlight(${i})">✕</button>
+        </div>
+        <div class="flight-route">
+          <div class="flight-airport">
+            <div class="flight-airport-code">${f.dep_code||'???'}</div>
+            <div class="flight-airport-name">${f.dep_name||''}</div>
+          </div>
+          <div class="flight-line"><span class="flight-plane">✈</span></div>
+          <div class="flight-airport" style="text-align:right">
+            <div class="flight-airport-code">${f.arr_code||'???'}</div>
+            <div class="flight-airport-name">${f.arr_name||''}</div>
+          </div>
+        </div>
+        <div class="info-grid">
+          ${infoItem('Airline', f.airline)}
+          ${infoItem('Flight #', f.flight_num)}
+          ${infoItem('Seat', f.seat)}
+          ${infoItem('Dep. Terminal', f.dep_terminal)}
+          ${infoItem('Boarding', fmt(f.boarding_time,'time'))}
+          ${infoItem('Takeoff', fmt(f.takeoff_time,'time'))}
+          ${infoItem('Arr. Terminal', f.arr_terminal)}
+          ${infoItem('Landing', fmt(f.landing_time,'time'))}
+        </div>
+      </div>`).join('') + `</div>`;
+  }
+  body += `<div class="segment-actions"><button class="btn btn-sm" onclick="openFlightModal()">＋ Add Flight</button></div>`;
+  const name = flights.length ? `${flights.length} flight${flights.length>1?'s':''}` : 'No flights added';
+  return makeSegment('✈️', 'Flights', name, body);
+}
+
+function openFlightModal(idx=null) {
+  editingRecordId = idx;
+  const data = currentTrip.data || {};
+  const flights = data.flights || [];
+  const f = idx !== null ? flights[idx] : {};
+  const fields = ['fDepCode','fDepName','fDepTerminal','fDepDate','fBoardingTime','fTakeoffTime','fArrCode','fArrName','fArrTerminal','fArrDate','fLandingTime','fAirline','fFlightNum','fSeat'];
+  const vals = [f.dep_code,f.dep_name,f.dep_terminal,f.dep_date,f.boarding_time,f.takeoff_time,f.arr_code,f.arr_name,f.arr_terminal,f.arr_date,f.landing_time,f.airline,f.flight_num,f.seat];
+  fields.forEach((id,i) => document.getElementById(id).value = vals[i]||'');
+  openModal('flightModal');
+}
+function editFlight(i) { openFlightModal(i); }
+async function deleteFlight(i) {
+  const data = currentTrip.data || {};
+  data.flights = (data.flights||[]).filter((_,idx)=>idx!==i);
+  await updateTripData(data);
+}
+async function saveFlight() {
+  const f = {
+    dep_code: document.getElementById('fDepCode').value.toUpperCase(),
+    dep_name: document.getElementById('fDepName').value,
+    dep_terminal: document.getElementById('fDepTerminal').value,
+    dep_date: document.getElementById('fDepDate').value,
+    boarding_time: document.getElementById('fBoardingTime').value,
+    takeoff_time: document.getElementById('fTakeoffTime').value,
+    arr_code: document.getElementById('fArrCode').value.toUpperCase(),
+    arr_name: document.getElementById('fArrName').value,
+    arr_terminal: document.getElementById('fArrTerminal').value,
+    arr_date: document.getElementById('fArrDate').value,
+    landing_time: document.getElementById('fLandingTime').value,
+    airline: document.getElementById('fAirline').value,
+    flight_num: document.getElementById('fFlightNum').value,
+    seat: document.getElementById('fSeat').value,
+  };
+  const data = currentTrip.data || {};
+  data.flights = data.flights || [];
+  if (editingRecordId !== null) data.flights[editingRecordId] = f;
+  else data.flights.push(f);
+  await updateTripData(data);
+  closeModal('flightModal');
+}
+
+// ── CAR RENTAL ───────────────────────────────────────────
+function makeCarSegment(car) {
+  let body = '';
+  if (car) {
+    body += `
+      <div class="sub-item">
+        <div class="sub-item-actions">
+          <button class="btn btn-ghost btn-sm" onclick="openCarModal(true)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteCar()">✕</button>
+        </div>
+        <div class="info-grid">
+          ${infoItem('Company', car.company)}
+          ${infoItem('Car Type', car.type)}
+          ${infoItem('Pickup', fmt(car.pickup,'datetime'))}
+          ${infoItem('Dropoff', fmt(car.dropoff,'datetime'))}
+          ${infoItem('Address', car.address)}
+          ${infoItem('Confirmation #', car.confirmation)}
+        </div>
+      </div>`;
+  }
+  if (!car) body += `<div class="segment-actions"><button class="btn btn-sm" onclick="openCarModal(false)">＋ Add Car Rental</button></div>`;
+  return makeSegment('🚗', 'Car Rental', car ? car.company || 'Rental Added' : 'No rental added', body);
+}
+
+function openCarModal(editing=false) {
+  const car = editing && currentTrip.data?.car ? currentTrip.data.car : {};
+  document.getElementById('carCompany').value = car.company||'';
+  document.getElementById('carType').value = car.type||'';
+  document.getElementById('carPickup').value = car.pickup||'';
+  document.getElementById('carDropoff').value = car.dropoff||'';
+  document.getElementById('carAddress').value = car.address||'';
+  document.getElementById('carConfirmation').value = car.confirmation||'';
+  openModal('carModal');
+}
+async function deleteCar() {
+  const data = currentTrip.data || {};
+  delete data.car;
+  await updateTripData(data);
+}
+async function saveCarRental() {
+  const data = currentTrip.data || {};
+  data.car = {
+    company: document.getElementById('carCompany').value,
+    type: document.getElementById('carType').value,
+    pickup: document.getElementById('carPickup').value,
+    dropoff: document.getElementById('carDropoff').value,
+    address: document.getElementById('carAddress').value,
+    confirmation: document.getElementById('carConfirmation').value,
+  };
+  await updateTripData(data);
+  closeModal('carModal');
+}
+
+// ── HOTELS ───────────────────────────────────────────────
+function makeHotelsSegment(hotels) {
+  let body = '';
+  if (hotels.length) {
+    body += `<div class="sub-items">` + hotels.map((h,i) => `
+      <div class="sub-item">
+        <div class="sub-item-name">${h.name||'Hotel'}</div>
+        <div class="sub-item-actions">
+          <button class="btn btn-ghost btn-sm" onclick="editHotel(${i})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteHotel(${i})">✕</button>
+        </div>
+        <div class="info-grid">
+          ${infoItem('Brand / Parent', h.brand)}
+          ${infoItem('Address', h.address)}
+          ${infoItem('Check-in', fmt(h.checkin,'datetime'))}
+          ${infoItem('Check-out', fmt(h.checkout,'datetime'))}
+          ${infoItem('Room', h.room)}
+          ${infoItem('Confirmation #', h.confirmation)}
+        </div>
+      </div>`).join('') + `</div>`;
+  }
+  body += `<div class="segment-actions"><button class="btn btn-sm" onclick="openHotelModal()">＋ Add Hotel</button></div>`;
+  return makeSegment('🏨', 'Hotels', hotels.length ? `${hotels.length} hotel${hotels.length>1?'s':''}` : 'No hotels added', body);
+}
+
+function openHotelModal(idx=null) {
+  editingRecordId = idx;
+  const h = idx !== null ? (currentTrip.data?.hotels||[])[idx] : {};
+  document.getElementById('hotelName').value = h.name||'';
+  document.getElementById('hotelBrand').value = h.brand||'';
+  document.getElementById('hotelAddress').value = h.address||'';
+  document.getElementById('hotelCheckin').value = h.checkin||'';
+  document.getElementById('hotelCheckout').value = h.checkout||'';
+  document.getElementById('hotelConfirmation').value = h.confirmation||'';
+  document.getElementById('hotelRoom').value = h.room||'';
+  openModal('hotelModal');
+}
+function editHotel(i) { openHotelModal(i); }
+async function deleteHotel(i) {
+  const data = currentTrip.data || {};
+  data.hotels = (data.hotels||[]).filter((_,idx)=>idx!==i);
+  await updateTripData(data);
+}
+async function saveHotel() {
+  const h = {
+    name: document.getElementById('hotelName').value,
+    brand: document.getElementById('hotelBrand').value,
+    address: document.getElementById('hotelAddress').value,
+    checkin: document.getElementById('hotelCheckin').value,
+    checkout: document.getElementById('hotelCheckout').value,
+    confirmation: document.getElementById('hotelConfirmation').value,
+    room: document.getElementById('hotelRoom').value,
+  };
+  const data = currentTrip.data || {};
+  data.hotels = data.hotels || [];
+  if (editingRecordId !== null) data.hotels[editingRecordId] = h;
+  else data.hotels.push(h);
+  await updateTripData(data);
+  closeModal('hotelModal');
+}
+
+// ── ATTRACTIONS ──────────────────────────────────────────
+function makeAttractionsSegment(attractions) {
+  let body = '';
+  if (attractions.length) {
+    body += `<div class="sub-items">` + attractions.map((a,i) => `
+      <div class="sub-item">
+        <div class="sub-item-name">${a.name||'Attraction'}</div>
+        <div class="sub-item-actions">
+          <button class="btn btn-ghost btn-sm" onclick="editAttraction(${i})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteAttraction(${i})">✕</button>
+        </div>
+        <div class="info-grid">
+          ${infoItem('Date', fmt(a.date))}
+          ${infoItem('Time', fmt(a.time,'time'))}
+          ${infoItem('Address', a.address)}
+          ${infoItem('Ticket #', a.confirmation)}
+        </div>
+        ${a.notes?`<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-muted);font-style:italic;">${a.notes}</div>`:''}
+      </div>`).join('') + `</div>`;
+  }
+  body += `<div class="segment-actions"><button class="btn btn-sm" onclick="openAttractionModal()">＋ Add Attraction</button></div>`;
+  return makeSegment('🗺️', 'Attractions', attractions.length ? `${attractions.length} attraction${attractions.length>1?'s':''}` : 'No attractions added', body);
+}
+
+function openAttractionModal(idx=null) {
+  editingRecordId = idx;
+  const a = idx !== null ? (currentTrip.data?.attractions||[])[idx] : {};
+  document.getElementById('attrName').value = a.name||'';
+  document.getElementById('attrDate').value = a.date||'';
+  document.getElementById('attrAddress').value = a.address||'';
+  document.getElementById('attrTime').value = a.time||'';
+  document.getElementById('attrConfirmation').value = a.confirmation||'';
+  document.getElementById('attrNotes').value = a.notes||'';
+  openModal('attractionModal');
+}
+function editAttraction(i) { openAttractionModal(i); }
+async function deleteAttraction(i) {
+  const data = currentTrip.data || {};
+  data.attractions = (data.attractions||[]).filter((_,idx)=>idx!==i);
+  await updateTripData(data);
+}
+async function saveAttraction() {
+  const a = {
+    name: document.getElementById('attrName').value,
+    date: document.getElementById('attrDate').value,
+    address: document.getElementById('attrAddress').value,
+    time: document.getElementById('attrTime').value,
+    confirmation: document.getElementById('attrConfirmation').value,
+    notes: document.getElementById('attrNotes').value,
+  };
+  const data = currentTrip.data || {};
+  data.attractions = data.attractions || [];
+  if (editingRecordId !== null) data.attractions[editingRecordId] = a;
+  else data.attractions.push(a);
+  await updateTripData(data);
+  closeModal('attractionModal');
+}
+
+// ── RESTAURANTS ──────────────────────────────────────────
+function makeRestaurantsSegment(restaurants) {
+  let body = '';
+  if (restaurants.length) {
+    body += `<div class="sub-items">` + restaurants.map((r,i) => `
+      <div class="sub-item">
+        <div class="sub-item-name">${r.name||'Restaurant'}</div>
+        <div class="sub-item-actions">
+          <button class="btn btn-ghost btn-sm" onclick="editRestaurant(${i})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteRestaurant(${i})">✕</button>
+        </div>
+        <div class="info-grid">
+          ${infoItem('Cuisine', r.cuisine)}
+          ${infoItem('Address', r.address)}
+          ${infoItem('Date', fmt(r.date))}
+          ${infoItem('Time', fmt(r.time,'time'))}
+          ${infoItem('Reservation', r.confirmation)}
+          ${infoItem('Price Range', r.price)}
+        </div>
+        ${r.notes?`<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-muted);font-style:italic;">${r.notes}</div>`:''}
+      </div>`).join('') + `</div>`;
+  }
+  body += `<div class="segment-actions"><button class="btn btn-sm" onclick="openRestaurantModal()">＋ Add Restaurant</button></div>`;
+  return makeSegment('🍽️', 'Dining', restaurants.length ? `${restaurants.length} restaurant${restaurants.length>1?'s':''}` : 'No restaurants added', body);
+}
+
+function openRestaurantModal(idx=null) {
+  editingRecordId = idx;
+  const r = idx !== null ? (currentTrip.data?.restaurants||[])[idx] : {};
+  document.getElementById('restName').value = r.name||'';
+  document.getElementById('restCuisine').value = r.cuisine||'';
+  document.getElementById('restAddress').value = r.address||'';
+  document.getElementById('restDate').value = r.date||'';
+  document.getElementById('restTime').value = r.time||'';
+  document.getElementById('restConfirmation').value = r.confirmation||'';
+  document.getElementById('restPrice').value = r.price||'';
+  document.getElementById('restNotes').value = r.notes||'';
+  openModal('restaurantModal');
+}
+function editRestaurant(i) { openRestaurantModal(i); }
+async function deleteRestaurant(i) {
+  const data = currentTrip.data || {};
+  data.restaurants = (data.restaurants||[]).filter((_,idx)=>idx!==i);
+  await updateTripData(data);
+}
+async function saveRestaurant() {
+  const r = {
+    name: document.getElementById('restName').value,
+    cuisine: document.getElementById('restCuisine').value,
+    address: document.getElementById('restAddress').value,
+    date: document.getElementById('restDate').value,
+    time: document.getElementById('restTime').value,
+    confirmation: document.getElementById('restConfirmation').value,
+    price: document.getElementById('restPrice').value,
+    notes: document.getElementById('restNotes').value,
+  };
+  const data = currentTrip.data || {};
+  data.restaurants = data.restaurants || [];
+  if (editingRecordId !== null) data.restaurants[editingRecordId] = r;
+  else data.restaurants.push(r);
+  await updateTripData(data);
+  closeModal('restaurantModal');
+}
+
+// ── SAVE DATA ────────────────────────────────────────────
+async function updateTripData(data) {
+  try {
+    currentTrip = await pb.collection('trips').update(currentTrip.id, { data });
+    allTrips = allTrips.map(t => t.id === currentTrip.id ? currentTrip : t);
+    renderDetailView();
+    showToast('Saved!');
+  } catch(e) {
+    showToast('Error saving.', 'error');
+    console.error(e);
+  }
+}
+
+// ── INIT ─────────────────────────────────────────────────
+checkConnection();
+loadTrips();
+setInterval(checkConnection, 30000);
+</script>
+</body>
+</html>
