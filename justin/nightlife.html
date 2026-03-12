@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>NightFinder — Where To?</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -20,13 +23,22 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
+  html {
+    height: 100%;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+  }
+
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
+    min-height: 100%;
     overflow-x: hidden;
     position: relative;
+    /* Prevent double-tap zoom on all elements */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body::before {
@@ -56,7 +68,8 @@
     z-index: 1;
     max-width: 520px;
     margin: 0 auto;
-    padding: 40px 20px 60px;
+    padding: 40px 20px env(safe-area-inset-bottom, 60px);
+    padding-bottom: max(60px, env(safe-area-inset-bottom, 60px));
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -136,7 +149,7 @@
     color: white;
     border: none;
     border-radius: 12px;
-    padding: 14px 32px;
+    padding: 16px 36px;
     font-family: 'Space Mono', monospace;
     font-size: 13px;
     font-weight: 700;
@@ -144,6 +157,9 @@
     cursor: pointer;
     transition: all 0.2s;
     text-transform: uppercase;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 52px;
   }
 
   .btn-primary:hover {
@@ -197,6 +213,9 @@
     transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
     overflow: hidden;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 100px;
   }
 
   .cat-btn::before {
@@ -435,12 +454,16 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 14px 20px;
+    padding: 16px 24px;
     color: var(--text);
     cursor: pointer;
     font-size: 18px;
     transition: all 0.2s;
     flex-shrink: 0;
+    min-width: 56px;
+    min-height: 52px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .nav-btn:hover:not(:disabled) {
@@ -868,8 +891,24 @@
     pizza_restaurant: '[amenity=restaurant][name~"[Pp]izza",i]',
   };
 
+  // ── CUSTOM LOCATIONS ───────────────────────────────────────────────────────
+  // To set Bear Bar's location:
+  //   1. Go to maps.google.com and find your address
+  //   2. Right-click the pin → copy the coordinates
+  //   3. Replace YOUR_LAT and YOUR_LNG below with the numbers (e.g. 45.1234 and -93.5678)
+  const CUSTOM_LOCATIONS = {
+    bar: [
+      {
+        name: '🐻 Bear Bar',
+        address: 'My Place',   // optional: replace with your street address
+        lat: 45.4621829,
+        lng: -92.9659767,
+      }
+    ]
+  };
+
   async function searchNearby(type, label) {
-    const radius = 10000; // 10 km
+    const radius = 25000; // 25 km (~15 miles)
     const tag = OSM_TAGS[type] || '[amenity=bar]';
     const query = buildOverpassQuery(tag, radius);
 
@@ -900,10 +939,18 @@
       }
 
       // Compute distance for each, sort
+      // Inject custom locations for this category (e.g. Bear Bar for bars)
+      const customs = (CUSTOM_LOCATIONS[type] || []).map(c => ({
+        ...c,
+        dist: haversine(userLat, userLng, c.lat, c.lng),
+        opening_hours: null,
+      }));
+
       places = elements.map(el => {
-        const lat = el.lat || (el.center && el.center.lat);
-        const lng = el.lon || (el.center && el.center.lon);
-        const dist = haversine(45.4621829, -92.9659767, lat, lng);
+        const lat = parseFloat(el.lat ?? el.center?.lat);
+        const lng = parseFloat(el.lon ?? el.center?.lon);
+        if (isNaN(lat) || isNaN(lng)) return null;
+        const dist = haversine(userLat, userLng, lat, lng);
         return {
           name: el.tags?.name || label,
           address: buildAddress(el.tags),
@@ -912,7 +959,10 @@
           phone: el.tags?.phone || null,
           website: el.tags?.website || null,
         };
-      }).sort((a, b) => a.dist - b.dist);
+      }).filter(Boolean).sort((a, b) => a.dist - b.dist);
+
+      // Custom locations always appear first
+      places = [...customs, ...places];
 
       clearInterval(dotsInterval);
       currentIndex = 0;
