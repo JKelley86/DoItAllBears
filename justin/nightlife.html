@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NightFinder — Where To?</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --border: #1e1e2e;
+    --neon: #ff3c6f;
+    --neon2: #ff9f1c;
+    --cyan: #00d4ff;
+    --text: #e8e8f0;
+    --muted: #5a5a7a;
+    --card: #16161f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 10%, rgba(255,60,111,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 80% 90%, rgba(0,212,255,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Noise texture overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 40px 20px 60px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    margin-bottom: 44px;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 12vw, 72px);
+    letter-spacing: 4px;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--neon) 0%, var(--neon2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    position: relative;
+  }
+
+  .logo-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 6px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  /* SCREEN SYSTEM */
+  .screen { display: none; width: 100%; }
+  .screen.active { display: flex; flex-direction: column; align-items: center; }
+
+  /* LOCATION SCREEN */
+  #screen-location { gap: 24px; }
+
+  .location-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px 28px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .location-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .location-card h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .location-card p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--neon), #c4164f);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 32px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255,60,111,0.4);
+  }
+
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* STATUS */
+  .status-msg {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--cyan);
+    text-align: center;
+    min-height: 20px;
+  }
+
+  /* CATEGORY SCREEN */
+  #screen-categories { gap: 20px; }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    align-self: flex-start;
+  }
+
+  .categories-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .cat-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cat-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--cat-color, var(--neon)), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.25s;
+    border-radius: inherit;
+  }
+
+  .cat-btn:hover {
+    transform: translateY(-4px) scale(1.02);
+    border-color: var(--cat-color, var(--neon));
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px var(--cat-color, var(--neon));
+  }
+
+  .cat-btn:hover::before { opacity: 0.1; }
+
+  .cat-btn .cat-emoji {
+    font-size: 36px;
+    display: block;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cat-btn .cat-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1.5px;
+    color: var(--text);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* LUCKY is full width */
+  .cat-btn.lucky {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 20px;
+  }
+
+  .cat-btn.lucky .cat-emoji { margin-bottom: 0; font-size: 28px; }
+
+  /* COMPASS SCREEN */
+  #screen-compass { gap: 28px; }
+
+  .back-btn {
+    align-self: flex-start;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    transition: all 0.2s;
+  }
+
+  .back-btn:hover { color: var(--text); border-color: var(--muted); }
+
+  .place-header {
+    text-align: center;
+    width: 100%;
+  }
+
+  .place-category {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--neon);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .place-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(26px, 7vw, 38px);
+    letter-spacing: 2px;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .place-address {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* COMPASS */
+  .compass-wrap {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    margin: 0 auto;
+  }
+
+  .compass-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--card);
+    box-shadow: 0 0 60px rgba(255,60,111,0.1), inset 0 0 40px rgba(0,0,0,0.5);
+  }
+
+  .compass-ring::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,60,111,0.15);
+  }
+
+  .compass-ticks {
+    position: absolute;
+    inset: 0;
+  }
+
+  .compass-label {
+    position: absolute;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  .compass-label.n { top: 14px; left: 50%; transform: translateX(-50%); color: var(--neon); }
+  .compass-label.s { bottom: 14px; left: 50%; transform: translateX(-50%); }
+  .compass-label.e { right: 14px; top: 50%; transform: translateY(-50%); }
+  .compass-label.w { left: 14px; top: 50%; transform: translateY(-50%); }
+
+  .compass-needle-wrap {
+    position: absolute;
+    inset: 0;
+    transition: transform 1s cubic-bezier(0.34, 1.2, 0.64, 1);
+    transform-origin: center;
+  }
+
+  .compass-needle {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 4px;
+    margin-left: -2px;
+  }
+
+  .needle-north {
+    height: 75px;
+    margin-top: -75px;
+    background: linear-gradient(to top, var(--neon2), var(--neon));
+    border-radius: 2px 2px 0 0;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    width: 14px;
+    margin-left: -7px;
+  }
+
+  .needle-south {
+    height: 55px;
+    background: linear-gradient(to bottom, var(--muted), #2a2a3a);
+    border-radius: 0 0 2px 2px;
+    clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
+    width: 10px;
+    margin-left: -5px;
+  }
+
+  .compass-center {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--neon);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 12px var(--neon);
+    z-index: 2;
+  }
+
+  /* DISTANCE */
+  .distance-badge {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 28px;
+    width: 100%;
+  }
+
+  .distance-icon { font-size: 28px; }
+
+  .distance-info { flex: 1; }
+
+  .distance-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .distance-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 2px;
+    color: var(--neon2);
+    line-height: 1;
+  }
+
+  .distance-unit {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* NAV + DIRECTIONS */
+  .nav-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+  }
+
+  .nav-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .nav-btn:hover:not(:disabled) {
+    border-color: var(--neon);
+    box-shadow: 0 0 20px rgba(255,60,111,0.2);
+  }
+
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .nav-counter {
+    flex: 1;
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 2px;
+  }
+
+  .btn-directions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #00d4ff, #0092cc);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    padding: 16px 24px;
+    width: 100%;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .btn-directions:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,212,255,0.35);
+  }
+
+  /* LOADING SPINNER */
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--neon);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 40px auto;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Searching screen */
+  #screen-searching {
+    gap: 20px;
+    text-align: center;
+  }
+
+  #screen-searching p {
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+
+  /* Error */
+  .error-msg {
+    background: rgba(255,60,111,0.08);
+    border: 1px solid rgba(255,60,111,0.3);
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: var(--neon);
+    font-size: 13px;
+    text-align: center;
+    width: 100%;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* Rating stars */
+  .place-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  .rating {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--neon2);
+  }
+
+  .open-status {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .open-status.open { background: rgba(0,255,150,0.1); color: #00ff96; }
+  .open-status.closed { background: rgba(255,60,111,0.1); color: var(--neon); }
+  .open-status.unknown { background: rgba(90,90,122,0.2); color: var(--muted); }
+
+  /* Pulse ring on compass when loading */
+  @keyframes pulseRing {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(1.3); opacity: 0; }
+  }
+
+  .compass-ring.pulsing::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    border: 2px solid var(--neon);
+    animation: pulseRing 1.2s ease-out infinite;
+  }
+
+  /* Fade in animation */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .screen.active { animation: fadeUp 0.35s ease forwards; }
+
+  .dots {
+    display: inline-block;
+  }
+
+  /* Decorative scanline */
+  .scanline {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon), transparent);
+    opacity: 0.4;
+    animation: scanline 4s linear infinite;
+  }
+
+  @keyframes scanline {
+    0% { top: -2px; }
+    100% { top: 100vh; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scanline"></div>
+
+<div class="container">
+  <header>
+    <div class="logo">NightFinder</div>
+    <div class="logo-sub">Your guide to the night</div>
+  </header>
+
+  <!-- SCREEN 1: Location -->
+  <div id="screen-location" class="screen active">
+    <div class="location-card">
+      <span class="location-icon">📍</span>
+      <h2>Where Are You?</h2>
+      <p>NightFinder needs your location to point you toward the nearest bars, clubs, and everything in between.</p>
+      <button class="btn-primary" id="btn-locate" onclick="requestLocation()">
+        <span>📡</span> Detect My Location
+      </button>
+    </div>
+    <div class="status-msg" id="loc-status"></div>
+    <div id="loc-error"></div>
+  </div>
+
+  <!-- SCREEN 2: Categories -->
+  <div id="screen-categories" class="screen">
+    <div class="section-label">What Are You Looking For?</div>
+    <div class="categories-grid">
+      <button class="cat-btn" style="--cat-color:#ff3c6f" onclick="selectCategory('bar','🍺','Bar')">
+        <span class="cat-emoji">🍺</span>
+        <span class="cat-name">Bars</span>
+      </button>
+      <button class="cat-btn" style="--cat-color:#9b59b6" onclick="selectCategory('liquor_store','🥃','Liquor Store')">
+        <span class="cat-emoji">🥃</span>
+        <span class="cat-name">Liquor Stores</span>
+      </button>
+      <button class="cat-btn" style="--cat-color:#e91e63" onclick="selectCategory('night_club','🎶','Club')">
+        <span class="cat-emoji">🎶</span>
+        <span class="cat-name">Clubs</span>
+      </button>
+      <button class="cat-btn" style="--cat-color:#00d4ff" onclick="selectCategory('casino','🎰','Casino')">
+        <span class="cat-emoji">🎰</span>
+        <span class="cat-name">Casinos</span>
+      </button>
+      <button class="cat-btn" style="--cat-color:#ff9f1c" onclick="selectCategory('pizza_restaurant','🍕','Pizza')">
+        <span class="cat-emoji">🍕</span>
+        <span class="cat-name">Pizza</span>
+      </button>
+      <button class="cat-btn lucky" style="--cat-color:#ffd700" onclick="feelingLucky()">
+        <span class="cat-emoji">🎲</span>
+        <span class="cat-name">Feeling Lucky</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: Searching -->
+  <div id="screen-searching" class="screen">
+    <div class="spinner"></div>
+    <p>SCANNING THE AREA<span class="dots" id="dot-anim">...</span></p>
+  </div>
+
+  <!-- SCREEN 4: Compass -->
+  <div id="screen-compass" class="screen">
+    <button class="back-btn" onclick="showScreen('screen-categories')">← CHANGE CATEGORY</button>
+
+    <div class="place-header">
+      <div class="place-category" id="place-category">Bar</div>
+      <div class="place-name" id="place-name">—</div>
+      <div class="place-address" id="place-address">—</div>
+      <div class="place-meta">
+        <span class="rating" id="place-rating"></span>
+        <span class="open-status unknown" id="place-open"></span>
+      </div>
+    </div>
+
+    <div class="compass-wrap">
+      <div class="compass-ring" id="compass-ring">
+        <span class="compass-label n">N</span>
+        <span class="compass-label s">S</span>
+        <span class="compass-label e">E</span>
+        <span class="compass-label w">W</span>
+        <div class="compass-needle-wrap" id="needle-wrap">
+          <div class="compass-needle needle-north"></div>
+          <div class="compass-needle needle-south"></div>
+        </div>
+        <div class="compass-center"></div>
+      </div>
+    </div>
+
+    <div class="distance-badge">
+      <span class="distance-icon">🗺️</span>
+      <div class="distance-info">
+        <div class="distance-label">Distance</div>
+        <div>
+          <span class="distance-value" id="distance-value">—</span>
+          <span class="distance-unit" id="distance-unit"> mi away</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" id="btn-prev" onclick="navigate(-1)" title="Previous">◀</button>
+      <div class="nav-counter" id="nav-counter">1 / 1</div>
+      <button class="nav-btn" id="btn-next" onclick="navigate(1)" title="Next">▶</button>
+    </div>
+
+    <a class="btn-directions" id="btn-directions" href="#" target="_blank">
+      <span>🧭</span> Get Directions
+    </a>
+  </div>
+
+</div>
+
+<script>
+  // ── STATE ──────────────────────────────────────────────────────────────────
+  let userLat = null, userLng = null;
+  let places = [];
+  let currentIndex = 0;
+  let currentCategory = '';
+  let currentCategoryLabel = '';
+  let deviceBearing = 0;   // device compass heading (degrees)
+  let watchId = null;
+
+  // ── UTILITIES ──────────────────────────────────────────────────────────────
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function setStatus(msg) {
+    document.getElementById('loc-status').textContent = msg;
+  }
+
+  function setError(msg) {
+    const el = document.getElementById('loc-error');
+    if (msg) {
+      el.innerHTML = `<div class="error-msg">${msg}</div>`;
+    } else {
+      el.innerHTML = '';
+    }
+  }
+
+  function deg2rad(d) { return d * Math.PI / 180; }
+  function rad2deg(r) { return r * 180 / Math.PI; }
+
+  // Haversine distance (km)
+  function haversine(lat1, lng1, lat2, lng2) {
+    const R = 6371;
+    const dLat = deg2rad(lat2 - lat1);
+    const dLng = deg2rad(lng2 - lng1);
+    const a = Math.sin(dLat/2)**2 +
+              Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLng/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+
+  // Bearing from user to target (degrees, 0=N, 90=E)
+  function bearingTo(lat1, lng1, lat2, lng2) {
+    const dLng = deg2rad(lng2 - lng1);
+    const y = Math.sin(dLng) * Math.cos(deg2rad(lat2));
+    const x = Math.cos(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) -
+              Math.sin(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(dLng);
+    return (rad2deg(Math.atan2(y, x)) + 360) % 360;
+  }
+
+  function kmToMiles(km) { return km * 0.621371; }
+
+  // ── LOCATION ───────────────────────────────────────────────────────────────
+  function requestLocation() {
+    const btn = document.getElementById('btn-locate');
+    btn.disabled = true;
+    setStatus('Detecting location…');
+    setError('');
+
+    if (!navigator.geolocation) {
+      setError('Geolocation is not supported by your browser.');
+      btn.disabled = false;
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        userLat = pos.coords.latitude;
+        userLng = pos.coords.longitude;
+        setStatus('✓ Location found');
+        setTimeout(() => showScreen('screen-categories'), 600);
+        startCompassWatch();
+      },
+      err => {
+        btn.disabled = false;
+        setStatus('');
+        const msgs = {
+          1: 'Location access denied. Please allow location in your browser settings.',
+          2: 'Location unavailable. Check your signal and try again.',
+          3: 'Location request timed out. Please try again.',
+        };
+        setError(msgs[err.code] || 'Could not get location.');
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+  }
+
+  // ── DEVICE COMPASS ─────────────────────────────────────────────────────────
+  function startCompassWatch() {
+    // DeviceOrientationEvent (needs permission on iOS 13+)
+    if (typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function') {
+      DeviceOrientationEvent.requestPermission()
+        .then(state => {
+          if (state === 'granted') listenOrientation();
+        }).catch(() => {});
+    } else if (window.DeviceOrientationEvent) {
+      listenOrientation();
+    }
+  }
+
+  function listenOrientation() {
+    window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+    window.addEventListener('deviceorientation', handleOrientation, true);
+  }
+
+  function handleOrientation(e) {
+    // alpha = compass heading (0=N on some devices), webkitCompassHeading = iOS
+    if (e.webkitCompassHeading != null) {
+      deviceBearing = e.webkitCompassHeading;
+    } else if (e.absolute && e.alpha != null) {
+      deviceBearing = (360 - e.alpha) % 360;
+    }
+    if (places.length > 0) updateCompassDisplay();
+  }
+
+  // ── CATEGORY SELECTION ─────────────────────────────────────────────────────
+  const LUCKY_OPTIONS = ['bar','liquor_store','night_club','casino','pizza_restaurant'];
+  const LUCKY_LABELS  = { bar:'Bar', liquor_store:'Liquor Store', night_club:'Club', casino:'Casino', pizza_restaurant:'Pizza' };
+
+  function feelingLucky() {
+    const pick = LUCKY_OPTIONS[Math.floor(Math.random() * LUCKY_OPTIONS.length)];
+    selectCategory(pick, '', LUCKY_LABELS[pick]);
+  }
+
+  function selectCategory(type, emoji, label) {
+    currentCategory = type;
+    currentCategoryLabel = label;
+    document.getElementById('place-category').textContent = label;
+    places = [];
+    currentIndex = 0;
+    showScreen('screen-searching');
+    animateDots();
+    searchNearby(type, label);
+  }
+
+  // Dots animation
+  let dotsInterval = null;
+  function animateDots() {
+    clearInterval(dotsInterval);
+    let n = 0;
+    dotsInterval = setInterval(() => {
+      document.getElementById('dot-anim').textContent = '.'.repeat((n++ % 3) + 1);
+    }, 400);
+  }
+
+  // ── PLACES SEARCH via Overpass API (OSM) ──────────────────────────────────
+  const OSM_TAGS = {
+    bar:               '[amenity=bar]',
+    liquor_store:      '[shop=alcohol]',
+    night_club:        '[amenity=nightclub]',
+    casino:            '[amenity=casino]',
+    pizza_restaurant:  '[amenity=restaurant][cuisine=pizza]',
+  };
+
+  // Fallback: pizza_restaurant without cuisine tag if 0 results
+  const OSM_TAGS_FALLBACK = {
+    pizza_restaurant: '[amenity=restaurant][name~"[Pp]izza",i]',
+  };
+
+  async function searchNearby(type, label) {
+    const radius = 10000; // 10 km
+    const tag = OSM_TAGS[type] || '[amenity=bar]';
+    const query = buildOverpassQuery(tag, radius);
+
+    try {
+      const resp = await fetch('https://overpass-api.de/api/interpreter', {
+        method: 'POST',
+        body: 'data=' + encodeURIComponent(query),
+      });
+      const json = await resp.json();
+      let elements = json.elements || [];
+
+      // Fallback for pizza
+      if (elements.length === 0 && OSM_TAGS_FALLBACK[type]) {
+        const query2 = buildOverpassQuery(OSM_TAGS_FALLBACK[type], radius);
+        const resp2 = await fetch('https://overpass-api.de/api/interpreter', {
+          method: 'POST',
+          body: 'data=' + encodeURIComponent(query2),
+        });
+        const json2 = await resp2.json();
+        elements = json2.elements || [];
+      }
+
+      if (elements.length === 0) {
+        clearInterval(dotsInterval);
+        showScreen('screen-categories');
+        alert(`No ${label} found within 10 km. Try a different category or check your location.`);
+        return;
+      }
+
+      // Compute distance for each, sort
+      places = elements.map(el => {
+        const lat = el.lat || (el.center && el.center.lat);
+        const lng = el.lon || (el.center && el.center.lon);
+        const dist = haversine(45.4621829, -92.9659767, lat, lng);
+        return {
+          name: el.tags?.name || label,
+          address: buildAddress(el.tags),
+          lat, lng, dist,
+          opening_hours: el.tags?.opening_hours || null,
+          phone: el.tags?.phone || null,
+          website: el.tags?.website || null,
+        };
+      }).sort((a, b) => a.dist - b.dist);
+
+      clearInterval(dotsInterval);
+      currentIndex = 0;
+      showCompassScreen();
+
+    } catch (err) {
+      clearInterval(dotsInterval);
+      showScreen('screen-categories');
+      alert('Could not fetch places. Check your internet connection and try again.');
+    }
+  }
+
+  function buildOverpassQuery(tag, radius) {
+    return `
+      [out:json][timeout:15];
+      (
+        node${tag}(around:${radius},${userLat},${userLng});
+        way${tag}(around:${radius},${userLat},${userLng});
+      );
+      out center;
+    `;
+  }
+
+  function buildAddress(tags) {
+    if (!tags) return '';
+    const parts = [];
+    if (tags['addr:housenumber'] && tags['addr:street'])
+      parts.push(`${tags['addr:housenumber']} ${tags['addr:street']}`);
+    else if (tags['addr:street'])
+      parts.push(tags['addr:street']);
+    if (tags['addr:city']) parts.push(tags['addr:city']);
+    return parts.join(', ');
+  }
+
+  // ── COMPASS SCREEN ─────────────────────────────────────────────────────────
+  function showCompassScreen() {
+    showScreen('screen-compass');
+    renderPlace();
+  }
+
+  function renderPlace() {
+    const p = places[currentIndex];
+    if (!p) return;
+
+    document.getElementById('place-name').textContent = p.name;
+    document.getElementById('place-address').textContent = p.address || 'Address not listed';
+
+    // Distance
+    const miles = kmToMiles(p.dist);
+    if (miles < 0.1) {
+      document.getElementById('distance-value').textContent = Math.round(miles * 5280);
+      document.getElementById('distance-unit').textContent = ' ft away';
+    } else {
+      document.getElementById('distance-value').textContent = miles.toFixed(1);
+      document.getElementById('distance-unit').textContent = ' mi away';
+    }
+
+    // Opening hours
+    const openEl = document.getElementById('place-open');
+    if (p.opening_hours) {
+      openEl.textContent = '⏰ Hours: ' + p.opening_hours.slice(0, 40);
+      openEl.className = 'open-status unknown';
+    } else {
+      openEl.textContent = 'Hours unknown';
+      openEl.className = 'open-status unknown';
+    }
+
+    // Rating placeholder
+    document.getElementById('place-rating').textContent = '';
+
+    // Nav counter
+    document.getElementById('nav-counter').textContent = `${currentIndex + 1} / ${places.length}`;
+    document.getElementById('btn-prev').disabled = currentIndex === 0;
+    document.getElementById('btn-next').disabled = currentIndex === places.length - 1;
+
+    // Directions
+    const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${p.lat},${p.lng}&travelmode=driving`;
+    document.getElementById('btn-directions').href = mapsUrl;
+
+    updateCompassDisplay();
+  }
+
+  function updateCompassDisplay() {
+    if (!places[currentIndex]) return;
+    const p = places[currentIndex];
+    const bearing = bearingTo(userLat, userLng, p.lat, p.lng);
+    // Needle should point at bearing, adjusted for device heading
+    const needleAngle = bearing - deviceBearing;
+    document.getElementById('needle-wrap').style.transform = `rotate(${needleAngle}deg)`;
+  }
+
+  function navigate(dir) {
+    const next = currentIndex + dir;
+    if (next < 0 || next >= places.length) return;
+    currentIndex = next;
+    renderPlace();
+  }
+
+</script>
+</body>
+</html>
