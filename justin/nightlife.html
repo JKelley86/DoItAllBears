@@ -360,7 +360,7 @@
   .compass-needle-wrap {
     position: absolute;
     inset: 0;
-    transition: transform 1s cubic-bezier(0.34, 1.2, 0.64, 1);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     transform-origin: center;
   }
 
@@ -717,6 +717,13 @@
       </div>
     </div>
 
+    <!-- Arrived banner (hidden until close) -->
+    <div id="arrived-banner" style="display:none; background:rgba(0,255,150,0.08); border:1px solid rgba(0,255,150,0.4); border-radius:16px; padding:18px 24px; width:100%; align-items:center; justify-content:center; gap:12px; flex-direction:column; text-align:center;">
+      <div style="font-size:42px;">🎉</div>
+      <div style="font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:2px; color:#00ff96;">YOU MADE IT!</div>
+      <div style="font-family:'Space Mono',monospace; font-size:11px; color:#5a5a7a; letter-spacing:2px;">Go get that drink 🍺</div>
+    </div>
+
     <div class="nav-row">
       <button class="nav-btn" id="btn-prev" onclick="navigate(-1)" title="Previous">◀</button>
       <div class="nav-counter" id="nav-counter">1 / 1</div>
@@ -802,7 +809,8 @@
         userLng = pos.coords.longitude;
         setStatus('✓ Location found');
         setTimeout(() => showScreen('screen-categories'), 600);
-        startCompassWatch();
+        // Start live tracking now so GPS+compass are ready when compass screen opens
+        startLiveTracking();
       },
       err => {
         btn.disabled = false;
@@ -818,30 +826,69 @@
     );
   }
 
-  // ── DEVICE COMPASS ─────────────────────────────────────────────────────────
-  function startCompassWatch() {
-    // DeviceOrientationEvent (needs permission on iOS 13+)
+  // ── LIVE TRACKING ──────────────────────────────────────────────────────────
+  let gpsWatchId = null;
+  let currentNeedleAngle = 0;   // tracks current rendered angle to avoid wrap-around jumps
+  let hasCompass = false;
+
+  function startLiveTracking() {
+    // 1. Continuous GPS watch — updates position as user walks around
+    if (navigator.geolocation) {
+      gpsWatchId = navigator.geolocation.watchPosition(
+        pos => {
+          userLat = pos.coords.latitude;
+          userLng  = pos.coords.longitude;
+          // Recalculate distance for current place live
+          if (places[currentIndex]) {
+            places[currentIndex].dist = haversine(userLat, userLng, places[currentIndex].lat, places[currentIndex].lng);
+            updateDistanceDisplay();
+          }
+          updateCompassDisplay();
+        },
+        () => {}, // silent fail — we already have an initial position
+        { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
+      );
+    }
+
+    // 2. Device compass orientation
     if (typeof DeviceOrientationEvent !== 'undefined' &&
         typeof DeviceOrientationEvent.requestPermission === 'function') {
+      // iOS 13+ requires a user gesture to request — we trigger this from the
+      // compass screen so the user has already tapped something
       DeviceOrientationEvent.requestPermission()
-        .then(state => {
-          if (state === 'granted') listenOrientation();
-        }).catch(() => {});
+        .then(state => { if (state === 'granted') listenOrientation(); })
+        .catch(() => {});
     } else if (window.DeviceOrientationEvent) {
       listenOrientation();
     }
   }
 
+  function stopLiveTracking() {
+    if (gpsWatchId !== null) {
+      navigator.geolocation.clearWatch(gpsWatchId);
+      gpsWatchId = null;
+    }
+    window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
+    window.removeEventListener('deviceorientation', handleOrientation, true);
+  }
+
   function listenOrientation() {
+    // Prefer absolute (Android) over relative, both for safety
     window.addEventListener('deviceorientationabsolute', handleOrientation, true);
     window.addEventListener('deviceorientation', handleOrientation, true);
   }
 
   function handleOrientation(e) {
-    // alpha = compass heading (0=N on some devices), webkitCompassHeading = iOS
     if (e.webkitCompassHeading != null) {
+      // iOS — webkitCompassHeading is degrees from true north, clockwise
       deviceBearing = e.webkitCompassHeading;
+      hasCompass = true;
     } else if (e.absolute && e.alpha != null) {
+      // Android absolute
+      deviceBearing = (360 - e.alpha) % 360;
+      hasCompass = true;
+    } else if (!hasCompass && e.alpha != null) {
+      // Relative fallback — better than nothing
       deviceBearing = (360 - e.alpha) % 360;
     }
     if (places.length > 0) updateCompassDisplay();
@@ -1010,27 +1057,16 @@
     document.getElementById('place-name').textContent = p.name;
     document.getElementById('place-address').textContent = p.address || 'Address not listed';
 
-    // Distance
-    const miles = kmToMiles(p.dist);
-    if (miles < 0.1) {
-      document.getElementById('distance-value').textContent = Math.round(miles * 5280);
-      document.getElementById('distance-unit').textContent = ' ft away';
-    } else {
-      document.getElementById('distance-value').textContent = miles.toFixed(1);
-      document.getElementById('distance-unit').textContent = ' mi away';
-    }
-
     // Opening hours
     const openEl = document.getElementById('place-open');
     if (p.opening_hours) {
-      openEl.textContent = '⏰ Hours: ' + p.opening_hours.slice(0, 40);
+      openEl.textContent = '⏰ ' + p.opening_hours.slice(0, 40);
       openEl.className = 'open-status unknown';
     } else {
       openEl.textContent = 'Hours unknown';
       openEl.className = 'open-status unknown';
     }
 
-    // Rating placeholder
     document.getElementById('place-rating').textContent = '';
 
     // Nav counter
@@ -1038,20 +1074,58 @@
     document.getElementById('btn-prev').disabled = currentIndex === 0;
     document.getElementById('btn-next').disabled = currentIndex === places.length - 1;
 
-    // Directions
-    const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${p.lat},${p.lng}&travelmode=driving`;
-    document.getElementById('btn-directions').href = mapsUrl;
+    // Directions — always uses live userLat/userLng at click time
+    document.getElementById('btn-directions').onclick = () => {
+      const url = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${p.lat},${p.lng}&travelmode=walking`;
+      window.open(url, '_blank');
+    };
 
+    updateDistanceDisplay();
     updateCompassDisplay();
   }
 
-  function updateCompassDisplay() {
-    if (!places[currentIndex]) return;
+  function updateDistanceDisplay() {
     const p = places[currentIndex];
+    if (!p) return;
+    // Recalc live distance from current position
+    const dist = haversine(userLat, userLng, p.lat, p.lng);
+    p.dist = dist;
+    const miles = kmToMiles(dist);
+
+    const arrivedBanner = document.getElementById('arrived-banner');
+
+    if (miles < 0.05) {
+      // ~264 ft — close enough, show arrived banner
+      document.getElementById('distance-value').textContent = '🎉';
+      document.getElementById('distance-unit').textContent = " YOU'RE HERE!";
+      if (arrivedBanner) arrivedBanner.style.display = 'flex';
+    } else {
+      if (arrivedBanner) arrivedBanner.style.display = 'none';
+      if (miles < 0.1) {
+        document.getElementById('distance-value').textContent = Math.round(miles * 5280);
+        document.getElementById('distance-unit').textContent = ' ft away';
+      } else {
+        document.getElementById('distance-value').textContent = miles.toFixed(1);
+        document.getElementById('distance-unit').textContent = ' mi away';
+      }
+    }
+  }
+
+  function updateCompassDisplay() {
+    const p = places[currentIndex];
+    if (!p) return;
+
     const bearing = bearingTo(userLat, userLng, p.lat, p.lng);
-    // Needle should point at bearing, adjusted for device heading
-    const needleAngle = bearing - deviceBearing;
-    document.getElementById('needle-wrap').style.transform = `rotate(${needleAngle}deg)`;
+    // Target needle angle = bearing relative to device heading
+    let targetAngle = bearing - deviceBearing;
+
+    // Shortest-path rotation — avoids spinning 350° the wrong way
+    let delta = ((targetAngle - currentNeedleAngle) % 360 + 540) % 360 - 180;
+    currentNeedleAngle += delta;
+
+    const needle = document.getElementById('needle-wrap');
+    // Smooth CSS transition handles the animation
+    needle.style.transform = `rotate(${currentNeedleAngle}deg)`;
   }
 
   function navigate(dir) {
