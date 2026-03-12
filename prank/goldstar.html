@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Official Gold Star Evaluation System</title>
+
+<style>
+
+body{
+    background:#0b0f1a;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+}
+
+.panel{
+    background:#111827;
+    padding:30px;
+    border-radius:10px;
+    margin-top:20px;
+    box-shadow:0 0 25px rgba(255,215,0,.2);
+}
+
+.stars{
+    font-size:50px;
+    margin:20px;
+}
+
+.star{
+    color:gold;
+    text-shadow:0 0 12px gold;
+    animation: twinkle 2s infinite alternate;
+}
+
+@keyframes twinkle{
+    from{opacity:.6; transform:scale(1);}
+    to{opacity:1; transform:scale(1.15);}
+}
+
+.progress{
+    height:30px;
+    background:#1f2937;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.bar{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,gold,orange);
+    transition:width 3s;
+}
+
+.loadingText{
+    margin-top:15px;
+    font-style:italic;
+}
+
+.stat{
+    margin:10px;
+}
+
+button{
+    padding:10px 20px;
+    background:gold;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:orange;
+}
+
+.certificate{
+    display:none;
+    margin-top:40px;
+    padding:40px;
+    background:white;
+    color:black;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>⭐ International Gold Star Evaluation System ⭐</h1>
+
+<div class="panel">
+
+<h3>AI Performance Analysis</h3>
+
+<div class="progress">
+<div id="progressBar" class="bar"></div>
+</div>
+
+<div id="loadingText" class="loadingText">
+Initializing evaluation engines...
+</div>
+
+</div>
+
+<div id="results" class="panel" style="display:none">
+
+<h2>Evaluation Results</h2>
+
+<div id="stars" class="stars"></div>
+
+<div class="stat">Total Stars Awarded: <b id="starNumber"></b></div>
+
+<div class="stat">Performance Score: <b id="score"></b></div>
+
+<div class="stat">Star Inflation Index: <b id="inflation"></b></div>
+
+<div class="stat">Global Percentile Rank: <b id="percentile"></b></div>
+
+<button onclick="printCertificate()">Print Official Certificate</button>
+
+</div>
+
+<div id="certificate" class="certificate">
+
+<h1>Official Gold Star Certificate</h1>
+
+<p>This certifies that</p>
+
+<h2>________________________</h2>
+
+<p>has been awarded</p>
+
+<h1 id="certStars"></h1>
+
+<p>Gold Stars</p>
+
+<p>By the International Committee for Excellence</p>
+
+</div>
+
+</div>
+
+<script>
+
+// =============================
+// ONLY CHANGE THIS NUMBER
+// =============================
+
+const STAR_COUNT = 1;
+
+// =============================
+
+const messages = [
+"Initializing neural evaluation matrix...",
+"Consulting international star council...",
+"Analyzing behavioral excellence...",
+"Calculating achievement vectors...",
+"Cross referencing NASA performance metrics...",
+"Running 12,000 simulated life scenarios...",
+"Finalizing cosmic performance score..."
+];
+
+let step = 0;
+
+let progress = document.getElementById("progressBar");
+let loadingText = document.getElementById("loadingText");
+
+function runAnalysis(){
+
+    let interval = setInterval(()=>{
+
+        step++;
+
+        progress.style.width = (step*15) + "%";
+
+        if(step < messages.length){
+            loadingText.innerText = messages[step];
+        }
+
+        if(step >= messages.length){
+
+            clearInterval(interval);
+            showResults();
+
+        }
+
+    },900);
+
+}
+
+function showResults(){
+
+    document.getElementById("results").style.display="block";
+
+    document.getElementById("starNumber").innerText = STAR_COUNT;
+
+    // stars
+
+    let starHTML="";
+
+    for(let i=0;i<STAR_COUNT;i++){
+        starHTML += '<span class="star">★</span>';
+    }
+
+    document.getElementById("stars").innerHTML = starHTML;
+
+    // fake scoring algorithm
+
+    let score = (STAR_COUNT*137)%100 + 50;
+
+    document.getElementById("score").innerText = score + "/150";
+
+    // star inflation stats
+
+    let inflation = (STAR_COUNT*3.4).toFixed(2);
+
+    document.getElementById("inflation").innerText =
+        inflation + "% annual star inflation";
+
+    let percentile = Math.min(99, STAR_COUNT*12);
+
+    document.getElementById("percentile").innerText =
+        percentile + "th percentile";
+
+}
+
+function printCertificate(){
+
+    document.getElementById("certificate").style.display="block";
+
+    document.getElementById("certStars").innerText =
+        STAR_COUNT + " Gold Stars";
+
+    window.print();
+
+}
+
+runAnalysis();
+
+</script>
+
+</body>
+</html>
