@@ -2,87 +2,112 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Official Gold Star Evaluation System</title>
+<title>Gold Star System</title>
 
 <style>
 
 body{
-    background:#0b0f1a;
-    color:white;
-    font-family:Arial;
-    text-align:center;
+margin:0;
+font-family:Arial;
+background:#0b0f1a;
+color:white;
+}
+
+header{
+display:flex;
+align-items:center;
+padding:15px;
+background:#111827;
+box-shadow:0 0 10px black;
+}
+
+.menuBtn{
+font-size:24px;
+cursor:pointer;
+margin-right:15px;
+}
+
+.title{
+font-size:18px;
+}
+
+.sidebar{
+position:fixed;
+top:0;
+left:-260px;
+width:260px;
+height:100%;
+background:#111827;
+transition:.3s;
+padding-top:60px;
+z-index:5;
+}
+
+.sidebar a{
+display:block;
+padding:15px;
+color:white;
+text-decoration:none;
+border-bottom:1px solid #1f2937;
+}
+
+.sidebar a:hover{
+background:#1f2937;
 }
 
 .container{
-    max-width:900px;
-    margin:auto;
+padding:15px;
+max-width:500px;
+margin:auto;
 }
 
-.panel{
-    background:#111827;
-    padding:30px;
-    border-radius:10px;
-    margin-top:20px;
-    box-shadow:0 0 25px rgba(255,215,0,.2);
+.card{
+background:#111827;
+padding:18px;
+margin-bottom:15px;
+border-radius:10px;
+box-shadow:0 0 15px rgba(255,215,0,.15);
 }
 
 .stars{
-    font-size:50px;
-    margin:20px;
-}
-
-.star{
-    color:gold;
-    text-shadow:0 0 12px gold;
-    animation: twinkle 2s infinite alternate;
-}
-
-@keyframes twinkle{
-    from{opacity:.6; transform:scale(1);}
-    to{opacity:1; transform:scale(1.15);}
+font-size:40px;
+text-align:center;
+color:gold;
 }
 
 .progress{
-    height:30px;
-    background:#1f2937;
-    border-radius:20px;
-    overflow:hidden;
+height:18px;
+background:#1f2937;
+border-radius:20px;
+overflow:hidden;
 }
 
 .bar{
-    height:100%;
-    width:0%;
-    background:linear-gradient(90deg,gold,orange);
-    transition:width 3s;
-}
-
-.loadingText{
-    margin-top:15px;
-    font-style:italic;
+height:100%;
+width:0%;
+background:linear-gradient(90deg,gold,orange);
+transition:2s;
 }
 
 .stat{
-    margin:10px;
+margin-top:8px;
+font-size:14px;
+opacity:.9;
+}
+
+.logs{
+font-size:12px;
+opacity:.7;
+max-height:100px;
+overflow:auto;
 }
 
 button{
-    padding:10px 20px;
-    background:gold;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-}
-
-button:hover{
-    background:orange;
-}
-
-.certificate{
-    display:none;
-    margin-top:40px;
-    padding:40px;
-    background:white;
-    color:black;
+margin-top:10px;
+padding:8px 14px;
+background:gold;
+border:none;
+border-radius:6px;
 }
 
 </style>
@@ -90,57 +115,94 @@ button:hover{
 
 <body>
 
+<div class="sidebar" id="sidebar">
+
+<a href="#">Dashboard</a>
+<a href="#">Star Economy</a>
+<a href="#">AI Performance Audit</a>
+<a href="#">International Rankings</a>
+<a href="#">Gold Star Congress</a>
+<a href="#">Historical Star Archives</a>
+<a href="#">Certification Center</a>
+
+</div>
+
+<header>
+
+<div class="menuBtn" onclick="toggleMenu()">☰</div>
+<div class="title">Gold Star Evaluation System</div>
+
+</header>
+
 <div class="container">
 
-<h1>⭐ International Gold Star Evaluation System ⭐</h1>
+<div class="card">
 
-<div class="panel">
-
-<h3>AI Performance Analysis</h3>
+<h3>AI Evaluation</h3>
 
 <div class="progress">
-<div id="progressBar" class="bar"></div>
+<div id="bar" class="bar"></div>
 </div>
 
-<div id="loadingText" class="loadingText">
-Initializing evaluation engines...
+<div id="analysisText">
+Initializing evaluation engine...
 </div>
 
 </div>
 
-<div id="results" class="panel" style="display:none">
+<div class="card">
 
-<h2>Evaluation Results</h2>
+<h3>Gold Star Count</h3>
 
 <div id="stars" class="stars"></div>
 
-<div class="stat">Total Stars Awarded: <b id="starNumber"></b></div>
-
-<div class="stat">Performance Score: <b id="score"></b></div>
-
-<div class="stat">Star Inflation Index: <b id="inflation"></b></div>
-
-<div class="stat">Global Percentile Rank: <b id="percentile"></b></div>
-
-<button onclick="printCertificate()">Print Official Certificate</button>
+<div class="stat">
+Total Stars Awarded: <b id="starNum"></b>
+</div>
 
 </div>
 
-<div id="certificate" class="certificate">
+<div class="card">
 
-<h1>Official Gold Star Certificate</h1>
+<h3>Performance Metrics</h3>
 
-<p>This certifies that</p>
+<div class="stat">AI Score: <b id="score"></b></div>
+<div class="stat">Global Rank: <b id="rank"></b></div>
+<div class="stat">Productivity Index: <b id="prod"></b></div>
 
-<h2>________________________</h2>
+</div>
 
-<p>has been awarded</p>
+<div class="card">
 
-<h1 id="certStars"></h1>
+<h3>Star Inflation Statistics</h3>
 
-<p>Gold Stars</p>
+<div class="stat">Annual Star Inflation: <b id="inflation"></b></div>
+<div class="stat">Gold Reserve Stability: 94%</div>
+<div class="stat">Star Central Bank Interest Rate: 3.2%</div>
 
-<p>By the International Committee for Excellence</p>
+</div>
+
+<div class="card">
+
+<h3>Leaderboard</h3>
+
+<div class="stat">1. Your Friend — <span id="leaderStars"></span> ⭐</div>
+
+</div>
+
+<div class="card">
+
+<h3>System Logs</h3>
+
+<div class="logs" id="logs"></div>
+
+</div>
+
+<div class="card">
+
+<h3>Certification</h3>
+
+<button onclick="printCert()">Print Gold Star Certificate</button>
 
 </div>
 
@@ -148,96 +210,98 @@ Initializing evaluation engines...
 
 <script>
 
-// =============================
-// ONLY CHANGE THIS NUMBER
-// =============================
+const STAR_COUNT = 2;
 
-const STAR_COUNT = 1;
-
-// =============================
-
-const messages = [
-"Initializing neural evaluation matrix...",
+const analysisMessages = [
+"Initializing neural networks...",
 "Consulting international star council...",
-"Analyzing behavioral excellence...",
-"Calculating achievement vectors...",
-"Cross referencing NASA performance metrics...",
-"Running 12,000 simulated life scenarios...",
-"Finalizing cosmic performance score..."
+"Running 9,000 simulated scenarios...",
+"Evaluating cosmic performance metrics...",
+"Checking Nobel prize database...",
+"Calculating final rating..."
 ];
 
-let step = 0;
-
-let progress = document.getElementById("progressBar");
-let loadingText = document.getElementById("loadingText");
+let index=0;
 
 function runAnalysis(){
 
-    let interval = setInterval(()=>{
+let interval=setInterval(()=>{
 
-        step++;
+index++;
 
-        progress.style.width = (step*15) + "%";
+document.getElementById("analysisText").innerText =
+analysisMessages[index];
 
-        if(step < messages.length){
-            loadingText.innerText = messages[step];
-        }
+document.getElementById("bar").style.width =
+(index/analysisMessages.length*100)+"%";
 
-        if(step >= messages.length){
+addLog(analysisMessages[index]);
 
-            clearInterval(interval);
-            showResults();
+if(index>=analysisMessages.length-1){
 
-        }
+clearInterval(interval);
 
-    },900);
+showResults();
+
+}
+
+},800)
 
 }
 
 function showResults(){
 
-    document.getElementById("results").style.display="block";
+document.getElementById("starNum").innerText=STAR_COUNT;
 
-    document.getElementById("starNumber").innerText = STAR_COUNT;
+document.getElementById("leaderStars").innerText=STAR_COUNT;
 
-    // stars
+let stars="";
 
-    let starHTML="";
+for(let i=0;i<STAR_COUNT;i++){
+stars+="★";
+}
 
-    for(let i=0;i<STAR_COUNT;i++){
-        starHTML += '<span class="star">★</span>';
-    }
+document.getElementById("stars").innerText=stars;
 
-    document.getElementById("stars").innerHTML = starHTML;
+let score=(STAR_COUNT*137)%100+50;
 
-    // fake scoring algorithm
+document.getElementById("score").innerText=score+"/150";
 
-    let score = (STAR_COUNT*137)%100 + 50;
+document.getElementById("rank").innerText=Math.min(99,STAR_COUNT*12)+"th percentile";
 
-    document.getElementById("score").innerText = score + "/150";
+document.getElementById("prod").innerText=(STAR_COUNT*8)+" productivity units";
 
-    // star inflation stats
-
-    let inflation = (STAR_COUNT*3.4).toFixed(2);
-
-    document.getElementById("inflation").innerText =
-        inflation + "% annual star inflation";
-
-    let percentile = Math.min(99, STAR_COUNT*12);
-
-    document.getElementById("percentile").innerText =
-        percentile + "th percentile";
+document.getElementById("inflation").innerText=(STAR_COUNT*3.1).toFixed(2)+"%";
 
 }
 
-function printCertificate(){
+function toggleMenu(){
 
-    document.getElementById("certificate").style.display="block";
+let s=document.getElementById("sidebar");
 
-    document.getElementById("certStars").innerText =
-        STAR_COUNT + " Gold Stars";
+if(s.style.left==="0px"){
+s.style.left="-260px";
+}else{
+s.style.left="0px";
+}
 
-    window.print();
+}
+
+function addLog(text){
+
+let log=document.getElementById("logs");
+
+let time=new Date().toLocaleTimeString();
+
+log.innerHTML+="["+time+"] "+text+"<br>";
+
+log.scrollTop=log.scrollHeight;
+
+}
+
+function printCert(){
+
+window.print();
 
 }
 
