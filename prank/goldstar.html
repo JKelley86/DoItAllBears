@@ -11,6 +11,7 @@ margin:0;
 font-family:Arial;
 background:#0b0f1a;
 color:white;
+font-size:22px;
 }
 
 /* LOADING */
@@ -25,13 +26,17 @@ flex-direction:column;
 justify-content:center;
 align-items:center;
 text-align:center;
-padding:30px;
+padding:40px;
 z-index:10;
+}
+
+#loading h1{
+font-size:42px;
 }
 
 .progress{
 width:90%;
-height:26px;
+height:40px;
 background:#1f2937;
 border-radius:20px;
 overflow:hidden;
@@ -50,14 +55,14 @@ transition:.7s;
 header{
 display:flex;
 align-items:center;
-padding:18px;
-font-size:22px;
+padding:24px;
+font-size:34px;
 background:#111827;
 }
 
 .menuBtn{
-font-size:30px;
-margin-right:20px;
+font-size:40px;
+margin-right:25px;
 cursor:pointer;
 }
 
@@ -66,19 +71,19 @@ cursor:pointer;
 .sidebar{
 position:fixed;
 top:0;
-left:-260px;
-width:260px;
+left:-300px;
+width:300px;
 height:100%;
 background:#111827;
 transition:.3s;
-padding-top:60px;
+padding-top:80px;
 z-index:5;
 }
 
 .sidebar a{
 display:block;
-padding:18px;
-font-size:18px;
+padding:24px;
+font-size:26px;
 color:white;
 text-decoration:none;
 border-bottom:1px solid #1f2937;
@@ -86,9 +91,9 @@ border-bottom:1px solid #1f2937;
 
 .close{
 position:absolute;
-top:10px;
-right:15px;
-font-size:28px;
+top:20px;
+right:20px;
+font-size:40px;
 cursor:pointer;
 }
 
@@ -96,8 +101,8 @@ cursor:pointer;
 
 .screen{
 display:none;
-padding:20px;
-max-width:650px;
+padding:30px;
+max-width:700px;
 margin:auto;
 }
 
@@ -107,35 +112,40 @@ display:block;
 
 .card{
 background:#111827;
-padding:22px;
-margin-bottom:18px;
-border-radius:12px;
-font-size:19px;
+padding:30px;
+margin-bottom:24px;
+border-radius:16px;
+font-size:26px;
 }
 
-h3{margin-top:0}
+h3{
+margin-top:0;
+font-size:32px;
+}
 
-.stat{margin-top:10px}
+.stat{
+margin-top:14px;
+}
 
 .stars{
-font-size:48px;
+font-size:90px;
 color:gold;
 text-align:center;
 }
 
 .logs{
-font-size:14px;
-max-height:120px;
+font-size:18px;
+max-height:160px;
 overflow:auto;
 }
 
 button{
-padding:12px 18px;
-font-size:18px;
+padding:18px 24px;
+font-size:26px;
 background:gold;
 border:none;
-border-radius:8px;
-margin-top:15px;
+border-radius:12px;
+margin-top:20px;
 }
 
 /* CERTIFICATE */
@@ -145,7 +155,16 @@ display:none;
 background:white;
 color:black;
 text-align:center;
-padding:40px;
+padding:80px;
+font-size:30px;
+}
+
+#certificate h1{
+font-size:56px;
+}
+
+#certificate h2{
+font-size:42px;
 }
 
 @media print{
@@ -168,8 +187,6 @@ width:100%;
 
 <body>
 
-<!-- LOADING -->
-
 <div id="loading">
 
 <h1>AI Behavioral Evaluation</h1>
@@ -183,8 +200,6 @@ Initializing evaluation engine...
 </div>
 
 </div>
-
-<!-- SIDEBAR -->
 
 <div class="sidebar" id="sidebar">
 
@@ -203,7 +218,7 @@ Initializing evaluation engine...
 
 <div class="menuBtn" onclick="toggleMenu()">☰</div>
 
-Gold Star Evaluation System
+Gold Star Evaluation
 
 </header>
 
@@ -305,20 +320,6 @@ AI Conclusion: Improvement strongly recommended.
 
 </div>
 
-<div class="card">
-
-<h3>Recommended Improvement Program</h3>
-
-<div class="stat">
-
-• Attempt basic productivity  
-• Increase effort above minimal threshold  
-• Seek additional gold stars where possible  
-
-</div>
-
-</div>
-
 <button onclick="openPage('dashboard')">← Back</button>
 
 </div>
@@ -362,19 +363,13 @@ AI Conclusion: Improvement strongly recommended.
 
 </div>
 
-<!-- CERT CENTER -->
+<!-- CERT -->
 
 <div id="certcenter" class="screen">
 
 <div class="card">
 
 <h3>Certification Center</h3>
-
-<div class="stat">
-
-Generate an official certificate verifying Ryan Grise's star evaluation.
-
-</div>
 
 <button onclick="printCert()">Generate Certificate</button>
 
@@ -383,8 +378,6 @@ Generate an official certificate verifying Ryan Grise's star evaluation.
 <button onclick="openPage('dashboard')">← Back</button>
 
 </div>
-
-<!-- CERTIFICATE -->
 
 <div id="certificate">
 
@@ -406,7 +399,7 @@ Generate an official certificate verifying Ryan Grise's star evaluation.
 
 <script>
 
-const STAR_COUNT = 7;
+const STAR_COUNT = 1;
 
 const messages=[
 "Initializing neural analysis...",
@@ -482,9 +475,9 @@ document.getElementById("inflation").innerText=(STAR_COUNT*3.2).toFixed(2)+"%";
 document.getElementById("comment").innerText=
 comments[Math.floor(Math.random()*comments.length)];
 
-if(STAR_COUNT<10){
+if(STAR_COUNT<5){
 document.getElementById("alert").innerText=
-"WARNING: Ryan Grise's star count is significantly below recommended levels.";
+"WARNING: Ryan Grise's star count is critically low.";
 }else{
 document.getElementById("alert").innerText=
 "Star levels acceptable.";
@@ -497,7 +490,7 @@ function toggleMenu(){
 let s=document.getElementById("sidebar");
 
 if(s.style.left==="0px"){
-s.style.left="-260px";
+s.style.left="-300px";
 }else{
 s.style.left="0px";
 }
