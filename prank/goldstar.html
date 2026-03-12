@@ -2,23 +2,21 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Gold Star Evaluation System</title>
+<title>Gold Star Authority</title>
 
 <style>
 
 body{
 margin:0;
-font-family:Arial,Helvetica,sans-serif;
+font-family:Arial;
 background:#0b0f1a;
 color:white;
 }
 
-/* ---------- LOADING SCREEN ---------- */
+/* LOADING */
 
-#loadingScreen{
+#loading{
 position:fixed;
-top:0;
-left:0;
 width:100%;
 height:100%;
 background:#0b0f1a;
@@ -26,19 +24,14 @@ display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
-padding:30px;
 text-align:center;
+padding:30px;
 z-index:10;
-}
-
-.loadingText{
-font-size:20px;
-margin-top:20px;
 }
 
 .progress{
 width:90%;
-height:24px;
+height:26px;
 background:#1f2937;
 border-radius:20px;
 overflow:hidden;
@@ -49,10 +42,10 @@ margin-top:30px;
 height:100%;
 width:0%;
 background:linear-gradient(90deg,gold,orange);
-transition:.8s;
+transition:.7s;
 }
 
-/* ---------- HEADER ---------- */
+/* HEADER */
 
 header{
 display:flex;
@@ -63,12 +56,12 @@ background:#111827;
 }
 
 .menuBtn{
-font-size:28px;
+font-size:30px;
 margin-right:20px;
 cursor:pointer;
 }
 
-/* ---------- SIDEBAR ---------- */
+/* SIDEBAR */
 
 .sidebar{
 position:fixed;
@@ -91,7 +84,7 @@ text-decoration:none;
 border-bottom:1px solid #1f2937;
 }
 
-.closeMenu{
+.close{
 position:absolute;
 top:10px;
 right:15px;
@@ -99,12 +92,17 @@ font-size:28px;
 cursor:pointer;
 }
 
-/* ---------- CONTENT ---------- */
+/* SCREENS */
 
-.container{
+.screen{
+display:none;
 padding:20px;
-max-width:600px;
+max-width:650px;
 margin:auto;
+}
+
+.active{
+display:block;
 }
 
 .card{
@@ -112,73 +110,49 @@ background:#111827;
 padding:22px;
 margin-bottom:18px;
 border-radius:12px;
-font-size:18px;
+font-size:19px;
 }
 
-h3{
-margin-top:0;
-}
+h3{margin-top:0}
+
+.stat{margin-top:10px}
 
 .stars{
-font-size:50px;
-text-align:center;
+font-size:48px;
 color:gold;
-margin:10px 0;
-}
-
-.stat{
-margin-top:10px;
-font-size:20px;
+text-align:center;
 }
 
 .logs{
 font-size:14px;
-opacity:.8;
 max-height:120px;
 overflow:auto;
 }
 
 button{
-margin-top:15px;
 padding:12px 18px;
 font-size:18px;
 background:gold;
 border:none;
 border-radius:8px;
+margin-top:15px;
 }
 
-/* ---------- CERTIFICATE ---------- */
+/* CERTIFICATE */
 
 #certificate{
 display:none;
+background:white;
+color:black;
 text-align:center;
 padding:40px;
-color:black;
-background:white;
 }
 
-.certTitle{
-font-size:36px;
-margin-bottom:20px;
-}
+@media print{
 
-.certStars{
-font-size:40px;
-margin:20px;
-}
+body *{display:none}
 
-/* print mode */
-
-@media print {
-
-body *{
-display:none;
-}
-
-#certificate,
-#certificate *{
-display:block;
-}
+#certificate,#certificate *{display:block}
 
 #certificate{
 position:absolute;
@@ -194,9 +168,9 @@ width:100%;
 
 <body>
 
-<!-- LOADING SCREEN -->
+<!-- LOADING -->
 
-<div id="loadingScreen">
+<div id="loading">
 
 <h1>AI Behavioral Evaluation</h1>
 
@@ -204,7 +178,7 @@ width:100%;
 <div id="bar" class="bar"></div>
 </div>
 
-<div id="analysisText" class="loadingText">
+<div id="loadingText">
 Initializing evaluation engine...
 </div>
 
@@ -212,27 +186,30 @@ Initializing evaluation engine...
 
 <!-- SIDEBAR -->
 
-<div id="sidebar" class="sidebar">
+<div class="sidebar" id="sidebar">
 
-<div class="closeMenu" onclick="toggleMenu()">✕</div>
+<div class="close" onclick="toggleMenu()">✕</div>
 
-<a href="#">Dashboard</a>
-<a href="#">Star Economy</a>
-<a href="#">Behavioral Audit</a>
-<a href="#">Global Rankings</a>
-<a href="#">Star Congress</a>
-<a href="#">Failure Archives</a>
+<a onclick="openPage('dashboard')">Dashboard</a>
+<a onclick="openPage('economy')">Star Economy</a>
+<a onclick="openPage('audit')">Behavioral Audit</a>
+<a onclick="openPage('ranking')">Global Rankings</a>
+<a onclick="openPage('archives')">Failure Archives</a>
+<a onclick="openPage('certcenter')">Certification Center</a>
 
 </div>
 
 <header>
 
 <div class="menuBtn" onclick="toggleMenu()">☰</div>
+
 Gold Star Evaluation System
 
 </header>
 
-<div class="container">
+<!-- DASHBOARD -->
+
+<div id="dashboard" class="screen active">
 
 <div class="card">
 
@@ -240,35 +217,26 @@ Gold Star Evaluation System
 
 <div id="stars" class="stars"></div>
 
+<div class="stat">Recipient: <b>Ryan Grise</b></div>
 <div class="stat">Stars Awarded: <b id="starNum"></b></div>
 
 </div>
 
 <div class="card">
 
-<h3>AI Performance Evaluation</h3>
+<h3>AI Performance Score</h3>
 
-<div class="stat">Performance Score: <b id="score"></b></div>
+<div class="stat">Score: <b id="score"></b></div>
 <div class="stat">Productivity Index: <b id="prod"></b></div>
-<div class="stat">AI Commentary: <b id="comment"></b></div>
+<div class="stat">Evaluation: <b id="comment"></b></div>
 
 </div>
 
 <div class="card">
 
-<h3>Global Ranking</h3>
+<h3>Low Star Alert</h3>
 
-<div class="stat">Your Position: <b>#1,000,000</b></div>
-<div class="stat">Percentile Rank: <b id="rank"></b></div>
-
-</div>
-
-<div class="card">
-
-<h3>Star Inflation Report</h3>
-
-<div class="stat">Annual Inflation: <b id="inflation"></b></div>
-<div class="stat">Central Bank Policy: Concerned</div>
+<div class="stat" id="alert"></div>
 
 </div>
 
@@ -276,17 +244,143 @@ Gold Star Evaluation System
 
 <h3>System Logs</h3>
 
-<div id="logs" class="logs"></div>
+<div class="logs" id="logs"></div>
+
+</div>
+
+</div>
+
+<!-- ECONOMY -->
+
+<div id="economy" class="screen">
+
+<div class="card">
+
+<h3>Star Central Bank</h3>
+
+<div class="stat">Annual Star Inflation: <b id="inflation"></b></div>
+<div class="stat">Gold Star Reserves: Critically Low</div>
+<div class="stat">Emergency Star Printing: Approved</div>
 
 </div>
 
 <div class="card">
 
-<h3>Certification</h3>
+<h3>Star Deficit Warning</h3>
+
+<div class="stat">
+
+Ryan Grise's star acquisition rate is below the global average.
+
+Global Average: 14 stars  
+Ryan's Total: <span id="starCompare"></span>
+
+</div>
+
+</div>
+
+<button onclick="openPage('dashboard')">← Back</button>
+
+</div>
+
+<!-- AUDIT -->
+
+<div id="audit" class="screen">
+
+<div class="card">
+
+<h3>AI Behavioral Audit</h3>
+
+<div class="stat">
+
+Subject: Ryan Grise
+
+Motivation Score: 41%  
+Consistency Rating: Unreliable  
+Achievement Density: Sparse
+
+AI Conclusion: Improvement strongly recommended.
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>Recommended Improvement Program</h3>
+
+<div class="stat">
+
+• Attempt basic productivity  
+• Increase effort above minimal threshold  
+• Seek additional gold stars where possible  
+
+</div>
+
+</div>
+
+<button onclick="openPage('dashboard')">← Back</button>
+
+</div>
+
+<!-- RANKING -->
+
+<div id="ranking" class="screen">
+
+<div class="card">
+
+<h3>Global Rankings</h3>
+
+<div class="stat">Your Position: <b>#1,000,000</b></div>
+<div class="stat">Percentile: <b id="rank"></b></div>
+
+</div>
+
+<button onclick="openPage('dashboard')">← Back</button>
+
+</div>
+
+<!-- ARCHIVES -->
+
+<div id="archives" class="screen">
+
+<div class="card">
+
+<h3>Failure Archives</h3>
+
+<div class="stat">
+
+2009 – Global star shortage  
+2016 – Major star inflation crisis  
+2026 – Ryan Grise evaluated  
+
+</div>
+
+</div>
+
+<button onclick="openPage('dashboard')">← Back</button>
+
+</div>
+
+<!-- CERT CENTER -->
+
+<div id="certcenter" class="screen">
+
+<div class="card">
+
+<h3>Certification Center</h3>
+
+<div class="stat">
+
+Generate an official certificate verifying Ryan Grise's star evaluation.
+
+</div>
 
 <button onclick="printCert()">Generate Certificate</button>
 
 </div>
+
+<button onclick="openPage('dashboard')">← Back</button>
 
 </div>
 
@@ -294,19 +388,19 @@ Gold Star Evaluation System
 
 <div id="certificate">
 
-<div class="certTitle">Official Gold Star Certificate</div>
+<h1>Official Gold Star Certificate</h1>
 
-<p>This document verifies that</p>
+<p>This document certifies that</p>
 
-<h2>_____________________</h2>
+<h2>Ryan Grise</h2>
 
-<p>has been evaluated by the AI Gold Star Authority</p>
+<p>has been evaluated by the International Gold Star Authority</p>
 
-<div class="certStars" id="certStars"></div>
+<h1 id="certStars"></h1>
 
-<p>stars awarded</p>
+<p>Gold Stars Awarded</p>
 
-<p>Ranking: #1,000,000</p>
+<p>Global Ranking: #1,000,000</p>
 
 </div>
 
@@ -317,39 +411,39 @@ const STAR_COUNT = 7;
 const messages=[
 "Initializing neural analysis...",
 "Scanning behavioral history...",
-"Comparing performance against 8 billion humans...",
-"Running 12,000 life simulations...",
+"Comparing Ryan Grise against 8 billion humans...",
+"Running 12,000 simulated life scenarios...",
 "Checking for redeeming qualities...",
 "Minimal qualities detected...",
 "Finalizing evaluation..."
 ];
 
-const harshComments=[
-"Below average effort detected",
-"Performance barely meets basic expectations",
+const comments=[
+"Below average performance detected",
+"Effort level barely meets minimum expectations",
 "Improvement strongly recommended",
-"Significant motivational issues detected"
+"Motivation levels appear questionable"
 ];
 
-let index=0;
+let i=0;
 
 function runAnalysis(){
 
 let interval=setInterval(()=>{
 
-index++;
+i++;
 
-document.getElementById("analysisText").innerText=messages[index];
+document.getElementById("loadingText").innerText=messages[i];
 
-document.getElementById("bar").style.width=(index/messages.length*100)+"%";
+document.getElementById("bar").style.width=(i/messages.length*100)+"%";
 
-addLog(messages[index]);
+addLog(messages[i]);
 
-if(index>=messages.length-1){
+if(i>=messages.length-1){
 
 clearInterval(interval);
 
-showResults();
+finish();
 
 }
 
@@ -357,17 +451,19 @@ showResults();
 
 }
 
-function showResults(){
+function finish(){
 
-document.getElementById("loadingScreen").style.display="none";
+document.getElementById("loading").style.display="none";
 
 document.getElementById("starNum").innerText=STAR_COUNT;
+
+document.getElementById("starCompare").innerText=STAR_COUNT;
 
 document.getElementById("certStars").innerText=STAR_COUNT;
 
 let stars="";
 
-for(let i=0;i<STAR_COUNT;i++){
+for(let x=0;x<STAR_COUNT;x++){
 stars+="★";
 }
 
@@ -384,7 +480,15 @@ document.getElementById("rank").innerText=Math.min(99,STAR_COUNT*10)+"th percent
 document.getElementById("inflation").innerText=(STAR_COUNT*3.2).toFixed(2)+"%";
 
 document.getElementById("comment").innerText=
-harshComments[Math.floor(Math.random()*harshComments.length)];
+comments[Math.floor(Math.random()*comments.length)];
+
+if(STAR_COUNT<10){
+document.getElementById("alert").innerText=
+"WARNING: Ryan Grise's star count is significantly below recommended levels.";
+}else{
+document.getElementById("alert").innerText=
+"Star levels acceptable.";
+}
 
 }
 
@@ -397,6 +501,18 @@ s.style.left="-260px";
 }else{
 s.style.left="0px";
 }
+
+}
+
+function openPage(page){
+
+document.querySelectorAll(".screen").forEach(s=>{
+s.style.display="none";
+})
+
+document.getElementById(page).style.display="block";
+
+toggleMenu();
 
 }
 
