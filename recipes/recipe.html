@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Recipe — Bear Book</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&family=Dancing+Script:wght@600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --parchment: #fdf6e9;
+  --parchment-dark: #f5e6c8;
+  --brown-deep: #2c1a0e;
+  --brown-mid: #5c3d1e;
+  --brown-light: #8b5e3c;
+  --green: #4a6741;
+  --green-light: #6b8f62;
+  --cream: #fefcf7;
+  --text: #2c1a0e;
+  --text-muted: #8b7355;
+  --border: rgba(92,61,30,0.15);
+  --shadow: rgba(44,26,14,0.12);
+  --radius: 4px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--parchment);
+  color:var(--text);
+  font-family:'Lato',sans-serif;
+  font-weight:300;
+  min-height:100vh;
+}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%235c3d1e' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;
+}
+
+/* ── HEADER ── */
+.recipe-header{
+  position:relative;z-index:10;
+  background:var(--brown-deep);
+  padding:2.5rem 2rem;
+}
+.header-nav{
+  max-width:900px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:2rem;
+}
+.back-btn{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;
+  color:rgba(253,246,233,0.6);
+  background:none;border:none;cursor:pointer;
+  transition:color 0.2s;
+}
+.back-btn:hover{color:var(--parchment);}
+.header-actions{display:flex;gap:0.6rem;}
+.action-btn{
+  width:40px;height:40px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.15);
+  color:var(--parchment);
+  border-radius:var(--radius);
+  cursor:pointer;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;
+  position:relative;
+}
+.action-btn:hover{background:rgba(255,255,255,0.15);}
+.action-btn title{display:none;}
+
+.header-content{
+  max-width:900px;margin:0 auto;
+}
+.recipe-category{
+  font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;
+  color:rgba(253,246,233,0.5);margin-bottom:0.8rem;
+}
+.recipe-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,5vw,3.5rem);
+  font-weight:400;color:var(--parchment);
+  line-height:1.1;margin-bottom:1rem;
+}
+.recipe-author{
+  font-family:'Dancing Script',cursive;
+  font-size:1.2rem;color:rgba(253,246,233,0.6);
+  margin-bottom:1.5rem;
+}
+.recipe-description{
+  font-size:0.95rem;color:rgba(253,246,233,0.7);
+  max-width:600px;line-height:1.7;
+  margin-bottom:2rem;
+}
+.recipe-meta-row{
+  display:flex;flex-wrap:wrap;gap:2rem;
+}
+.meta-item{
+  display:flex;flex-direction:column;gap:0.2rem;
+}
+.meta-label{
+  font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:rgba(253,246,233,0.4);
+}
+.meta-value{
+  font-size:0.95rem;color:var(--parchment);font-weight:400;
+}
+
+/* ── SERVING MULTIPLIER ── */
+.multiplier-bar{
+  background:var(--green);
+  padding:1rem 2rem;
+  position:sticky;top:0;z-index:50;
+}
+.multiplier-inner{
+  max-width:900px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:1rem;
+}
+.multiplier-label{
+  font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;
+  color:rgba(255,255,255,0.8);
+}
+.multiplier-controls{
+  display:flex;align-items:center;gap:0.8rem;
+}
+.mult-btn{
+  width:34px;height:34px;
+  background:rgba(255,255,255,0.15);
+  border:1px solid rgba(255,255,255,0.25);
+  color:white;font-size:1.1rem;
+  border-radius:var(--radius);cursor:pointer;
+  transition:all 0.2s;
+  display:flex;align-items:center;justify-content:center;
+}
+.mult-btn:hover{background:rgba(255,255,255,0.25);}
+.mult-display{
+  font-family:'Playfair Display',serif;
+  font-size:1.4rem;color:white;font-weight:700;
+  min-width:60px;text-align:center;
+}
+.mult-presets{display:flex;gap:0.4rem;}
+.preset-btn{
+  font-size:0.65rem;font-weight:700;letter-spacing:0.05em;
+  padding:0.35rem 0.7rem;
+  background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.2);
+  color:white;border-radius:20px;cursor:pointer;
+  transition:all 0.2s;
+}
+.preset-btn:hover,.preset-btn.active{background:rgba(255,255,255,0.25);}
+.serving-info{
+  font-size:0.75rem;color:rgba(255,255,255,0.7);
+}
+
+/* ── CONTENT ── */
+.recipe-content{
+  position:relative;z-index:1;
+  max-width:900px;margin:0 auto;
+  padding:3rem 2rem;
+  display:grid;
+  grid-template-columns:1fr 320px;
+  gap:3rem;
+  align-items:start;
+}
+
+/* ── INGREDIENTS ── */
+.section-eyebrow{
+  font-size:0.6rem;letter-spacing:0.25em;text-transform:uppercase;
+  color:var(--brown-light);margin-bottom:0.4rem;
+}
+.section-title{
+  font-family:'Playfair Display',serif;
+  font-size:1.8rem;font-weight:400;color:var(--brown-deep);
+  margin-bottom:1.5rem;
+}
+.ingredient-section{margin-bottom:2rem;}
+.ingredient-section-name{
+  font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--green);margin-bottom:0.8rem;font-weight:700;
+  display:flex;align-items:center;gap:0.8rem;
+}
+.ingredient-section-name::after{
+  content:'';flex:1;height:1px;background:rgba(74,103,65,0.2);
+}
+.ingredient-list{list-style:none;}
+.ingredient-item{
+  display:flex;align-items:baseline;gap:0.8rem;
+  padding:0.6rem 0;
+  border-bottom:1px solid rgba(92,61,30,0.06);
+  cursor:pointer;transition:all 0.2s;
+  border-radius:var(--radius);
+}
+.ingredient-item:hover{
+  background:rgba(92,61,30,0.04);
+  padding-left:0.5rem;
+}
+.ingredient-item.checked{opacity:0.4;text-decoration:line-through;}
+.ingredient-amount{
+  font-weight:700;color:var(--brown-deep);
+  min-width:80px;font-size:0.9rem;
+  flex-shrink:0;
+}
+.ingredient-name{font-size:0.95rem;color:var(--text);}
+
+/* ── INSTRUCTIONS ── */
+.instructions-section{margin-bottom:3rem;}
+.instruction-group{margin-bottom:2.5rem;}
+.instruction-group-name{
+  font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--green);margin-bottom:1.2rem;font-weight:700;
+  display:flex;align-items:center;gap:0.8rem;
+}
+.instruction-group-name::after{
+  content:'';flex:1;height:1px;background:rgba(74,103,65,0.2);
+}
+.instruction-steps{list-style:none;counter-reset:steps;}
+.step{
+  display:flex;gap:1.2rem;
+  margin-bottom:1.5rem;
+  cursor:pointer;
+  transition:opacity 0.2s;
+}
+.step.checked{opacity:0.4;}
+.step-num{
+  width:32px;height:32px;flex-shrink:0;
+  background:var(--brown-deep);color:var(--parchment);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.75rem;font-weight:700;
+  margin-top:2px;
+  transition:background 0.2s;
+}
+.step.checked .step-num{background:var(--green);}
+.step-text{
+  font-size:0.95rem;line-height:1.8;color:var(--text);
+  padding-top:0.3rem;
+}
+
+/* ── SIDEBAR ── */
+.recipe-sidebar{position:sticky;top:80px;}
+
+.sidebar-card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  margin-bottom:1.5rem;
+  box-shadow:0 4px 20px var(--shadow);
+}
+.sidebar-card-header{
+  padding:1rem 1.5rem;
+  background:var(--brown-deep);
+  font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:rgba(253,246,233,0.7);
+}
+.sidebar-card-body{padding:1.5rem;}
+
+/* Nutrition */
+.nutrition-table{width:100%;}
+.nutrition-row{
+  display:flex;justify-content:space-between;
+  padding:0.5rem 0;
+  border-bottom:1px solid var(--border);
+  font-size:0.88rem;
+}
+.nutrition-row:last-child{border-bottom:none;}
+.nutrition-row.header{
+  font-weight:700;font-size:1rem;
+  border-bottom:3px solid var(--brown-deep);
+  padding-bottom:0.7rem;margin-bottom:0.3rem;
+}
+.nutrition-label{color:var(--text);}
+.nutrition-value{color:var(--brown-mid);font-weight:700;}
+.nutrition-serving{
+  font-size:0.72rem;color:var(--text-muted);
+  margin-bottom:1rem;
+  font-style:italic;
+}
+
+/* Notes */
+.notes-text{
+  font-size:0.88rem;line-height:1.8;color:var(--text-muted);
+  font-style:italic;
+}
+
+/* ── PRINT STYLES ── */
+@media print {
+  .multiplier-bar,.header-actions,.back-btn,.recipe-sidebar{display:none!important;}
+  .recipe-content{grid-template-columns:1fr!important;}
+  body::before{display:none;}
+  .recipe-header{background:white!important;color:var(--text)!important;}
+  .recipe-title,.recipe-category,.recipe-author,.meta-label,.recipe-description{color:var(--text)!important;}
+  .meta-value{color:var(--text)!important;}
+}
+
+/* ── NUTRITION MODAL ── */
+.overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(44,26,14,0.7);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  padding:2rem;
+  opacity:0;pointer-events:none;transition:opacity 0.3s;
+}
+.overlay.active{opacity:1;pointer-events:all;}
+.modal{
+  background:var(--cream);border:1px solid var(--border);
+  border-radius:var(--radius);width:100%;max-width:400px;
+  overflow:hidden;
+  transform:translateY(20px);transition:transform 0.3s;
+}
+.overlay.active .modal{transform:translateY(0);}
+.modal-header{
+  padding:1.5rem 2rem;background:var(--brown-deep);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.modal-title{
+  font-family:'Playfair Display',serif;
+  font-size:1.4rem;color:var(--parchment);font-weight:400;
+}
+.modal-close{
+  width:30px;height:30px;background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.2);color:var(--parchment);
+  border-radius:var(--radius);cursor:pointer;font-size:0.9rem;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;
+}
+.modal-close:hover{background:rgba(255,255,255,0.2);}
+.modal-body{padding:1.5rem 2rem;}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:2rem;right:2rem;z-index:999;
+  background:var(--brown-deep);color:var(--parchment);
+  padding:1rem 1.5rem;border-radius:var(--radius);
+  font-size:0.82rem;
+  transform:translateY(100px);opacity:0;transition:all 0.3s;
+}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .recipe-content{grid-template-columns:1fr;}
+  .recipe-sidebar{position:static;}
+  .multiplier-inner{flex-direction:column;align-items:flex-start;}
+  .mult-presets{flex-wrap:wrap;}
+}
+</style>
+</head>
+<body>
+
+<div class="recipe-header" id="recipeHeader">
+  <div class="header-nav">
+    <button class="back-btn" onclick="window.location.href='test.html'">← Back to Bear Book</button>
+    <div class="header-actions">
+      <button class="action-btn" onclick="window.print()" title="Print">🖨️</button>
+      <button class="action-btn" onclick="shareRecipe()" title="Share">📤</button>
+      <button class="action-btn" onclick="openNutrition()" title="Nutrition">📊</button>
+      <button class="action-btn" onclick="editRecipe()" title="Edit">✏️</button>
+    </div>
+  </div>
+  <div class="header-content">
+    <div class="recipe-category" id="rCategory">—</div>
+    <h1 class="recipe-title" id="rTitle">Loading...</h1>
+    <div class="recipe-author" id="rAuthor"></div>
+    <div class="recipe-description" id="rDescription"></div>
+    <div class="recipe-meta-row">
+      <div class="meta-item">
+        <span class="meta-label">Prep Time</span>
+        <span class="meta-value" id="rPrepTime">—</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Cook Time</span>
+        <span class="meta-value" id="rCookTime">—</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Total Time</span>
+        <span class="meta-value" id="rTotalTime">—</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Base Servings</span>
+        <span class="meta-value" id="rServings">—</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Diet</span>
+        <span class="meta-value" id="rDiet">—</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SERVING MULTIPLIER -->
+<div class="multiplier-bar">
+  <div class="multiplier-inner">
+    <div>
+      <div class="multiplier-label">Adjust Servings</div>
+      <div class="serving-info" id="servingInfo">Base: — servings</div>
+    </div>
+    <div class="multiplier-controls">
+      <button class="mult-btn" onclick="changeMultiplier(-0.5)">−</button>
+      <div class="mult-display" id="multDisplay">1×</div>
+      <button class="mult-btn" onclick="changeMultiplier(0.5)">+</button>
+    </div>
+    <div class="mult-presets">
+      <button class="preset-btn active" onclick="setMultiplier(1)">1×</button>
+      <button class="preset-btn" onclick="setMultiplier(1.5)">1.5×</button>
+      <button class="preset-btn" onclick="setMultiplier(2)">2×</button>
+      <button class="preset-btn" onclick="setMultiplier(3)">3×</button>
+      <button class="preset-btn" onclick="setMultiplier(4)">4×</button>
+    </div>
+  </div>
+</div>
+
+<div class="recipe-content">
+  <!-- LEFT COLUMN -->
+  <div>
+    <!-- INGREDIENTS -->
+    <div style="margin-bottom:3rem;">
+      <div class="section-eyebrow">What You'll Need</div>
+      <div class="section-title">Ingredients</div>
+      <div id="ingredientsContainer"></div>
+    </div>
+
+    <!-- INSTRUCTIONS -->
+    <div>
+      <div class="section-eyebrow">How To Make It</div>
+      <div class="section-title">Instructions</div>
+      <div id="instructionsContainer"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <div class="recipe-sidebar">
+
+    <!-- Nutrition -->
+    <div class="sidebar-card" id="nutritionCard" style="display:none;">
+      <div class="sidebar-card-header">Nutrition Facts</div>
+      <div class="sidebar-card-body">
+        <div class="nutrition-serving" id="nutritionServing">Per serving</div>
+        <div class="nutrition-row header">
+          <span class="nutrition-label">Calories</span>
+          <span class="nutrition-value" id="nCalDisplay">—</span>
+        </div>
+        <div class="nutrition-row">
+          <span class="nutrition-label">Protein</span>
+          <span class="nutrition-value" id="nProtDisplay">—</span>
+        </div>
+        <div class="nutrition-row">
+          <span class="nutrition-label">Carbohydrates</span>
+          <span class="nutrition-value" id="nCarbDisplay">—</span>
+        </div>
+        <div class="nutrition-row">
+          <span class="nutrition-label">Fat</span>
+          <span class="nutrition-value" id="nFatDisplay">—</span>
+        </div>
+        <div class="nutrition-row">
+          <span class="nutrition-label">Sodium</span>
+          <span class="nutrition-value" id="nSodDisplay">—</span>
+        </div>
+        <div class="nutrition-row">
+          <span class="nutrition-label">Fiber</span>
+          <span class="nutrition-value" id="nFibDisplay">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="sidebar-card" id="notesCard" style="display:none;">
+      <div class="sidebar-card-header">Chef's Notes</div>
+      <div class="sidebar-card-body">
+        <div class="notes-text" id="notesText"></div>
+      </div>
+    </div>
+
+    <!-- Tips card -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-header">Quick Tips</div>
+      <div class="sidebar-card-body">
+        <div style="font-size:0.82rem;color:var(--text-muted);line-height:1.8;">
+          <p>👆 Tap any ingredient to mark it off as you go.</p>
+          <br/>
+          <p>✅ Tap any step to mark it complete.</p>
+          <br/>
+          <p>🔢 Use the serving multiplier above to scale ingredients up or down.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- NUTRITION MODAL (mobile) -->
+<div class="overlay" id="nutritionModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Nutrition Facts</div>
+      <button class="modal-close" onclick="closeNutrition()">✕</button>
+    </div>
+    <div class="modal-body" id="nutritionModalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var recipe = null;
+var multiplier = 1;
+var baseServings = 4;
+
+// ── LOAD ─────────────────────────────────────────────────
+function loadRecipe() {
+  const stored = sessionStorage.getItem('currentRecipe');
+  if (!stored) {
+    window.location.href = 'test.html';
+    return;
+  }
+  recipe = JSON.parse(stored);
+  renderRecipe();
+}
+
+function renderRecipe() {
+  const r = recipe;
+  document.title = `${r.name} — Bear Book`;
+  document.getElementById('rCategory').textContent = r.category || 'Recipe';
+  document.getElementById('rTitle').textContent = r.name || 'Recipe';
+  document.getElementById('rAuthor').textContent = r.author ? `by ${r.author}` : '';
+  document.getElementById('rDescription').textContent = r.description || '';
+  document.getElementById('rPrepTime').textContent = r.prep_time || '—';
+  document.getElementById('rCookTime').textContent = r.cook_time || '—';
+  document.getElementById('rTotalTime').textContent = r.total_time || '—';
+  baseServings = r.servings || 4;
+  document.getElementById('rServings').textContent = baseServings;
+  document.getElementById('rDiet').textContent = r.diet || '—';
+  document.getElementById('servingInfo').textContent = `Base: ${baseServings} servings`;
+
+  // Color header bar based on category
+  const catColors = {
+    Breakfast: 'linear-gradient(135deg,#c8860a,#2c1a0e)',
+    Lunch: 'linear-gradient(135deg,#2d5a27,#2c1a0e)',
+    Dinner: 'linear-gradient(135deg,#5c3d1e,#2c1a0e)',
+    Dessert: 'linear-gradient(135deg,#7b1a1a,#2c1a0e)',
+    Snacks: 'linear-gradient(135deg,#4a2060,#2c1a0e)',
+  };
+  if (catColors[r.category]) {
+    document.getElementById('recipeHeader').style.background = catColors[r.category];
+  }
+
+  renderIngredients();
+  renderInstructions();
+  renderNutrition();
+  renderNotes();
+}
+
+// ── INGREDIENTS ──────────────────────────────────────────
+function renderIngredients() {
+  const container = document.getElementById('ingredientsContainer');
+  const sections = recipe.ingredient_sections || [];
+
+  if (!sections.length) {
+    container.innerHTML = '<p style="color:var(--text-muted);font-style:italic;">No ingredients added.</p>';
+    return;
+  }
+
+  container.innerHTML = sections.map((section, si) => `
+    <div class="ingredient-section">
+      ${sections.length > 1 ? `<div class="ingredient-section-name">${section.name}</div>` : ''}
+      <ul class="ingredient-list">
+        ${(section.items || []).map((item, ii) => {
+          const scaled = scaleIngredient(item, multiplier);
+          return `<li class="ingredient-item" id="ing_${si}_${ii}" onclick="toggleIngredient('ing_${si}_${ii}')">
+            <span class="ingredient-amount">${scaled.amount}</span>
+            <span class="ingredient-name">${scaled.name}</span>
+          </li>`;
+        }).join('')}
+      </ul>
+    </div>
+  `).join('');
+}
+
+function scaleIngredient(text, mult) {
+  // Try to parse and scale the amount at the start of the ingredient
+  const match = text.match(/^([\d\s\/\.]+(?:\s+\d+\/\d+)?)\s*(.*)/);
+  if (!match) return { amount: '', name: text };
+
+  let amountStr = match[1].trim();
+  const rest = match[2];
+
+  // Parse fractions and mixed numbers
+  const parsed = parseFraction(amountStr);
+  if (parsed === null) return { amount: amountStr, name: rest };
+
+  const scaled = parsed * mult;
+  return { amount: formatAmount(scaled), name: rest };
+}
+
+function parseFraction(str) {
+  str = str.trim();
+  // Mixed number like "1 1/2"
+  const mixed = str.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+  if (mixed) return parseInt(mixed[1]) + parseInt(mixed[2])/parseInt(mixed[3]);
+  // Simple fraction like "1/2"
+  const frac = str.match(/^(\d+)\/(\d+)$/);
+  if (frac) return parseInt(frac[1])/parseInt(frac[2]);
+  // Decimal or integer
+  const num = parseFloat(str);
+  return isNaN(num) ? null : num;
+}
+
+function formatAmount(num) {
+  if (num === Math.round(num)) return num.toString();
+
+  // Try to express as nice fraction
+  const fractions = [
+    [1,8],[1,4],[1,3],[3,8],[1,2],[5,8],[2,3],[3,4],[7,8]
+  ];
+  const whole = Math.floor(num);
+  const decimal = num - whole;
+
+  let bestFrac = null;
+  let bestDiff = 0.05;
+  for (const [n,d] of fractions) {
+    const diff = Math.abs(decimal - n/d);
+    if (diff < bestDiff) { bestDiff = diff; bestFrac = `${n}/${d}`; }
+  }
+
+  if (bestFrac) {
+    return whole > 0 ? `${whole} ${bestFrac}` : bestFrac;
+  }
+
+  return num.toFixed(1).replace(/\.0$/,'');
+}
+
+function toggleIngredient(id) {
+  document.getElementById(id)?.classList.toggle('checked');
+}
+
+// ── INSTRUCTIONS ─────────────────────────────────────────
+function renderInstructions() {
+  const container = document.getElementById('instructionsContainer');
+  const sections = recipe.instruction_sections || [];
+
+  if (!sections.length) {
+    container.innerHTML = '<p style="color:var(--text-muted);font-style:italic;">No instructions added.</p>';
+    return;
+  }
+
+  let stepNum = 0;
+  container.innerHTML = sections.map((section, si) => `
+    <div class="instruction-group">
+      ${sections.length > 1 ? `<div class="instruction-group-name">${section.name}</div>` : ''}
+      <ol class="instruction-steps">
+        ${(section.steps || []).map((step, ii) => {
+          stepNum++;
+          return `<li class="step" id="step_${si}_${ii}" onclick="toggleStep('step_${si}_${ii}')">
+            <div class="step-num">${stepNum}</div>
+            <div class="step-text">${step}</div>
+          </li>`;
+        }).join('')}
+      </ol>
+    </div>
+  `).join('');
+}
+
+function toggleStep(id) {
+  document.getElementById(id)?.classList.toggle('checked');
+}
+
+// ── NUTRITION ────────────────────────────────────────────
+function renderNutrition() {
+  const n = recipe.nutrition;
+  if (!n || !n.calories) return;
+
+  document.getElementById('nutritionCard').style.display = 'block';
+  document.getElementById('nCalDisplay').textContent = n.calories ? `${n.calories} kcal` : '—';
+  document.getElementById('nProtDisplay').textContent = n.protein ? `${n.protein}g` : '—';
+  document.getElementById('nCarbDisplay').textContent = n.carbs ? `${n.carbs}g` : '—';
+  document.getElementById('nFatDisplay').textContent = n.fat ? `${n.fat}g` : '—';
+  document.getElementById('nSodDisplay').textContent = n.sodium ? `${n.sodium}mg` : '—';
+  document.getElementById('nFibDisplay').textContent = n.fiber ? `${n.fiber}g` : '—';
+  document.getElementById('nutritionServing').textContent = `Per serving (${baseServings} servings total)`;
+
+  // Build modal content too
+  document.getElementById('nutritionModalBody').innerHTML = `
+    <div class="nutrition-serving">Per serving · ${baseServings} servings total</div>
+    <div class="nutrition-row header"><span>Calories</span><span>${n.calories} kcal</span></div>
+    <div class="nutrition-row"><span>Protein</span><span>${n.protein||'—'}g</span></div>
+    <div class="nutrition-row"><span>Carbohydrates</span><span>${n.carbs||'—'}g</span></div>
+    <div class="nutrition-row"><span>Fat</span><span>${n.fat||'—'}g</span></div>
+    <div class="nutrition-row"><span>Sodium</span><span>${n.sodium||'—'}mg</span></div>
+    <div class="nutrition-row"><span>Fiber</span><span>${n.fiber||'—'}g</span></div>
+  `;
+}
+
+function renderNotes() {
+  const notes = recipe.notes;
+  if (!notes) return;
+  document.getElementById('notesCard').style.display = 'block';
+  document.getElementById('notesText').textContent = notes;
+}
+
+// ── MULTIPLIER ───────────────────────────────────────────
+function setMultiplier(val) {
+  multiplier = Math.max(0.5, val);
+  updateMultiplierUI();
+  renderIngredients();
+}
+
+function changeMultiplier(delta) {
+  setMultiplier(Math.round((multiplier + delta) * 10) / 10);
+}
+
+function updateMultiplierUI() {
+  const display = multiplier % 1 === 0 ? `${multiplier}×` : `${multiplier}×`;
+  document.getElementById('multDisplay').textContent = display;
+  const currentServings = Math.round(baseServings * multiplier * 10) / 10;
+  document.getElementById('servingInfo').textContent =
+    `${currentServings} serving${currentServings !== 1 ? 's' : ''} (base: ${baseServings})`;
+
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.classList.toggle('active', parseFloat(btn.textContent) === multiplier);
+  });
+}
+
+// ── NUTRITION MODAL ──────────────────────────────────────
+function openNutrition() {
+  const n = recipe.nutrition;
+  if (!n || !n.calories) {
+    showToast('No nutrition info for this recipe.'); return;
+  }
+  document.getElementById('nutritionModal').classList.add('active');
+}
+function closeNutrition() {
+  document.getElementById('nutritionModal').classList.remove('active');
+}
+
+// ── SHARE ────────────────────────────────────────────────
+function shareRecipe() {
+  if (navigator.share) {
+    navigator.share({
+      title: recipe.name,
+      text: `Check out this recipe: ${recipe.name}`,
+      url: window.location.href
+    });
+  } else {
+    navigator.clipboard.writeText(window.location.href);
+    showToast('Link copied to clipboard!');
+  }
+}
+
+// ── EDIT ─────────────────────────────────────────────────
+function editRecipe() {
+  sessionStorage.setItem('editRecipe', JSON.stringify(recipe));
+  window.location.href = 'test.html?edit=' + recipe.id;
+}
+
+// ── TOAST ────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show';
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// ── INIT ─────────────────────────────────────────────────
+loadRecipe();
+</script>
+</body>
+</html>
