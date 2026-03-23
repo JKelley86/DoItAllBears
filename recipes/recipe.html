@@ -515,6 +515,7 @@ var baseServings = 4;
 function loadRecipe() {
   const stored = sessionStorage.getItem('currentRecipe');
   if (!stored) {
+    // Change 'index.html' to your filename if different (e.g. 'test.html')
     window.location.href = 'test.html';
     return;
   }
@@ -754,7 +755,9 @@ function shareRecipe() {
 // ── EDIT ─────────────────────────────────────────────────
 function editRecipe() {
   sessionStorage.setItem('editRecipe', JSON.stringify(recipe));
-  window.location.href = 'test.html?edit=' + recipe.id;
+  // Change 'index.html' to your filename if different (e.g. 'test.html')
+  const indexPage = 'test.html';
+  window.location.href = indexPage + '?edit=' + recipe.id;
 }
 
 // ── TOAST ────────────────────────────────────────────────
