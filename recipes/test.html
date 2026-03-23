@@ -1017,8 +1017,99 @@ async function saveRecipe() {
   }
 }
 
+// ── EDIT MODE ────────────────────────────────────────────
+function populateFormForEdit(r) {
+  document.getElementById('modalEyebrow').textContent = 'Edit Recipe';
+  document.getElementById('rName').value = r.name || '';
+  document.getElementById('rCategory').value = r.category || '';
+  document.getElementById('rDiet').value = r.diet || '';
+  document.getElementById('rPrepTime').value = r.prep_time || '';
+  document.getElementById('rCookTime').value = r.cook_time || '';
+  document.getElementById('rTotalTime').value = r.total_time || '';
+  document.getElementById('rServings').value = r.servings || '';
+  document.getElementById('rDescription').value = r.description || '';
+  document.getElementById('rNotes').value = r.notes || '';
+  document.getElementById('rAuthor').value = r.author || '';
+  document.getElementById('nCalories').value = r.nutrition?.calories || '';
+  document.getElementById('nProtein').value = r.nutrition?.protein || '';
+  document.getElementById('nCarbs').value = r.nutrition?.carbs || '';
+  document.getElementById('nFat').value = r.nutrition?.fat || '';
+  document.getElementById('nSodium').value = r.nutrition?.sodium || '';
+  document.getElementById('nFiber').value = r.nutrition?.fiber || '';
+
+  // Populate ingredient sections
+  document.getElementById('ingredientSections').innerHTML = '';
+  (r.ingredient_sections || []).forEach(section => {
+    addIngredientSection(section.name || 'Ingredients');
+    const lists = document.querySelectorAll('#ingredientSections .ingredient-list');
+    const list = lists[lists.length - 1];
+    // Remove the auto-added blank item
+    list.innerHTML = '';
+    (section.items || []).forEach(item => addIngredientToList(list.id, item));
+  });
+  if (!r.ingredient_sections?.length) addIngredientSection('Ingredients');
+
+  // Populate instruction sections
+  document.getElementById('instructionSections').innerHTML = '';
+  (r.instruction_sections || []).forEach(section => {
+    addInstructionSection(section.name || 'Instructions');
+    const lists = document.querySelectorAll('#instructionSections .instruction-list');
+    const list = lists[lists.length - 1];
+    list.innerHTML = '';
+    (section.steps || []).forEach(step => addInstructionToList(list.id, step));
+  });
+  if (!r.instruction_sections?.length) addInstructionSection('Instructions');
+
+  document.getElementById('recipeModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+// Helper versions that accept list id and value directly
+function addIngredientToList(listId, value) {
+  const list = document.getElementById(listId);
+  if (!list) return;
+  const li = document.createElement('li');
+  li.className = 'ingredient-item';
+  const itemId = 'ing_' + Date.now() + Math.random();
+  li.innerHTML = `
+    <input type="text" id="${itemId}" value="${value.replace(/"/g,'&quot;')}" placeholder="e.g. 1 Cup all-purpose flour"/>
+    <button class="btn-remove-item" onclick="this.parentElement.remove()">✕</button>
+  `;
+  list.appendChild(li);
+}
+
+function addInstructionToList(listId, value) {
+  const list = document.getElementById(listId);
+  if (!list) return;
+  const li = document.createElement('li');
+  li.className = 'instruction-item';
+  const itemId = 'step_' + Date.now() + Math.random();
+  li.innerHTML = `
+    <input type="text" id="${itemId}" value="${value.replace(/"/g,'&quot;')}" placeholder="Describe this step..."/>
+    <button class="btn-remove-item" onclick="this.parentElement.remove()">✕</button>
+  `;
+  list.appendChild(li);
+}
+
 // ── INIT ─────────────────────────────────────────────────
-loadRecipes();
+async function init() {
+  await loadRecipes();
+  // Check if we came back from recipe page with edit intent
+  const params = new URLSearchParams(window.location.search);
+  const editId = params.get('edit');
+  if (editId) {
+    const stored = sessionStorage.getItem('editRecipe');
+    if (stored) {
+      const r = JSON.parse(stored);
+      editingId = editId;
+      populateFormForEdit(r);
+      sessionStorage.removeItem('editRecipe');
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }
+}
+init();
 </script>
 </body>
 </html>
