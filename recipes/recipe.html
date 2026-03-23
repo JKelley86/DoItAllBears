@@ -355,7 +355,7 @@ body::before{
 
 <div class="recipe-header" id="recipeHeader">
   <div class="header-nav">
-    <button class="back-btn" onclick="window.location.href='test.html'">← Back to Bear Book</button>
+    <button class="back-btn" onclick="window.location.href='familycookbook.html'">← Back to Bear Book</button>
     <div class="header-actions">
       <button class="action-btn" onclick="window.print()" title="Print">🖨️</button>
       <button class="action-btn" onclick="shareRecipe()" title="Share">📤</button>
@@ -516,7 +516,7 @@ function loadRecipe() {
   const stored = sessionStorage.getItem('currentRecipe');
   if (!stored) {
     // Change 'index.html' to your filename if different (e.g. 'test.html')
-    window.location.href = 'test.html';
+    window.location.href = 'familycookbook.html';
     return;
   }
   recipe = JSON.parse(stored);
