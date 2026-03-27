@@ -756,7 +756,7 @@ function shareRecipe() {
 function editRecipe() {
   sessionStorage.setItem('editRecipe', JSON.stringify(recipe));
   // Change 'index.html' to your filename if different (e.g. 'test.html')
-  const indexPage = 'test.html';
+  const indexPage = 'familycookbook.html';
   window.location.href = indexPage + '?edit=' + recipe.id;
 }
 
