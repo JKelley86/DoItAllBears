@@ -1124,12 +1124,12 @@ function makeFlightsSegment(flights) {
   let body = '';
   if (flights.length) {
     body += `<div class="sub-items">` + flights.map((f,i) => `
-      <div class="sub-item">
-        <div class="sub-item-actions">
-          <button class="btn btn-ghost btn-sm" onclick="editFlight(${i})">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteFlight(${i})">✕</button>
+      <div class="sub-item" style="position:relative;">
+        <div style="display:flex;justify-content:flex-end;gap:0.4rem;margin-bottom:0.8rem;">
+          <button class="btn btn-ghost btn-sm" onclick="editFlight(${i})" style="border:none!important;background:none!important;color:var(--text-muted);padding:0.2rem 0.5rem;font-size:0.6rem;">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteFlight(${i})" style="border:none!important;background:none!important;color:rgba(239,68,68,0.6);padding:0.2rem 0.5rem;font-size:0.6rem;">✕</button>
         </div>
-        <div class="flight-route">
+        <div class="flight-route" style="width:100%;box-sizing:border-box;">
           <div class="flight-airport"><div class="flight-airport-code">${f.dep_code||'???'}</div><div class="flight-airport-name">${f.dep_name||''}</div></div>
           <div class="flight-line"><span class="flight-plane">✈</span></div>
           <div class="flight-airport" style="text-align:right"><div class="flight-airport-code">${f.arr_code||'???'}</div><div class="flight-airport-name">${f.arr_name||''}</div></div>
