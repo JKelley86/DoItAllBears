@@ -42,30 +42,55 @@ body::before{
 /* ── HEADER ── */
 header{
   position:sticky;top:0;z-index:100;
-  padding:1.2rem 3rem;
+  padding:1rem 1.5rem;
   display:flex;align-items:center;justify-content:space-between;
   border-bottom:1px solid var(--border);
   background:rgba(8,12,24,0.85);
   backdrop-filter:blur(24px);
+  overflow:hidden;
+  min-width:0;
 }
 .logo{
   font-family:'Cormorant Garamond',serif;
-  font-size:1.9rem;font-weight:300;letter-spacing:0.25em;
+  font-size:1.6rem;font-weight:300;letter-spacing:0.2em;
   color:var(--gold-light);text-transform:uppercase;
+  flex-shrink:0;
 }
 .logo span{font-style:italic;color:var(--cream);}
-.header-actions{display:flex;gap:1rem;align-items:center;}
-.status-dot{width:8px;height:8px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px #4ade80;animation:pulse 2s infinite;}
+.header-actions{display:flex;gap:0.6rem;align-items:center;flex-shrink:0;}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:#4ade80;box-shadow:0 0 8px #4ade80;animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
 .status-text{font-size:0.7rem;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase;}
-.user-badge{
-  display:flex;align-items:center;gap:0.6rem;
-  font-size:0.72rem;color:var(--text-muted);
-  padding:0.4rem 0.8rem;
-  border:1px solid var(--border);
-  border-radius:20px;
+.user-menu-wrap{position:relative;}
+.user-icon-btn{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--gold-pale);border:1px solid var(--border);
+  color:var(--gold-light);font-size:1rem;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all 0.2s;
 }
-.user-badge span{color:var(--gold-light);}
+.user-icon-btn:hover{background:var(--gold);color:var(--navy);}
+.user-dropdown{
+  position:absolute;top:calc(100% + 0.5rem);right:0;
+  background:var(--navy-mid);border:1px solid var(--border);
+  border-radius:var(--radius);padding:0.5rem;
+  min-width:180px;z-index:300;
+  display:none;
+  box-shadow:0 8px 30px rgba(0,0,0,0.5);
+}
+.user-dropdown.open{display:block;}
+.user-dropdown-name{font-size:0.75rem;color:var(--gold-light);padding:0.5rem 0.8rem;border-bottom:1px solid var(--border);margin-bottom:0.3rem;}
+.user-dropdown-item{
+  display:block;width:100%;text-align:left;
+  font-family:'Montserrat',sans-serif;font-size:0.72rem;
+  letter-spacing:0.1em;text-transform:uppercase;
+  padding:0.6rem 0.8rem;background:none;
+  border:none;color:var(--text-muted);cursor:pointer;
+  border-radius:var(--radius);transition:all 0.2s;
+}
+.user-dropdown-item:hover{background:rgba(255,255,255,0.05);color:var(--text);}
+.user-dropdown-item.danger{color:#f87171;}
+.user-dropdown-item.danger:hover{background:rgba(239,68,68,0.1);}
 
 /* ── BUTTONS ── */
 .btn{
@@ -318,6 +343,71 @@ textarea{resize:vertical;min-height:80px;}
   .modal-header{padding:1.5rem;}
   .modal-footer{padding:1rem 1.5rem;}
 }
+
+/* ── DAY VIEW ── */
+.view-toggle{
+  display:flex;gap:0;margin-bottom:2rem;
+  border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;width:fit-content;
+}
+.view-btn{
+  padding:0.6rem 1.2rem;font-size:0.65rem;letter-spacing:0.15em;
+  text-transform:uppercase;font-family:'Montserrat',sans-serif;
+  background:transparent;border:none;color:var(--text-muted);
+  cursor:pointer;transition:all 0.2s;white-space:nowrap;
+}
+.view-btn.active{background:var(--gold);color:var(--navy);font-weight:600;}
+.day-view{display:none;}
+.day-view.active{display:block;}
+.segments-view{display:block;}
+.segments-view.hidden{display:none;}
+.day-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);margin-bottom:1.5rem;overflow:hidden;
+}
+.day-card-header{
+  padding:1.2rem 1.8rem;
+  background:linear-gradient(135deg,rgba(201,168,76,0.08) 0%,transparent 60%);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:1rem;
+}
+.day-number{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2rem;font-weight:300;color:var(--gold-light);
+  line-height:1;min-width:2.5rem;
+}
+.day-info{}
+.day-label{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.2rem;}
+.day-date{font-size:1rem;color:var(--cream);font-weight:400;}
+.day-events{padding:1rem 1.8rem;}
+.day-event{
+  display:flex;gap:1rem;align-items:flex-start;
+  padding:0.9rem 0;
+  border-bottom:1px solid rgba(201,168,76,0.06);
+}
+.day-event:last-child{border-bottom:none;}
+.day-event-icon{
+  width:34px;height:34px;flex-shrink:0;
+  border:1px solid var(--border);border-radius:var(--radius);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.9rem;margin-top:2px;
+}
+.day-event-content{}
+.day-event-type{font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.2rem;}
+.day-event-name{font-size:0.9rem;color:var(--cream);font-weight:400;}
+.day-event-detail{font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem;}
+.day-empty{
+  padding:2rem;text-align:center;
+  font-size:0.8rem;color:var(--text-muted);font-style:italic;
+}
+.no-date-section{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);margin-bottom:1.5rem;overflow:hidden;
+}
+.no-date-header{
+  padding:1rem 1.8rem;border-bottom:1px solid var(--border);
+  font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);
+}
 </style>
 </head>
 <body>
@@ -329,9 +419,12 @@ textarea{resize:vertical;min-height:80px;}
       <div class="status-dot" id="statusDot" style="background:#ef4444;box-shadow:0 0 8px #ef4444;"></div>
       <span class="status-text" id="statusText">Connecting...</span>
     </div>
-    <div class="user-badge" id="userBadge" style="display:none;">
-      👤 <span id="userNameDisplay">—</span>
-      <button class="btn btn-ghost btn-sm" onclick="logout()" style="padding:0.2rem 0.6rem;font-size:0.6rem;">Sign Out</button>
+    <div class="user-menu-wrap" id="userMenuWrap" style="display:none;">
+      <button class="user-icon-btn" onclick="toggleUserMenu()" id="userIconBtn">👤</button>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-dropdown-name" id="userNameDisplay">—</div>
+        <button class="user-dropdown-item danger" onclick="logout()">Sign Out</button>
+      </div>
     </div>
   </div>
 </header>
@@ -419,12 +512,19 @@ textarea{resize:vertical;min-height:80px;}
       <div class="detail-dates" id="detailDates">—</div>
       <div id="sharedBadge" style="display:none;" class="shared-badge">🔗 Shared Trip</div>
     </div>
-    <div style="display:flex;justify-content:flex-end;gap:0.6rem;margin-bottom:2rem;flex-wrap:wrap;">
-      <button class="btn btn-share btn-sm" onclick="openShareModal()">🔗 Share</button>
-      <button class="btn btn-ghost btn-sm" onclick="openEditTripModal()">Edit Trip</button>
-      <button class="btn btn-danger btn-sm" onclick="deleteCurrentTrip()">Delete Trip</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-bottom:2rem;flex-wrap:wrap;">
+      <div class="view-toggle">
+        <button class="view-btn active" id="segmentsViewBtn" onclick="switchView('segments')">📋 By Category</button>
+        <button class="view-btn" id="dayViewBtn" onclick="switchView('day')">📅 Day by Day</button>
+      </div>
+      <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+        <button class="btn btn-share btn-sm" onclick="openShareModal()">🔗 Share</button>
+        <button class="btn btn-ghost btn-sm" onclick="openEditTripModal()">Edit Trip</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteCurrentTrip()">Delete Trip</button>
+      </div>
     </div>
-    <div class="segments" id="segmentsContainer"></div>
+    <div class="segments segments-view" id="segmentsContainer"></div>
+    <div class="day-view" id="dayViewContainer"></div>
   </div>
 </main>
 
@@ -693,7 +793,7 @@ function onAuthSuccess() {
   const user = pb.authStore.model;
   document.getElementById('authScreen').style.display = 'none';
   document.getElementById('tripsView').style.display = 'block';
-  document.getElementById('userBadge').style.display = 'flex';
+  document.getElementById('userMenuWrap').style.display = 'block';
   document.getElementById('userNameDisplay').textContent = user.name || user.email;
   loadTrips();
   loadAllUsers();
@@ -706,7 +806,8 @@ function logout() {
   document.getElementById('authScreen').style.display = 'flex';
   document.getElementById('tripsView').style.display = 'none';
   document.getElementById('detailView').style.display = 'none';
-  document.getElementById('userBadge').style.display = 'none';
+  document.getElementById('userMenuWrap').style.display = 'none';
+  document.getElementById('userDropdown').classList.remove('open');
   allTrips = [];
 }
 
@@ -872,8 +973,14 @@ function openTrip(id) {
   const found = allTrips.find(t => t.id === id);
   if (!found) return;
   currentTrip = found;
+  currentView = 'segments';
   document.getElementById('tripsView').style.display = 'none';
   document.getElementById('detailView').style.display = 'block';
+  // Reset view toggle
+  document.getElementById('segmentsViewBtn')?.classList.add('active');
+  document.getElementById('dayViewBtn')?.classList.remove('active');
+  document.getElementById('segmentsContainer')?.classList.remove('hidden');
+  document.getElementById('dayViewContainer')?.classList.remove('active');
   renderDetailView();
   window.scrollTo(0,0);
 }
@@ -1074,6 +1181,154 @@ async function updateTripData(data) {
     showToast('Saved!');
   } catch(e) { showToast('Error saving.', 'error'); console.error(e); }
 }
+
+// ── VIEW SWITCHING ───────────────────────────────────────
+var currentView = 'segments';
+
+function switchView(view) {
+  currentView = view;
+  document.getElementById('segmentsViewBtn').classList.toggle('active', view === 'segments');
+  document.getElementById('dayViewBtn').classList.toggle('active', view === 'day');
+  document.getElementById('segmentsContainer').classList.toggle('hidden', view === 'day');
+  const dayView = document.getElementById('dayViewContainer');
+  if (view === 'day') {
+    dayView.classList.add('active');
+    buildDayView();
+  } else {
+    dayView.classList.remove('active');
+  }
+}
+
+function buildDayView() {
+  const container = document.getElementById('dayViewContainer');
+  const data = currentTrip.data || {};
+  const startDate = currentTrip.start_date ? new Date(currentTrip.start_date) : null;
+  const endDate = currentTrip.end_date ? new Date(currentTrip.end_date) : null;
+
+  // Collect all events with dates
+  const allEvents = [];
+
+  // Flights by departure date
+  (data.flights || []).forEach(f => {
+    if (f.dep_date) allEvents.push({ date: f.dep_date, type: 'flight', icon: '✈️', label: 'Flight', name: `${f.dep_code||'?'} → ${f.arr_code||'?'}`, detail: `${f.airline||''} ${f.flight_num||''} · Seat ${f.seat||'?'} · Boards ${f.boarding_time ? fmt(f.boarding_time,'time') : '—'}`.trim() });
+    if (f.arr_date && f.arr_date !== f.dep_date) allEvents.push({ date: f.arr_date, type: 'flight-arrive', icon: '🛬', label: 'Arrives', name: `Lands at ${f.arr_code||'?'}`, detail: `${f.arr_name||''} · Terminal ${f.arr_terminal||'?'} · ${f.landing_time ? fmt(f.landing_time,'time') : '—'}`.trim() });
+  });
+
+  // Car rental by pickup date
+  if (data.car && data.car.pickup) {
+    const d = data.car.pickup.slice(0,10);
+    allEvents.push({ date: d, type: 'car', icon: '🚗', label: 'Car Rental', name: data.car.company || 'Car Rental', detail: `Pickup ${fmt(data.car.pickup,'datetime')}` });
+  }
+  if (data.car && data.car.dropoff) {
+    const d = data.car.dropoff.slice(0,10);
+    allEvents.push({ date: d, type: 'car-return', icon: '🔑', label: 'Return Car', name: `Return to ${data.car.company||'rental'}`, detail: `Dropoff ${fmt(data.car.dropoff,'datetime')}` });
+  }
+
+  // Hotels by checkin/checkout
+  (data.hotels || []).forEach(h => {
+    if (h.checkin) allEvents.push({ date: h.checkin.slice(0,10), type: 'hotel', icon: '🏨', label: 'Check In', name: h.name || 'Hotel', detail: `${h.brand ? h.brand+' · ' : ''}${h.address||''}`.trim() });
+    if (h.checkout) allEvents.push({ date: h.checkout.slice(0,10), type: 'hotel-out', icon: '🧳', label: 'Check Out', name: `Check out of ${h.name||'hotel'}`, detail: fmt(h.checkout,'datetime') });
+  });
+
+  // Attractions by date
+  (data.attractions || []).forEach(a => {
+    if (a.date) allEvents.push({ date: a.date, type: 'attraction', icon: '🗺️', label: 'Attraction', name: a.name || 'Attraction', detail: `${a.time ? fmt(a.time,'time')+' · ' : ''}${a.address||''}`.trim() });
+  });
+
+  // Restaurants by date
+  (data.restaurants || []).forEach(r => {
+    if (r.date) allEvents.push({ date: r.date, type: 'restaurant', icon: '🍽️', label: 'Dining', name: r.name || 'Restaurant', detail: `${r.time ? fmt(r.time,'time')+' · ' : ''}${r.cuisine||''}${r.price ? ' · '+r.price : ''}`.trim() });
+  });
+
+  // Sort events by date then by time if available
+  allEvents.sort((a,b) => {
+    if (a.date !== b.date) return a.date.localeCompare(b.date);
+    return 0;
+  });
+
+  // Separate dated and undated
+  const datedEvents = allEvents.filter(e => e.date);
+  const noDateEvents = [
+    ...(data.flights||[]).filter(f => !f.dep_date).map(f => ({type:'flight',icon:'✈️',label:'Flight',name:`${f.dep_code||'?'} → ${f.arr_code||'?'}`,detail:`${f.airline||''} ${f.flight_num||''}`.trim()})),
+    ...(data.attractions||[]).filter(a => !a.date).map(a => ({type:'attraction',icon:'🗺️',label:'Attraction',name:a.name||'Attraction',detail:a.address||''})),
+    ...(data.restaurants||[]).filter(r => !r.date).map(r => ({type:'restaurant',icon:'🍽️',label:'Dining',name:r.name||'Restaurant',detail:r.cuisine||''})),
+  ];
+
+  // Group by date
+  const byDate = {};
+  datedEvents.forEach(e => {
+    if (!byDate[e.date]) byDate[e.date] = [];
+    byDate[e.date].push(e);
+  });
+
+  // Build date range
+  let html = '';
+  const dates = Object.keys(byDate).sort();
+
+  if (!dates.length && !noDateEvents.length) {
+    html = `<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No Scheduled Items</div><div class="empty-sub">Add flights, hotels, attractions and restaurants with dates to see your day-by-day plan.</div></div>`;
+  } else {
+    dates.forEach((date, idx) => {
+      const events = byDate[date];
+      const d = new Date(date + 'T12:00:00');
+      const dayNum = startDate ? Math.round((d - startDate) / (1000*60*60*24)) + 1 : idx + 1;
+      const dayLabel = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+
+      html += `
+        <div class="day-card">
+          <div class="day-card-header">
+            <div class="day-number">${dayNum}</div>
+            <div class="day-info">
+              <div class="day-label">Day ${dayNum}</div>
+              <div class="day-date">${dayLabel}</div>
+            </div>
+          </div>
+          <div class="day-events">
+            ${events.map(e => `
+              <div class="day-event">
+                <div class="day-event-icon">${e.icon}</div>
+                <div class="day-event-content">
+                  <div class="day-event-type">${e.label}</div>
+                  <div class="day-event-name">${e.name}</div>
+                  ${e.detail ? `<div class="day-event-detail">${e.detail}</div>` : ''}
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>`;
+    });
+
+    if (noDateEvents.length) {
+      html += `
+        <div class="no-date-section">
+          <div class="no-date-header">No Date Assigned</div>
+          <div class="day-events">
+            ${noDateEvents.map(e => `
+              <div class="day-event">
+                <div class="day-event-icon">${e.icon}</div>
+                <div class="day-event-content">
+                  <div class="day-event-type">${e.label}</div>
+                  <div class="day-event-name">${e.name}</div>
+                  ${e.detail ? `<div class="day-event-detail">${e.detail}</div>` : ''}
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>`;
+    }
+  }
+
+  container.innerHTML = html;
+}
+
+// ── USER MENU ────────────────────────────────────────────
+function toggleUserMenu() {
+  document.getElementById('userDropdown').classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('userMenuWrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('userDropdown')?.classList.remove('open');
+  }
+});
 
 // ── INIT ─────────────────────────────────────────────────
 checkConnection();
