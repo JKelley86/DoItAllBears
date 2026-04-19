@@ -6,6 +6,7 @@
 <title>Game Codex</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Share+Tech+Mono&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pocketbase@0.21.3/dist/pocketbase.umd.js"></script>
 <style>
   :root {
     --bg: #0a0c0f;
@@ -917,9 +918,16 @@
 
 <script>
 // ────────────────────────────────────────────────────────────
-//  Config & PocketBase helpers
+//  PocketBase SDK setup (same pattern as your Voyage app)
 // ────────────────────────────────────────────────────────────
 let PB_URL = localStorage.getItem('pb_url') || 'http://raspberrypi.local:8090';
+let pb = new PocketBase(PB_URL);
+pb.autoCancellation(false);
+pb.beforeSend = function(url, options) {
+  options.headers = Object.assign({}, options.headers, { 'ngrok-skip-browser-warning': 'true' });
+  return { url, options };
+};
+
 if (document.getElementById('pbUrlInput')) {
   document.getElementById('pbUrlInput').value = PB_URL;
 }
@@ -929,77 +937,35 @@ function saveConfig() {
   if (!val) return;
   PB_URL = val;
   localStorage.setItem('pb_url', PB_URL);
+  // Reinitialise the SDK pointing at the new URL
+  pb = new PocketBase(PB_URL);
+  pb.autoCancellation(false);
+  pb.beforeSend = function(url, options) {
+    options.headers = Object.assign({}, options.headers, { 'ngrok-skip-browser-warning': 'true' });
+    return { url, options };
+  };
   toast('✓ Config saved, connecting…');
   init();
 }
 
-async function pbRequest(method, path, body) {
-  const opts = { method, headers: { 'Content-Type': 'application/json' } };
-  if (body) opts.body = JSON.stringify(body);
-  const r = await fetch(`${PB_URL}/api/collections/${path}`, opts);
-  if (!r.ok) {
-    const err = await r.json().catch(() => ({}));
-    throw new Error(err.message || r.statusText);
-  }
-  return r.json();
-}
-
+// ── SDK wrappers (clean interface used throughout the app) ──
 async function getAll(col, filter = '', sort = 'created') {
-  const qs = new URLSearchParams({ perPage: 500, sort });
-  if (filter) qs.set('filter', filter);
-  return pbRequest('GET', `${col}/records?${qs}`);
+  const opts = { perPage: 500, sort };
+  if (filter) opts.filter = filter;
+  const res = await pb.collection(col).getList(1, 500, opts);
+  return { items: res.items };
 }
 
-async function createRec(col, data) { return pbRequest('POST', `${col}/records`, data); }
-async function updateRec(col, id, data) { return pbRequest('PATCH', `${col}/records/${id}`, data); }
-async function deleteRec(col, id) { return pbRequest('DELETE', `${col}/records/${id}`); }
-
-// ── Collection bootstrap (creates if missing) ──
-async function ensureCollections() {
-  const needed = ['gc_games', 'gc_sections', 'gc_entries'];
-  for (const col of needed) {
-    try { await pbRequest('GET', `${col}/records?perPage=1`); }
-    catch { await createCollection(col); }
-  }
+async function createRec(col, data) {
+  return pb.collection(col).create(data);
 }
 
-async function createCollection(name) {
-  const schemas = {
-    gc_games: [
-      { name: 'name', type: 'text', required: true },
-      { name: 'genre', type: 'text' },
-      { name: 'notes', type: 'text' },
-      { name: 'icon', type: 'text' },
-      { name: 'sort_order', type: 'number' }
-    ],
-    gc_sections: [
-      { name: 'game_id', type: 'text', required: true },
-      { name: 'name', type: 'text', required: true },
-      { name: 'type', type: 'text' },  // commands | notes | table
-      { name: 'columns', type: 'text' }, // JSON for table type
-      { name: 'sort_order', type: 'number' }
-    ],
-    gc_entries: [
-      { name: 'section_id', type: 'text', required: true },
-      { name: 'data', type: 'text' }, // JSON blob
-      { name: 'sort_order', type: 'number' }
-    ]
-  };
+async function updateRec(col, id, data) {
+  return pb.collection(col).update(id, data);
+}
 
-  await fetch(`${PB_URL}/api/collections`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name,
-      type: 'base',
-      schema: schemas[name],
-      listRule: '',
-      viewRule: '',
-      createRule: '',
-      updateRule: '',
-      deleteRule: ''
-    })
-  });
+async function deleteRec(col, id) {
+  return pb.collection(col).delete(id);
 }
 
 // ────────────────────────────────────────────────────────────
@@ -1023,7 +989,7 @@ let selectedEmoji = '🎮';
 async function init() {
   setStatus('connecting');
   try {
-    await ensureCollections();
+    await pb.health.check();
     setStatus('connected');
     await loadGames();
   } catch (e) {
