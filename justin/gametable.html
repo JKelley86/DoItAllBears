@@ -920,7 +920,7 @@
 // ────────────────────────────────────────────────────────────
 //  PocketBase SDK setup (same pattern as your Voyage app)
 // ────────────────────────────────────────────────────────────
-let PB_URL = localStorage.getItem('pb_url') || 'http://raspberrypi.local:8090';
+let PB_URL = localStorage.getItem('pb_url') || 'https://tumid-kiltlike-maia.ngrok-free.dev';
 let pb = new PocketBase(PB_URL);
 pb.autoCancellation(false);
 pb.beforeSend = function(url, options) {
