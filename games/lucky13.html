@@ -284,7 +284,7 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
 .pl-body{padding:1.5rem;width:100%;max-width:600px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:1rem;}
 .plinko-cabinet{width:100%;background:linear-gradient(180deg,#0a0a1a,#15153a,#0a0a1a);border-radius:20px;border:2px solid rgba(100,100,255,.3);box-shadow:0 20px 60px rgba(0,0,0,.7);overflow:hidden;}
 .plinko-top{background:linear-gradient(135deg,#1a1a60,#0a0a30);padding:.6rem 1rem;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.3em;color:#8080ff;border-bottom:1px solid rgba(100,100,255,.2);}
-#plinko-canvas{display:block;margin:0 auto;}
+#plinko-canvas{display:block;width:100%;}
 .plinko-slots{display:flex;width:100%;justify-content:stretch;}
 .pl-slot{flex:1;padding:.4rem .1rem;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:.58rem;letter-spacing:.05em;border-top:2px solid rgba(255,255,255,.1);}
 .pl-slot.mega{background:rgba(201,168,76,.2);border-top-color:var(--gold);}
@@ -494,11 +494,9 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
     <div class="pl-bet-bar"><span class="bet-lbl" style="color:#8080ff;">Bet Per Drop</span><button class="bet-btn" style="border-color:rgba(100,100,255,.4);background:rgba(100,100,255,.1);color:#a0a0ff;" onclick="changePlBet(-1)">−</button><span class="bet-val" id="pl-bet-val" style="color:#a0a0ff;min-width:80px;text-align:center;font-family:'Playfair Display',serif;font-size:1.5rem;">$5</span><button class="bet-btn" style="border-color:rgba(100,100,255,.4);background:rgba(100,100,255,.1);color:#a0a0ff;" onclick="changePlBet(1)">+</button></div>
     <div class="plinko-cabinet">
       <div class="plinko-top">✦ Plinko Board ✦</div>
-      <canvas id="plinko-canvas" width="500" height="380"></canvas>
-      <div class="plinko-slots" id="plinko-slots"></div>
+      <canvas id="plinko-canvas" style="width:100%;display:block;"></canvas>
     </div>
     <button class="pl-drop-btn" id="pl-drop-btn" onclick="plDrop()">▼ DROP</button>
-    <div class="sc-progress" id="pl-progress" style="display:none"></div>
     <div class="result-card" id="pl-result" style="max-width:440px"></div>
   </div>
 </div>
@@ -695,91 +693,46 @@ const numEl=document.getElementById('rl-result');if(win>0){applyMoney(win);const
 // ═══════════════════════════════════════════════════
 //  PLINKO
 // ═══════════════════════════════════════════════════
+//  PLINKO
+// ═══════════════════════════════════════════════════
 const PL_BET_OPTS=[1,2,5,10,25,50,100,250,500];
-let plBetIdx=1,plBetAmt=5,plDropping=false;
-const SLOT_MULTS=[10,3,1.5,0.5,0.2,0.5,1.5,3,10]; // 9 slots
+const SLOT_MULTS=[10,3,1.5,0.5,0.2,0.5,1.5,3,10];
 const SLOT_CLASSES=['mega','big','med','small','small','small','med','big','mega'];
 const ROWS=8,COLS=9;
+let plBetIdx=1,plBetAmt=5,plDropping=false;
+// Layout computed fresh each time Plinko opens (responsive)
+let PL={};
 
-function plInit(){plBetAmt=PL_BET_OPTS[plBetIdx];document.getElementById('pl-bet-val').textContent=`$${plBetAmt}`;document.getElementById('pl-result').className='result-card';document.getElementById('pl-drop-btn').disabled=false;buildPlinkoSlots();drawPlinkoBoard();}
-function changePlBet(d){plBetIdx=Math.max(0,Math.min(PL_BET_OPTS.length-1,plBetIdx+d));plBetAmt=PL_BET_OPTS[plBetIdx];document.getElementById('pl-bet-val').textContent=`$${plBetAmt}`;}
-function buildPlinkoSlots(){
-  const s=document.getElementById('plinko-slots');
-  s.innerHTML='';
-  // Compute slot widths proportional to peg gaps (same as physics boundary logic)
-  // Canvas width = 500, padX=40, COLS=9 pegs → spacX=(500-80)/8=52.5
-  const CW=500, padX=40, spacX=(CW-padX*2)/(COLS-1);
-  const bottomPegXs=[];
-  for(let col=0;col<COLS;col++) bottomPegXs.push(padX+col*spacX);
-  // boundaries: [0, mid01, mid12, ..., mid78, CW]
-  const bounds=[0];
-  for(let i=0;i<COLS-1;i++) bounds.push((bottomPegXs[i]+bottomPegXs[i+1])/2);
-  bounds.push(CW);
-  // slot widths as percentages of CW
-  SLOT_MULTS.forEach((m,i)=>{
-    const w=((bounds[i+1]-bounds[i])/CW*100).toFixed(2);
-    const div=document.createElement('div');
-    div.className=`pl-slot ${SLOT_CLASSES[i]}`;
-    div.id=`plslot${i}`;
-    div.style.flex='none';
-    div.style.width=w+'%';
-    div.innerHTML=`<span class="sl-mult">${m}x</span>`;
-    s.appendChild(div);
-  });
-}
-
-function drawPlinkoBoard(){
-  const canvas=document.getElementById('plinko-canvas');if(!canvas)return;
-  const ctx=canvas.getContext('2d');const W=canvas.width,H=canvas.height;
-  ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='rgba(10,10,40,.6)';ctx.fillRect(0,0,W,H);
-
-  const padX=40,padY=30,spacX=(W-padX*2)/(COLS-1),spacY=(H-padY*2)/ROWS;
-  const floorY=padY+(ROWS-1)*spacY+spacY*0.75;
-
-  // Slot dividers: midpoints between bottom-row (even, COLS pegs) consecutive pegs
-  const bottomPegXs=[];
-  for(let col=0;col<COLS;col++) bottomPegXs.push(padX+col*spacX);
-  for(let i=0;i<COLS-1;i++){
-    const divX=(bottomPegXs[i]+bottomPegXs[i+1])/2;
-    ctx.beginPath();ctx.moveTo(divX,floorY);ctx.lineTo(divX,H);
-    ctx.strokeStyle='rgba(255,255,255,0.14)';ctx.lineWidth=1;ctx.stroke();
-  }
-
-  // Pegs
-  const pegR=6;
-  for(let row=0;row<ROWS;row++){
-    const cols=row%2===0?COLS:COLS-1;
-    const offsetX=row%2===0?0:spacX/2;
-    for(let col=0;col<cols;col++){
-      const x=padX+offsetX+col*spacX,y=padY+row*spacY;
-      ctx.beginPath();ctx.arc(x,y,pegR,0,Math.PI*2);
-      const g=ctx.createRadialGradient(x-1,y-1,1,x,y,pegR);
-      g.addColorStop(0,'#d0d0ff');g.addColorStop(1,'#6060b0');
-      ctx.fillStyle=g;ctx.fill();
-      ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=1;ctx.stroke();
-    }
-  }
-}
-
-function getPegPos(){const W=500,H=380,padX=40,padY=30,spacX=(W-padX*2)/(COLS-1),spacY=(H-padY*2)/ROWS;const pegs=[];for(let row=0;row<ROWS;row++){const cols=row%2===0?COLS:COLS-1,offsetX=row%2===0?0:spacX/2;for(let col=0;col<cols;col++)pegs.push({x:padX+offsetX+col*spacX,y:padY+row*spacY,row,col});}return{pegs,spacX,spacY,padX,padY};}
-
-function plDrop(){
-  if(plDropping||money<plBetAmt)return;
-  applyMoney(-plBetAmt);plinkoDrops++;plDropping=true;
-  document.getElementById('pl-drop-btn').disabled=true;
+function plInit(){
+  plBetAmt=PL_BET_OPTS[plBetIdx];
+  document.getElementById('pl-bet-val').textContent=`$${plBetAmt}`;
   document.getElementById('pl-result').className='result-card';
+  document.getElementById('pl-drop-btn').disabled=false;
+  plDropping=false;
+  plSetup();
+  plDrawBoard();
+}
 
+function plSetup(){
   const canvas=document.getElementById('plinko-canvas');
-  const ctx=canvas.getContext('2d');
-  const CW=canvas.width, CH=canvas.height;
+  const cab=canvas.parentElement;
+  // Size canvas to exactly match its CSS display width on this device
+  const dw=Math.floor(cab.getBoundingClientRect().width)||320;
+  const SLOT_H=Math.round(dw*0.13);
+  const boardH=Math.round(dw*1.05);
+  canvas.width=dw;
+  canvas.height=boardH+SLOT_H;
 
-  const PAD_X=40, PAD_Y=30, CHIP_R=8, PEG_R=6;
+  const CW=dw, CH=canvas.height;
+  const PAD_X=Math.round(CW*0.07);
+  const PAD_Y=Math.round(CW*0.055);
   const spacX=(CW-PAD_X*2)/(COLS-1);
-  const spacY=(CH-PAD_Y*2)/ROWS;
-  const FLOOR_Y=PAD_Y+(ROWS-1)*spacY+spacY*0.75;
+  const spacY=(boardH-PAD_Y*2)/(ROWS-1);
+  const FLOOR_Y=PAD_Y+(ROWS-1)*spacY+spacY*0.55;
+  const PEG_R=Math.max(4,Math.round(CW*0.013));
+  const CHIP_R=Math.max(6,Math.round(CW*0.02));
 
-  // Build pegs — identical to drawPlinkoBoard
+  // Build pegs
   const pegs=[];
   for(let row=0;row<ROWS;row++){
     const cols=row%2===0?COLS:COLS-1;
@@ -789,73 +742,107 @@ function plDrop(){
     }
   }
 
-  // The 9 landing slots sit BETWEEN the bottom-row pegs.
-  // Bottom row (row 7, even) has COLS=9 pegs at x = PAD_X + col*spacX.
-  // The gaps between consecutive bottom pegs define the 8 inner slots;
-  // plus one slot left of peg 0 and one right of peg 8 = 10 zones total.
-  // We map those to our 9 multiplier slots by using peg midpoints.
-  // Simpler: the 9 slots are centred between peg pairs on the last even row.
-  // Last even row = row ROWS-2 (row 6) for ROWS=8, which has COLS=9 pegs.
-  // Slot boundaries = midpoints between consecutive pegs on that row + edges.
-  const lastEvenRow = ROWS%2===0 ? ROWS-2 : ROWS-1; // row 6
-  const bottomPegXs=[];
-  for(let col=0;col<COLS;col++) bottomPegXs.push(PAD_X+col*spacX);
-  // 9 slots: slot i is centred between bottomPegXs[i-1] and bottomPegXs[i], with edges at 0 and CW
-  const slotBoundaries=[0];
-  for(let i=0;i<COLS-1;i++) slotBoundaries.push((bottomPegXs[i]+bottomPegXs[i+1])/2);
-  slotBoundaries.push(CW);
-  // slotBoundaries.length = COLS+1 = 10 → defines 9 slots
+  // Slot boundaries = midpoints between consecutive bottom-row pegs + canvas edges
+  const botXs=[];
+  for(let col=0;col<COLS;col++) botXs.push(PAD_X+col*spacX);
+  const slotBounds=[0];
+  for(let i=0;i<COLS-1;i++) slotBounds.push((botXs[i]+botXs[i+1])/2);
+  slotBounds.push(CW);
 
-  // Per-peg cooldown so we can't double-collide same peg same frame
-  const pegCooldown=new Map();
+  PL={CW,CH,PAD_X,PAD_Y,SLOT_H,spacX,spacY,pegs,slotBounds,FLOOR_Y,PEG_R,CHIP_R,slotTop:boardH};
+}
 
-  let bx=CW/2+(Math.random()-0.5)*8, by=2;
-  let vx=(Math.random()-0.5)*2, vy=3;
-  const GRAVITY=1.4, BOUNCE=0.36, FRICTION=0.80;
-  let settleFrames=0, raf;
-  let lastVibrateTime=0;
+function plDrawBoard(chipX,chipY,hlSlot=-1){
+  const canvas=document.getElementById('plinko-canvas');if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const{CW,CH,PAD_X,PAD_Y,SLOT_H,spacX,spacY,pegs,slotBounds,FLOOR_Y,PEG_R,CHIP_R,slotTop}=PL;
 
-  function drawChip(){
-    ctx.beginPath();ctx.ellipse(bx,by+CHIP_R+1,CHIP_R*0.8,3,0,0,Math.PI*2);
-    ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fill();
-    ctx.beginPath();ctx.arc(bx,by,CHIP_R,0,Math.PI*2);
-    const g=ctx.createRadialGradient(bx-2,by-2,1,bx,by,CHIP_R);
-    g.addColorStop(0,'#fff8b0');g.addColorStop(0.5,'#f0d060');g.addColorStop(1,'#a07820');
+  ctx.clearRect(0,0,CW,CH);
+  // Board bg
+  ctx.fillStyle='rgba(8,8,32,.95)';ctx.fillRect(0,0,CW,CH);
+
+  // Draw slot buckets
+  const slotColors={
+    mega:{bg:'rgba(201,168,76,.2)',bgh:'rgba(201,168,76,.65)',border:'rgba(201,168,76,.7)',borderh:'#f0d080'},
+    big: {bg:'rgba(80,200,80,.14)',bgh:'rgba(80,200,80,.55)',border:'rgba(80,200,80,.5)',borderh:'#80ff80'},
+    med: {bg:'rgba(80,140,220,.12)',bgh:'rgba(80,140,220,.5)',border:'rgba(80,140,220,.4)',borderh:'#80c0ff'},
+    small:{bg:'rgba(255,255,255,.05)',bgh:'rgba(255,255,255,.22)',border:'rgba(255,255,255,.18)',borderh:'rgba(255,255,255,.7)'}
+  };
+  for(let i=0;i<SLOT_MULTS.length;i++){
+    const x1=slotBounds[i],x2=slotBounds[i+1],w=x2-x1;
+    const hl=(i===hlSlot);
+    const cls=SLOT_CLASSES[i];
+    const c=slotColors[cls];
+    // Fill
+    ctx.fillStyle=hl?c.bgh:c.bg;
+    ctx.fillRect(x1,slotTop,w,SLOT_H);
+    // Top border bar
+    ctx.fillStyle=hl?c.borderh:c.border;
+    ctx.fillRect(x1,slotTop,w,hl?3:2);
+    // Side dividers
+    if(i>0){ctx.fillStyle='rgba(255,255,255,.1)';ctx.fillRect(x1,slotTop,1,SLOT_H);}
+    // Label
+    const fs=Math.max(10,Math.round(CW*0.032));
+    ctx.font=`bold ${fs}px Bebas Neue,sans-serif`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle=hl?'#fff':'rgba(240,210,120,.9)';
+    ctx.fillText(`${SLOT_MULTS[i]}x`,(x1+x2)/2,slotTop+SLOT_H*0.55);
+  }
+
+  // Pegs
+  for(const p of pegs){
+    ctx.beginPath();ctx.arc(p.x,p.y,PEG_R,0,Math.PI*2);
+    const g=ctx.createRadialGradient(p.x-PEG_R*.3,p.y-PEG_R*.3,PEG_R*.1,p.x,p.y,PEG_R);
+    g.addColorStop(0,'#d8d8ff');g.addColorStop(1,'#5050a0');
     ctx.fillStyle=g;ctx.fill();
-    ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=1.5;ctx.stroke();
-    ctx.beginPath();ctx.arc(bx-2,by-2,CHIP_R*0.32,0,Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.18)';ctx.lineWidth=1;ctx.stroke();
   }
 
-  function getSlot(x){
-    for(let i=0;i<SLOT_MULTS.length;i++){
-      if(x>=slotBoundaries[i]&&x<slotBoundaries[i+1]) return i;
-    }
-    return x<slotBoundaries[0]?0:SLOT_MULTS.length-1;
+  // Chip
+  if(chipX!==undefined){
+    const CR=CHIP_R;
+    ctx.beginPath();ctx.ellipse(chipX,chipY+CR+1,CR*.75,3,0,0,Math.PI*2);
+    ctx.fillStyle='rgba(0,0,0,.22)';ctx.fill();
+    ctx.beginPath();ctx.arc(chipX,chipY,CR,0,Math.PI*2);
+    const cg=ctx.createRadialGradient(chipX-CR*.3,chipY-CR*.3,CR*.1,chipX,chipY,CR);
+    cg.addColorStop(0,'#fff8b0');cg.addColorStop(.5,'#f0d060');cg.addColorStop(1,'#a07820');
+    ctx.fillStyle=cg;ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.5)';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.beginPath();ctx.arc(chipX-CR*.25,chipY-CR*.25,CR*.28,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,.38)';ctx.fill();
   }
+}
 
-  function settle(){
+function changePlBet(d){if(plDropping)return;plBetIdx=Math.max(0,Math.min(PL_BET_OPTS.length-1,plBetIdx+d));plBetAmt=PL_BET_OPTS[plBetIdx];document.getElementById('pl-bet-val').textContent=`$${plBetAmt}`;}
+
+function plDrop(){
+  if(plDropping||money<plBetAmt)return;
+  applyMoney(-plBetAmt);plinkoDrops++;plDropping=true;
+  document.getElementById('pl-drop-btn').disabled=true;
+  document.getElementById('pl-result').className='result-card';
+
+  const{CW,CH,PAD_X,PAD_Y,spacX,spacY,pegs,slotBounds,FLOOR_Y,PEG_R,CHIP_R,slotTop}=PL;
+  const COLL=CHIP_R+PEG_R+1;
+  const pegCD=new Map();
+  let lastVib=0;
+
+  let bx=CW/2+(Math.random()-0.5)*spacX*0.6;
+  let by=CHIP_R+2;
+  let vx=(Math.random()-0.5)*1.8, vy=2.5;
+  const GRAV=0.52, BNC=0.36, FRIC=0.80;
+  let settle=0,raf;
+
+  function getSlot(x){for(let i=0;i<slotBounds.length-1;i++)if(x>=slotBounds[i]&&x<slotBounds[i+1])return i;return SLOT_MULTS.length-1;}
+
+  function done(){
     cancelAnimationFrame(raf);
-
     const slot=Math.max(0,Math.min(SLOT_MULTS.length-1,getSlot(bx)));
-
-    // Park chip visually in slot centre
-    const slotCX=(slotBoundaries[slot]+slotBoundaries[slot+1])/2;
-    drawPlinkoBoard();
-    bx=slotCX; by=FLOOR_Y+2;
-    drawChip();
-
-    const slotEl=document.getElementById(`plslot${slot}`);
-    if(slotEl){
-      slotEl.style.background='rgba(201,168,76,.55)';
-      slotEl.style.borderTopColor='var(--gold)';
-      setTimeout(()=>{slotEl.style.background='';slotEl.style.borderTopColor='';},1400);
-    }
-
+    bx=(slotBounds[slot]+slotBounds[slot+1])/2;
+    by=slotTop-CHIP_R-1;
+    plDrawBoard(bx,by,slot);
     const mult=SLOT_MULTS[slot];
     const prize=Math.round(plBetAmt*mult*100)/100;
     if(prize>0)applyMoney(prize);
-
     setTimeout(()=>{
       showResult('pl-result',prize>=plBetAmt?'win':'lose',
         prize>=plBetAmt?'💰':'📉',
@@ -868,56 +855,33 @@ function plDrop(){
     },300);
   }
 
-  function physicsFrame(ts){
-    // Decay cooldowns
-    for(const [id,t] of pegCooldown) if(ts-t>80) pegCooldown.delete(id);
-
-    vy+=GRAVITY;
-    bx+=vx;
-    by+=vy;
-
-    // Peg collisions — one response per peg per cooldown window
-    for(const peg of pegs){
-      if(pegCooldown.has(peg.id)) continue;
-      const dx=bx-peg.x, dy=by-peg.y;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-      const minD=CHIP_R+PEG_R+1;
-      if(dist<minD&&dist>0.001){
-        pegCooldown.set(peg.id,ts);
-        const nx=dx/dist, ny=dy/dist;
-        bx=peg.x+nx*(minD+0.5);
-        by=peg.y+ny*(minD+0.5);
+  function frame(ts){
+    for(const[id,t]of pegCD)if(ts-t>85)pegCD.delete(id);
+    vy+=GRAV; bx+=vx; by+=vy;
+    for(const p of pegs){
+      if(pegCD.has(p.id))continue;
+      const dx=bx-p.x,dy=by-p.y,dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<COLL&&dist>.001){
+        pegCD.set(p.id,ts);
+        const nx=dx/dist,ny=dy/dist;
+        bx=p.x+nx*(COLL+.5); by=p.y+ny*(COLL+.5);
         const dot=vx*nx+vy*ny;
-        vx=(vx-2*dot*nx)*BOUNCE+(Math.random()-0.5)*2.5;
-        vy=(vy-2*dot*ny)*BOUNCE;
-        // ensure ball always moves downward after bounce
-        if(vy<0) vy*=-0.3;
-        vx*=FRICTION;
-        if(ts-lastVibrateTime>60){lastVibrateTime=ts;if(navigator.vibrate)navigator.vibrate(5);}
+        vx=(vx-2*dot*nx)*BNC+(Math.random()-.5)*3;
+        vy=(vy-2*dot*ny)*BNC;
+        if(vy<.4)vy=.4+Math.random()*.8;
+        vx*=FRIC;
+        if(ts-lastVib>55){lastVib=ts;if(navigator.vibrate)navigator.vibrate(5);}
       }
     }
-
-    // Walls
-    if(bx<CHIP_R){bx=CHIP_R;vx=Math.abs(vx)*BOUNCE;}
-    if(bx>CW-CHIP_R){bx=CW-CHIP_R;vx=-Math.abs(vx)*BOUNCE;}
-
-    // Floor
-    if(by>=FLOOR_Y){
-      by=FLOOR_Y;
-      vy=-Math.abs(vy)*0.18;
-      vx*=0.60;
-      if(Math.abs(vy)<1.2&&Math.abs(vx)<1.0) settleFrames++;
-      else settleFrames=Math.max(0,settleFrames-1);
-    }
-
-    drawPlinkoBoard();
-    drawChip();
-
-    if(settleFrames>8||by>CH+50){ settle(); return; }
-    raf=requestAnimationFrame(physicsFrame);
+    if(bx<CHIP_R){bx=CHIP_R;vx=Math.abs(vx)*BNC;}
+    if(bx>CW-CHIP_R){bx=CW-CHIP_R;vx=-Math.abs(vx)*BNC;}
+    const floor=slotTop-CHIP_R;
+    if(by>=floor){by=floor;vy=-Math.abs(vy)*.15;vx*=.55;if(Math.abs(vy)<1.2&&Math.abs(vx)<.9)settle++;else settle=Math.max(0,settle-1);}
+    plDrawBoard(bx,by);
+    if(settle>8||by>CH+40){done();return;}
+    raf=requestAnimationFrame(frame);
   }
-
-  raf=requestAnimationFrame(physicsFrame);
+  raf=requestAnimationFrame(frame);
 }
 
 // ═══════════════════════════════════════════════════
