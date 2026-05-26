@@ -1,0 +1,130 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    overflow:hidden;
+    font-family:'Orbitron',sans-serif;
+    background:black;
+    color:white;
+}
+
+canvas{
+    display:block;
+}
+
+#ui{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+}
+
+#topBar{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:70px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:0 30px;
+
+    background:rgba(0,0,0,0.4);
+    backdrop-filter:blur(10px);
+
+    border-bottom:2px solid cyan;
+
+    z-index:50;
+}
+
+.logo{
+    font-size:2rem;
+    font-weight:900;
+
+    color:cyan;
+
+    text-shadow:
+        0 0 10px cyan,
+        0 0 20px cyan,
+        0 0 40px cyan;
+}
+
+.stats{
+    display:flex;
+    gap:30px;
+    font-size:1rem;
+}
+
+#instructions{
+    position:absolute;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+
+    background:rgba(0,0,0,0.5);
+    padding:12px 20px;
+    border-radius:999px;
+
+    border:1px solid magenta;
+}
+
+#gameOverlay{
+    position:absolute;
+    inset:0;
+
+    background:rgba(0,0,0,0.95);
+
+    display:none;
+    flex-direction:column;
+
+    pointer-events:auto;
+
+    z-index:100;
+}
+
+#gameHeader{
+    height:80px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:0 25px;
+
+    border-bottom:2px solid cyan;
+
+    background:rgba(0,0,0,0.6);
+}
+
+#gameCanvas{
+    flex:1;
+    width:100%;
+}
+
+button{
+    padding:12px 24px;
+
+    border:none;
+    border-radius:999px;
+
+    background:linear-gradient(90deg,cyan,magenta);
+
+    color:white;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    box-shadow:0 0 20px cyan;
+}
+
+.neonText{
+    text-shadow:
+        0 0 5px white,
+        0 0 10px cyan,
+        0 0 20px cyan;
+}
