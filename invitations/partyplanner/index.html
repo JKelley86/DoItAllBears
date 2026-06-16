@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gather Plan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://unpkg.com/pocketbase@0.26.2/dist/pocketbase.umd.js"></script>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div class="hero__content">
+          <p class="eyebrow" data-field="kindLabel">Long Weekend</p>
+          <h1 data-field="title">Lake Weekend Food Plan</h1>
+          <p class="lede" data-field="description">A shared plan for meals, snacks, arrivals, and who is bringing what.</p>
+          <div class="hero__meta">
+            <span data-field="dates">July 3-6, 2026</span>
+            <span data-field="location">Cabin on Cedar Lake</span>
+            <span data-field="timeWindow">Check-in after 4:00 PM</span>
+          </div>
+        </div>
+        <div class="hero__actions">
+          <button class="icon-button" type="button" id="refreshBtn" aria-label="Refresh plan" title="Refresh plan">
+            <i data-lucide="refresh-cw"></i>
+          </button>
+          <button class="primary-button" type="button" id="editBtn">
+            <i data-lucide="lock"></i>
+            Edit plan
+          </button>
+        </div>
+      </section>
+
+      <section class="status-row" id="statusRow" aria-live="polite"></section>
+
+      <section class="invite-panel">
+        <div>
+          <p class="section-kicker">Invite</p>
+          <h2 data-field="inviteHeading">Food, friends, and a little coordination</h2>
+        </div>
+        <div class="invite-grid">
+          <div>
+            <span>What</span>
+            <strong data-field="eventFor">Fourth of July weekend</strong>
+          </div>
+          <div>
+            <span>When</span>
+            <strong data-field="dates">July 3-6, 2026</strong>
+          </div>
+          <div>
+            <span>Where</span>
+            <strong data-field="location">Cabin on Cedar Lake</strong>
+          </div>
+          <div>
+            <span>Timing</span>
+            <strong data-field="timeWindow">Check-in after 4:00 PM</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <div class="main-stack">
+          <section class="planner-section trip-only">
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">Day by day</p>
+                <h2>Meal Plan</h2>
+              </div>
+            </div>
+            <div class="day-list" id="dayList"></div>
+          </section>
+
+          <section class="planner-section party-only" hidden>
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">One day</p>
+                <h2>Food List</h2>
+              </div>
+            </div>
+            <div class="single-day-list" id="singleDayList"></div>
+          </section>
+
+          <section class="planner-section">
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">Always welcome</p>
+                <h2>Snacks & Extras</h2>
+              </div>
+            </div>
+            <div class="snack-list" id="snackList"></div>
+          </section>
+        </div>
+
+        <aside class="side-stack">
+          <section class="planner-section">
+            <div class="section-heading compact">
+              <div>
+                <p class="section-kicker">People</p>
+                <h2>Who's Coming</h2>
+              </div>
+            </div>
+            <div class="people-list" id="peopleList"></div>
+          </section>
+
+          <section class="planner-section">
+            <div class="section-heading compact">
+              <div>
+                <p class="section-kicker">Responsibilities</p>
+                <h2>Bringing</h2>
+              </div>
+            </div>
+            <div class="bring-list" id="bringList"></div>
+          </section>
+        </aside>
+      </section>
+    </main>
+
+    <dialog class="editor" id="editorDialog">
+      <form method="dialog" class="editor__panel" id="editorForm">
+        <div class="editor__header">
+          <div>
+            <p class="section-kicker">Admin</p>
+            <h2 id="editorTitle">Unlock plan</h2>
+          </div>
+          <button class="icon-button" type="button" id="closeEditorBtn" aria-label="Close editor" title="Close">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+
+        <div class="unlock-view" id="unlockView">
+          <label class="field">
+            <span>Password</span>
+            <input type="password" id="passwordInput" autocomplete="current-password" placeholder="Enter editor password" />
+          </label>
+          <p class="hint">Default password is <strong>partyplan</strong>. Change it after your first save.</p>
+          <button class="primary-button full" type="button" id="unlockBtn">Unlock editor</button>
+        </div>
+
+        <div class="edit-view" id="editView" hidden>
+          <div class="editor-tabs" role="tablist" aria-label="Editor sections">
+            <button type="button" class="tab is-active" data-tab="basics">Basics</button>
+            <button type="button" class="tab" data-tab="people">People</button>
+            <button type="button" class="tab" data-tab="meals">Meals</button>
+            <button type="button" class="tab" data-tab="snacks">Snacks</button>
+            <button type="button" class="tab" data-tab="settings">Settings</button>
+          </div>
+
+          <section class="tab-panel is-active" data-panel="basics">
+            <div class="mode-toggle">
+              <button type="button" class="mode-option is-active" data-mode="trip">
+                <i data-lucide="calendar-days"></i>
+                Trip
+              </button>
+              <button type="button" class="mode-option" data-mode="party">
+                <i data-lucide="party-popper"></i>
+                One-day
+              </button>
+            </div>
+            <div class="form-grid">
+              <label class="field span-2"><span>Title</span><input data-edit="title" /></label>
+              <label class="field span-2"><span>Description</span><textarea data-edit="description"></textarea></label>
+              <label class="field"><span>What it's for</span><input data-edit="eventFor" /></label>
+              <label class="field"><span>Dates</span><input data-edit="dates" /></label>
+              <label class="field"><span>Location</span><input data-edit="location" /></label>
+              <label class="field"><span>Times</span><input data-edit="timeWindow" /></label>
+              <label class="field span-2"><span>Invite heading</span><input data-edit="inviteHeading" /></label>
+            </div>
+          </section>
+
+          <section class="tab-panel" data-panel="people">
+            <div class="editor-list" id="peopleEditor"></div>
+            <button class="secondary-button" type="button" id="addPersonBtn"><i data-lucide="plus"></i>Add person</button>
+          </section>
+
+          <section class="tab-panel" data-panel="meals">
+            <div class="trip-meal-editor">
+              <div class="editor-list" id="daysEditor"></div>
+              <button class="secondary-button" type="button" id="addDayBtn"><i data-lucide="plus"></i>Add day</button>
+            </div>
+            <div class="party-meal-editor" hidden>
+              <div class="editor-list" id="partyMealsEditor"></div>
+              <button class="secondary-button" type="button" id="addPartyMealBtn"><i data-lucide="plus"></i>Add food section</button>
+            </div>
+          </section>
+
+          <section class="tab-panel" data-panel="snacks">
+            <div class="editor-list" id="snacksEditor"></div>
+            <button class="secondary-button" type="button" id="addSnackBtn"><i data-lucide="plus"></i>Add snack</button>
+          </section>
+
+          <section class="tab-panel" data-panel="settings">
+            <div class="form-grid">
+              <label class="field"><span>PocketBase URL</span><input id="pbUrlInput" /></label>
+              <label class="field"><span>Collection</span><input id="collectionInput" /></label>
+              <label class="field"><span>Plan slug</span><input id="slugInput" /></label>
+              <label class="field"><span>New editor password</span><input type="password" id="newPasswordInput" autocomplete="new-password" placeholder="Leave blank to keep current" /></label>
+            </div>
+            <p class="hint">For GitHub Pages, create a PocketBase collection with text field <strong>slug</strong> and JSON field <strong>data</strong>. Public list/view should be allowed for guests who can see the page. Create/update must be allowed or handled with stronger PocketBase auth rules.</p>
+          </section>
+
+          <div class="editor__footer">
+            <button class="secondary-button" type="button" id="exportBtn"><i data-lucide="download"></i>Export JSON</button>
+            <button class="primary-button" type="button" id="saveBtn"><i data-lucide="save"></i>Save plan</button>
+          </div>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
