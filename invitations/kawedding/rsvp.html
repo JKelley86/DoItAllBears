@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSVP — Kaiden &amp; Amelia</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rye&family=Vollkorn:ital,wght@0,400;0,600;1,400&family=Vollkorn+SC:wght@400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="wrap">
+
+    <!-- ===================== PAGE TITLE ===================== -->
+    <header class="page-header">
+      <p class="eyebrow">Kaiden &amp; Amelia</p>
+      <h1>RSVP</h1>
+    </header>
+
+    <div class="rope-divider" aria-hidden="true"></div>
+
+    <!-- ===================== INTRO ===================== -->
+    <div class="rsvp-intro">
+      <p>
+        Saddle up and let us know if you'll be joining the celebration.
+        Please respond by <strong>September 1, 2026</strong>.
+      </p>
+    </div>
+
+    <!-- ===================== FORM ===================== -->
+    <main>
+      <form class="rsvp-form" id="rsvp-form" autocomplete="off">
+
+        <div class="form-field">
+          <label for="guest-name">Your Name</label>
+          <input type="text" id="guest-name" name="guest-name" placeholder="Full name" required>
+        </div>
+
+        <div class="form-field">
+          <label>Will you be attending?</label>
+          <div class="attend-toggle">
+            <input type="radio" id="attend-yes" name="attending" value="yes" required>
+            <label for="attend-yes">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+              Joyfully Accept
+            </label>
+
+            <input type="radio" id="attend-no" name="attending" value="no">
+            <label for="attend-no">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+              Regretfully Decline
+            </label>
+          </div>
+        </div>
+
+        <!-- ============ REVEAL: shown only if attending = yes ============ -->
+        <div class="rsvp-reveal" id="reveal-yes">
+          <h3>We can't wait to see you!</h3>
+          <p>Mark your calendar and head on out to the ranch:</p>
+          <p class="venue-address">
+            Cedar Bend Ranch<br>
+            1842 Hollow Creek Road<br>
+            Bandera, TX 78003
+          </p>
+          <a class="map-link" href="https://maps.google.com/?q=1842+Hollow+Creek+Road+Bandera+TX+78003" target="_blank" rel="noopener">
+            Open in Google Maps
+          </a>
+        </div>
+
+        <!-- ============ REVEAL: shown only if attending = no ============ -->
+        <div class="rsvp-reveal sorry" id="reveal-no">
+          <h3>We'll miss you</h3>
+          <p>
+            Thank you for letting us know. You'll be in our thoughts as we
+            celebrate — we'll be sure to share photos from the day.
+          </p>
+        </div>
+
+        <!-- ============ EXTRA FIELDS: only shown if attending = yes ============ -->
+        <div class="rsvp-extra-fields" id="extra-fields">
+
+          <div class="form-field">
+            <label for="guest-count">Number in Your Party</label>
+            <input type="number" id="guest-count" name="guest-count" min="1" max="10" value="1">
+            <span class="hint">Include yourself and anyone attending with you.</span>
+          </div>
+
+          <div class="form-field">
+            <label for="meal-choice">Meal Choice</label>
+            <select id="meal-choice" name="meal-choice">
+              <option value="">Select one</option>
+              <option value="smoked-brisket">Smoked Brisket</option>
+              <option value="herb-chicken">Herb Roasted Chicken</option>
+              <option value="vegetarian">Vegetarian Plate</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="dietary-notes">Dietary Restrictions or Allergies</label>
+            <textarea id="dietary-notes" name="dietary-notes" placeholder="Let us know if there's anything we should be aware of"></textarea>
+          </div>
+
+          <div class="form-field">
+            <label for="song-request">Song Request <span class="hint" style="display:inline">(optional)</span></label>
+            <input type="text" id="song-request" name="song-request" placeholder="What'll get you on the dance floor?">
+          </div>
+
+        </div>
+
+        <div class="form-field">
+          <label for="message">Message for the Couple <span class="hint" style="display:inline">(optional)</span></label>
+          <textarea id="message" name="message" placeholder="Well wishes, memories, anything goes"></textarea>
+        </div>
+
+        <button type="submit" class="rsvp-submit" id="rsvp-submit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+          Send RSVP
+        </button>
+
+        <p class="rsvp-note">
+          Questions? Reach out to Kaiden or Amelia directly and we'll sort it out.
+        </p>
+
+      </form>
+
+      <!-- ============ SUCCESS MESSAGE (shown after submit) ============ -->
+      <div class="rsvp-success" id="rsvp-success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+        <h3>Got it, thank you!</h3>
+        <p>Your RSVP has been sent. We'll see you on the ranch.</p>
+      </div>
+    </main>
+
+    <!-- ===================== BOTTOM NAVIGATION ===================== -->
+    <nav class="bottom-nav" aria-label="Site navigation">
+      <a href="index.html" class="nav-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+        Home
+      </a>
+      <a href="our-story.html" class="nav-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Our Story
+      </a>
+      <a href="rsvp.html" class="nav-btn current" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+        RSVP
+      </a>
+      <a href="details.html" class="nav-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        Details
+      </a>
+    </nav>
+
+    <footer class="site-footer">Kaiden &amp; Amelia · October 17, 2026</footer>
+
+  </div>
+
+  <script>
+    /* =========================================================
+       RSVP FORM LOGIC
+       =========================================================
+       Part 1: show/hide the address vs "we'll miss you" message,
+       and show/hide the extra fields (meal, guest count, etc).
+       This part is pure front-end and works right now.
+
+       Part 2: submit the data to Google Forms so responses land
+       in a Google Sheet. See the SETUP INSTRUCTIONS comment
+       below — you must create a Google Form and paste in your
+       own field IDs before submissions will actually go anywhere.
+       Until then, submitting just shows the success message
+       locally (nothing is sent or saved).
+       ========================================================= */
+
+    const form = document.getElementById('rsvp-form');
+    const revealYes = document.getElementById('reveal-yes');
+    const revealNo = document.getElementById('reveal-no');
+    const extraFields = document.getElementById('extra-fields');
+    const submitBtn = document.getElementById('rsvp-submit');
+    const successPanel = document.getElementById('rsvp-success');
+
+    const attendRadios = document.querySelectorAll('input[name="attending"]');
+
+    attendRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        const isAttending = radio.value === 'yes' && radio.checked;
+        const isDeclining = radio.value === 'no' && radio.checked;
+
+        if (isAttending) {
+          revealYes.classList.add('is-visible');
+          revealNo.classList.remove('is-visible');
+          extraFields.classList.add('is-visible');
+          // make meal choice required only when attending
+          document.getElementById('meal-choice').required = true;
+        }
+        if (isDeclining) {
+          revealNo.classList.add('is-visible');
+          revealYes.classList.remove('is-visible');
+          extraFields.classList.remove('is-visible');
+          document.getElementById('meal-choice').required = false;
+        }
+      });
+    });
+
+    /* =========================================================
+       SETUP INSTRUCTIONS — connecting this form to Google Forms
+       =========================================================
+       1. Go to forms.google.com and create a new form titled
+          "Kaiden & Amelia RSVP" with these questions, IN THIS
+          ORDER, matching these types:
+            - Your Name            (Short answer)
+            - Attending?           (Short answer)
+            - Number in Party      (Short answer)
+            - Meal Choice          (Short answer)
+            - Dietary Notes        (Paragraph)
+            - Song Request         (Short answer)
+            - Message              (Paragraph)
+
+       2. Click the three dots (top right) > "Get pre-filled link".
+       3. Fill in dummy answers for every question, click "Get link".
+       4. Copy that long URL. It will look like:
+            https://docs.google.com/forms/d/e/XXXXXXX/viewform?usp=pp_url&entry.111=a&entry.222=b...
+       5. From that URL, copy two things into the constants below:
+            a) The base form URL (everything before "?")
+               -> paste into GOOGLE_FORM_ACTION_URL
+            b) Each "entry.XXXXXXX" number
+               -> paste into the matching FIELD_ID_* constant
+       6. Set FORM_CONNECTED to true.
+
+       That's it — submissions will then flow into the Responses
+       tab of your Google Form, which auto-creates a Google Sheet
+       (click the green Sheets icon in the Responses tab).
+       ========================================================= */
+
+    const FORM_CONNECTED = false; // set to true once IDs below are filled in
+
+    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLScV6tICDwrqRKRfcHv2MxivKtunr_euSNUXR8qR6bOqtIn1pA/viewform";
+
+    const FIELD_ID_NAME = "entry.000000001";
+    const FIELD_ID_ATTENDING = "entry.000000002";
+    const FIELD_ID_GUEST_COUNT = "entry.000000003";
+    const FIELD_ID_MEAL = "entry.000000004";
+    const FIELD_ID_DIETARY = "entry.000000005";
+    const FIELD_ID_SONG = "entry.000000006";
+    const FIELD_ID_MESSAGE = "entry.000000007";
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      submitBtn.disabled = true;
+
+      const data = {
+        name: document.getElementById('guest-name').value,
+        attending: document.querySelector('input[name="attending"]:checked')?.value || '',
+        guestCount: document.getElementById('guest-count').value,
+        meal: document.getElementById('meal-choice').value,
+        dietary: document.getElementById('dietary-notes').value,
+        song: document.getElementById('song-request').value,
+        message: document.getElementById('message').value,
+      };
+
+      if (FORM_CONNECTED) {
+        // Build a hidden form POST to Google Forms.
+        // Google Forms blocks normal fetch() due to CORS, so we
+        // submit via a hidden iframe instead — this is the
+        // standard workaround for posting to Google Forms from
+        // a custom page.
+        const iframe = document.createElement('iframe');
+        iframe.name = 'hidden-rsvp-frame';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+
+        const gForm = document.createElement('form');
+        gForm.action = GOOGLE_FORM_ACTION_URL;
+        gForm.method = 'POST';
+        gForm.target = 'hidden-rsvp-frame';
+
+        const fields = {
+          [FIELD_ID_NAME]: data.name,
+          [FIELD_ID_ATTENDING]: data.attending,
+          [FIELD_ID_GUEST_COUNT]: data.guestCount,
+          [FIELD_ID_MEAL]: data.meal,
+          [FIELD_ID_DIETARY]: data.dietary,
+          [FIELD_ID_SONG]: data.song,
+          [FIELD_ID_MESSAGE]: data.message,
+        };
+
+        Object.entries(fields).forEach(([key, value]) => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = value;
+          gForm.appendChild(input);
+        });
+
+        document.body.appendChild(gForm);
+        gForm.submit();
+
+        setTimeout(() => {
+          document.body.removeChild(gForm);
+          document.body.removeChild(iframe);
+        }, 1000);
+      } else {
+        // Not connected yet — log to console so you can see the
+        // shape of the data while testing locally.
+        console.log('RSVP data (not yet sent anywhere):', data);
+      }
+
+      // Show success message either way
+      form.style.display = 'none';
+      successPanel.classList.add('is-visible');
+    });
+  </script>
+
+</body>
+</html>
