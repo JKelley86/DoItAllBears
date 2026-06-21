@@ -351,3 +351,471 @@ footer.site-footer {
     transition: none;
   }
 }
+
+/* =========================================================
+   STORY SECTIONS — alternating image/text rows (Our Story page)
+   ========================================================= */
+
+.story-intro {
+  text-align: center;
+  padding: 4px 6px 8px;
+}
+
+.story-intro p {
+  font-size: 1.02rem;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.story {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  padding: 12px 0 8px;
+}
+
+.story-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  align-items: center;
+}
+
+.story-section .story-photo-wrap {
+  position: relative;
+  padding: 8px;
+  background: var(--color-bg-panel);
+  border-radius: var(--radius-frame);
+  box-shadow: var(--shadow-soft), var(--shadow-inset);
+}
+
+.story-section .story-photo-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px solid var(--color-rope);
+  border-radius: 2px;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.story-photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 2px;
+  object-fit: cover;
+  display: block;
+  background: linear-gradient(135deg, #D9C4A3, #B98E63);
+}
+
+.story-photo.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--color-bg-panel);
+  font-family: var(--font-label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  text-align: center;
+  padding: 16px;
+}
+
+.story-photo.placeholder svg {
+  width: 36px;
+  height: 36px;
+  opacity: 0.85;
+}
+
+.story-section .story-text {
+  text-align: center;
+  padding: 0 6px;
+}
+
+.story-section .story-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-label);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  color: var(--color-rust);
+  margin: 0 0 8px;
+}
+
+.story-section .story-eyebrow svg {
+  width: 14px;
+  height: 14px;
+}
+
+.story-section h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 6vw, 2rem);
+  color: var(--color-leather-dark);
+  margin: 0 0 10px;
+  line-height: 1.1;
+}
+
+.story-section p {
+  font-size: 0.98rem;
+  line-height: 1.7;
+  margin: 0;
+  color: var(--color-ink);
+}
+
+/* Divider between story sections — small rope-stitch, quieter than header version */
+.story-section-divider {
+  width: 64px;
+  height: 8px;
+  margin: 0 auto;
+  background-image: repeating-linear-gradient(
+    115deg,
+    var(--color-rope) 0px,
+    var(--color-rope) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  opacity: 0.55;
+}
+
+/* Closing note styled like a small signed card */
+.story-closing {
+  text-align: center;
+  padding: 22px 18px;
+  margin: 8px 0 4px;
+  background: var(--color-bg-panel);
+  border: 1px solid var(--color-rope);
+  border-radius: var(--radius-frame);
+  box-shadow: var(--shadow-soft);
+}
+
+.story-closing p {
+  font-size: 1rem;
+  line-height: 1.7;
+  margin: 0 0 10px;
+}
+
+.story-closing .signature {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--color-leather);
+  margin: 0;
+}
+
+/* ---- Desktop: alternate text/photo sides left-right ---- */
+@media (min-width: 640px) {
+  .story-section {
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+  }
+
+  .story-section .story-text {
+    text-align: left;
+    padding: 0;
+  }
+
+  .story-section .story-eyebrow {
+    justify-content: flex-start;
+  }
+
+  /* odd sections: photo left, text right (default order) */
+  .story-section:nth-of-type(odd) .story-photo-wrap {
+    order: 1;
+  }
+  .story-section:nth-of-type(odd) .story-text {
+    order: 2;
+  }
+
+  /* even sections: text left, photo right */
+  .story-section:nth-of-type(even) .story-photo-wrap {
+    order: 2;
+  }
+  .story-section:nth-of-type(even) .story-text {
+    order: 1;
+    text-align: right;
+  }
+  .story-section:nth-of-type(even) .story-eyebrow {
+    justify-content: flex-end;
+  }
+}
+
+/* =========================================================
+   RSVP FORM
+   ========================================================= */
+
+.rsvp-intro {
+  text-align: center;
+  padding: 4px 6px 18px;
+}
+
+.rsvp-intro p {
+  font-size: 1.02rem;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.rsvp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 4px 4px 8px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.form-field label {
+  font-family: var(--font-label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  color: var(--color-leather-dark);
+}
+
+.form-field .hint {
+  font-size: 0.82rem;
+  color: var(--color-rust);
+  font-family: var(--font-body);
+  letter-spacing: normal;
+  text-transform: none;
+  margin-top: -2px;
+}
+
+.form-field input[type="text"],
+.form-field input[type="email"],
+.form-field input[type="number"],
+.form-field select,
+.form-field textarea {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-ink);
+  background: var(--color-bg-panel);
+  border: 1px solid var(--color-rope);
+  border-radius: var(--radius-frame);
+  padding: 12px 14px;
+  box-shadow: var(--shadow-inset);
+  width: 100%;
+}
+
+.form-field textarea {
+  resize: vertical;
+  min-height: 90px;
+  font-family: var(--font-body);
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: 2px solid var(--color-leather);
+  outline-offset: 1px;
+}
+
+/* Attending toggle — two big ranch-sign style buttons */
+.attend-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.attend-toggle input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.attend-toggle label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 10px;
+  background: var(--color-bg-panel);
+  border: 1px solid var(--color-rope);
+  border-radius: var(--radius-frame);
+  font-family: var(--font-label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: var(--color-leather-dark);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  text-align: center;
+}
+
+.attend-toggle label svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.attend-toggle input[type="radio"]:checked + label {
+  background: linear-gradient(180deg, var(--color-leather), var(--color-leather-dark));
+  color: var(--color-cream-text);
+  border-color: var(--color-leather-dark);
+  box-shadow: var(--shadow-soft);
+}
+
+.attend-toggle input[type="radio"]:focus-visible + label {
+  outline: 3px solid var(--color-rope);
+  outline-offset: 2px;
+}
+
+/* Conditional reveal panels */
+.rsvp-reveal {
+  display: none;
+  text-align: center;
+  padding: 22px 20px;
+  margin-top: -4px;
+  border-radius: var(--radius-frame);
+  border: 1px solid var(--color-rope);
+  background: var(--color-bg-panel);
+  box-shadow: var(--shadow-soft);
+}
+
+.rsvp-reveal.is-visible {
+  display: block;
+  animation: reveal-in 0.25s ease;
+}
+
+@keyframes reveal-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.rsvp-reveal h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.5rem;
+  color: var(--color-leather-dark);
+  margin: 0 0 10px;
+}
+
+.rsvp-reveal p {
+  font-size: 0.98rem;
+  line-height: 1.65;
+  margin: 0 0 6px;
+  color: var(--color-ink);
+}
+
+.rsvp-reveal .venue-address {
+  font-family: var(--font-label);
+  letter-spacing: 0.04em;
+  font-size: 1.02rem;
+  color: var(--color-leather);
+  margin: 10px 0 4px;
+}
+
+.rsvp-reveal .map-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--color-rust);
+  text-decoration: underline;
+}
+
+.rsvp-reveal.sorry h3 {
+  color: var(--color-rust);
+}
+
+/* extra fields that only appear when attending */
+.rsvp-extra-fields {
+  display: none;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.rsvp-extra-fields.is-visible {
+  display: flex;
+  animation: reveal-in 0.25s ease;
+}
+
+.rsvp-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 16px 20px;
+  background: linear-gradient(180deg, var(--color-leather), var(--color-leather-dark));
+  color: var(--color-cream-text);
+  font-family: var(--font-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+  border: 1px solid var(--color-leather-dark);
+  border-radius: var(--radius-frame);
+  box-shadow: var(--shadow-soft);
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.rsvp-submit svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.rsvp-submit:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.rsvp-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: none;
+  transform: none;
+}
+
+.rsvp-note {
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--color-rust);
+  line-height: 1.6;
+  padding: 0 10px;
+}
+
+.rsvp-success {
+  display: none;
+  text-align: center;
+  padding: 28px 20px;
+  border-radius: var(--radius-frame);
+  border: 1px solid var(--color-rope);
+  background: var(--color-bg-panel);
+  box-shadow: var(--shadow-soft);
+}
+
+.rsvp-success.is-visible {
+  display: block;
+  animation: reveal-in 0.25s ease;
+}
+
+.rsvp-success svg {
+  width: 36px;
+  height: 36px;
+  color: var(--color-leather);
+  margin-bottom: 10px;
+}
+
+.rsvp-success h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.5rem;
+  color: var(--color-leather-dark);
+  margin: 0 0 8px;
+}
+
+.rsvp-success p {
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: var(--color-ink);
+  margin: 0;
+}
