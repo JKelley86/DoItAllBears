@@ -57,29 +57,6 @@
           </div>
         </div>
 
-        <!-- ============ REVEAL: shown only if attending = yes ============ -->
-        <div class="rsvp-reveal" id="reveal-yes">
-          <h3>We can't wait to see you!</h3>
-          <p>Mark your calendar and head on out to the ranch:</p>
-          <p class="venue-address">
-            Cedar Bend Ranch<br>
-            1842 Hollow Creek Road<br>
-            Bandera, TX 78003
-          </p>
-          <a class="map-link" href="https://maps.google.com/?q=1842+Hollow+Creek+Road+Bandera+TX+78003" target="_blank" rel="noopener">
-            Open in Google Maps
-          </a>
-        </div>
-
-        <!-- ============ REVEAL: shown only if attending = no ============ -->
-        <div class="rsvp-reveal sorry" id="reveal-no">
-          <h3>We'll miss you</h3>
-          <p>
-            Thank you for letting us know. You'll be in our thoughts as we
-            celebrate — we'll be sure to share photos from the day.
-          </p>
-        </div>
-
         <!-- ============ EXTRA FIELDS: only shown if attending = yes ============ -->
         <div class="rsvp-extra-fields" id="extra-fields">
 
@@ -117,12 +94,39 @@
 
       </form>
 
-      <!-- ============ SUCCESS MESSAGE (shown after submit) ============ -->
+      <!-- ============ POST-SUBMIT STATE: shown after submitting, or
+           automatically on return visits if this browser has already
+           submitted an RSVP (see localStorage logic in the script). ============ -->
       <div class="rsvp-success" id="rsvp-success">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
-        <h3>Got it, thank you!</h3>
-        <p>Your RSVP has been sent. We'll see you on the ranch.</p>
+        <h3 id="success-heading">Got it, thank you!</h3>
+        <p id="success-subtext">Your RSVP has been sent.</p>
       </div>
+
+      <div class="rsvp-reveal" id="reveal-yes">
+        <h3>We can't wait to see you!</h3>
+        <p>Mark your calendar and head on out to the ranch:</p>
+        <p class="venue-address">
+          Cedar Bend Ranch<br>
+          1842 Hollow Creek Road<br>
+          Bandera, TX 78003
+        </p>
+        <a class="map-link" href="https://maps.google.com/?q=1842+Hollow+Creek+Road+Bandera+TX+78003" target="_blank" rel="noopener">
+          Open in Google Maps
+        </a>
+      </div>
+
+      <div class="rsvp-reveal sorry" id="reveal-no">
+        <h3>We'll miss you</h3>
+        <p>
+          Thank you for letting us know. You'll be in our thoughts as we
+          celebrate — we'll be sure to share photos from the day.
+        </p>
+      </div>
+
+      <button type="button" class="rsvp-edit-link" id="rsvp-edit-btn">
+        Need to change your response? Submit again
+      </button>
     </main>
 
     <!-- ===================== BOTTOM NAVIGATION ===================== -->
@@ -153,17 +157,28 @@
     /* =========================================================
        RSVP FORM LOGIC
        =========================================================
-       Part 1: show/hide the address vs "we'll miss you" message,
-       and show/hide the extra fields (meal, guest count, etc).
-       This part is pure front-end and works right now.
+       Key behavior: the venue address is NOT shown just by
+       clicking the "Joyfully Accept" radio button. It only
+       appears after the form is actually submitted with "yes"
+       selected. This stops someone from toggling to "yes" to
+       peek at the address, then switching to "no" before
+       submitting.
 
-       Part 2: submit the data to Google Forms so responses land
-       in a Google Sheet. See the SETUP INSTRUCTIONS comment
-       below — you must create a Google Form and paste in your
-       own field IDs before submissions will actually go anywhere.
-       Until then, submitting just shows the success message
-       locally (nothing is sent or saved).
+       Persistence: once someone submits, their answer (yes/no)
+       is saved in this browser's localStorage. If they close the
+       tab and come back later on the SAME browser/device, the
+       page skips the form entirely and shows them the same
+       result immediately — no need to resubmit. This is tied to
+       the browser, not a real account, so it won't follow them
+       to a different device.
+
+       Part 2 (Google Forms submission): see the SETUP
+       INSTRUCTIONS comment further down. Until connected,
+       submissions are saved locally (for the reveal/persistence
+       above) but not sent anywhere external yet.
        ========================================================= */
+
+    const STORAGE_KEY = 'kaiden-amelia-rsvp';
 
     const form = document.getElementById('rsvp-form');
     const revealYes = document.getElementById('reveal-yes');
@@ -171,6 +186,9 @@
     const extraFields = document.getElementById('extra-fields');
     const submitBtn = document.getElementById('rsvp-submit');
     const successPanel = document.getElementById('rsvp-success');
+    const successHeading = document.getElementById('success-heading');
+    const successSubtext = document.getElementById('success-subtext');
+    const editBtn = document.getElementById('rsvp-edit-btn');
 
     const attendRadios = document.querySelectorAll('input[name="attending"]');
 
@@ -180,20 +198,59 @@
         const isDeclining = radio.value === 'no' && radio.checked;
 
         if (isAttending) {
-          revealYes.classList.add('is-visible');
-          revealNo.classList.remove('is-visible');
           extraFields.classList.add('is-visible');
-          // make meal choice required only when attending
-          document.getElementById('meal-choice').required = true;
         }
         if (isDeclining) {
-          revealNo.classList.add('is-visible');
-          revealYes.classList.remove('is-visible');
           extraFields.classList.remove('is-visible');
-          document.getElementById('meal-choice').required = false;
         }
       });
     });
+
+    // Show the post-submit state (success message + correct reveal panel)
+    function showResult(attending) {
+      form.style.display = 'none';
+      editBtn.style.display = 'block';
+
+      successPanel.classList.add('is-visible');
+      if (attending === 'yes') {
+        successHeading.textContent = 'Got it, thank you!';
+        successSubtext.textContent = "We'll see you on the ranch.";
+        revealYes.classList.add('is-visible');
+        revealNo.classList.remove('is-visible');
+      } else {
+        successHeading.textContent = 'Got it, thank you!';
+        successSubtext.textContent = 'Thanks for letting us know.';
+        revealNo.classList.add('is-visible');
+        revealYes.classList.remove('is-visible');
+      }
+    }
+
+    // Reset back to the blank form (used by the "submit again" link)
+    function showForm() {
+      form.style.display = 'flex';
+      form.reset();
+      submitBtn.disabled = false;
+      extraFields.classList.remove('is-visible');
+      successPanel.classList.remove('is-visible');
+      revealYes.classList.remove('is-visible');
+      revealNo.classList.remove('is-visible');
+      editBtn.style.display = 'none';
+    }
+
+    editBtn.addEventListener('click', showForm);
+
+    // On page load: check if this browser already has a saved RSVP
+    (function checkSavedRSVP() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          showResult(data.attending);
+        } catch (err) {
+          // corrupted/old data, ignore and show the form normally
+        }
+      }
+    })();
 
     /* =========================================================
        SETUP INSTRUCTIONS — connecting this form to Google Forms
@@ -204,6 +261,7 @@
             - Your Name            (Short answer)
             - Attending?           (Short answer)
             - Number in Party      (Short answer)
+            - Meal Choice          (Short answer)
             - Dietary Notes        (Paragraph)
             - Song Request         (Short answer)
             - Message              (Paragraph)
@@ -224,16 +282,16 @@
        (click the green Sheets icon in the Responses tab).
        ========================================================= */
 
-    const FORM_CONNECTED = true; // set to true once IDs below are filled in
+    const FORM_CONNECTED = true;
 
-    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLScV6tICDwrqRKRfcHv2MxivKtunr_euSNUXR8qR6bOqtIn1pA/viewform";
+    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLScV6tICDwrqRKRfcHv2MxivKtunr_euSNUXR8qR6bOqtIn1pA/formResponse";
 
-    const FIELD_ID_NAME = "entry.1514313038";
-    const FIELD_ID_ATTENDING = "entry.1481747785";
+    const FIELD_ID_NAME       = "entry.1514313038";
+    const FIELD_ID_ATTENDING  = "entry.1481747785";
     const FIELD_ID_GUEST_COUNT = "entry.1605712446";
-    const FIELD_ID_DIETARY = "entry.1658210186";
-    const FIELD_ID_SONG = "entry.1339546978";
-    const FIELD_ID_MESSAGE = "entry.159558264";
+    const FIELD_ID_DIETARY    = "entry.1658210186";
+    const FIELD_ID_SONG       = "entry.1339546978";
+    const FIELD_ID_MESSAGE    = "entry.159558264";
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -243,18 +301,20 @@
         name: document.getElementById('guest-name').value,
         attending: document.querySelector('input[name="attending"]:checked')?.value || '',
         guestCount: document.getElementById('guest-count').value,
-        meal: document.getElementById('meal-choice').value,
         dietary: document.getElementById('dietary-notes').value,
         song: document.getElementById('song-request').value,
         message: document.getElementById('message').value,
       };
 
+      // Save locally so a return visit on this browser shows the
+      // same result without resubmitting.
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        attending: data.attending,
+        name: data.name,
+        submittedAt: new Date().toISOString(),
+      }));
+
       if (FORM_CONNECTED) {
-        // Build a hidden form POST to Google Forms.
-        // Google Forms blocks normal fetch() due to CORS, so we
-        // submit via a hidden iframe instead — this is the
-        // standard workaround for posting to Google Forms from
-        // a custom page.
         const iframe = document.createElement('iframe');
         iframe.name = 'hidden-rsvp-frame';
         iframe.style.display = 'none';
@@ -266,13 +326,12 @@
         gForm.target = 'hidden-rsvp-frame';
 
         const fields = {
-          [FIELD_ID_NAME]: data.name,
-          [FIELD_ID_ATTENDING]: data.attending,
+          [FIELD_ID_NAME]:        data.name,
+          [FIELD_ID_ATTENDING]:   data.attending,
           [FIELD_ID_GUEST_COUNT]: data.guestCount,
-          [FIELD_ID_MEAL]: data.meal,
-          [FIELD_ID_DIETARY]: data.dietary,
-          [FIELD_ID_SONG]: data.song,
-          [FIELD_ID_MESSAGE]: data.message,
+          [FIELD_ID_DIETARY]:     data.dietary,
+          [FIELD_ID_SONG]:        data.song,
+          [FIELD_ID_MESSAGE]:     data.message,
         };
 
         Object.entries(fields).forEach(([key, value]) => {
@@ -291,14 +350,10 @@
           document.body.removeChild(iframe);
         }, 1000);
       } else {
-        // Not connected yet — log to console so you can see the
-        // shape of the data while testing locally.
         console.log('RSVP data (not yet sent anywhere):', data);
       }
 
-      // Show success message either way
-      form.style.display = 'none';
-      successPanel.classList.add('is-visible');
+      showResult(data.attending);
     });
   </script>
 
