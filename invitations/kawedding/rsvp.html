@@ -90,16 +90,6 @@
           </div>
 
           <div class="form-field">
-            <label for="meal-choice">Meal Choice</label>
-            <select id="meal-choice" name="meal-choice">
-              <option value="">Select one</option>
-              <option value="smoked-brisket">Smoked Brisket</option>
-              <option value="herb-chicken">Herb Roasted Chicken</option>
-              <option value="vegetarian">Vegetarian Plate</option>
-            </select>
-          </div>
-
-          <div class="form-field">
             <label for="dietary-notes">Dietary Restrictions or Allergies</label>
             <textarea id="dietary-notes" name="dietary-notes" placeholder="Let us know if there's anything we should be aware of"></textarea>
           </div>
@@ -214,7 +204,6 @@
             - Your Name            (Short answer)
             - Attending?           (Short answer)
             - Number in Party      (Short answer)
-            - Meal Choice          (Short answer)
             - Dietary Notes        (Paragraph)
             - Song Request         (Short answer)
             - Message              (Paragraph)
@@ -235,17 +224,16 @@
        (click the green Sheets icon in the Responses tab).
        ========================================================= */
 
-    const FORM_CONNECTED = false; // set to true once IDs below are filled in
+    const FORM_CONNECTED = true; // set to true once IDs below are filled in
 
     const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLScV6tICDwrqRKRfcHv2MxivKtunr_euSNUXR8qR6bOqtIn1pA/viewform";
 
-    const FIELD_ID_NAME = "entry.000000001";
-    const FIELD_ID_ATTENDING = "entry.000000002";
-    const FIELD_ID_GUEST_COUNT = "entry.000000003";
-    const FIELD_ID_MEAL = "entry.000000004";
-    const FIELD_ID_DIETARY = "entry.000000005";
-    const FIELD_ID_SONG = "entry.000000006";
-    const FIELD_ID_MESSAGE = "entry.000000007";
+    const FIELD_ID_NAME = "entry.1514313038";
+    const FIELD_ID_ATTENDING = "entry.1481747785";
+    const FIELD_ID_GUEST_COUNT = "entry.1605712446";
+    const FIELD_ID_DIETARY = "entry.1658210186";
+    const FIELD_ID_SONG = "entry.1339546978";
+    const FIELD_ID_MESSAGE = "entry.159558264";
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
