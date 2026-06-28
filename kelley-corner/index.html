@@ -82,29 +82,6 @@
             <button id="refreshFeedBtn" class="icon-button" type="button" title="Refresh">Refresh</button>
           </header>
 
-          <form id="postForm" class="composer">
-            <textarea name="text" rows="3" placeholder="Share something with the family..."></textarea>
-            <div class="composer-grid">
-              <label>Photos
-                <input name="images" type="file" accept="image/*" multiple>
-              </label>
-              <label class="checkbox-row">
-                <input name="isCookbookPost" type="checkbox">
-                <span>Recipe is in the cookbook</span>
-              </label>
-              <label id="cookbookLabelWrap" class="hidden">Recipe button text
-                <input name="cookbookLabel" placeholder="Open family cookbook">
-              </label>
-              <label id="cookbookUrlWrap" class="hidden">Recipe URL
-                <input name="cookbookUrl" type="url" value="https://jkelley86.github.io/DoItAllBears/recipes/familycookbook.html">
-              </label>
-            </div>
-            <div class="composer-actions">
-              <span id="postLifetimeHint" class="tiny muted">Posts delete after 30 days.</span>
-              <button class="primary-button" type="submit">Post</button>
-            </div>
-          </form>
-
           <div id="feedList" class="post-list"></div>
         </section>
 
@@ -199,6 +176,39 @@
           </div>
         </section>
       </main>
+    </div>
+
+    <button id="openComposerBtn" class="fab hidden" type="button" aria-label="Create post">+</button>
+
+    <div id="composerModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="composerTitle">
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h2 id="composerTitle">New Post</h2>
+          <button id="closeComposerBtn" class="icon-button" type="button" aria-label="Close post form">Close</button>
+        </div>
+        <form id="postForm" class="composer">
+          <textarea name="text" rows="4" placeholder="Share something with the family..."></textarea>
+          <div class="composer-grid">
+            <label>Photos
+              <input name="images" type="file" accept="image/*" multiple>
+            </label>
+            <label class="checkbox-row">
+              <input name="isCookbookPost" type="checkbox">
+              <span>Recipe is in the cookbook</span>
+            </label>
+            <label id="cookbookLabelWrap" class="hidden">Recipe button text
+              <input name="cookbookLabel" placeholder="Open family cookbook">
+            </label>
+            <label id="cookbookUrlWrap" class="hidden">Recipe URL
+              <input name="cookbookUrl" type="url" value="https://jkelley86.github.io/DoItAllBears/recipes/familycookbook.html">
+            </label>
+          </div>
+          <div class="composer-actions">
+            <span id="postLifetimeHint" class="tiny muted">Posts delete after 30 days.</span>
+            <button class="primary-button" type="submit">Post</button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <div id="toast" class="toast hidden" role="status"></div>
