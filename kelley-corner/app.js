@@ -64,6 +64,9 @@ async function pb(path, options = {}) {
         .map((item) => item.message)
         .filter(Boolean);
       if (fieldMessages.length) detail = fieldMessages.join(" ");
+      if (data.data?.post?.code === "validation_missing_rel_records") {
+        detail = "PocketBase cannot find that post through the relation field. Check that the comments/reactions post field is a single relation to the posts collection.";
+      }
       console.error("PocketBase error", { path, status: response.status, data });
       console.error("PocketBase error details", JSON.stringify({ path, status: response.status, data }, null, 2));
     } catch (_) {}
