@@ -65,7 +65,7 @@ async function pb(path, options = {}) {
         .filter(Boolean);
       if (fieldMessages.length) detail = fieldMessages.join(" ");
       if (data.data?.post?.code === "validation_missing_rel_records") {
-        detail = "PocketBase cannot find that post through the relation field. Check that the comments/reactions post field is a single relation to the posts collection.";
+        detail = "PocketBase cannot find that post relation. Update comments/reactions to use the postId text field in the latest setup guide.";
       }
       console.error("PocketBase error", { path, status: response.status, data });
       console.error("PocketBase error details", JSON.stringify({ path, status: response.status, data }, null, 2));
@@ -217,7 +217,7 @@ async function loadPosts() {
 
 async function hydratePostDetails(posts) {
   await Promise.all(posts.map(async (post) => {
-    const postFilter = encodeURIComponent(`post = "${post.id}"`);
+    const postFilter = encodeURIComponent(`postId = "${post.id}"`);
     const [comments, reactions] = await Promise.all([
       pb(`/api/collections/comments/records?sort=created&perPage=80&expand=author&filter=${postFilter}`),
       pb(`/api/collections/reactions/records?perPage=120&expand=user&filter=${postFilter}`)
@@ -290,7 +290,7 @@ function renderPost(post) {
 
 async function loadNotifications() {
   const filter = encodeURIComponent(`recipient = "${state.user.id}"`);
-  const data = await pb(`/api/collections/notifications/records?sort=-created&perPage=80&expand=actor,post&filter=${filter}`);
+  const data = await pb(`/api/collections/notifications/records?sort=-created&perPage=80&expand=actor&filter=${filter}`);
   state.notifications = data.items;
   const unread = state.notifications.filter((item) => !item.read).length;
   $("#notificationBadge").textContent = unread;
@@ -364,17 +364,21 @@ async function loadDeveloper() {
 
 async function createNotification(post, type, commentId = "") {
   if (!post || post.author === state.user.id) return;
-  await pb("/api/collections/notifications/records", {
-    method: "POST",
-    body: JSON.stringify({
-      recipient: post.author,
-      actor: state.user.id,
-      post: post.id,
-      comment: commentId || undefined,
-      type,
-      read: false
-    })
-  });
+  try {
+    await pb("/api/collections/notifications/records", {
+      method: "POST",
+      body: JSON.stringify({
+        recipient: post.author,
+        actor: state.user.id,
+        postId: post.id,
+        comment: commentId || undefined,
+        type,
+        read: false
+      })
+    });
+  } catch (error) {
+    console.warn("Notification was not created", error);
+  }
 }
 
 function bindEvents() {
@@ -507,7 +511,7 @@ function bindEvents() {
     event.preventDefault();
     const post = state.posts.find((item) => item.id === commentForm.closest(".post-card").dataset.postId);
     const commentPayload = {
-      post: post?.id,
+      postId: post?.id,
       author: state.user.id,
       text: commentForm.text.value
     };
@@ -613,7 +617,7 @@ async function handleReaction(postId, type) {
     } else {
       await pb("/api/collections/reactions/records", {
         method: "POST",
-        body: JSON.stringify({ post: postId, user: state.user.id, type })
+        body: JSON.stringify({ postId, user: state.user.id, type })
       });
       await createNotification(post, "reaction");
     }
