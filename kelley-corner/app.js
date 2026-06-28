@@ -13,7 +13,8 @@ const state = {
   user: JSON.parse(localStorage.getItem("kc_user") || "null"),
   settings: null,
   posts: [],
-  notifications: []
+  notifications: [],
+  fileCache: new Map()
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -76,8 +77,31 @@ function fileUrl(collection, recordId, filename) {
 }
 
 function userAvatar(user) {
-  if (user?.avatar) return fileUrl("users", user.id, user.avatar);
+  if (user?.avatar) return fileUrl(user.collectionName || "users", user.id, user.avatar);
   return "";
+}
+
+async function protectedFileUrl(url) {
+  if (!url) return "";
+  if (state.fileCache.has(url)) return state.fileCache.get(url);
+  const response = await fetch(url, {
+    headers: authHeaders(false)
+  });
+  if (!response.ok) {
+    console.error("PocketBase file load failed", { url, status: response.status });
+    return "";
+  }
+  const blobUrl = URL.createObjectURL(await response.blob());
+  state.fileCache.set(url, blobUrl);
+  return blobUrl;
+}
+
+async function loadProtectedImages(container = document) {
+  const images = Array.from(container.querySelectorAll("img[data-file-url]"));
+  await Promise.all(images.map(async (image) => {
+    const url = await protectedFileUrl(image.dataset.fileUrl);
+    if (url) image.src = url;
+  }));
 }
 
 function initials(name = "KC") {
@@ -203,6 +227,7 @@ function renderPosts(container, posts) {
     return;
   }
   container.innerHTML = posts.map(renderPost).join("");
+  loadProtectedImages(container);
 }
 
 function renderPost(post) {
@@ -214,7 +239,7 @@ function renderPost(post) {
     return { ...reactionType, total };
   });
   const images = (post.images || []).map((image) =>
-    `<img src="${fileUrl("posts", post.id, image)}" alt="Family post image" loading="lazy">`
+    `<img data-file-url="${fileUrl(post.collectionName || "posts", post.id, image)}" alt="Family post image" loading="lazy">`
   ).join("");
   const cookbook = post.isCookbookPost
     ? `<a class="cookbook-link" href="${escapeHtml(post.cookbookUrl || state.settings?.cookbookBaseUrl || COOKBOOK_URL)}" target="_blank" rel="noreferrer">${escapeHtml(post.cookbookLabel || "Open family cookbook")}</a>`
@@ -229,7 +254,7 @@ function renderPost(post) {
       <div class="post-inner">
         <div class="post-head">
           <div class="author">
-            ${avatar ? `<img class="avatar" src="${avatar}" alt="">` : `<div class="avatar avatar-fallback">${initials(author.name)}</div>`}
+            ${avatar ? `<img class="avatar" data-file-url="${avatar}" alt="">` : `<div class="avatar avatar-fallback">${initials(author.name)}</div>`}
             <div>
               <strong>${escapeHtml(author.name || "Family")}</strong>
               <span class="muted">${new Date(post.created).toLocaleString()} - ${Math.max(daysUntil(post.expiresAt), 0)} days left</span>
@@ -296,8 +321,10 @@ function renderProfile() {
   $("#profileForm").bio.value = state.user.bio || "";
   $("#profileForm").theme.value = state.user.theme || "dark";
   const avatar = userAvatar(state.user);
-  $("#profileAvatarPreview").src = avatar || "";
+  $("#profileAvatarPreview").src = "";
+  $("#profileAvatarPreview").dataset.fileUrl = avatar || "";
   $("#profileAvatarPreview").alt = state.user.name || "Profile picture";
+  loadProtectedImages($("#profileForm"));
   renderProfilePosts();
 }
 
