@@ -39,10 +39,10 @@ function toast(message) {
   toast.timer = setTimeout(() => el.classList.add("hidden"), 4200);
 }
 
-function authHeaders(json = true) {
-  const headers = {};
+function authHeaders(json = true, includeAuth = true) {
+  const headers = { "ngrok-skip-browser-warning": "true" };
   if (json) headers["Content-Type"] = "application/json";
-  if (state.token) headers.Authorization = `Bearer ${state.token}`;
+  if (includeAuth && state.token) headers.Authorization = `Bearer ${state.token}`;
   return headers;
 }
 
@@ -50,8 +50,8 @@ async function pb(path, options = {}) {
   const response = await fetch(`${PB_URL}${path}`, {
     ...options,
     headers: {
-      ...(options.headers || {}),
-      ...(options.skipAuth ? {} : authHeaders(options.json !== false))
+      ...authHeaders(options.json !== false, !options.skipAuth),
+      ...(options.headers || {})
     }
   });
   if (!response.ok) {
@@ -59,6 +59,11 @@ async function pb(path, options = {}) {
     try {
       const data = await response.json();
       detail = data.message || detail;
+      const fieldMessages = Object.values(data.data || {})
+        .map((item) => item.message)
+        .filter(Boolean);
+      if (fieldMessages.length) detail = fieldMessages.join(" ");
+      console.error("PocketBase error", { path, status: response.status, data });
     } catch (_) {}
     throw new Error(detail);
   }
