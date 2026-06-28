@@ -65,6 +65,7 @@ async function pb(path, options = {}) {
         .filter(Boolean);
       if (fieldMessages.length) detail = fieldMessages.join(" ");
       console.error("PocketBase error", { path, status: response.status, data });
+      console.error("PocketBase error details", JSON.stringify({ path, status: response.status, data }, null, 2));
     } catch (_) {}
     throw new Error(detail);
   }
@@ -145,7 +146,9 @@ function applyUserChrome() {
   const isDev = state.user?.role === "developer";
   $$(".view, #authView, #pendingView").forEach((el) => el.classList.add("hidden"));
   document.body.classList.toggle("light", state.user?.theme === "light");
+  $(".sidebar").classList.toggle("hidden", !approved);
   $("#logoutBtn").classList.toggle("hidden", !state.user);
+  $("#openComposerBtn").classList.toggle("hidden", !approved);
   $$(".dev-only").forEach((el) => el.classList.toggle("hidden", !isDev));
   if (!state.user) {
     $("#authView").classList.remove("hidden");
@@ -388,6 +391,11 @@ function bindEvents() {
   $("#logoutBtn").addEventListener("click", logout);
   $("#pendingLogoutBtn").addEventListener("click", logout);
   $("#refreshFeedBtn").addEventListener("click", loadApp);
+  $("#openComposerBtn").addEventListener("click", openComposer);
+  $("#closeComposerBtn").addEventListener("click", closeComposer);
+  $("#composerModal").addEventListener("click", (event) => {
+    if (event.target.id === "composerModal") closeComposer();
+  });
 
   $("#loginForm").addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -462,6 +470,7 @@ function bindEvents() {
       form.reset();
       $("#cookbookLabelWrap").classList.add("hidden");
       $("#cookbookUrlWrap").classList.add("hidden");
+      closeComposer();
       await loadPosts();
       toast("Posted to Kelley Corner.");
     } catch (error) {
@@ -494,14 +503,16 @@ function bindEvents() {
     if (!commentForm) return;
     event.preventDefault();
     const post = state.posts.find((item) => item.id === commentForm.closest(".post-card").dataset.postId);
+    const commentPayload = {
+      post: post?.id,
+      author: state.user.id,
+      text: commentForm.text.value
+    };
+    console.info("Creating Kelley Corner comment", commentPayload);
     try {
       const created = await pb("/api/collections/comments/records", {
         method: "POST",
-        body: JSON.stringify({
-          post: post.id,
-          author: state.user.id,
-          text: commentForm.text.value
-        })
+        body: JSON.stringify(commentPayload)
       });
       await createNotification(post, "comment", created.id);
       commentForm.reset();
@@ -573,6 +584,15 @@ function bindEvents() {
     await loadNotifications();
     renderNotifications();
   });
+}
+
+function openComposer() {
+  $("#composerModal").classList.remove("hidden");
+  $("#postForm").elements.text.focus();
+}
+
+function closeComposer() {
+  $("#composerModal").classList.add("hidden");
 }
 
 async function handleReaction(postId, type) {
