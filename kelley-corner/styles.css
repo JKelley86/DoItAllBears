@@ -50,21 +50,25 @@ button {
 }
 
 .app-shell {
-  display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
+  display: block;
   min-height: 100vh;
 }
 
 .sidebar {
-  position: sticky;
-  top: 0;
-  height: 100vh;
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  z-index: 30;
   display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding: 24px;
-  border-right: 1px solid var(--line);
+  align-items: center;
+  gap: 14px;
+  min-height: 72px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
   background: var(--surface);
+  box-shadow: var(--shadow);
 }
 
 .brand {
@@ -84,6 +88,10 @@ button {
   font-weight: 800;
 }
 
+.brand p {
+  display: none;
+}
+
 .brand h1,
 .brand p,
 .view-header h2,
@@ -101,8 +109,11 @@ button {
 }
 
 .nav-list {
-  display: grid;
+  display: flex;
+  flex: 1;
   gap: 8px;
+  min-width: 0;
+  overflow-x: auto;
 }
 
 .nav-item,
@@ -118,12 +129,15 @@ button {
 }
 
 .nav-item {
+  flex: 1 0 auto;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   min-height: 44px;
+  min-width: 96px;
   padding: 0 14px;
-  text-align: left;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .nav-item.active,
@@ -149,7 +163,7 @@ button {
 
 .main {
   min-width: 0;
-  padding: 32px;
+  padding: 32px 32px 124px;
 }
 
 .view {
@@ -239,8 +253,10 @@ textarea {
 .composer {
   display: grid;
   gap: 14px;
-  padding: 18px;
-  margin-bottom: 20px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  box-shadow: none;
 }
 
 .composer-grid {
@@ -448,7 +464,7 @@ textarea {
 .toast {
   position: fixed;
   right: 20px;
-  bottom: 20px;
+  bottom: 110px;
   max-width: min(420px, calc(100vw - 40px));
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -457,28 +473,97 @@ textarea {
   padding: 14px 16px;
 }
 
+.fab {
+  position: fixed;
+  right: 28px;
+  bottom: 104px;
+  z-index: 35;
+  width: 58px;
+  height: 58px;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1;
+  box-shadow: var(--shadow);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.58);
+}
+
+.modal-panel {
+  width: min(620px, 100%);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
 .hidden {
   display: none !important;
 }
 
 @media (max-width: 860px) {
-  .app-shell {
-    grid-template-columns: 1fr;
-  }
-
   .sidebar {
-    position: static;
-    height: auto;
-    gap: 16px;
-    padding: 16px;
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+    gap: 8px;
+    min-height: 66px;
+    padding: 8px;
   }
 
-  .nav-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .brand h1 {
+    display: none;
+  }
+
+  .brand-mark {
+    width: 42px;
+    height: 42px;
+    font-size: 0.86rem;
+  }
+
+  .nav-item {
+    min-width: 76px;
+    min-height: 42px;
+    padding: 0 10px;
+    font-size: 0.86rem;
+  }
+
+  #logoutBtn {
+    padding: 0 10px;
+    font-size: 0.86rem;
   }
 
   .main {
-    padding: 18px;
+    padding: 18px 18px 116px;
+  }
+
+  .fab {
+    right: 18px;
+    bottom: 88px;
   }
 
   .composer-grid,
