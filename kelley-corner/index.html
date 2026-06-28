@@ -1,33 +1,207 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Kelley Corner</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div id="app" class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">KC</div>
+          <div>
+            <h1>Kelley Corner</h1>
+            <p>Family room</p>
+          </div>
+        </div>
+        <nav class="nav-list" aria-label="Main navigation">
+          <button class="nav-item active" data-view="feed" type="button">Home</button>
+          <button class="nav-item" data-view="memory" type="button">Memory Lane</button>
+          <button class="nav-item" data-view="notifications" type="button">
+            Notifications <span id="notificationBadge" class="badge hidden">0</span>
+          </button>
+          <button class="nav-item" data-view="profile" type="button">Profile</button>
+          <button class="nav-item dev-only hidden" data-view="developer" type="button">Developer</button>
+        </nav>
+        <button id="logoutBtn" class="ghost-button hidden" type="button">Sign out</button>
+      </aside>
 
-    <link
-        rel="stylesheet"
-        href="styles/main.css">
+      <main class="main">
+        <section id="authView" class="auth-layout">
+          <div class="auth-panel">
+            <h2>Welcome to Kelley Corner</h2>
+            <p class="muted">A private family space for updates, photos, recipes, and memories.</p>
+            <div class="tabs" role="tablist">
+              <button id="showLogin" class="tab active" type="button">Sign in</button>
+              <button id="showSignup" class="tab" type="button">Quick sign up</button>
+            </div>
 
-</head>
+            <form id="loginForm" class="form-stack">
+              <label>Email
+                <input name="identity" autocomplete="email" required>
+              </label>
+              <label>Password
+                <input name="password" type="password" autocomplete="current-password" required>
+              </label>
+              <button class="primary-button" type="submit">Sign in</button>
+            </form>
 
-<body>
+            <form id="signupForm" class="form-stack hidden">
+              <label>Name
+                <input name="name" autocomplete="name" required>
+              </label>
+              <label>Username
+                <input name="username" autocomplete="username" required>
+              </label>
+              <label>Email
+                <input name="email" type="email" autocomplete="email" required>
+              </label>
+              <label>Password
+                <input name="password" type="password" autocomplete="new-password" minlength="8" required>
+              </label>
+              <button class="primary-button" type="submit">Request access</button>
+              <p class="tiny muted">New accounts wait for family approval before using the site.</p>
+            </form>
+          </div>
+        </section>
 
-<div id="app">
+        <section id="pendingView" class="center-card hidden">
+          <h2>Waiting for approval</h2>
+          <p class="muted">Your account was created. A Kelley Corner developer can approve you soon.</p>
+          <button id="pendingLogoutBtn" class="primary-button" type="button">Sign out</button>
+        </section>
 
-</div>
+        <section id="feedView" class="view hidden">
+          <header class="view-header">
+            <div>
+              <h2>Home</h2>
+              <p class="muted">Posts disappear automatically after their family timer runs out.</p>
+            </div>
+            <button id="refreshFeedBtn" class="icon-button" type="button" title="Refresh">Refresh</button>
+          </header>
 
-<script
-type="module"
-src="js/app.js">
-</script>
+          <form id="postForm" class="composer">
+            <textarea name="text" rows="3" placeholder="Share something with the family..."></textarea>
+            <div class="composer-grid">
+              <label>Photos
+                <input name="images" type="file" accept="image/*" multiple>
+              </label>
+              <label class="checkbox-row">
+                <input name="isCookbookPost" type="checkbox">
+                <span>Recipe is in the cookbook</span>
+              </label>
+              <label id="cookbookLabelWrap" class="hidden">Recipe button text
+                <input name="cookbookLabel" placeholder="Open family cookbook">
+              </label>
+              <label id="cookbookUrlWrap" class="hidden">Recipe URL
+                <input name="cookbookUrl" type="url" value="https://jkelley86.github.io/DoItAllBears/recipes/familycookbook.html">
+              </label>
+            </div>
+            <div class="composer-actions">
+              <span id="postLifetimeHint" class="tiny muted">Posts delete after 30 days.</span>
+              <button class="primary-button" type="submit">Post</button>
+            </div>
+          </form>
 
-</body>
+          <div id="feedList" class="post-list"></div>
+        </section>
 
+        <section id="memoryView" class="view hidden">
+          <header class="view-header">
+            <div>
+              <h2>Memory Lane</h2>
+              <p class="muted">Family posts with one week or less before cleanup.</p>
+            </div>
+          </header>
+          <div id="memoryList" class="post-list"></div>
+        </section>
+
+        <section id="notificationsView" class="view hidden">
+          <header class="view-header">
+            <div>
+              <h2>Notifications</h2>
+              <p class="muted">Likes, reactions, and comments on your posts.</p>
+            </div>
+            <button id="markAllReadBtn" class="ghost-button" type="button">Mark all read</button>
+          </header>
+          <div id="notificationsList" class="list-panel"></div>
+        </section>
+
+        <section id="profileView" class="view hidden">
+          <header class="view-header">
+            <div>
+              <h2>Profile</h2>
+              <p class="muted">Your photo, bio, theme, and current posts.</p>
+            </div>
+          </header>
+          <div class="profile-grid">
+            <form id="profileForm" class="settings-panel">
+              <img id="profileAvatarPreview" class="avatar-large" alt="">
+              <label>Name
+                <input name="name" required>
+              </label>
+              <label>Bio
+                <textarea name="bio" rows="4"></textarea>
+              </label>
+              <label>Profile picture
+                <input name="avatar" type="file" accept="image/*">
+              </label>
+              <label>Theme
+                <select name="theme">
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">Save profile</button>
+            </form>
+            <div>
+              <h3>Your current posts</h3>
+              <div id="profilePosts" class="post-list compact"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="developerView" class="view hidden">
+          <header class="view-header">
+            <div>
+              <h2>Developer</h2>
+              <p class="muted">Settings, approvals, and moderation for Kelley Corner.</p>
+            </div>
+          </header>
+          <div class="dev-grid">
+            <form id="settingsForm" class="settings-panel">
+              <h3>App settings</h3>
+              <label>Post lifetime days
+                <input name="postLifetimeDays" type="number" min="1" max="365" required>
+              </label>
+              <label>Cookbook URL
+                <input name="cookbookBaseUrl" type="url" required>
+              </label>
+              <label>Max images per post
+                <input name="maxImagesPerPost" type="number" min="1" max="12" required>
+              </label>
+              <label class="checkbox-row">
+                <input name="maintenanceMode" type="checkbox">
+                <span>Maintenance mode</span>
+              </label>
+              <button class="primary-button" type="submit">Save settings</button>
+            </form>
+            <div class="settings-panel">
+              <h3>Pending family approvals</h3>
+              <div id="pendingUsersList" class="list-panel"></div>
+            </div>
+            <div class="settings-panel">
+              <h3>Moderation</h3>
+              <div id="moderationList" class="list-panel"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast hidden" role="status"></div>
+    <script src="app.js"></script>
+  </body>
 </html>
