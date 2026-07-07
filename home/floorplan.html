@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>House 3D Viewer</title>
+<style>
+  html, body { margin:0; padding:0; height:100%; overflow:hidden; font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:#1b1d22; }
+  #canvas-wrap { position:absolute; inset:0; }
+  canvas { display:block; }
+
+  #topbar {
+    position:absolute; top:0; left:0; right:0;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 20px; box-sizing:border-box;
+    pointer-events:none;
+  }
+  #topbar > * { pointer-events:auto; }
+
+  #floorToggle {
+    display:flex; background:#26292f; border:1px solid #383c44; border-radius:10px;
+    overflow:hidden; box-shadow:0 4px 14px rgba(0,0,0,0.35);
+  }
+  #floorToggle button {
+    border:none; background:transparent; color:#9aa0aa; font-size:14px; font-weight:600;
+    padding:10px 18px; cursor:pointer; transition:background .15s, color .15s;
+  }
+  #floorToggle button.active { background:#4f7cff; color:#fff; }
+  #floorToggle button:hover:not(.active) { background:#2f333b; color:#fff; }
+
+  #hint {
+    color:#7a808c; font-size:13px; background:#26292f; border:1px solid #383c44;
+    padding:8px 14px; border-radius:10px;
+  }
+
+  #tooltip {
+    position:absolute; pointer-events:none; background:#0f1013; color:#fff;
+    padding:6px 10px; border-radius:6px; font-size:13px; display:none; z-index:5;
+    border:1px solid #383c44;
+  }
+
+  /* Popup */
+  #overlay {
+    position:absolute; inset:0; background:rgba(10,11,13,0.55);
+    display:none; align-items:center; justify-content:center; z-index:10;
+    backdrop-filter: blur(2px);
+  }
+  #panel {
+    width:380px; max-width:90vw; max-height:80vh; overflow-y:auto;
+    background:#1f2126; border:1px solid #383c44; border-radius:16px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5); color:#e7e9ec;
+  }
+  #panel-header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 20px; border-bottom:1px solid #33363d;
+  }
+  #panel-header h2 { margin:0; font-size:18px; }
+  #panel-close {
+    background:#2c2f36; border:1px solid #3a3e46; color:#c9cdd4; width:30px; height:30px;
+    border-radius:8px; cursor:pointer; font-size:16px; line-height:1;
+  }
+  #panel-close:hover { background:#3a3e46; color:#fff; }
+  #panel-body { padding:16px 20px 20px; }
+  .section-title {
+    font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#7a808c;
+    margin:16px 0 8px; font-weight:700;
+  }
+  .section-title:first-child { margin-top:0; }
+  .dim-row {
+    display:flex; justify-content:space-between; padding:7px 0;
+    border-bottom:1px solid #2a2d33; font-size:14px;
+  }
+  .dim-row:last-child { border-bottom:none; }
+  .dim-label { color:#c9cdd4; }
+  .dim-value { color:#8fb0ff; font-weight:600; }
+  .note { font-size:13px; color:#9aa0aa; line-height:1.5; margin-top:10px; }
+</style>
+</head>
+<body>
+
+<div id="canvas-wrap"></div>
+
+<div id="topbar">
+  <div id="floorToggle">
+    <button id="btnFloor1" class="active">1st Floor</button>
+    <button id="btnFloor2">2nd Floor</button>
+  </div>
+  <div id="hint">Click a room for details · drag to orbit · scroll to zoom</div>
+</div>
+
+<div id="tooltip"></div>
+
+<div id="overlay">
+  <div id="panel">
+    <div id="panel-header">
+      <h2 id="panel-title">Room</h2>
+      <button id="panel-close">✕</button>
+    </div>
+    <div id="panel-body"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/controls/OrbitControls.js"></script>
+<script>
+/* =====================================================================
+   1) HOUSE DATA — EDIT THIS SECTION WITH YOUR REAL HOUSE INFO
+   =====================================================================
+   All dimensions are in FEET. Coordinates: x = left/right, z = front/back.
+   (0,0) can be anywhere you like — it's just the corner you measure from.
+   Each room is a rectangle defined by x, z (bottom-left corner), width, depth.
+   Add as many "extra" lines as you want per room (closets, windows, notes...).
+*/
+const HOUSE = {
+  floors: [
+    {
+      name: "1st Floor",
+      y: 0,               // vertical position of this floor
+      wallHeight: 9,
+      rooms: [
+        {
+          id: "living",
+          label: "Living Room",
+          x: 0, z: 0, width: 18, depth: 14,
+          color: 0x4f7cff,
+          dims: {
+            "Room size": "18' x 14'",
+            "Ceiling height": "9'",
+            "Windows": "2x (4' x 5')",
+            "Flooring": "Hardwood"
+          }
+        },
+        {
+          id: "kitchen",
+          label: "Kitchen",
+          x: 18, z: 0, width: 14, depth: 14,
+          color: 0x4fd88c,
+          dims: {
+            "Room size": "14' x 14'",
+            "Ceiling height": "9'",
+            "Window": "1x (3' x 4')",
+            "Island": "6' x 3'"
+          }
+        },
+        {
+          id: "entry",
+          label: "Entryway",
+          x: 0, z: 14, width: 8, depth: 8,
+          color: 0xd8c04f,
+          dims: {
+            "Room size": "8' x 8'",
+            "Closet": "3' x 2'"
+          }
+        }
+      ]
+    },
+    {
+      name: "2nd Floor",
+      y: 12,
+      wallHeight: 9,
+      rooms: [
+        {
+          id: "master",
+          label: "Master Bedroom",
+          x: 0, z: 0, width: 16, depth: 14,
+          color: 0xff8f4f,
+          dims: {
+            "Room size": "16' x 14'",
+            "Ceiling height": "9'",
+            "Closet 1 (walk-in)": "6' x 5'",
+            "Closet 2": "4' x 2'",
+            "Window 1": "4' x 5'",
+            "Window 2": "3' x 5'",
+            "Flooring": "Carpet"
+          }
+        },
+        {
+          id: "bed2",
+          label: "Bedroom 2",
+          x: 16, z: 0, width: 12, depth: 12,
+          color: 0xff4f88,
+          dims: {
+            "Room size": "12' x 12'",
+            "Closet": "5' x 2'",
+            "Window": "3' x 4'"
+          }
+        },
+        {
+          id: "bath",
+          label: "Bathroom",
+          x: 16, z: 12, width: 8, depth: 8,
+          color: 0x4fd0ff,
+          dims: {
+            "Room size": "8' x 8'",
+            "Window": "2' x 2'",
+            "Vanity": "5' x 2'"
+          }
+        }
+      ]
+    }
+  ]
+};
+/* ===================================================================== */
+
+
+// ---------- Three.js setup ----------
+const wrap = document.getElementById('canvas-wrap');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1b1d22);
+
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 1000);
+camera.position.set(30, 30, 40);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+wrap.appendChild(renderer.domElement);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.target.set(12, 0, 8);
+controls.maxPolarAngle = Math.PI/2 - 0.02;
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+const sun = new THREE.DirectionalLight(0xffffff, 0.8);
+sun.position.set(25, 40, 15);
+scene.add(sun);
+
+const grid = new THREE.GridHelper(80, 40, 0x333844, 0x2a2d33);
+scene.add(grid);
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ---------- Build rooms ----------
+let currentFloorIndex = 0;
+let floorGroups = [];
+const clickable = []; // {mesh, room}
+
+function buildFloor(floorData) {
+  const group = new THREE.Group();
+  floorData.rooms.forEach(room => {
+    const geo = new THREE.BoxGeometry(room.width, floorData.wallHeight, room.depth);
+    const mat = new THREE.MeshStandardMaterial({
+      color: room.color, transparent: true, opacity: 0.55,
+      metalness: 0.1, roughness: 0.7
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(
+      room.x + room.width/2,
+      floorData.wallHeight/2,
+      room.z + room.depth/2
+    );
+    mesh.userData.room = room;
+    group.add(mesh);
+
+    // wireframe edges for clarity
+    const edges = new THREE.LineSegments(
+      new THREE.EdgesGeometry(geo),
+      new THREE.LineBasicMaterial({ color: 0xffffff, transparent:true, opacity:0.25 })
+    );
+    edges.position.copy(mesh.position);
+    group.add(edges);
+
+    // floor slab
+    const slabGeo = new THREE.BoxGeometry(room.width, 0.2, room.depth);
+    const slabMat = new THREE.MeshStandardMaterial({ color: 0x2a2d33 });
+    const slab = new THREE.Mesh(slabGeo, slabMat);
+    slab.position.set(room.x + room.width/2, 0, room.z + room.depth/2);
+    group.add(slab);
+
+    clickable.push({ mesh, room, group });
+  });
+  return group;
+}
+
+HOUSE.floors.forEach((floorData, i) => {
+  const g = buildFloor(floorData);
+  g.position.y = 0; // we show one floor at a time at ground level for clarity
+  g.visible = (i === 0);
+  scene.add(g);
+  floorGroups.push(g);
+});
+
+// ---------- Floor toggle ----------
+const btn1 = document.getElementById('btnFloor1');
+const btn2 = document.getElementById('btnFloor2');
+btn1.textContent = HOUSE.floors[0].name;
+btn2.textContent = HOUSE.floors[1] ? HOUSE.floors[1].name : "2nd Floor";
+
+function setFloor(index) {
+  currentFloorIndex = index;
+  floorGroups.forEach((g, i) => g.visible = (i === index));
+  btn1.classList.toggle('active', index === 0);
+  btn2.classList.toggle('active', index === 1);
+}
+btn1.addEventListener('click', () => setFloor(0));
+btn2.addEventListener('click', () => setFloor(1));
+
+// ---------- Raycasting / interaction ----------
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const tooltip = document.getElementById('tooltip');
+
+function getActiveMeshes() {
+  return clickable.filter(c => c.group.visible).map(c => c.mesh);
+}
+
+renderer.domElement.addEventListener('mousemove', (e) => {
+  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(getActiveMeshes());
+  if (hits.length > 0) {
+    const room = hits[0].object.userData.room;
+    tooltip.style.display = 'block';
+    tooltip.style.left = (e.clientX + 14) + 'px';
+    tooltip.style.top = (e.clientY + 14) + 'px';
+    tooltip.textContent = room.label;
+    renderer.domElement.style.cursor = 'pointer';
+  } else {
+    tooltip.style.display = 'none';
+    renderer.domElement.style.cursor = 'default';
+  }
+});
+
+renderer.domElement.addEventListener('click', (e) => {
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(getActiveMeshes());
+  if (hits.length > 0) {
+    openPanel(hits[0].object.userData.room);
+  }
+});
+
+// ---------- Popup panel ----------
+const overlay = document.getElementById('overlay');
+const panelTitle = document.getElementById('panel-title');
+const panelBody = document.getElementById('panel-body');
+const panelClose = document.getElementById('panel-close');
+
+function openPanel(room) {
+  panelTitle.textContent = room.label;
+  panelBody.innerHTML = '';
+
+  const title = document.createElement('div');
+  title.className = 'section-title';
+  title.textContent = 'Dimensions & details';
+  panelBody.appendChild(title);
+
+  Object.entries(room.dims).forEach(([label, value]) => {
+    const row = document.createElement('div');
+    row.className = 'dim-row';
+    row.innerHTML = `<span class="dim-label">${label}</span><span class="dim-value">${value}</span>`;
+    panelBody.appendChild(row);
+  });
+
+  overlay.style.display = 'flex';
+}
+
+function closePanel() {
+  overlay.style.display = 'none';
+}
+panelClose.addEventListener('click', closePanel);
+overlay.addEventListener('click', (e) => {
+  if (e.target === overlay) closePanel();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closePanel();
+});
+
+// ---------- Render loop ----------
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>
