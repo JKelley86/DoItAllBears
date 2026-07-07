@@ -99,8 +99,8 @@
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
 /* =====================================================================
    1) HOUSE DATA — EDIT THIS SECTION WITH YOUR REAL HOUSE INFO
@@ -201,6 +201,16 @@ const HOUSE = {
 };
 /* ===================================================================== */
 
+
+// ---------- Sanity check: make sure libraries actually loaded ----------
+if (typeof THREE === 'undefined' || typeof THREE.OrbitControls === 'undefined') {
+  document.getElementById('canvas-wrap').innerHTML =
+    '<div style="color:#fff;padding:40px;font-family:sans-serif;max-width:500px">' +
+    '<h2>Could not load 3D libraries</h2>' +
+    '<p>The three.js or OrbitControls script failed to load from the CDN. ' +
+    'Check your internet connection, or that the &lt;script&gt; tag URLs in this file are reachable, then reload the page.</p></div>';
+  throw new Error('THREE or THREE.OrbitControls failed to load');
+}
 
 // ---------- Three.js setup ----------
 const wrap = document.getElementById('canvas-wrap');
