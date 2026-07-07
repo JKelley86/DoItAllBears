@@ -13,7 +13,7 @@
     position:absolute; top:0; left:0; right:0;
     display:flex; align-items:center; justify-content:space-between; gap:10px;
     padding:14px 16px; box-sizing:border-box;
-    pointer-events:none;
+    pointer-events:none; z-index:2;
   }
   #topbar > * { pointer-events:auto; }
 
@@ -32,9 +32,7 @@
     color:#7a808c; font-size:12px; background:#26292f; border:1px solid #383c44;
     padding:8px 12px; border-radius:10px; max-width:40vw;
   }
-  @media (max-width: 640px) {
-    #hint { display:none; }
-  }
+  @media (max-width: 640px) { #hint { display:none; } }
 
   #tooltip {
     position:absolute; pointer-events:none; background:#0f1013; color:#fff;
@@ -42,7 +40,6 @@
     border:1px solid #383c44;
   }
 
-  /* Popup */
   #overlay {
     position:absolute; inset:0; background:rgba(10,11,13,0.55);
     display:none; align-items:center; justify-content:center; z-index:10;
@@ -76,6 +73,23 @@
   .dim-row:last-child { border-bottom:none; }
   .dim-label { color:#c9cdd4; }
   .dim-value { color:#8fb0ff; font-weight:600; text-align:right; }
+
+  .room-label {
+    background: rgba(15,16,19,0.85);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.15);
+    white-space: nowrap;
+  }
+  .room-label.small-label {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    opacity: 0.85;
+  }
 </style>
 </head>
 <body>
@@ -84,7 +98,7 @@
 
 <div id="topbar">
   <div id="floorToggle"></div>
-  <div id="hint">Tap/click a room or building for details · drag to orbit · pinch/scroll to zoom</div>
+  <div id="hint">Tap/click a room, window, door, or building for details · drag to orbit · pinch/scroll to zoom</div>
 </div>
 
 <div id="tooltip"></div>
@@ -101,14 +115,38 @@
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
 <script>
 /* =====================================================================
    1) HOUSE DATA — EDIT THIS SECTION WITH YOUR REAL HOUSE INFO
    =====================================================================
    All dimensions are in FEET. Coordinates: x = left/right, z = front/back.
    (0,0) can be anywhere you like — it's just the corner you measure from.
-   Each room/structure is a rectangle: x, z (bottom-left corner), width, depth.
-   Add as many "dims" lines as you want per room (closets, windows, notes...).
+
+   ROOMS (per floor):
+     x, z, width, depth  → footprint, bottom-left corner at (x,z)
+     color               → translucent wall-box tint
+     floor.type          → 'hardwood' | 'carpet' | 'tile' | 'concrete' | 'vinyl'
+                            (leave "floor" out entirely for a plain gray floor)
+     windows / doors     → OPTIONAL arrays. Each one is placed on a real wall,
+                            so it shows up in the right spot and can be tapped
+                            individually. This is also how you tell windows
+                            apart — name them by wall + landmark instead of
+                            "Window 1 / Window 2":
+        {
+          wall: 'south' | 'north' | 'east' | 'west',
+          offset: 4,     // feet from the wall's start corner to the window's edge
+          width: 4, height: 5, sill: 3,   // sill = height of window bottom off floor
+          label: 'Window 1 — south wall, faces backyard'
+        }
+     doors are the same shape but no "sill" (they start at the floor):
+        { wall:'west', offset:2, width:3, height:6.8, label:'Closet door' }
+
+     Wall offset direction (so you know which way to measure):
+       south/north walls → offset measured along X, starting at the room's x
+       east/west walls   → offset measured along Z, starting at the room's z
+
+     dims → the general room-level info shown when you click the room itself
 */
 const HOUSE = {
   floors: [
@@ -121,11 +159,17 @@ const HOUSE = {
           label: "Living Room",
           x: 0, z: 0, width: 18, depth: 14,
           color: 0x4f7cff,
+          floor: { type: "carpet" },
+          windows: [
+            { wall: "south", offset: 5, width: 6, height: 5, sill: 2, label: "Window 1 — south wall, faces street" }
+          ],
+          doors: [
+            { wall: "east", offset: 0, width: 3.5, height: 7, label: "Doorway to kitchen" }
+          ],
           dims: {
             "Room size": "18' x 14'",
             "Ceiling height": "9'",
-            "Windows": "2x (4' x 5')",
-            "Flooring": "Hardwood"
+            "Flooring": "Carpet"
           }
         },
         {
@@ -133,11 +177,15 @@ const HOUSE = {
           label: "Kitchen",
           x: 18, z: 0, width: 14, depth: 14,
           color: 0x4fd88c,
+          floor: { type: "tile" },
+          windows: [
+            { wall: "north", offset: 4, width: 3, height: 4, sill: 3, label: "Window 1 — north wall, over the sink" }
+          ],
           dims: {
             "Room size": "14' x 14'",
             "Ceiling height": "9'",
-            "Window": "1x (3' x 4')",
-            "Island": "6' x 3'"
+            "Island": "6' x 3'",
+            "Flooring": "Tile"
           }
         },
         {
@@ -145,6 +193,10 @@ const HOUSE = {
           label: "Entryway",
           x: 0, z: 14, width: 8, depth: 8,
           color: 0xd8c04f,
+          floor: { type: "vinyl" },
+          doors: [
+            { wall: "south", offset: 2, width: 3.5, height: 7, label: "Front door" }
+          ],
           dims: {
             "Room size": "8' x 8'",
             "Closet": "3' x 2'"
@@ -161,14 +213,20 @@ const HOUSE = {
           label: "Master Bedroom",
           x: 0, z: 0, width: 16, depth: 14,
           color: 0xff8f4f,
+          floor: { type: "hardwood" },
+          windows: [
+            { wall: "south", offset: 3, width: 4, height: 5, sill: 2.5, label: "Window 1 — south wall, over the bed" },
+            { wall: "west",  offset: 4, width: 3, height: 5, sill: 2.5, label: "Window 2 — west wall, faces backyard" }
+          ],
+          doors: [
+            { wall: "east", offset: 1, width: 3, height: 7, label: "Bedroom door" }
+          ],
           dims: {
             "Room size": "16' x 14'",
             "Ceiling height": "9'",
             "Closet 1 (walk-in)": "6' x 5'",
             "Closet 2": "4' x 2'",
-            "Window 1": "4' x 5'",
-            "Window 2": "3' x 5'",
-            "Flooring": "Carpet"
+            "Flooring": "Hardwood"
           }
         },
         {
@@ -176,10 +234,14 @@ const HOUSE = {
           label: "Bedroom 2",
           x: 16, z: 0, width: 12, depth: 12,
           color: 0xff4f88,
+          floor: { type: "carpet" },
+          windows: [
+            { wall: "north", offset: 4, width: 3, height: 4, sill: 3, label: "Window 1 — north wall" }
+          ],
           dims: {
             "Room size": "12' x 12'",
             "Closet": "5' x 2'",
-            "Window": "3' x 4'"
+            "Flooring": "Carpet"
           }
         },
         {
@@ -187,10 +249,14 @@ const HOUSE = {
           label: "Bathroom",
           x: 16, z: 12, width: 8, depth: 8,
           color: 0x4fd0ff,
+          floor: { type: "tile" },
+          windows: [
+            { wall: "east", offset: 2, width: 2, height: 2, sill: 4.5, label: "Window 1 — east wall, over the tub" }
+          ],
           dims: {
             "Room size": "8' x 8'",
-            "Window": "2' x 2'",
-            "Vanity": "5' x 2'"
+            "Vanity": "5' x 2'",
+            "Flooring": "Tile"
           }
         }
       ]
@@ -199,10 +265,10 @@ const HOUSE = {
 
   /* ---------------------------------------------------------------
      OUTSIDE / PROPERTY VIEW
-     Same coordinate system as the floors above (feet, same origin),
-     so a structure's x/z is its real position relative to the house.
-     Add as many outbuildings as you want (barn, garage, shed...).
-     "height" here is just for the 3D box, not a formal ceiling height.
+     Same coordinate system as the floors above (feet, same origin).
+     structures  → buildings (boxes)
+     surfaces    → flat ground features: driveway, walkway, patio, grass
+                   type: 'driveway' | 'walkway' | 'patio' | 'grass'
   ----------------------------------------------------------------*/
   exterior: {
     name: "Outside",
@@ -212,11 +278,7 @@ const HOUSE = {
         label: "House (footprint)",
         x: 0, z: 0, width: 32, depth: 22, height: 20,
         color: 0x8a8f99,
-        dims: {
-          "Footprint": "32' x 22'",
-          "Stories": "2",
-          "Approx. total height": "20'"
-        }
+        dims: { "Footprint": "32' x 22'", "Stories": "2", "Approx. total height": "20'" }
       },
       {
         id: "barn",
@@ -230,6 +292,29 @@ const HOUSE = {
           "Distance from house": "~85'"
         }
       }
+    ],
+    surfaces: [
+      {
+        id: "driveway",
+        label: "Driveway",
+        type: "driveway",
+        x: -22, z: 4, width: 20, depth: 12,
+        dims: { "Length": "20'", "Width": "12'", "Surface": "Asphalt" }
+      },
+      {
+        id: "walkway",
+        label: "Front Walkway",
+        type: "walkway",
+        x: -2, z: 22, width: 4, depth: 8,
+        dims: { "Length": "8'", "Width": "4'", "Surface": "Concrete pavers" }
+      },
+      {
+        id: "yard",
+        label: "Yard",
+        type: "grass",
+        x: -10, z: -10, width: 110, depth: 90,
+        dims: { "Approx. area": "~9,900 sq ft" }
+      }
     ]
   }
 };
@@ -237,13 +322,13 @@ const HOUSE = {
 
 
 // ---------- Sanity check: make sure libraries actually loaded ----------
-if (typeof THREE === 'undefined' || typeof THREE.OrbitControls === 'undefined') {
+if (typeof THREE === 'undefined' || typeof THREE.OrbitControls === 'undefined' || typeof THREE.CSS2DRenderer === 'undefined') {
   document.getElementById('canvas-wrap').innerHTML =
     '<div style="color:#fff;padding:40px;font-family:sans-serif;max-width:500px">' +
     '<h2>Could not load 3D libraries</h2>' +
-    '<p>The three.js or OrbitControls script failed to load from the CDN. ' +
-    'Check your internet connection, or that the &lt;script&gt; tag URLs in this file are reachable, then reload the page.</p></div>';
-  throw new Error('THREE or THREE.OrbitControls failed to load');
+    '<p>A required script failed to load from the CDN. Check your internet connection, ' +
+    'or that the &lt;script&gt; tag URLs in this file are reachable, then reload the page.</p></div>';
+  throw new Error('A required THREE.js library failed to load');
 }
 
 // ---------- Three.js setup ----------
@@ -257,6 +342,14 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 wrap.appendChild(renderer.domElement);
+
+const labelRenderer = new THREE.CSS2DRenderer();
+labelRenderer.setSize(window.innerWidth, window.innerHeight);
+labelRenderer.domElement.style.position = 'absolute';
+labelRenderer.domElement.style.top = '0px';
+labelRenderer.domElement.style.left = '0px';
+labelRenderer.domElement.style.pointerEvents = 'none';
+wrap.appendChild(labelRenderer.domElement);
 
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -275,19 +368,166 @@ window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// ---------- Build one "view" (a floor, or the exterior) ----------
-// Each entry has: { label, group, camPos, camTarget }
-const views = [];
-const clickable = []; // { mesh, item, group } — item = room or structure data
+// ---------- Procedural floor / ground textures (no external image files) ----------
+function makeCanvasTexture(drawFn, size = 256) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  drawFn(ctx, size);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  return tex;
+}
 
+const BASE_TEXTURES = {
+  hardwood: makeCanvasTexture((ctx, s) => {
+    const planks = 6, plankH = s / planks;
+    for (let i = 0; i < planks; i++) {
+      const shade = 118 + Math.floor(Math.random() * 26) - 13;
+      ctx.fillStyle = `rgb(${shade + 42},${shade},${shade - 48})`;
+      ctx.fillRect(0, i * plankH, s, plankH);
+      ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+      for (let g = 0; g < 4; g++) {
+        const y = i * plankH + Math.random() * plankH;
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(s, y + (Math.random() * 4 - 2)); ctx.stroke();
+      }
+      ctx.strokeStyle = 'rgba(0,0,0,0.28)';
+      ctx.beginPath(); ctx.moveTo(0, i * plankH); ctx.lineTo(s, i * plankH); ctx.stroke();
+    }
+  }),
+  carpet: makeCanvasTexture((ctx, s) => {
+    ctx.fillStyle = '#8f8478'; ctx.fillRect(0, 0, s, s);
+    for (let i = 0; i < 3500; i++) {
+      ctx.fillStyle = `rgba(0,0,0,${0.02 + Math.random() * 0.05})`;
+      ctx.fillRect(Math.random() * s, Math.random() * s, 1.5, 1.5);
+    }
+  }),
+  tile: makeCanvasTexture((ctx, s) => {
+    ctx.fillStyle = '#d8d3c8'; ctx.fillRect(0, 0, s, s);
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 3;
+    const grid = 4;
+    for (let i = 0; i <= grid; i++) {
+      const p = i * s / grid;
+      ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, s); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(s, p); ctx.stroke();
+    }
+  }),
+  concrete: makeCanvasTexture((ctx, s) => {
+    ctx.fillStyle = '#9a9a95'; ctx.fillRect(0, 0, s, s);
+    for (let i = 0; i < 2200; i++) {
+      ctx.fillStyle = `rgba(0,0,0,${Math.random() * 0.06})`;
+      ctx.fillRect(Math.random() * s, Math.random() * s, 2, 2);
+    }
+  }),
+  vinyl: makeCanvasTexture((ctx, s) => {
+    ctx.fillStyle = '#cfc9bd'; ctx.fillRect(0, 0, s, s);
+    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+    for (let i = 0; i < 6; i++) { const p = i * s / 6; ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, s); ctx.stroke(); }
+  }),
+  driveway: makeCanvasTexture((ctx, s) => {
+    ctx.fillStyle = '#2b2b2e'; ctx.fillRect(0, 0, s, s);
+    for (let i = 0; i < 3200; i++) {
+      ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.04})`;
+      ctx.fillRect(Math.random() * s, Math.random() * s, 1.5, 1.5);
+    }
+  }),
+  walkway: makeCanvasTexture((ctx, s) => {
+    ctx.fillStyle = '#b7b2a6'; ctx.fillRect(0, 0, s, s);
+    ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+    const grid = 3;
+    for (let i = 0; i <= grid; i++) {
+      const p = i * s / grid;
+      ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, s); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(s, p); ctx.stroke();
+    }
+  }),
+  patio: makeCanvasTexture((ctx, s) => {
+    ctx.fillStyle = '#a89f8f'; ctx.fillRect(0, 0, s, s);
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+    const grid = 4;
+    for (let i = 0; i <= grid; i++) {
+      const p = i * s / grid;
+      ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, s); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(s, p); ctx.stroke();
+    }
+  }),
+  grass: makeCanvasTexture((ctx, s) => {
+    ctx.fillStyle = '#4c7a3d'; ctx.fillRect(0, 0, s, s);
+    for (let i = 0; i < 4500; i++) {
+      ctx.fillStyle = `rgba(${20 + Math.random() * 40},${60 + Math.random() * 50},${20 + Math.random() * 30},0.5)`;
+      ctx.fillRect(Math.random() * s, Math.random() * s, 2, 3);
+    }
+  })
+};
+
+function getTiledTexture(type, width, depth, tileSize = 4) {
+  const base = BASE_TEXTURES[type] || BASE_TEXTURES.concrete;
+  const tex = base.clone();
+  tex.needsUpdate = true;
+  tex.repeat.set(Math.max(1, width / tileSize), Math.max(1, depth / tileSize));
+  return tex;
+}
+
+// ---------- Shared state ----------
+const views = [];
+const clickableFeatures = []; // { mesh, item, group } — windows & doors (checked first)
+const clickableBoxes = [];    // { mesh, item, group } — rooms, buildings, ground surfaces
+const labels = [];            // { cssObj, group }
+
+function addLabel(text, x, y, z, group, small = false) {
+  const div = document.createElement('div');
+  div.className = small ? 'room-label small-label' : 'room-label';
+  div.textContent = text;
+  const obj = new THREE.CSS2DObject(div);
+  obj.position.set(x, y, z);
+  group.add(obj);
+  labels.push({ cssObj: obj, group });
+}
+
+// ---------- Wall-mounted windows & doors ----------
+function addWallFeature(room, feature, kind, group) {
+  const w = feature.width, h = feature.height;
+  const bottom = kind === 'window' ? (feature.sill || 0) : 0;
+  const centerY = bottom + h / 2;
+  let px, pz, rotY, nx, nz;
+
+  switch (feature.wall) {
+    case 'south': px = room.x + feature.offset + w/2; pz = room.z;              rotY = 0;          nx = 0;  nz = -1; break;
+    case 'north': px = room.x + feature.offset + w/2; pz = room.z + room.depth; rotY = 0;          nx = 0;  nz = 1;  break;
+    case 'west':  px = room.x;                         pz = room.z + feature.offset + w/2; rotY = Math.PI/2; nx = -1; nz = 0;  break;
+    case 'east':  px = room.x + room.width;             pz = room.z + feature.offset + w/2; rotY = Math.PI/2; nx = 1;  nz = 0;  break;
+    default: return;
+  }
+
+  const eps = 0.3;
+  const geo = new THREE.PlaneGeometry(w, h);
+  const color = kind === 'window' ? 0x9fd8ff : 0x6b4a30;
+  const opacity = kind === 'window' ? 0.75 : 0.95;
+  const mat = new THREE.MeshStandardMaterial({ color, transparent: true, opacity, side: THREE.DoubleSide });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(px + nx * eps, centerY, pz + nz * eps);
+  mesh.rotation.y = rotY;
+  group.add(mesh);
+
+  const dims = Object.assign(
+    { "Size": `${w}' x ${h}'`, "Wall": feature.wall.charAt(0).toUpperCase() + feature.wall.slice(1) },
+    kind === 'window' ? { "Sill height": `${bottom}'` } : {},
+    feature.extra || {}
+  );
+  const itemData = { label: feature.label || (kind === 'window' ? 'Window' : 'Door'), dims };
+  mesh.userData.item = itemData;
+  clickableFeatures.push({ mesh, item: itemData, group });
+
+  addLabel(kind === 'window' ? 'W' : 'D', px, centerY, pz, group, true);
+}
+
+// ---------- Rooms & buildings (boxes) ----------
 function buildBoxItem(item, height, group, opacity) {
   const geo = new THREE.BoxGeometry(item.width, height, item.depth);
-  const mat = new THREE.MeshStandardMaterial({
-    color: item.color, transparent: true, opacity: opacity,
-    metalness: 0.1, roughness: 0.7
-  });
+  const mat = new THREE.MeshStandardMaterial({ color: item.color, transparent: true, opacity, metalness: 0.1, roughness: 0.7 });
   const mesh = new THREE.Mesh(geo, mat);
   mesh.position.set(item.x + item.width/2, height/2, item.z + item.depth/2);
   mesh.userData.item = item;
@@ -295,18 +535,42 @@ function buildBoxItem(item, height, group, opacity) {
 
   const edges = new THREE.LineSegments(
     new THREE.EdgesGeometry(geo),
-    new THREE.LineBasicMaterial({ color: 0xffffff, transparent:true, opacity:0.25 })
+    new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.25 })
   );
   edges.position.copy(mesh.position);
   group.add(edges);
 
   const slabGeo = new THREE.BoxGeometry(item.width, 0.2, item.depth);
-  const slabMat = new THREE.MeshStandardMaterial({ color: 0x2a2d33 });
+  let slabMat;
+  if (item.floor && item.floor.type) {
+    const tex = getTiledTexture(item.floor.type, item.width, item.depth, item.floor.tileSize || 4);
+    slabMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9 });
+  } else {
+    slabMat = new THREE.MeshStandardMaterial({ color: 0x2a2d33 });
+  }
   const slab = new THREE.Mesh(slabGeo, slabMat);
   slab.position.set(item.x + item.width/2, 0, item.z + item.depth/2);
   group.add(slab);
 
-  clickable.push({ mesh, item, group });
+  clickableBoxes.push({ mesh, item, group });
+  addLabel(item.label, item.x + item.width/2, height + 1.5, item.z + item.depth/2, group);
+
+  (item.windows || []).forEach(win => addWallFeature(item, win, 'window', group));
+  (item.doors || []).forEach(door => addWallFeature(item, door, 'door', group));
+}
+
+// ---------- Flat ground surfaces (driveway, walkway, patio, grass) ----------
+function buildSurface(surface, group) {
+  const height = 0.15;
+  const geo = new THREE.BoxGeometry(surface.width, height, surface.depth);
+  const tex = getTiledTexture(surface.type, surface.width, surface.depth, surface.tileSize || 6);
+  const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 1 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(surface.x + surface.width/2, height/2, surface.z + surface.depth/2);
+  mesh.userData.item = surface;
+  group.add(mesh);
+  clickableBoxes.push({ mesh, item: surface, group });
+  addLabel(surface.label, surface.x + surface.width/2, height + 1, surface.z + surface.depth/2, group, true);
 }
 
 // Floors
@@ -316,9 +580,8 @@ HOUSE.floors.forEach((floorData) => {
   floorData.rooms.forEach(room => buildBoxItem(room, floorData.wallHeight, group, 0.55));
   scene.add(group);
 
-  // frame the rooms on this floor
   let maxX = 0, maxZ = 0;
-  floorData.rooms.forEach(r => { maxX = Math.max(maxX, r.x+r.width); maxZ = Math.max(maxZ, r.z+r.depth); });
+  floorData.rooms.forEach(r => { maxX = Math.max(maxX, r.x + r.width); maxZ = Math.max(maxZ, r.z + r.depth); });
 
   views.push({
     label: floorData.name,
@@ -328,20 +591,23 @@ HOUSE.floors.forEach((floorData) => {
   });
 });
 
-// Exterior (house + outbuildings), zoomed out further
+// Exterior (buildings + ground surfaces)
 {
   const group = new THREE.Group();
   group.visible = false;
   const ext = HOUSE.exterior;
+
+  (ext.surfaces || []).forEach(s => buildSurface(s, group));
   ext.structures.forEach(s => buildBoxItem(s, s.height, group, 0.7));
   scene.add(group);
 
-  let minX=0, minZ=0, maxX=0, maxZ=0;
-  ext.structures.forEach(s => {
+  let minX = 0, minZ = 0, maxX = 0, maxZ = 0;
+  const allFootprints = [...ext.structures, ...(ext.surfaces || [])];
+  allFootprints.forEach(s => {
     minX = Math.min(minX, s.x); minZ = Math.min(minZ, s.z);
-    maxX = Math.max(maxX, s.x+s.width); maxZ = Math.max(maxZ, s.z+s.depth);
+    maxX = Math.max(maxX, s.x + s.width); maxZ = Math.max(maxZ, s.z + s.depth);
   });
-  const spanX = maxX-minX, spanZ = maxZ-minZ;
+  const spanX = maxX - minX, spanZ = maxZ - minZ;
   const span = Math.max(spanX, spanZ);
 
   views.push({
@@ -354,8 +620,6 @@ HOUSE.floors.forEach((floorData) => {
 
 // ---------- View toggle buttons ----------
 const toggleBar = document.getElementById('floorToggle');
-let currentView = 0;
-
 views.forEach((v, i) => {
   const b = document.createElement('button');
   b.textContent = v.label;
@@ -365,9 +629,9 @@ views.forEach((v, i) => {
 });
 
 function setView(index) {
-  currentView = index;
   views.forEach((v, i) => v.group.visible = (i === index));
   Array.from(toggleBar.children).forEach((btn, i) => btn.classList.toggle('active', i === index));
+  labels.forEach(l => { l.cssObj.visible = l.group.visible; });
 
   const v = views[index];
   camera.position.copy(v.camPos);
@@ -380,31 +644,35 @@ setView(0);
 const raycaster = new THREE.Raycaster();
 const tooltip = document.getElementById('tooltip');
 
-function getActiveMeshes() {
-  return clickable.filter(c => c.group.visible).map(c => c.mesh);
+function activeMeshes(list) {
+  return list.filter(c => c.group.visible).map(c => c.mesh);
 }
 
 function ndcFromClient(clientX, clientY) {
-  return new THREE.Vector2(
-    (clientX / window.innerWidth) * 2 - 1,
-    -(clientY / window.innerHeight) * 2 + 1
-  );
+  return new THREE.Vector2((clientX / window.innerWidth) * 2 - 1, -(clientY / window.innerHeight) * 2 + 1);
+}
+
+// Windows/doors are checked first — otherwise the room's own translucent
+// wall box (which the tap ray also passes through) would win the hit test
+// even when the user is clearly tapping a window or door.
+function raycastPick(clientX, clientY) {
+  raycaster.setFromCamera(ndcFromClient(clientX, clientY), camera);
+  let hits = raycaster.intersectObjects(activeMeshes(clickableFeatures));
+  if (hits.length > 0) return hits[0];
+  hits = raycaster.intersectObjects(activeMeshes(clickableBoxes));
+  if (hits.length > 0) return hits[0];
+  return null;
 }
 
 function trySelect(clientX, clientY) {
-  raycaster.setFromCamera(ndcFromClient(clientX, clientY), camera);
-  const hits = raycaster.intersectObjects(getActiveMeshes());
-  if (hits.length > 0) {
-    openPanel(hits[0].object.userData.item);
-    return true;
-  }
+  const hit = raycastPick(clientX, clientY);
+  if (hit) { openPanel(hit.object.userData.item); return true; }
   return false;
 }
 
-// Desktop hover tooltip
 renderer.domElement.addEventListener('mousemove', (e) => {
-  raycaster.setFromCamera(ndcFromClient(e.clientX, e.clientY), camera);
-  const hits = raycaster.intersectObjects(getActiveMeshes());
+  const hit = raycastPick(e.clientX, e.clientY);
+  const hits = hit ? [hit] : [];
   if (hits.length > 0) {
     tooltip.style.display = 'block';
     tooltip.style.left = (e.clientX + 14) + 'px';
@@ -417,31 +685,19 @@ renderer.domElement.addEventListener('mousemove', (e) => {
   }
 });
 
-// Desktop click
-renderer.domElement.addEventListener('click', (e) => {
-  trySelect(e.clientX, e.clientY);
-});
+renderer.domElement.addEventListener('click', (e) => trySelect(e.clientX, e.clientY));
 
-// Mobile tap — distinguished from a drag/orbit gesture by movement distance
 let touchStart = null;
 renderer.domElement.addEventListener('touchstart', (e) => {
-  if (e.touches.length === 1) {
-    touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-  } else {
-    touchStart = null; // multi-touch = pinch zoom, not a tap
-  }
+  touchStart = (e.touches.length === 1) ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
 }, { passive: true });
 
 renderer.domElement.addEventListener('touchend', (e) => {
   if (!touchStart) return;
   const t = e.changedTouches[0];
-  const dx = t.clientX - touchStart.x;
-  const dy = t.clientY - touchStart.y;
-  const moved = Math.sqrt(dx*dx + dy*dy);
+  const moved = Math.hypot(t.clientX - touchStart.x, t.clientY - touchStart.y);
   touchStart = null;
-  if (moved < 12) { // it was a tap, not a drag-to-orbit
-    trySelect(t.clientX, t.clientY);
-  }
+  if (moved < 12) trySelect(t.clientX, t.clientY);
 }, { passive: true });
 
 // ---------- Popup panel ----------
@@ -451,40 +707,35 @@ const panelBody = document.getElementById('panel-body');
 const panelClose = document.getElementById('panel-close');
 
 function openPanel(item) {
+  labelRenderer.domElement.style.display = 'none';
   panelTitle.textContent = item.label;
   panelBody.innerHTML = '';
-
   const title = document.createElement('div');
   title.className = 'section-title';
   title.textContent = 'Dimensions & details';
   panelBody.appendChild(title);
-
   Object.entries(item.dims).forEach(([label, value]) => {
     const row = document.createElement('div');
     row.className = 'dim-row';
     row.innerHTML = `<span class="dim-label">${label}</span><span class="dim-value">${value}</span>`;
     panelBody.appendChild(row);
   });
-
   overlay.style.display = 'flex';
 }
-
 function closePanel() {
   overlay.style.display = 'none';
+  labelRenderer.domElement.style.display = '';
 }
 panelClose.addEventListener('click', closePanel);
-overlay.addEventListener('click', (e) => {
-  if (e.target === overlay) closePanel();
-});
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closePanel();
-});
+overlay.addEventListener('click', (e) => { if (e.target === overlay) closePanel(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePanel(); });
 
 // ---------- Render loop ----------
 function animate() {
   requestAnimationFrame(animate);
   controls.update();
   renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
 }
 animate();
 </script>
