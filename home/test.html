@@ -11,7 +11,7 @@
 
   #topbar {
     position:absolute; top:0; left:0; right:0;
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
     padding:14px 16px; box-sizing:border-box;
     pointer-events:none; z-index:2;
   }
@@ -28,9 +28,16 @@
   #floorToggle button.active { background:#4f7cff; color:#fff; }
   #floorToggle button:hover:not(.active) { background:#2f333b; color:#fff; }
 
+  #rightStack { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+
+  #stats {
+    color:#c9cdd4; font-size:12px; font-weight:700; background:#26292f; border:1px solid #383c44;
+    padding:7px 12px; border-radius:8px; white-space:nowrap;
+  }
+
   #hint {
     color:#7a808c; font-size:12px; background:#26292f; border:1px solid #383c44;
-    padding:8px 12px; border-radius:10px; max-width:40vw;
+    padding:8px 12px; border-radius:10px; max-width:40vw; text-align:right;
   }
   @media (max-width: 640px) { #hint { display:none; } }
 
@@ -98,7 +105,10 @@
 
 <div id="topbar">
   <div id="floorToggle"></div>
-  <div id="hint">Tap/click a room, window, door, or building for details · drag to orbit · pinch/scroll to zoom</div>
+  <div id="rightStack">
+    <div id="stats"></div>
+    <div id="hint">Tap/click a room, window, door, or building for details · drag to orbit · pinch/scroll to zoom</div>
+  </div>
 </div>
 
 <div id="tooltip"></div>
@@ -125,14 +135,14 @@
 
    ROOMS (per floor):
      x, z, width, depth  → footprint, bottom-left corner at (x,z)
-     color               → translucent wall-box tint
+     color               → wall tint
      floor.type          → 'hardwood' | 'carpet' | 'tile' | 'concrete' | 'vinyl'
                             (leave "floor" out entirely for a plain gray floor)
-     windows / doors     → OPTIONAL arrays. Each one is placed on a real wall,
-                            so it shows up in the right spot and can be tapped
-                            individually. This is also how you tell windows
-                            apart — name them by wall + landmark instead of
-                            "Window 1 / Window 2":
+     windows / doors     → OPTIONAL arrays. Each one is placed on a real wall
+                            (and doors actually cut a gap in the wall), so it
+                            shows up in the right spot and can be tapped
+                            individually. Name windows by wall + landmark
+                            instead of "Window 1 / Window 2":
         {
           wall: 'south' | 'north' | 'east' | 'west',
           offset: 4,     // feet from the wall's start corner to the window's edge
@@ -146,7 +156,9 @@
        south/north walls → offset measured along X, starting at the room's x
        east/west walls   → offset measured along Z, starting at the room's z
 
-     dims → the general room-level info shown when you click the room itself
+     dims → the general room-level info shown when you click the room itself.
+            (Floor area is now calculated automatically from width/depth and
+            shown at the top of the popup — no need to type it in manually.)
 */
 const HOUSE = {
   floors: [
@@ -166,11 +178,7 @@ const HOUSE = {
           doors: [
             { wall: "east", offset: 0, width: 3.5, height: 7, label: "Doorway to kitchen" }
           ],
-          dims: {
-            "Room size": "18' x 14'",
-            "Ceiling height": "9'",
-            "Flooring": "Carpet"
-          }
+          dims: { "Ceiling height": "9'", "Flooring": "Carpet" }
         },
         {
           id: "kitchen",
@@ -181,12 +189,7 @@ const HOUSE = {
           windows: [
             { wall: "north", offset: 4, width: 3, height: 4, sill: 3, label: "Window 1 — north wall, over the sink" }
           ],
-          dims: {
-            "Room size": "14' x 14'",
-            "Ceiling height": "9'",
-            "Island": "6' x 3'",
-            "Flooring": "Tile"
-          }
+          dims: { "Ceiling height": "9'", "Island": "6' x 3'", "Flooring": "Tile" }
         },
         {
           id: "entry",
@@ -197,10 +200,7 @@ const HOUSE = {
           doors: [
             { wall: "south", offset: 2, width: 3.5, height: 7, label: "Front door" }
           ],
-          dims: {
-            "Room size": "8' x 8'",
-            "Closet": "3' x 2'"
-          }
+          dims: { "Closet": "3' x 2'" }
         }
       ]
     },
@@ -222,7 +222,6 @@ const HOUSE = {
             { wall: "east", offset: 1, width: 3, height: 7, label: "Bedroom door" }
           ],
           dims: {
-            "Room size": "16' x 14'",
             "Ceiling height": "9'",
             "Closet 1 (walk-in)": "6' x 5'",
             "Closet 2": "4' x 2'",
@@ -238,11 +237,7 @@ const HOUSE = {
           windows: [
             { wall: "north", offset: 4, width: 3, height: 4, sill: 3, label: "Window 1 — north wall" }
           ],
-          dims: {
-            "Room size": "12' x 12'",
-            "Closet": "5' x 2'",
-            "Flooring": "Carpet"
-          }
+          dims: { "Closet": "5' x 2'", "Flooring": "Carpet" }
         },
         {
           id: "bath",
@@ -253,11 +248,7 @@ const HOUSE = {
           windows: [
             { wall: "east", offset: 2, width: 2, height: 2, sill: 4.5, label: "Window 1 — east wall, over the tub" }
           ],
-          dims: {
-            "Room size": "8' x 8'",
-            "Vanity": "5' x 2'",
-            "Flooring": "Tile"
-          }
+          dims: { "Vanity": "5' x 2'", "Flooring": "Tile" }
         }
       ]
     }
@@ -266,7 +257,15 @@ const HOUSE = {
   /* ---------------------------------------------------------------
      OUTSIDE / PROPERTY VIEW
      Same coordinate system as the floors above (feet, same origin).
-     structures  → buildings (boxes)
+     structures  → buildings (get real siding texture + a gable roof
+                   automatically). color = default siding tint for all 4
+                   sides. Optionally override individual sides with
+                   faceColors, e.g. if a gable end or accent wall is a
+                   different color:
+                     faceColors: { north: 0xffffff, south: 0x8a4a2f }
+                   (any side you don't list falls back to "color")
+                   Set roof:false to skip the roof, or roofHeight/roofColor
+                   to tweak it.
      surfaces    → flat ground features: driveway, walkway, patio, grass
                    type: 'driveway' | 'walkway' | 'patio' | 'grass'
   ----------------------------------------------------------------*/
@@ -278,19 +277,17 @@ const HOUSE = {
         label: "House (footprint)",
         x: 0, z: 0, width: 32, depth: 22, height: 20,
         color: 0x8a8f99,
-        dims: { "Footprint": "32' x 22'", "Stories": "2", "Approx. total height": "20'" }
+        roofHeight: 7, roofColor: 0x4a4f57,
+        dims: { "Stories": "2", "Approx. total height": "20'" }
       },
       {
         id: "barn",
         label: "Barn",
         x: 70, z: 40, width: 30, depth: 24, height: 18,
         color: 0x8a4a2f,
-        dims: {
-          "Footprint": "30' x 24'",
-          "Approx. height": "18' at peak",
-          "Bay doors": "2x (10' x 10')",
-          "Distance from house": "~85'"
-        }
+        faceColors: { north: 0xc9c2b4, south: 0xc9c2b4 },
+        roofHeight: 8, roofColor: 0x39342f,
+        dims: { "Approx. height": "18' at peak", "Bay doors": "2x (10' x 10')", "Distance from house": "~85'" }
       }
     ],
     surfaces: [
@@ -299,21 +296,21 @@ const HOUSE = {
         label: "Driveway",
         type: "driveway",
         x: -22, z: 4, width: 20, depth: 12,
-        dims: { "Length": "20'", "Width": "12'", "Surface": "Asphalt" }
+        dims: { "Surface": "Asphalt" }
       },
       {
         id: "walkway",
         label: "Front Walkway",
         type: "walkway",
         x: -2, z: 22, width: 4, depth: 8,
-        dims: { "Length": "8'", "Width": "4'", "Surface": "Concrete pavers" }
+        dims: { "Surface": "Concrete pavers" }
       },
       {
         id: "yard",
         label: "Yard",
         type: "grass",
         x: -10, z: -10, width: 110, depth: 90,
-        dims: { "Approx. area": "~9,900 sq ft" }
+        dims: {}
       }
     ]
   }
@@ -341,6 +338,8 @@ const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHei
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 wrap.appendChild(renderer.domElement);
 
 const labelRenderer = new THREE.CSS2DRenderer();
@@ -356,13 +355,32 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 controls.maxPolarAngle = Math.PI/2 - 0.02;
 
-scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-const sun = new THREE.DirectionalLight(0xffffff, 0.8);
-sun.position.set(25, 40, 15);
+scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+const sun = new THREE.DirectionalLight(0xffffff, 0.9);
+sun.position.set(60, 90, 40);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.left = -150;
+sun.shadow.camera.right = 150;
+sun.shadow.camera.top = 150;
+sun.shadow.camera.bottom = -150;
+sun.shadow.camera.near = 1;
+sun.shadow.camera.far = 400;
+sun.shadow.bias = -0.0015;
 scene.add(sun);
 
 const grid = new THREE.GridHelper(240, 60, 0x333844, 0x2a2d33);
+grid.position.y = 0.01;
 scene.add(grid);
+
+// Ground plane so buildings/rooms cast a real shadow onto something
+const groundGeo = new THREE.PlaneGeometry(600, 600);
+const groundMat = new THREE.MeshStandardMaterial({ color: 0x1e2025, roughness: 1 });
+const groundMesh = new THREE.Mesh(groundGeo, groundMat);
+groundMesh.rotation.x = -Math.PI / 2;
+groundMesh.position.y = -0.02;
+groundMesh.receiveShadow = true;
+scene.add(groundMesh);
 
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth/window.innerHeight;
@@ -408,9 +426,9 @@ const BASE_TEXTURES = {
   tile: makeCanvasTexture((ctx, s) => {
     ctx.fillStyle = '#d8d3c8'; ctx.fillRect(0, 0, s, s);
     ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 3;
-    const grid = 4;
-    for (let i = 0; i <= grid; i++) {
-      const p = i * s / grid;
+    const grid2 = 4;
+    for (let i = 0; i <= grid2; i++) {
+      const p = i * s / grid2;
       ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, s); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(s, p); ctx.stroke();
     }
@@ -437,9 +455,9 @@ const BASE_TEXTURES = {
   walkway: makeCanvasTexture((ctx, s) => {
     ctx.fillStyle = '#b7b2a6'; ctx.fillRect(0, 0, s, s);
     ctx.strokeStyle = 'rgba(0,0,0,0.12)';
-    const grid = 3;
-    for (let i = 0; i <= grid; i++) {
-      const p = i * s / grid;
+    const grid3 = 3;
+    for (let i = 0; i <= grid3; i++) {
+      const p = i * s / grid3;
       ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, s); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(s, p); ctx.stroke();
     }
@@ -447,9 +465,9 @@ const BASE_TEXTURES = {
   patio: makeCanvasTexture((ctx, s) => {
     ctx.fillStyle = '#a89f8f'; ctx.fillRect(0, 0, s, s);
     ctx.strokeStyle = 'rgba(0,0,0,0.15)';
-    const grid = 4;
-    for (let i = 0; i <= grid; i++) {
-      const p = i * s / grid;
+    const grid4 = 4;
+    for (let i = 0; i <= grid4; i++) {
+      const p = i * s / grid4;
       ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, s); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(s, p); ctx.stroke();
     }
@@ -459,6 +477,17 @@ const BASE_TEXTURES = {
     for (let i = 0; i < 4500; i++) {
       ctx.fillStyle = `rgba(${20 + Math.random() * 40},${60 + Math.random() * 50},${20 + Math.random() * 30},0.5)`;
       ctx.fillRect(Math.random() * s, Math.random() * s, 2, 3);
+    }
+  }),
+  siding: makeCanvasTexture((ctx, s) => {
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, s, s);
+    const rows = 10, rowH = s / rows;
+    for (let i = 0; i < rows; i++) {
+      const y = i * rowH;
+      ctx.fillStyle = i % 2 === 0 ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.05)';
+      ctx.fillRect(0, y, s, rowH);
+      ctx.fillStyle = 'rgba(0,0,0,0.22)';
+      ctx.fillRect(0, y + rowH - 2, s, 2);
     }
   })
 };
@@ -471,10 +500,19 @@ function getTiledTexture(type, width, depth, tileSize = 4) {
   return tex;
 }
 
+function getSidingMaterial(faceWidth, wallHeight, tintColor) {
+  const tex = BASE_TEXTURES.siding.clone();
+  tex.needsUpdate = true;
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(Math.max(1, faceWidth / 6), Math.max(1, wallHeight / 1.1));
+  return new THREE.MeshStandardMaterial({ map: tex, color: tintColor, roughness: 0.85, metalness: 0.02 });
+}
+
 // ---------- Shared state ----------
 const views = [];
-const clickable = []; // { mesh, item, group }
-const labels = [];    // { element, group }
+const clickableFeatures = []; // { mesh, item, group } — windows & doors (checked first)
+const clickableBoxes = [];    // { mesh, item, group } — rooms, buildings, ground surfaces
+const labels = [];            // { cssObj, group }
 
 function addLabel(text, x, y, z, group, small = false) {
   const div = document.createElement('div');
@@ -483,7 +521,7 @@ function addLabel(text, x, y, z, group, small = false) {
   const obj = new THREE.CSS2DObject(div);
   obj.position.set(x, y, z);
   group.add(obj);
-  labels.push({ element: div, group });
+  labels.push({ cssObj: obj, group });
 }
 
 // ---------- Wall-mounted windows & doors ----------
@@ -501,7 +539,7 @@ function addWallFeature(room, feature, kind, group) {
     default: return;
   }
 
-  const eps = 0.15;
+  const eps = 0.3;
   const geo = new THREE.PlaneGeometry(w, h);
   const color = kind === 'window' ? 0x9fd8ff : 0x6b4a30;
   const opacity = kind === 'window' ? 0.75 : 0.95;
@@ -518,19 +556,131 @@ function addWallFeature(room, feature, kind, group) {
   );
   const itemData = { label: feature.label || (kind === 'window' ? 'Window' : 'Door'), dims };
   mesh.userData.item = itemData;
-  clickable.push({ mesh, item: itemData, group });
+  clickableFeatures.push({ mesh, item: itemData, group });
 
   addLabel(kind === 'window' ? 'W' : 'D', px, centerY, pz, group, true);
 }
 
-// ---------- Rooms & buildings (boxes) ----------
-function buildBoxItem(item, height, group, opacity) {
+// ---------- Interior rooms: thin walls (with real door gaps) + textured floor ----------
+function buildWallsForRoom(room, wallHeight, group) {
+  const thickness = 0.35;
+  const wallDefs = [
+    { wall: 'south', axis: 'x', length: room.width, fixed: room.z },
+    { wall: 'north', axis: 'x', length: room.width, fixed: room.z + room.depth },
+    { wall: 'west',  axis: 'z', length: room.depth, fixed: room.x },
+    { wall: 'east',  axis: 'z', length: room.depth, fixed: room.x + room.width }
+  ];
+
+  wallDefs.forEach(def => {
+    const gaps = (room.doors || [])
+      .filter(d => d.wall === def.wall)
+      .map(d => ({ start: d.offset, end: d.offset + d.width }))
+      .sort((a, b) => a.start - b.start);
+
+    let segments = [];
+    let cursor = 0;
+    gaps.forEach(g => {
+      if (g.start > cursor) segments.push([cursor, g.start]);
+      cursor = Math.max(cursor, g.end);
+    });
+    if (cursor < def.length) segments.push([cursor, def.length]);
+
+    segments.forEach(([s, e]) => {
+      const segLen = e - s;
+      if (segLen < 0.05) return;
+      const w = def.axis === 'x' ? segLen : thickness;
+      const d = def.axis === 'x' ? thickness : segLen;
+      const geo = new THREE.BoxGeometry(w, wallHeight, d);
+      const mat = new THREE.MeshStandardMaterial({ color: room.color, roughness: 0.85, metalness: 0.05 });
+      const mesh = new THREE.Mesh(geo, mat);
+
+      let cx, cz;
+      if (def.axis === 'x') { cx = room.x + s + segLen/2; cz = def.fixed; }
+      else { cx = def.fixed; cz = room.z + s + segLen/2; }
+      mesh.position.set(cx, wallHeight/2, cz);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      mesh.userData.item = room;
+      group.add(mesh);
+      clickableBoxes.push({ mesh, item: room, group });
+
+      const edges = new THREE.LineSegments(
+        new THREE.EdgesGeometry(geo),
+        new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.2 })
+      );
+      edges.position.copy(mesh.position);
+      group.add(edges);
+    });
+  });
+}
+
+function buildRoom(room, wallHeight, group) {
+  const slabGeo = new THREE.BoxGeometry(room.width, 0.2, room.depth);
+  let slabMat;
+  if (room.floor && room.floor.type) {
+    const tex = getTiledTexture(room.floor.type, room.width, room.depth, room.floor.tileSize || 4);
+    slabMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9 });
+  } else {
+    slabMat = new THREE.MeshStandardMaterial({ color: 0x2a2d33 });
+  }
+  const slab = new THREE.Mesh(slabGeo, slabMat);
+  slab.position.set(room.x + room.width/2, 0, room.z + room.depth/2);
+  slab.receiveShadow = true;
+  slab.userData.item = room;
+  group.add(slab);
+  clickableBoxes.push({ mesh: slab, item: room, group });
+
+  buildWallsForRoom(room, wallHeight, group);
+  addLabel(room.label, room.x + room.width/2, wallHeight + 1.5, room.z + room.depth/2, group);
+
+  (room.windows || []).forEach(w => addWallFeature(room, w, 'window', group));
+  (room.doors || []).forEach(d => addWallFeature(room, d, 'door', group));
+}
+
+// ---------- Exterior buildings: solid box + automatic gable roof ----------
+function buildGableRoofGeometry(width, depth, ridgeHeight) {
+  let geo;
+  if (width >= depth) {
+    const half = depth / 2;
+    const shape = new THREE.Shape();
+    shape.moveTo(-half, 0); shape.lineTo(0, ridgeHeight); shape.lineTo(half, 0); shape.lineTo(-half, 0);
+    geo = new THREE.ExtrudeGeometry(shape, { depth: width, bevelEnabled: false, steps: 1 });
+    geo.rotateY(Math.PI / 2);
+    geo.translate(-width / 2, 0, 0);
+  } else {
+    const half = width / 2;
+    const shape = new THREE.Shape();
+    shape.moveTo(-half, 0); shape.lineTo(0, ridgeHeight); shape.lineTo(half, 0); shape.lineTo(-half, 0);
+    geo = new THREE.ExtrudeGeometry(shape, { depth: depth, bevelEnabled: false, steps: 1 });
+    geo.translate(0, 0, -depth / 2);
+  }
+  return geo;
+}
+
+function faceColor(item, face) {
+  return (item.faceColors && item.faceColors[face] !== undefined) ? item.faceColors[face] : item.color;
+}
+
+function buildStructure(item, group) {
+  const height = item.height;
   const geo = new THREE.BoxGeometry(item.width, height, item.depth);
-  const mat = new THREE.MeshStandardMaterial({ color: item.color, transparent: true, opacity, metalness: 0.1, roughness: 0.7 });
-  const mesh = new THREE.Mesh(geo, mat);
+
+  // Box face order for a material array: +x, -x, +y, -y, +z, -z
+  // In our coordinate system: +x = east, -x = west, +z = north, -z = south
+  const matEast  = getSidingMaterial(item.depth,  height, faceColor(item, 'east'));
+  const matWest  = getSidingMaterial(item.depth,  height, faceColor(item, 'west'));
+  const matNorth = getSidingMaterial(item.width,  height, faceColor(item, 'north'));
+  const matSouth = getSidingMaterial(item.width,  height, faceColor(item, 'south'));
+  const capMat   = new THREE.MeshStandardMaterial({ color: 0x33363c, roughness: 0.9 });   // top, hidden under roof
+  const baseMat  = new THREE.MeshStandardMaterial({ color: 0x2a2d33, roughness: 1 });      // foundation, mostly hidden
+
+  const mesh = new THREE.Mesh(geo, [matEast, matWest, capMat, baseMat, matNorth, matSouth]);
   mesh.position.set(item.x + item.width/2, height/2, item.z + item.depth/2);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
   mesh.userData.item = item;
   group.add(mesh);
+  clickableBoxes.push({ mesh, item, group });
 
   const edges = new THREE.LineSegments(
     new THREE.EdgesGeometry(geo),
@@ -539,23 +689,19 @@ function buildBoxItem(item, height, group, opacity) {
   edges.position.copy(mesh.position);
   group.add(edges);
 
-  const slabGeo = new THREE.BoxGeometry(item.width, 0.2, item.depth);
-  let slabMat;
-  if (item.floor && item.floor.type) {
-    const tex = getTiledTexture(item.floor.type, item.width, item.depth, item.floor.tileSize || 4);
-    slabMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9 });
-  } else {
-    slabMat = new THREE.MeshStandardMaterial({ color: 0x2a2d33 });
+  let ridgeHeight = 0;
+  if (item.roof !== false) {
+    ridgeHeight = item.roofHeight || Math.max(4, Math.min(10, Math.max(item.width, item.depth) * 0.25));
+    const roofGeo = buildGableRoofGeometry(item.width, item.depth, ridgeHeight);
+    const roofMat = new THREE.MeshStandardMaterial({ color: item.roofColor || 0x54463f, roughness: 0.75 });
+    const roofMesh = new THREE.Mesh(roofGeo, roofMat);
+    roofMesh.position.set(item.x + item.width/2, height, item.z + item.depth/2);
+    roofMesh.castShadow = true;
+    roofMesh.receiveShadow = true;
+    group.add(roofMesh);
   }
-  const slab = new THREE.Mesh(slabGeo, slabMat);
-  slab.position.set(item.x + item.width/2, 0, item.z + item.depth/2);
-  group.add(slab);
 
-  clickable.push({ mesh, item, group });
-  addLabel(item.label, item.x + item.width/2, height + 1.5, item.z + item.depth/2, group);
-
-  (item.windows || []).forEach(win => addWallFeature(item, win, 'window', group));
-  (item.doors || []).forEach(door => addWallFeature(item, door, 'door', group));
+  addLabel(item.label, item.x + item.width/2, height + ridgeHeight + 1.5, item.z + item.depth/2, group);
 }
 
 // ---------- Flat ground surfaces (driveway, walkway, patio, grass) ----------
@@ -566,17 +712,23 @@ function buildSurface(surface, group) {
   const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 1 });
   const mesh = new THREE.Mesh(geo, mat);
   mesh.position.set(surface.x + surface.width/2, height/2, surface.z + surface.depth/2);
+  mesh.receiveShadow = true;
   mesh.userData.item = surface;
   group.add(mesh);
-  clickable.push({ mesh, item: surface, group });
+  clickableBoxes.push({ mesh, item: surface, group });
   addLabel(surface.label, surface.x + surface.width/2, height + 1, surface.z + surface.depth/2, group, true);
 }
 
+// ---------- Square footage math ----------
+const floorAreas = HOUSE.floors.map(f => f.rooms.reduce((sum, r) => sum + r.width * r.depth, 0));
+const totalHouseArea = floorAreas.reduce((a, b) => a + b, 0);
+const structuresArea = HOUSE.exterior.structures.reduce((sum, s) => sum + s.width * s.depth, 0);
+
 // Floors
-HOUSE.floors.forEach((floorData) => {
+HOUSE.floors.forEach((floorData, idx) => {
   const group = new THREE.Group();
   group.visible = false;
-  floorData.rooms.forEach(room => buildBoxItem(room, floorData.wallHeight, group, 0.55));
+  floorData.rooms.forEach(room => buildRoom(room, floorData.wallHeight, group));
   scene.add(group);
 
   let maxX = 0, maxZ = 0;
@@ -586,7 +738,8 @@ HOUSE.floors.forEach((floorData) => {
     label: floorData.name,
     group,
     camPos: new THREE.Vector3(maxX*0.9 + 10, Math.max(maxX,maxZ)*0.9 + 10, maxZ*0.9 + 20),
-    camTarget: new THREE.Vector3(maxX/2, 0, maxZ/2)
+    camTarget: new THREE.Vector3(maxX/2, 0, maxZ/2),
+    statsText: `${Math.round(floorAreas[idx])} sq ft this floor · ${Math.round(totalHouseArea)} sq ft total`
   });
 });
 
@@ -597,7 +750,7 @@ HOUSE.floors.forEach((floorData) => {
   const ext = HOUSE.exterior;
 
   (ext.surfaces || []).forEach(s => buildSurface(s, group));
-  ext.structures.forEach(s => buildBoxItem(s, s.height, group, 0.7));
+  ext.structures.forEach(s => buildStructure(s, group));
   scene.add(group);
 
   let minX = 0, minZ = 0, maxX = 0, maxZ = 0;
@@ -613,12 +766,14 @@ HOUSE.floors.forEach((floorData) => {
     label: ext.name,
     group,
     camPos: new THREE.Vector3(minX + spanX*0.7 + span*0.5, span*0.9, minZ + spanZ*0.4 + span*0.9),
-    camTarget: new THREE.Vector3(minX + spanX/2, 0, minZ + spanZ/2)
+    camTarget: new THREE.Vector3(minX + spanX/2, 0, minZ + spanZ/2),
+    statsText: `${Math.round(structuresArea)} sq ft under roof`
   });
 }
 
 // ---------- View toggle buttons ----------
 const toggleBar = document.getElementById('floorToggle');
+const statsEl = document.getElementById('stats');
 views.forEach((v, i) => {
   const b = document.createElement('button');
   b.textContent = v.label;
@@ -627,15 +782,25 @@ views.forEach((v, i) => {
   toggleBar.appendChild(b);
 });
 
+// Smooth camera transition between views
+let camTransition = null;
+function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2; }
+
 function setView(index) {
   views.forEach((v, i) => v.group.visible = (i === index));
   Array.from(toggleBar.children).forEach((btn, i) => btn.classList.toggle('active', i === index));
-  labels.forEach(l => { l.element.style.display = l.group.visible ? '' : 'none'; });
+  labels.forEach(l => { l.cssObj.visible = l.group.visible; });
+  statsEl.textContent = views[index].statsText;
 
   const v = views[index];
-  camera.position.copy(v.camPos);
-  controls.target.copy(v.camTarget);
-  controls.update();
+  camTransition = {
+    fromPos: camera.position.clone(),
+    fromTarget: controls.target.clone(),
+    toPos: v.camPos.clone(),
+    toTarget: v.camTarget.clone(),
+    start: performance.now(),
+    duration: 900
+  };
 }
 setView(0);
 
@@ -643,29 +808,39 @@ setView(0);
 const raycaster = new THREE.Raycaster();
 const tooltip = document.getElementById('tooltip');
 
-function getActiveMeshes() {
-  return clickable.filter(c => c.group.visible).map(c => c.mesh);
+function activeMeshes(list) {
+  return list.filter(c => c.group.visible).map(c => c.mesh);
 }
 
 function ndcFromClient(clientX, clientY) {
   return new THREE.Vector2((clientX / window.innerWidth) * 2 - 1, -(clientY / window.innerHeight) * 2 + 1);
 }
 
-function trySelect(clientX, clientY) {
+// Windows/doors are checked first — otherwise the room's own wall
+// (which the tap ray also passes through) would win the hit test
+// even when the user is clearly tapping a window or door.
+function raycastPick(clientX, clientY) {
   raycaster.setFromCamera(ndcFromClient(clientX, clientY), camera);
-  const hits = raycaster.intersectObjects(getActiveMeshes());
-  if (hits.length > 0) { openPanel(hits[0].object.userData.item); return true; }
+  let hits = raycaster.intersectObjects(activeMeshes(clickableFeatures));
+  if (hits.length > 0) return hits[0];
+  hits = raycaster.intersectObjects(activeMeshes(clickableBoxes));
+  if (hits.length > 0) return hits[0];
+  return null;
+}
+
+function trySelect(clientX, clientY) {
+  const hit = raycastPick(clientX, clientY);
+  if (hit) { openPanel(hit.object.userData.item); return true; }
   return false;
 }
 
 renderer.domElement.addEventListener('mousemove', (e) => {
-  raycaster.setFromCamera(ndcFromClient(e.clientX, e.clientY), camera);
-  const hits = raycaster.intersectObjects(getActiveMeshes());
-  if (hits.length > 0) {
+  const hit = raycastPick(e.clientX, e.clientY);
+  if (hit) {
     tooltip.style.display = 'block';
     tooltip.style.left = (e.clientX + 14) + 'px';
     tooltip.style.top = (e.clientY + 14) + 'px';
-    tooltip.textContent = hits[0].object.userData.item.label;
+    tooltip.textContent = hit.object.userData.item.label;
     renderer.domElement.style.cursor = 'pointer';
   } else {
     tooltip.style.display = 'none';
@@ -694,14 +869,23 @@ const panelTitle = document.getElementById('panel-title');
 const panelBody = document.getElementById('panel-body');
 const panelClose = document.getElementById('panel-close');
 
+function dimsForDisplay(item) {
+  if (item.width && item.depth) {
+    const area = Math.round(item.width * item.depth);
+    return Object.assign({ "Area": `${area} sq ft` }, item.dims);
+  }
+  return item.dims;
+}
+
 function openPanel(item) {
+  labelRenderer.domElement.style.display = 'none';
   panelTitle.textContent = item.label;
   panelBody.innerHTML = '';
   const title = document.createElement('div');
   title.className = 'section-title';
   title.textContent = 'Dimensions & details';
   panelBody.appendChild(title);
-  Object.entries(item.dims).forEach(([label, value]) => {
+  Object.entries(dimsForDisplay(item)).forEach(([label, value]) => {
     const row = document.createElement('div');
     row.className = 'dim-row';
     row.innerHTML = `<span class="dim-label">${label}</span><span class="dim-value">${value}</span>`;
@@ -709,7 +893,10 @@ function openPanel(item) {
   });
   overlay.style.display = 'flex';
 }
-function closePanel() { overlay.style.display = 'none'; }
+function closePanel() {
+  overlay.style.display = 'none';
+  labelRenderer.domElement.style.display = '';
+}
 panelClose.addEventListener('click', closePanel);
 overlay.addEventListener('click', (e) => { if (e.target === overlay) closePanel(); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePanel(); });
@@ -717,6 +904,16 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePanel
 // ---------- Render loop ----------
 function animate() {
   requestAnimationFrame(animate);
+
+  if (camTransition) {
+    const now = performance.now();
+    const t = Math.min(1, (now - camTransition.start) / camTransition.duration);
+    const e = easeInOutCubic(t);
+    camera.position.lerpVectors(camTransition.fromPos, camTransition.toPos, e);
+    controls.target.lerpVectors(camTransition.fromTarget, camTransition.toTarget, e);
+    if (t >= 1) camTransition = null;
+  }
+
   controls.update();
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
