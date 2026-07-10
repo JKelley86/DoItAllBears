@@ -59,7 +59,7 @@
   }
 
   main {
-    max-width: 1100px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 2.5rem 1.5rem 4rem;
   }
@@ -164,8 +164,6 @@
 
   /* ---------- READER VIEW ---------- */
 
-  .reader-view { }
-
   .back-btn {
     background: none;
     border: none;
@@ -179,34 +177,101 @@
 
   .back-btn:hover { text-decoration: underline; }
 
-  .reader-stand {
+  .reader-header {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+  }
+
+  .reader-header img {
+    width: 70px;
+    border-radius: 4px;
+    box-shadow: 0 10px 18px rgba(0,0,0,0.5);
+    border: 1px solid rgba(0,0,0,0.4);
+  }
+
+  .reader-header h2 {
+    margin: 0 0 0.15rem;
+    font-size: 1.5rem;
+  }
+
+  .reader-header p {
+    margin: 0;
+    color: var(--parchment-dim);
+    font-size: 0.85rem;
+  }
+
+  .mode-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+
+  .mode-tabs button {
+    font-family: 'Libre Franklin', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(201,162,75,0.4);
+    background: transparent;
+    color: var(--parchment-dim);
+    cursor: pointer;
+  }
+
+  .mode-tabs button.active {
+    background: var(--gold);
+    color: #241a13;
+    border-color: var(--gold);
+  }
+
+  .reader-layout {
     display: grid;
-    grid-template-columns: 260px 1fr;
-    gap: 2.5rem;
+    grid-template-columns: 220px 1fr;
+    gap: 2rem;
     align-items: start;
   }
 
-  @media (max-width: 640px) {
-    .reader-stand {
+  @media (max-width: 720px) {
+    .reader-layout {
       grid-template-columns: 1fr;
-      justify-items: center;
-      text-align: center;
     }
   }
 
-  .cover-frame {
-    perspective: 800px;
+  /* Chapter list, shared between modes */
+  .chapter-list {
+    background: rgba(236,227,209,0.06);
+    border: 1px solid rgba(201,162,75,0.2);
+    border-radius: 10px;
+    max-height: 520px;
+    overflow-y: auto;
   }
 
-  .cover-frame img {
-    width: 100%;
-    max-width: 260px;
-    border-radius: 4px;
-    box-shadow: 0 25px 45px rgba(0,0,0,0.6);
-    transform: rotateY(-6deg);
-    border: 1px solid rgba(0,0,0,0.4);
+  .chapter-list button {
     display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-bottom: 1px solid rgba(201,162,75,0.1);
+    color: var(--parchment-dim);
+    font-family: 'Libre Franklin', sans-serif;
+    font-size: 0.85rem;
+    padding: 0.7rem 0.9rem;
+    cursor: pointer;
   }
+
+  .chapter-list button:last-child { border-bottom: none; }
+
+  .chapter-list button.active {
+    background: rgba(201,162,75,0.15);
+    color: var(--gold-bright);
+    font-weight: 600;
+  }
+
+  /* ---------- LISTEN PANEL ---------- */
 
   .control-panel {
     background: var(--parchment);
@@ -222,21 +287,9 @@
     font-size: 0.72rem;
     color: var(--cloth-red);
     font-weight: 600;
-    margin: 0 0 0.4rem;
+    margin: 0 0 0.6rem;
   }
 
-  #reader-title {
-    margin: 0 0 0.2rem;
-    font-size: 1.6rem;
-  }
-
-  #reader-author {
-    margin: 0 0 1.6rem;
-    color: #6b5c46;
-    font-size: 0.9rem;
-  }
-
-  /* Ribbon progress bar — signature element */
   .ribbon-track {
     position: relative;
     height: 10px;
@@ -294,8 +347,8 @@
     font-weight: 600;
   }
 
-  #btn-back15, #btn-fwd15 {
-    font-size: 0.85rem;
+  #btn-back15, #btn-fwd15, #btn-prev-chapter, #btn-next-chapter {
+    font-size: 0.8rem;
     color: #6b5c46;
   }
 
@@ -308,6 +361,7 @@
     font-size: 0;
     position: relative;
     box-shadow: 0 8px 16px rgba(127,53,39,0.4);
+    flex-shrink: 0;
   }
 
   #btn-playpause::before {
@@ -349,6 +403,43 @@
     color: #241a13;
   }
 
+  .load-note {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #8a7a5e;
+    margin-top: 1rem;
+  }
+
+  /* ---------- READ PANEL ---------- */
+
+  .read-panel {
+    background: var(--parchment);
+    color: #241a13;
+    border-radius: 10px;
+    padding: 2.25rem 2.5rem;
+    max-height: 640px;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    font-family: 'Fraunces', serif;
+    font-size: 1.05rem;
+    line-height: 1.75;
+  }
+
+  .read-panel p {
+    margin: 0 0 1.1rem;
+  }
+
+  .read-chapter-heading {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin: 2rem 0 1rem;
+    color: var(--cloth-red);
+    scroll-margin-top: 1rem;
+  }
+
+  .read-chapter-heading:first-child { margin-top: 0; }
+
   [hidden] { display: none !important; }
 </style>
 </head>
@@ -363,49 +454,66 @@
   <section id="shelf-view">
     <div class="shelf" id="shelf"></div>
     <p class="empty-state" id="empty-state" hidden>
-      No books on the shelf yet. Add a folder under <code>audiobooks/</code> with a
-      <code>book.mp3</code> and a cover image, then list it in <code>books.json</code>.
+      No books on the shelf yet. Add a folder under <code>audiobooks/</code> with
+      chapter audio and a cover image, then list it in <code>books.json</code>.
     </p>
   </section>
 
   <section class="reader-view" id="reader-view" hidden>
     <button class="back-btn" id="back-btn">&larr; Back to shelf</button>
-    <div class="reader-stand">
-      <div class="cover-frame">
-        <img id="reader-cover" alt="">
-      </div>
-      <div class="control-panel">
-        <p class="eyebrow">Now reading</p>
+
+    <div class="reader-header">
+      <img id="reader-cover" alt="">
+      <div>
         <h2 id="reader-title"></h2>
         <p id="reader-author"></p>
-
-        <div class="ribbon-track" id="ribbon-track">
-          <div class="ribbon-fill" id="ribbon-fill"></div>
-          <div class="ribbon-handle" id="ribbon-handle"></div>
-        </div>
-        <div class="time-row">
-          <span id="time-current">0:00</span>
-          <span id="time-duration">0:00</span>
-        </div>
-
-        <div class="transport">
-          <button id="btn-back15" aria-label="Back 15 seconds">-15s</button>
-          <button id="btn-playpause" aria-label="Play"></button>
-          <button id="btn-fwd15" aria-label="Forward 15 seconds">+15s</button>
-        </div>
-
-        <div class="speed-row">
-          <label for="speed-select">Speed</label>
-          <select id="speed-select">
-            <option value="0.75">0.75x</option>
-            <option value="1" selected>1x</option>
-            <option value="1.25">1.25x</option>
-            <option value="1.5">1.5x</option>
-            <option value="1.75">1.75x</option>
-            <option value="2">2x</option>
-          </select>
-        </div>
       </div>
+      <div class="mode-tabs">
+        <button id="tab-listen" class="active">Listen</button>
+        <button id="tab-read">Read</button>
+      </div>
+    </div>
+
+    <div class="reader-layout">
+      <div class="chapter-list" id="chapter-list"></div>
+
+      <div id="listen-panel">
+        <div class="control-panel">
+          <p class="eyebrow" id="now-playing-label">Now reading</p>
+
+          <div class="ribbon-track" id="ribbon-track">
+            <div class="ribbon-fill" id="ribbon-fill"></div>
+            <div class="ribbon-handle" id="ribbon-handle"></div>
+          </div>
+          <div class="time-row">
+            <span id="time-current">0:00</span>
+            <span id="time-duration">0:00</span>
+          </div>
+
+          <div class="transport">
+            <button id="btn-prev-chapter" aria-label="Previous chapter">&#10094;&#10094;</button>
+            <button id="btn-back15" aria-label="Back 15 seconds">-15s</button>
+            <button id="btn-playpause" aria-label="Play"></button>
+            <button id="btn-fwd15" aria-label="Forward 15 seconds">+15s</button>
+            <button id="btn-next-chapter" aria-label="Next chapter">&#10095;&#10095;</button>
+          </div>
+
+          <div class="speed-row">
+            <label for="speed-select">Speed</label>
+            <select id="speed-select">
+              <option value="0.75">0.75x</option>
+              <option value="1" selected>1x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+              <option value="1.75">1.75x</option>
+              <option value="2">2x</option>
+            </select>
+          </div>
+        </div>
+        <p class="load-note" id="load-note" hidden></p>
+      </div>
+
+      <div id="read-panel" class="read-panel" hidden></div>
     </div>
   </section>
 </main>
@@ -419,11 +527,19 @@
   const emptyState = document.getElementById('empty-state');
   const backBtn = document.getElementById('back-btn');
 
-  const audio = document.getElementById('audio-el');
   const readerCover = document.getElementById('reader-cover');
   const readerTitle = document.getElementById('reader-title');
   const readerAuthor = document.getElementById('reader-author');
 
+  const tabListen = document.getElementById('tab-listen');
+  const tabRead = document.getElementById('tab-read');
+  const listenPanel = document.getElementById('listen-panel');
+  const readPanel = document.getElementById('read-panel');
+  const chapterListEl = document.getElementById('chapter-list');
+  const nowPlayingLabel = document.getElementById('now-playing-label');
+  const loadNote = document.getElementById('load-note');
+
+  const audio = document.getElementById('audio-el');
   const ribbonTrack = document.getElementById('ribbon-track');
   const ribbonFill = document.getElementById('ribbon-fill');
   const ribbonHandle = document.getElementById('ribbon-handle');
@@ -433,9 +549,15 @@
   const playPauseBtn = document.getElementById('btn-playpause');
   const back15Btn = document.getElementById('btn-back15');
   const fwd15Btn = document.getElementById('btn-fwd15');
+  const prevChapterBtn = document.getElementById('btn-prev-chapter');
+  const nextChapterBtn = document.getElementById('btn-next-chapter');
   const speedSelect = document.getElementById('speed-select');
 
   let currentBook = null;
+  let chapters = [];        // [{title, file, duration, char_start}]
+  let currentChapterIndex = 0;
+  let bookText = '';
+  let suppressAutoplayOnLoad = false;
 
   function formatTime(seconds) {
     if (!isFinite(seconds) || isNaN(seconds)) return '0:00';
@@ -444,9 +566,29 @@
     return `${m}:${s}`;
   }
 
-  function progressKey(folder) {
-    return `audiobook-progress:${folder}`;
+  function positionKey(folder) {
+    return `audiobook-position:${folder}`;
   }
+
+  function savePosition() {
+    if (!currentBook) return;
+    localStorage.setItem(positionKey(currentBook.folder), JSON.stringify({
+      chapterIndex: currentChapterIndex,
+      time: audio.currentTime || 0
+    }));
+  }
+
+  function loadSavedPosition(folder) {
+    try {
+      const raw = localStorage.getItem(positionKey(folder));
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // ---------------- Shelf ----------------
 
   async function loadLibrary() {
     let books = [];
@@ -472,9 +614,7 @@
       img.className = 'book-cover';
       img.alt = `${book.title} cover`;
       img.src = `${book.folder}/${book.cover || 'coverphoto.jpg'}`;
-      img.onerror = () => {
-        img.replaceWith(makePlaceholderCover(book.title));
-      };
+      img.onerror = () => { img.replaceWith(makePlaceholderCover(book.title)); };
 
       const meta = document.createElement('div');
       meta.className = 'book-meta';
@@ -494,69 +634,146 @@
     return div;
   }
 
-  function openBook(book) {
+  // ---------------- Opening a book ----------------
+
+  async function openBook(book) {
     currentBook = book;
     shelfView.hidden = true;
     readerView.hidden = false;
 
     readerTitle.textContent = book.title;
     readerAuthor.textContent = book.author || '';
-
     const coverSrc = `${book.folder}/${book.cover || 'coverphoto.jpg'}`;
     readerCover.src = coverSrc;
-    readerCover.onerror = () => { readerCover.style.display = 'none'; };
+    readerCover.onerror = () => { readerCover.style.visibility = 'hidden'; };
 
-    audio.src = `${book.folder}/${book.audio || 'book.mp3'}`;
-    audio.playbackRate = 1;
-    speedSelect.value = '1';
+    chapters = [];
+    bookText = '';
+    currentChapterIndex = 0;
+    loadNote.hidden = true;
 
-    const saved = parseFloat(localStorage.getItem(progressKey(book.folder)) || '0');
-    audio.addEventListener('loadedmetadata', function onMeta() {
-      if (saved > 0 && saved < audio.duration) {
-        audio.currentTime = saved;
+    // Chapter manifest (new format). Falls back to a single legacy file
+    // if chapters.json isn't there yet (older books not yet regenerated).
+    try {
+      const res = await fetch(`${book.folder}/chapters.json`, { cache: 'no-store' });
+      if (res.ok) {
+        chapters = await res.json();
       }
-      timeDuration.textContent = formatTime(audio.duration);
-      audio.removeEventListener('loadedmetadata', onMeta);
-    });
+    } catch (e) { /* ignore */ }
 
-    setupMediaSession(book, coverSrc);
-    playPauseBtn.classList.remove('is-playing');
+    if (!chapters.length && book.audio) {
+      chapters = [{ title: book.title, file: book.audio, duration: null, char_start: 0 }];
+    }
+
+    if (!chapters.length) {
+      loadNote.hidden = false;
+      loadNote.textContent = "This book doesn't have any audio yet.";
+    }
+
+    // Book text, for Read mode
+    try {
+      const res = await fetch(`${book.folder}/book.txt`, { cache: 'no-store' });
+      if (res.ok) bookText = await res.text();
+    } catch (e) { /* ignore */ }
+
+    tabRead.hidden = !bookText;
+
+    const saved = loadSavedPosition(book.folder);
+    const startChapter = saved && saved.chapterIndex < chapters.length ? saved.chapterIndex : 0;
+    const startTime = saved ? saved.time : 0;
+
+    renderChapterList();
+    setActiveTab('listen');
+    loadChapter(startChapter, { seekTo: startTime, autoplay: false });
+    renderReadPanel();
   }
 
   backBtn.addEventListener('click', () => {
     audio.pause();
+    savePosition();
     readerView.hidden = true;
     shelfView.hidden = false;
   });
 
-  playPauseBtn.addEventListener('click', () => {
-    if (audio.paused) {
-      audio.play();
-    } else {
-      audio.pause();
+  // ---------------- Chapter list (shared by both modes) ----------------
+
+  function renderChapterList() {
+    chapterListEl.innerHTML = '';
+    if (chapters.length <= 1) {
+      chapterListEl.hidden = true;
+      return;
+    }
+    chapterListEl.hidden = false;
+    chapters.forEach((ch, i) => {
+      const btn = document.createElement('button');
+      btn.textContent = ch.title;
+      btn.className = i === currentChapterIndex ? 'active' : '';
+      btn.addEventListener('click', () => {
+        if (readPanel.hidden) {
+          loadChapter(i, { seekTo: 0, autoplay: !audio.paused });
+        } else {
+          scrollReadPanelToChapter(i);
+        }
+      });
+      chapterListEl.appendChild(btn);
+    });
+  }
+
+  function highlightActiveChapterButton() {
+    [...chapterListEl.children].forEach((btn, i) => {
+      btn.classList.toggle('active', i === currentChapterIndex);
+    });
+  }
+
+  // ---------------- Listen mode ----------------
+
+  function loadChapter(index, { seekTo = 0, autoplay = false } = {}) {
+    if (index < 0 || index >= chapters.length) return;
+    currentChapterIndex = index;
+    const chapter = chapters[index];
+
+    nowPlayingLabel.textContent = chapters.length > 1 ? chapter.title : 'Now reading';
+    audio.src = `${currentBook.folder}/${chapter.file}`;
+    suppressAutoplayOnLoad = !autoplay;
+
+    audio.addEventListener('loadedmetadata', function onMeta() {
+      if (seekTo > 0 && seekTo < audio.duration) {
+        audio.currentTime = seekTo;
+      }
+      timeDuration.textContent = formatTime(audio.duration);
+      if (autoplay) audio.play();
+      audio.removeEventListener('loadedmetadata', onMeta);
+    });
+
+    highlightActiveChapterButton();
+    setupMediaSession();
+  }
+
+  audio.addEventListener('ended', () => {
+    if (currentChapterIndex + 1 < chapters.length) {
+      loadChapter(currentChapterIndex + 1, { seekTo: 0, autoplay: true });
     }
   });
 
-  audio.addEventListener('play', () => playPauseBtn.classList.add('is-playing'));
-  audio.addEventListener('pause', () => playPauseBtn.classList.remove('is-playing'));
-
-  back15Btn.addEventListener('click', () => {
-    audio.currentTime = Math.max(0, audio.currentTime - 15);
+  playPauseBtn.addEventListener('click', () => {
+    if (audio.paused) audio.play(); else audio.pause();
   });
 
-  fwd15Btn.addEventListener('click', () => {
-    audio.currentTime = Math.min(audio.duration || Infinity, audio.currentTime + 15);
+  audio.addEventListener('play', () => playPauseBtn.classList.add('is-playing'));
+  audio.addEventListener('pause', () => { playPauseBtn.classList.remove('is-playing'); savePosition(); });
+
+  back15Btn.addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 15); });
+  fwd15Btn.addEventListener('click', () => { audio.currentTime = Math.min(audio.duration || Infinity, audio.currentTime + 15); });
+
+  prevChapterBtn.addEventListener('click', () => {
+    if (currentChapterIndex > 0) loadChapter(currentChapterIndex - 1, { seekTo: 0, autoplay: !audio.paused });
+  });
+  nextChapterBtn.addEventListener('click', () => {
+    if (currentChapterIndex + 1 < chapters.length) loadChapter(currentChapterIndex + 1, { seekTo: 0, autoplay: !audio.paused });
   });
 
   speedSelect.addEventListener('change', () => {
     audio.playbackRate = parseFloat(speedSelect.value);
-    if ('mediaSession' in navigator && audio.duration) {
-      navigator.mediaSession.setPositionState({
-        duration: audio.duration,
-        playbackRate: audio.playbackRate,
-        position: audio.currentTime
-      });
-    }
   });
 
   audio.addEventListener('timeupdate', () => {
@@ -566,10 +783,7 @@
     ribbonHandle.style.left = `${pct}%`;
     timeCurrent.textContent = formatTime(audio.currentTime);
     timeDuration.textContent = formatTime(audio.duration);
-
-    if (currentBook) {
-      localStorage.setItem(progressKey(currentBook.folder), audio.currentTime.toString());
-    }
+    savePosition();
 
     if ('mediaSession' in navigator) {
       navigator.mediaSession.setPositionState({
@@ -584,42 +798,99 @@
     const rect = ribbonTrack.getBoundingClientRect();
     const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
     const pct = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
-    if (isFinite(audio.duration)) {
-      audio.currentTime = pct * audio.duration;
-    }
+    if (isFinite(audio.duration)) audio.currentTime = pct * audio.duration;
   }
 
   ribbonTrack.addEventListener('click', seekFromEvent);
-
   let isDragging = false;
   ribbonTrack.addEventListener('mousedown', () => { isDragging = true; });
   window.addEventListener('mousemove', (e) => { if (isDragging) seekFromEvent(e); });
   window.addEventListener('mouseup', () => { isDragging = false; });
 
-  function setupMediaSession(book, coverSrc) {
-    if (!('mediaSession' in navigator)) return;
-
+  function setupMediaSession() {
+    if (!('mediaSession' in navigator) || !currentBook) return;
+    const coverSrc = `${currentBook.folder}/${currentBook.cover || 'coverphoto.jpg'}`;
     navigator.mediaSession.metadata = new MediaMetadata({
-      title: book.title,
-      artist: book.author || '',
+      title: chapters.length > 1 ? `${currentBook.title} — ${chapters[currentChapterIndex].title}` : currentBook.title,
+      artist: currentBook.author || '',
       album: 'The Shelf',
-      artwork: [
-        { src: coverSrc, sizes: '512x512', type: 'image/jpeg' }
-      ]
+      artwork: [{ src: coverSrc, sizes: '512x512', type: 'image/jpeg' }]
     });
-
     navigator.mediaSession.setActionHandler('play', () => audio.play());
     navigator.mediaSession.setActionHandler('pause', () => audio.pause());
-    navigator.mediaSession.setActionHandler('seekbackward', (details) => {
-      audio.currentTime = Math.max(0, audio.currentTime - (details.seekOffset || 15));
+    navigator.mediaSession.setActionHandler('seekbackward', (d) => {
+      audio.currentTime = Math.max(0, audio.currentTime - (d.seekOffset || 15));
     });
-    navigator.mediaSession.setActionHandler('seekforward', (details) => {
-      audio.currentTime = Math.min(audio.duration || Infinity, audio.currentTime + (details.seekOffset || 15));
+    navigator.mediaSession.setActionHandler('seekforward', (d) => {
+      audio.currentTime = Math.min(audio.duration || Infinity, audio.currentTime + (d.seekOffset || 15));
     });
-    navigator.mediaSession.setActionHandler('seekto', (details) => {
-      if (details.seekTime !== undefined) audio.currentTime = details.seekTime;
+    navigator.mediaSession.setActionHandler('seekto', (d) => {
+      if (d.seekTime !== undefined) audio.currentTime = d.seekTime;
+    });
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+      if (currentChapterIndex > 0) loadChapter(currentChapterIndex - 1, { seekTo: 0, autoplay: true });
+    });
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+      if (currentChapterIndex + 1 < chapters.length) loadChapter(currentChapterIndex + 1, { seekTo: 0, autoplay: true });
     });
   }
+
+  // ---------------- Read mode ----------------
+
+  function renderReadPanel() {
+    readPanel.innerHTML = '';
+    if (!bookText) return;
+
+    // Build boundaries from chapters (char_start) so headings can be
+    // inserted at the right point and used as scroll targets.
+    const boundaries = chapters.length
+      ? chapters.map((c, i) => ({ ...c, index: i }))
+      : [{ title: currentBook.title, char_start: 0, index: 0 }];
+
+    boundaries.forEach((ch, i) => {
+      const start = ch.char_start || 0;
+      const end = i + 1 < boundaries.length ? boundaries[i + 1].char_start : bookText.length;
+      const sectionText = bookText.slice(start, end);
+
+      if (chapters.length > 1) {
+        const heading = document.createElement('h3');
+        heading.className = 'read-chapter-heading';
+        heading.id = `read-chapter-${i}`;
+        heading.textContent = ch.title;
+        readPanel.appendChild(heading);
+      }
+
+      sectionText.split(/\n\s*\n/).forEach(para => {
+        const trimmed = para.trim();
+        if (!trimmed) return;
+        const p = document.createElement('p');
+        p.textContent = trimmed;
+        readPanel.appendChild(p);
+      });
+    });
+  }
+
+  function scrollReadPanelToChapter(index) {
+    currentChapterIndex = index;
+    highlightActiveChapterButton();
+    const el = document.getElementById(`read-chapter-${index}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ---------------- Tabs ----------------
+
+  function setActiveTab(mode) {
+    const isListen = mode === 'listen';
+    tabListen.classList.toggle('active', isListen);
+    tabRead.classList.toggle('active', !isListen);
+    listenPanel.hidden = !isListen;
+    readPanel.hidden = isListen;
+  }
+
+  tabListen.addEventListener('click', () => setActiveTab('listen'));
+  tabRead.addEventListener('click', () => setActiveTab('read'));
+
+  window.addEventListener('beforeunload', savePosition);
 
   loadLibrary();
 </script>
