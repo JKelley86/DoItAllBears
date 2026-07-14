@@ -18,6 +18,7 @@
         <p>OVERVIEW</p>
         <a href="#dashboard" class="active" data-page="dashboard"><i>⌂</i>Dashboard</a>
         <a href="#transactions" data-page="transactions"><i>↕</i>Transactions</a>
+        <a href="#accounts" data-page="accounts"><i>▤</i>Accounts</a>
         <a href="#budget" data-page="budget"><i>◒</i>Budget</a>
         <p>PLANNING</p>
         <a href="#loans" data-page="loans"><i>⌁</i>Loans & mortgages</a>
@@ -28,7 +29,7 @@
         <p>GROW</p>
         <a href="#learn" data-page="learn"><i>✦</i>Learn</a>
       </nav>
-      <div class="sidebar-bottom"><a href="#"><i>⚙</i>Settings</a><div class="secure">● Your data is secure</div></div>
+      <div class="sidebar-bottom"><a href="#settings" data-page="settings"><i>⚙</i>Settings</a><div class="secure">● Your data is secure</div></div>
     </aside>
 
     <main>
@@ -51,6 +52,8 @@
 
       <section id="transactions" class="page"><div class="page-intro"><div><p class="eyebrow">MONEY MOVEMENT</p><h2>Transactions</h2><p>Every dollar, neatly organized.</p></div><button class="add-button" id="transaction-add">+ Add transaction</button></div><div class="filter-row"><button class="filter active">All transactions</button><button class="filter">Income</button><button class="filter">Expenses</button><button class="filter">Transfers</button></div><article class="card table-card"><div class="table-head"><span>DATE</span><span>MERCHANT / DESCRIPTION</span><span>CATEGORY</span><span>ACCOUNT</span><span>AMOUNT</span></div><div id="transaction-table"></div></article></section>
 
+      <section id="accounts" class="page"><div class="page-intro"><div><p class="eyebrow">WHERE YOUR MONEY LIVES</p><h2>Accounts</h2><p>Every checking, savings, and card balance your transactions move between.</p></div><button class="add-button" data-create="accounts">+ Add account</button></div><div class="account-grid" id="accounts-grid"></div></section>
+
       <section id="budget" class="page"><div class="page-intro"><div><p class="eyebrow">PLAN WITH PURPOSE</p><h2>Budget</h2><p>Give every dollar a job, then adjust as life happens.</p></div><button class="outline-btn">Edit plan</button></div><div class="budget-summary"><div><span>TO BUDGET</span><b id="budget-to">$0.00</b></div><div><span>ASSIGNED</span><b id="budget-assigned">$0.00</b></div><div><span>UNASSIGNED</span><b id="budget-unassigned" class="good">$0.00</b></div><button class="add-button" data-create="monthly_budgets">+ Assign money</button></div><div class="budget-columns" id="budget-groups"></div></section>
 
       <section id="loans" class="page"><div class="page-intro"><div><p class="eyebrow">DEBT, MADE CLEAR</p><h2>Loans & mortgages</h2><p>See the full picture and make payoff progress visible.</p></div><button class="add-button" data-create="debts">+ Add loan</button></div><div class="loan-grid"><article class="card loan-feature" id="loan-feature"></article><article class="card payoff" id="loan-payoff-tip"></article></div><article class="card loans-list"></article></section>
@@ -64,6 +67,24 @@
       <section id="learn" class="page"><div class="learn-hero"><p class="eyebrow">MONEY KNOW-HOW, WITHOUT THE JARGON</p><h2>Get smarter with every dollar.</h2><p>Short, practical lessons built around where you are today.</p><button class="dark-btn">Start your learning plan →</button></div><div class="learn-section-title"><h2>Recommended for you</h2><span>Based on your goals and activity</span></div><div class="learn-grid"><article class="lesson"><div class="lesson-art green-art">↗</div><p>INVESTING · 6 MIN</p><h3>How much should I put in my 401(k)?</h3><span>Understand the match, tax benefits & a simple target.</span></article><article class="lesson"><div class="lesson-art gold-art">⌂</div><p>HOME BUYING · 8 MIN</p><h3>What home price can I comfortably afford?</h3><span>See the full cost beyond the mortgage payment.</span></article><article class="lesson"><div class="lesson-art blue-art">◇</div><p>SAVING · 4 MIN</p><h3>Your emergency fund, right-sized</h3><span>Build a safety net that actually fits your life.</span></article></div></section>
 
       <section id="scenario" class="page"><div class="page-intro"><div><p class="eyebrow">MAKE THE “WHAT IF” FEEL REAL</p><h2>Scenario lab</h2><p>Test a decision against your actual plan before you make it.</p></div><button class="outline-btn">Save scenario</button></div><div class="scenario-grid"><article class="card simulator"><p class="eyebrow">ONE-TIME PURCHASE</p><h2>Could I buy this?</h2><label>What are you considering?<input id="scenario-name" value="New purchase"></label><label>Purchase price<input id="scenario-price" type="number" value="0"></label><label>Timing<select><option>This month</option><option>Next month</option><option>In 3 months</option></select></label></article><article class="scenario-result"><p class="eyebrow">YOUR PROJECTED PLAN</p><div class="result-label">MONTHLY SPENDING POWER</div><strong id="scenario-result">$0.00</strong><p id="scenario-summary"></p><div class="impact-divider"></div><div class="impact-row"><span>Savings goal</span><b id="goal-impact"></b></div><div class="impact-row"><span>Budget health</span><b class="good">Still on track</b></div><div class="impact-row"><span>Cash cushion</span><b id="cushion-impact"></b></div></article></div><article class="card scenario-compare"><div><p class="eyebrow">COMPARE THE PATHS</p><h2>What changes over the next 6 months?</h2></div><div class="scenario-bars"><div><span>Without this choice</span><i class="base-bar" style="width:86%"></i><b id="scenario-base-saved"></b></div><div><span>With this choice</span><i id="scenario-bar" style="width:73%"></i><b id="scenario-saved"></b></div></div></article></section>
+      <section id="settings" class="page"><div class="page-intro"><div><p class="eyebrow">MAKE IT YOURS</p><h2>Settings</h2><p>Your name, workspace, and how Northstar looks.</p></div></div>
+        <article class="card settings-card">
+          <div class="card-title"><h2>Profile</h2></div>
+          <form id="settings-form">
+            <label>Your name<input id="settings-name" placeholder="e.g. Alex Rivera"></label>
+            <label>Workspace name<input id="settings-workspace" placeholder="e.g. Alex's finances"></label>
+            <button class="add-button" type="submit">Save changes</button>
+            <small id="settings-message"></small>
+          </form>
+        </article>
+        <article class="card settings-card">
+          <div class="card-title"><h2>Appearance</h2></div>
+          <div class="settings-toggle-row">
+            <div><b>Dark mode</b><p>Switch the whole app to a darker palette.</p></div>
+            <label class="switch"><input type="checkbox" id="theme-toggle"><span class="switch-track"></span></label>
+          </div>
+        </article>
+      </section>
     </main>
   </div>
   <div class="modal-backdrop" id="modal"><form class="modal"><button type="button" class="modal-close" id="close-modal">×</button><p class="eyebrow">NEW MONEY MOVEMENT</p><h2>Add a transaction</h2><label>Description<input id="tx-desc" placeholder="e.g. Coffee shop" required></label><div class="form-split"><label>Amount<input id="tx-amount" type="number" step="0.01" placeholder="0.00" required></label><label>Date<input id="tx-date" type="date" required></label></div><div class="form-split"><label>Type<select id="tx-type"><option value="expense">Expense</option><option value="income">Income</option></select></label><label>Account<select id="tx-account"><option value="">Select account</option></select></label></div><label>Category<select id="tx-category"></select></label><button class="add-button" type="submit">Save transaction</button></form></div>
