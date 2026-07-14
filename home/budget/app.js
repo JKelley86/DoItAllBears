@@ -1,11 +1,13 @@
-const POCKETBASE_URL = 'https://tumid-kiltlike-maia.ngrok-free.dev';
-const pb = new PocketBase(POCKETBASE_URL);
+/* Northstar local client — data is stored in your PocketBase server. */
+const PB_URL = 'https://tumid-kiltlike-maia.ngrok-free.dev';
+const pb = new PocketBase(PB_URL);
 pb.autoCancellation(false);
-pb.beforeSend = function(url, options) {
-  options.headers = Object.assign({}, options.headers, {'ngrok-skip-browser-warning': 'true'});
+// ngrok's free browser-warning page returns HTML without PocketBase CORS headers.
+// This header makes API calls reach PocketBase itself, without changing the server.
+pb.beforeSend = function (url, options) {
+  options.headers = Object.assign({}, options.headers, { 'ngrok-skip-browser-warning': 'true' });
   return { url, options };
 };
-
 const money = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'});
 const esc = value => String(value ?? '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const fmt = value => `${value < 0 ? '−' : '+'}${money.format(Math.abs(value))}`;
