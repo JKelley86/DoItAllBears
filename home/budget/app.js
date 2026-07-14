@@ -679,8 +679,11 @@ function updateScenario() {
   }
   const avgDailySpend = spend / 30 || 1;
   document.getElementById('cushion-impact').textContent = `${Math.max(0, Math.round(left / avgDailySpend))} days`;
-  document.getElementById('scenario-saved').textContent = `${money.format(Math.max(0, left * 6))} saved`;
-  document.getElementById('scenario-bar').style.width = `${clamp((left / (Math.max(left, 1) + price)) * 86, 12, 86)}%`;
+  const withoutChoice = Math.max(0, (income - spend) * 6);
+  const withChoice = Math.max(0, left * 6);
+  document.getElementById('scenario-base-saved').textContent = `${money.format(withoutChoice)} saved`;
+  document.getElementById('scenario-saved').textContent = `${money.format(withChoice)} saved`;
+  document.getElementById('scenario-bar').style.width = `${clamp(withoutChoice ? (withChoice / withoutChoice) * 86 : 12, 12, 86)}%`;
 }
 document.getElementById('scenario-price').addEventListener('input', updateScenario);
 document.getElementById('scenario-name').addEventListener('input', updateScenario);
