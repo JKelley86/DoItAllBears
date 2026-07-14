@@ -1,6 +1,12 @@
 /* Northstar local client — data is stored in your PocketBase server. */
 const PB_URL = 'https://tumid-kiltlike-maia.ngrok-free.dev';
 const pb = new PocketBase(PB_URL);
+// ngrok's free browser-warning page returns HTML without PocketBase CORS headers.
+// This header makes API calls reach PocketBase itself, without changing the server.
+pb.beforeSend = function (url, options) {
+  options.headers = { ...(options.headers || {}), 'ngrok-skip-browser-warning': 'true' };
+  return { url, options };
+};
 const money = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'});
 const esc = value => String(value ?? '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const fmt = value => `${value < 0 ? '−' : '+'}${money.format(Math.abs(value))}`;
@@ -8,7 +14,7 @@ let transactions = [], accounts = [], categories = [], budgets = [], goals = [],
 let transactionFilter = 'all';
 let displayedMonth = new Date();
 
-const titles={dashboard:'Good morning, Jordan <span>☀</span>',transactions:'Transactions',budget:'July budget',loans:'Loans & mortgages',investments:'Savings & investing',bills:'Bills & recurring',scenario:'Scenario lab',reports:'Reports',learn:'Learn'};
+const titles={dashboard:'Good morning, Justin <span>☀</span>',transactions:'Transactions',budget:'July budget',loans:'Loans & mortgages',investments:'Savings & investing',bills:'Bills & recurring',scenario:'Scenario lab',reports:'Reports',learn:'Learn'};
 document.querySelectorAll('[data-page]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();showPage(a.dataset.page)}));
 document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.go)));
 function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active-page'));document.getElementById(id).classList.add('active-page');document.querySelectorAll('[data-page]').forEach(x=>x.classList.toggle('active',x.dataset.page===id));document.getElementById('page-title').innerHTML=titles[id];window.scrollTo({top:0,behavior:'smooth'});}
