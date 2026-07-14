@@ -16,6 +16,10 @@ const esc = value => String(value ?? '').replace(/[&<>'"]/g, c => ({ '&': '&amp;
 const fmt = value => `${value < 0 ? '−' : '+'}${money.format(Math.abs(value))}`;
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 
+const THEME_KEY = 'northstar-theme';
+function applyTheme(theme) { document.documentElement.setAttribute('data-theme', theme); }
+applyTheme(localStorage.getItem(THEME_KEY) || 'light');
+
 let transactions = [], accounts = [], categories = [], budgets = [], goals = [], debts = [], recurring = [], investmentAccounts = [], holdings = [];
 let transactionFilter = 'all';
 let displayedMonth = new Date();
@@ -39,6 +43,14 @@ function groupBy(arr, keyFn) {
   return map;
 }
 function nameById(items, id, fallback = 'Uncategorized') { const x = items.find(item => item.id === id); return x?.name || fallback; }
+/* An account's "balance" field is treated as its opening balance when it was added.
+   The running/current balance is that opening balance plus every transaction tagged
+   to it — so it always reflects what you've actually logged, instead of a stored
+   number that can drift out of sync. */
+function currentBalanceFor(accountId, openingBalance) {
+  const net = sum(transactions.filter(t => t.account === accountId), t => t.amount);
+  return (openingBalance || 0) + net;
+}
 function categoryOf(id) { return categories.find(c => c.id === id) || null; }
 function firstName(fullName) { return (fullName || '').trim().split(/\s+/)[0] || 'there'; }
 function initialsOf(fullName) {
@@ -94,7 +106,7 @@ function monthsFromNow(n) {
 }
 
 /* ---------- nav / shell ---------- */
-const titles = { dashboard: '', transactions: 'Transactions', budget: 'Budget', loans: 'Loans & mortgages', investments: 'Savings & investing', bills: 'Bills & recurring', scenario: 'Scenario lab', reports: 'Reports', learn: 'Learn' };
+const titles = { dashboard: '', transactions: 'Transactions', accounts: 'Accounts', budget: 'Budget', loans: 'Loans & mortgages', investments: 'Savings & investing', bills: 'Bills & recurring', scenario: 'Scenario lab', reports: 'Reports', learn: 'Learn', settings: 'Settings' };
 document.querySelectorAll('[data-page]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); showPage(a.dataset.page); }));
 document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => showPage(b.dataset.go)));
 function pageTitleFor(id) {
@@ -107,6 +119,7 @@ function showPage(id) {
   document.getElementById(id).classList.add('active-page');
   document.querySelectorAll('[data-page]').forEach(x => x.classList.toggle('active', x.dataset.page === id));
   document.getElementById('page-title').innerHTML = pageTitleFor(id);
+  if (id === 'settings') fillSettingsForm();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -128,6 +141,26 @@ function renderTransactions() {
   const rows = transactions.slice(0, 4).map(t => `<div class="activity-row"><span class="activity-icon">${t.amount < 0 ? '•' : '$'}</span><div><b>${esc(t.merchant || t.description || 'Transaction')}</b><p>${esc(nameById(categories, t.category, t.kind || 'Other'))} · ${new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p></div><strong class="${t.amount < 0 ? 'negative' : 'good'}">${fmt(t.amount)}</strong></div>`).join('') || '<p class="empty">No transactions yet. Add your first one to get started.</p>';
   activity.innerHTML = rows;
   table.innerHTML = visible.map(t => `<div class="table-row"><span>${new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span><span class="merchant"><i class="merchant-icon">${t.amount < 0 ? '•' : '$'}</i><b>${esc(t.merchant || t.description || 'Transaction')}</b></span><span>${esc(nameById(categories, t.category, t.kind || 'Other'))}</span><span>${esc(nameById(accounts, t.account, '—'))}</span><strong class="${t.amount < 0 ? 'negative' : 'good'}">${fmt(t.amount)}</strong></div>`).join('') || '<p class="empty">No transactions yet.</p>';
+}
+
+/* ================= ACCOUNTS ================= */
+const ACCOUNT_LOGO = {
+  checking: { cls: 'checking-logo', icon: '▤' },
+  savings: { cls: 'savings-logo', icon: '◇' },
+  credit_card: { cls: 'credit-logo', icon: '▣' },
+  retirement: { cls: 'retirement', icon: '▥' },
+  brokerage: { cls: 'brokerage', icon: '◈' },
+};
+function renderAccountsPage() {
+  const grid = document.getElementById('accounts-grid');
+  if (!grid) return;
+  if (!accounts.length) { grid.innerHTML = '<p class="empty">No accounts yet. Add your checking, savings, or card to start tracking balances.</p>'; return; }
+  grid.innerHTML = accounts.map(a => {
+    const logo = ACCOUNT_LOGO[a.type] || { cls: 'checking-logo', icon: '●' };
+    const balance = currentBalanceFor(a.id, a.balance);
+    const isLiability = a.type === 'credit_card';
+    return `<article class="card account-card"><span class="account-logo ${logo.cls}">${logo.icon}</span><p>${esc((a.type || 'account').replace(/_/g, ' ').toUpperCase())}</p><h2>${esc(a.name)}</h2><strong class="${isLiability || balance < 0 ? 'negative' : ''}">${money.format(balance)}</strong><div><span>${esc(a.institution || '')}</span><small>Opening balance ${money.format(a.balance || 0)}</small></div></article>`;
+  }).join('');
 }
 
 /* ================= BUDGET ================= */
@@ -276,12 +309,14 @@ function renderInvestments() {
     grid.innerHTML = merged.map(a => `<article class="card account-card"><span class="account-logo savings-logo">◇</span><p>${esc((a.account_type || a.type || 'account').toUpperCase())}</p><h2>${esc(a.name || nameById(accounts, a.account, 'Investment account'))}</h2><strong>${money.format(a.current_value ?? a.balance ?? 0)}</strong><div><span>${a.monthly_contribution ? `${money.format(a.monthly_contribution)}/mo` : ''}</span><small>${esc(a.institution || '')}</small></div></article>`).join('') || '<p class="empty">No savings or investment accounts saved yet.</p>';
   }
 
-  const assets = sum(savingsAccounts, a => a.balance || 0) + sum(investmentAccounts, a => a.current_value || 0) + sum(goals, g => g.current_amount || 0);
-  const liabilities = sum(debts, d => d.current_balance || 0);
+  const assetAccounts = accounts.filter(a => a.type !== 'credit_card');
+  const creditAccounts = accounts.filter(a => a.type === 'credit_card');
+  const assets = sum(assetAccounts, a => currentBalanceFor(a.id, a.balance)) + sum(investmentAccounts, a => a.current_value || 0) + sum(goals, g => g.current_amount || 0);
+  const liabilities = sum(debts, d => d.current_balance || 0) + sum(creditAccounts, a => Math.abs(currentBalanceFor(a.id, a.balance)));
   const netWorth = assets - liabilities;
   if (wealthStrong) wealthStrong.textContent = money.format(netWorth);
   if (wealthSub) {
-    const accountCount = savingsAccounts.length + investmentAccounts.length;
+    const accountCount = assetAccounts.length + investmentAccounts.length;
     wealthSub.textContent = accountCount ? `Across ${accountCount} account${accountCount === 1 ? '' : 's'}, minus ${money.format(liabilities)} in debt` : 'Add accounts to track your net worth';
   }
 
@@ -544,6 +579,7 @@ function renderReports() {
 
 function renderAll() {
   renderTransactions();
+  renderAccountsPage();
   renderBudget();
   renderDebts();
   renderBills();
@@ -577,7 +613,7 @@ function populateCategoryOptions() {
 }
 function openTransaction() {
   document.getElementById('tx-date').value = new Date().toISOString().slice(0, 10);
-  document.getElementById('tx-account').innerHTML = '<option value="">Select account</option>' + accounts.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join('');
+  document.getElementById('tx-account').innerHTML = '<option value="">Select account</option>' + accounts.map(a => `<option value="${a.id}">${esc(a.name)} · ${money.format(currentBalanceFor(a.id, a.balance))}</option>`).join('');
   populateCategoryOptions();
   modal.classList.add('open');
   document.getElementById('tx-desc').focus();
@@ -611,7 +647,7 @@ document.querySelector('.modal').addEventListener('submit', async e => {
 
 /* ================= GENERIC "ADD RECORD" MODALS ================= */
 const createSchemas = {
-  accounts: { title: 'Add account', fields: [['name', 'Account name'], ['type', 'Type (checking, savings, credit_card, retirement, brokerage)'], ['institution', 'Institution'], ['balance', 'Current balance', 'number']] },
+  accounts: { title: 'Add account', fields: [['name', 'Account name'], ['type', 'Type (checking, savings, credit_card, retirement, brokerage)'], ['institution', 'Institution'], ['balance', 'Opening balance', 'number']] },
   monthly_budgets: { title: 'Add budget category', fields: [['category', 'Category name'], ['planned_amount', 'Monthly amount', 'number']] },
   debts: { title: 'Add loan or debt', fields: [['name', 'Name'], ['debt_type', 'Type (mortgage, student_loan, auto_loan, credit_card)'], ['current_balance', 'Current balance', 'number'], ['original_balance', 'Original balance (optional, enables % paid off)', 'number'], ['interest_rate', 'APR %', 'number'], ['minimum_payment', 'Monthly payment', 'number']] },
   recurring_items: { title: 'Add recurring bill', fields: [['name', 'Bill name'], ['amount', 'Amount', 'number'], ['frequency', 'Frequency (monthly, weekly, yearly)'], ['next_due_date', 'Next due date', 'date']] },
@@ -729,6 +765,57 @@ document.querySelectorAll('.filter').forEach(b => b.addEventListener('click', ()
   transactionFilter = label.includes('income') ? 'income' : label.includes('expense') ? 'expense' : label.includes('transfer') ? 'transfer' : 'all';
   renderTransactions();
 }));
+
+/* ================= SETTINGS ================= */
+function fillSettingsForm() {
+  const nameInput = document.getElementById('settings-name');
+  const workspaceInput = document.getElementById('settings-workspace');
+  if (nameInput) nameInput.value = pb.authStore.record?.name || '';
+  if (workspaceInput) workspaceInput.value = currentWorkspaceName();
+}
+function refreshIdentityUI() {
+  const workspaceNode = document.querySelector('.workspace');
+  if (workspaceNode) {
+    workspaceNode.childNodes[1].textContent = currentWorkspaceName();
+    const avatar = workspaceNode.querySelector('.avatar');
+    if (avatar) avatar.textContent = initialsOf(pb.authStore.record?.name);
+  }
+  const activePage = document.querySelector('.page.active-page');
+  if (activePage) document.getElementById('page-title').innerHTML = pageTitleFor(activePage.id);
+}
+const settingsForm = document.getElementById('settings-form');
+if (settingsForm) {
+  settingsForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const messageEl = document.getElementById('settings-message');
+    const newName = document.getElementById('settings-name').value.trim();
+    const newWorkspace = document.getElementById('settings-workspace').value.trim();
+    messageEl.textContent = '';
+    try {
+      if (newName && newName !== pb.authStore.record?.name) {
+        await pb.collection('users').update(pb.authStore.record.id, { name: newName });
+        await pb.collection('users').authRefresh();
+      }
+      if (newWorkspace) localStorage.setItem(workspaceKey(), newWorkspace);
+      refreshIdentityUI();
+      messageEl.classList.remove('error-text');
+      messageEl.textContent = 'Saved.';
+      toast('Settings updated');
+    } catch (err) {
+      messageEl.classList.add('error-text');
+      messageEl.textContent = err.message || 'Could not save settings';
+    }
+  });
+}
+const themeToggle = document.getElementById('theme-toggle');
+if (themeToggle) {
+  themeToggle.checked = (localStorage.getItem(THEME_KEY) || 'light') === 'dark';
+  themeToggle.addEventListener('change', () => {
+    const theme = themeToggle.checked ? 'dark' : 'light';
+    localStorage.setItem(THEME_KEY, theme);
+    applyTheme(theme);
+  });
+}
 
 /* ================= AUTH ================= */
 function authScreen() {
