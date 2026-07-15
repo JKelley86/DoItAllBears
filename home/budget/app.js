@@ -20,6 +20,18 @@ const THEME_KEY = 'northstar-theme';
 function applyTheme(theme) { document.documentElement.setAttribute('data-theme', theme); }
 applyTheme(localStorage.getItem(THEME_KEY) || 'light');
 
+/* pb.authStore exposes the logged-in user as .record on newer SDK builds and .model
+   on older ones — reading the wrong one silently returns undefined instead of
+   erroring, which is what was causing "Cannot read properties of undefined
+   (reading 'id')" when saving settings or creating an account. This helper checks
+   both, and requireUserId() fails loudly with a toast instead of a raw crash. */
+function currentUser() { return pb.authStore.record || pb.authStore.model || null; }
+function requireUserId() {
+  const u = currentUser();
+  if (!u?.id) { toast('Your session expired — please sign in again.', true); throw new Error('You need to be signed in to do that.'); }
+  return u.id;
+}
+
 let transactions = [], accounts = [], categories = [], budgets = [], goals = [], debts = [], recurring = [], investmentAccounts = [], holdings = [];
 let transactionFilter = 'all';
 let displayedMonth = new Date();
@@ -62,9 +74,9 @@ function timeGreeting() {
   const h = new Date().getHours();
   return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
 }
-function workspaceKey() { return `northstar-workspace-${pb.authStore.record?.id || 'anon'}`; }
+function workspaceKey() { return `northstar-workspace-${currentUser()?.id || 'anon'}`; }
 function currentWorkspaceName() {
-  return localStorage.getItem(workspaceKey()) || `${firstName(pb.authStore.record?.name)}'s finances`;
+  return localStorage.getItem(workspaceKey()) || `${firstName(currentUser()?.name)}'s finances`;
 }
 
 /* Monthly income/expense totals for the last N months (oldest first) */
@@ -110,7 +122,7 @@ const titles = { dashboard: '', transactions: 'Transactions', accounts: 'Account
 document.querySelectorAll('[data-page]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); showPage(a.dataset.page); }));
 document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => showPage(b.dataset.go)));
 function pageTitleFor(id) {
-  if (id === 'dashboard') return `${timeGreeting()}, ${esc(firstName(pb.authStore.record?.name))} <span>☀</span>`;
+  if (id === 'dashboard') return `${timeGreeting()}, ${esc(firstName(currentUser()?.name))} <span>☀</span>`;
   if (id === 'budget') return `${displayedMonth.toLocaleDateString('en-US', { month: 'long' })} budget`;
   return titles[id];
 }
@@ -138,9 +150,12 @@ async function getAll(collection, options = {}) {
 function renderTransactions() {
   const activity = document.getElementById('activity-list'), table = document.getElementById('transaction-table');
   const visible = transactions.filter(t => transactionFilter === 'all' || (transactionFilter === 'income' ? t.amount > 0 : transactionFilter === 'expense' ? t.amount < 0 : t.kind === transactionFilter));
-  const rows = transactions.slice(0, 4).map(t => `<div class="activity-row"><span class="activity-icon">${t.amount < 0 ? '•' : '$'}</span><div><b>${esc(t.merchant || t.description || 'Transaction')}</b><p>${esc(nameById(categories, t.category, t.kind || 'Other'))} · ${new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p></div><strong class="${t.amount < 0 ? 'negative' : 'good'}">${fmt(t.amount)}</strong></div>`).join('') || '<p class="empty">No transactions yet. Add your first one to get started.</p>';
+  const recent = transactions.slice(0, 4);
+  const rows = recent.map(t => `<div class="activity-row editable"><span class="activity-icon">${t.amount < 0 ? '•' : '$'}</span><div><b>${esc(t.merchant || t.description || 'Transaction')}</b><p>${esc(nameById(categories, t.category, t.kind || 'Other'))} · ${new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p></div><strong class="${t.amount < 0 ? 'negative' : 'good'}">${fmt(t.amount)}</strong></div>`).join('') || '<p class="empty">No transactions yet. Add your first one to get started.</p>';
   activity.innerHTML = rows;
-  table.innerHTML = visible.map(t => `<div class="table-row"><span>${new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span><span class="merchant"><i class="merchant-icon">${t.amount < 0 ? '•' : '$'}</i><b>${esc(t.merchant || t.description || 'Transaction')}</b></span><span>${esc(nameById(categories, t.category, t.kind || 'Other'))}</span><span>${esc(nameById(accounts, t.account, '—'))}</span><strong class="${t.amount < 0 ? 'negative' : 'good'}">${fmt(t.amount)}</strong></div>`).join('') || '<p class="empty">No transactions yet.</p>';
+  activity.querySelectorAll('.activity-row').forEach((el, i) => el.onclick = () => openTransactionForm(recent[i]));
+  table.innerHTML = visible.map(t => `<div class="table-row editable"><span>${new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span><span class="merchant"><i class="merchant-icon">${t.amount < 0 ? '•' : '$'}</i><b>${esc(t.merchant || t.description || 'Transaction')}</b></span><span>${esc(nameById(categories, t.category, t.kind || 'Other'))}</span><span>${esc(nameById(accounts, t.account, '—'))}</span><strong class="${t.amount < 0 ? 'negative' : 'good'}">${fmt(t.amount)}</strong></div>`).join('') || '<p class="empty">No transactions yet.</p>';
+  table.querySelectorAll('.table-row').forEach((el, i) => el.onclick = () => openTransactionForm(visible[i]));
 }
 
 /* ================= ACCOUNTS ================= */
@@ -159,8 +174,9 @@ function renderAccountsPage() {
     const logo = ACCOUNT_LOGO[a.type] || { cls: 'checking-logo', icon: '●' };
     const balance = currentBalanceFor(a.id, a.balance);
     const isLiability = a.type === 'credit_card';
-    return `<article class="card account-card"><span class="account-logo ${logo.cls}">${logo.icon}</span><p>${esc((a.type || 'account').replace(/_/g, ' ').toUpperCase())}</p><h2>${esc(a.name)}</h2><strong class="${isLiability || balance < 0 ? 'negative' : ''}">${money.format(balance)}</strong><div><span>${esc(a.institution || '')}</span><small>Opening balance ${money.format(a.balance || 0)}</small></div></article>`;
+    return `<article class="card account-card editable"><span class="account-logo ${logo.cls}">${logo.icon}</span><p>${esc((a.type || 'account').replace(/_/g, ' ').toUpperCase())}</p><h2>${esc(a.name)}</h2><strong class="${isLiability || balance < 0 ? 'negative' : ''}">${money.format(balance)}</strong><div><span>${esc(a.institution || '')}</span><small>Opening balance ${money.format(a.balance || 0)}${a.shared_with?.length ? ' · shared' : ''}</small></div></article>`;
   }).join('');
+  grid.querySelectorAll('.account-card').forEach((el, i) => el.onclick = () => openRecordForm('accounts', accounts[i]));
 }
 
 /* ================= BUDGET ================= */
@@ -190,18 +206,21 @@ function renderBudget() {
   }
   const groups = groupBy(budgets, b => categoryOf(b.category)?.group || 'other');
   const groupLabels = { needs: 'Essentials', wants: 'Wants', goals: 'Goals', other: 'Other' };
+  const renderOrder = [];
   container.innerHTML = [...groups.entries()].map(([groupKey, items]) => {
     const groupPlanned = sum(items, b => b.planned_amount || 0);
     const groupSpent = sum(items, b => spentByCategory.get(b.category) || 0);
     const lines = items.map(b => {
+      renderOrder.push(b);
       const planned = b.planned_amount || 0;
       const spent = spentByCategory.get(b.category) || 0;
       const width = planned ? clamp(spent / planned, 0, 1) : 0;
       const over = spent > planned;
-      return `<div class="budget-line"><span>${esc(nameById(categories, b.category))}</span><div class="progress ${over ? '' : 'green'}"><i style="width:${pct(width)}"></i></div><b>${money.format(spent)} / ${money.format(planned)}</b></div>`;
+      return `<div class="budget-line editable"><span>${esc(nameById(categories, b.category))}</span><div class="progress ${over ? '' : 'green'}"><i style="width:${pct(width)}"></i></div><b>${money.format(spent)} / ${money.format(planned)}</b></div>`;
     }).join('');
     return `<article class="card"><div class="card-title"><h2>${groupLabels[groupKey] || groupKey}</h2><b>${money.format(groupSpent)} <small>of ${money.format(groupPlanned)}</small></b></div>${lines}</article>`;
   }).join('') + `<div class="text-btn" style="grid-column:1/-1"><button class="text-btn" data-create="monthly_budgets">+ Add category</button></div>`;
+  container.querySelectorAll('.budget-line').forEach((el, i) => el.onclick = () => openRecordForm('monthly_budgets', renderOrder[i]));
   bindCreateButtons();
 }
 
@@ -216,9 +235,10 @@ function renderDebts() {
       debts.map(d => {
         const orig = d.original_balance;
         const progress = orig ? clamp(1 - (d.current_balance || 0) / orig, 0, 1) : null;
-        return `<div class="debt-row"><span class="debt-round blue">${esc((d.name || 'D')[0])}</span><div><b>${esc(d.name)}</b><p>${d.interest_rate || 0}% APR · ${money.format(d.minimum_payment || 0)}/mo</p></div><strong>${money.format(d.current_balance || 0)}</strong>${progress !== null ? `<span class="progress tiny"><i style="width:${pct(progress)}"></i></span>` : '<span></span>'}<button>›</button></div>`;
+        return `<div class="debt-row editable"><span class="debt-round blue">${esc((d.name || 'D')[0])}</span><div><b>${esc(d.name)}</b><p>${d.interest_rate || 0}% APR · ${money.format(d.minimum_payment || 0)}/mo${d.shared_with?.length ? ' · shared' : ''}</p></div><strong>${money.format(d.current_balance || 0)}</strong>${progress !== null ? `<span class="progress tiny"><i style="width:${pct(progress)}"></i></span>` : '<span></span>'}<button>›</button></div>`;
       }).join('') || '<p class="empty">No loans or debts saved yet.</p>'
     }`;
+    list.querySelectorAll('.debt-row').forEach((el, i) => el.onclick = () => openRecordForm('debts', debts[i]));
   }
 
   if (feature) {
@@ -229,6 +249,8 @@ function renderDebts() {
       const payoff = amortize(primary.current_balance || 0, primary.interest_rate || 0, primary.minimum_payment || 0);
       const orig = primary.original_balance;
       const progress = orig ? clamp(1 - (primary.current_balance || 0) / orig, 0, 1) : null;
+      feature.classList.add('editable');
+      feature.onclick = () => openRecordForm('debts', primary);
       feature.innerHTML = `<div class="loan-title"><span class="loan-icon">⌂</span><div><p class="eyebrow">${esc((primary.debt_type || 'LOAN').toUpperCase())}</p><h2>${esc(primary.name)}</h2></div><button class="dots">•••</button></div>
         <div class="loan-numbers"><div><span>REMAINING</span><b>${money.format(primary.current_balance || 0)}</b></div><div><span>INTEREST RATE</span><b>${primary.interest_rate || 0}%</b></div><div><span>PAYMENT</span><b>${money.format(primary.minimum_payment || 0)} <small>/mo</small></b></div></div>
         ${progress !== null ? `<div class="progress"><i style="width:${pct(progress)}"></i></div><p class="subtle">${pct(progress)} paid off${payoff ? ` · Estimated payoff: ${monthsFromNow(payoff.months)}` : ''}</p>` : (payoff ? `<p class="subtle">Estimated payoff: ${monthsFromNow(payoff.months)}</p>` : '<p class="subtle">Add an interest rate and payment to estimate payoff.</p>')}`;
@@ -263,9 +285,11 @@ function renderBills() {
 
   const sorted = [...recurring].filter(r => r.next_due_date).sort((a, b) => new Date(a.next_due_date) - new Date(b.next_due_date));
   if (box) {
+    const shown = sorted.slice(0, 6);
     box.innerHTML = `<div class="card-title"><h2>Coming up</h2><button class="text-btn" data-create="recurring_items">+ Add bill</button></div>${
-      sorted.slice(0, 6).map(r => `<div class="bill-row"><span class="bill-logo loan">${esc((r.name || 'B')[0])}</span><div><b>${esc(r.name)}</b><p>${new Date(r.next_due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} · ${esc(r.frequency || 'monthly')}</p></div><strong>${money.format(Math.abs(r.amount || 0))}</strong></div>`).join('') || '<p class="empty">No recurring bills saved yet.</p>'
+      shown.map(r => `<div class="bill-row editable"><span class="bill-logo loan">${esc((r.name || 'B')[0])}</span><div><b>${esc(r.name)}</b><p>${new Date(r.next_due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} · ${esc(r.frequency || 'monthly')}</p></div><strong>${money.format(Math.abs(r.amount || 0))}</strong></div>`).join('') || '<p class="empty">No recurring bills saved yet.</p>'
     }`;
+    box.querySelectorAll('.bill-row').forEach((el, i) => el.onclick = () => openRecordForm('recurring_items', shown[i]));
   }
 
   const today = new Date();
@@ -303,10 +327,9 @@ function renderInvestments() {
   const wealthSub = document.getElementById('wealth-total-sub');
   const allocContent = document.getElementById('allocation-content');
 
-  const savingsAccounts = accounts.filter(a => ['savings', 'retirement', 'brokerage'].includes(a.type));
   if (grid) {
-    const merged = [...savingsAccounts, ...investmentAccounts];
-    grid.innerHTML = merged.map(a => `<article class="card account-card"><span class="account-logo savings-logo">◇</span><p>${esc((a.account_type || a.type || 'account').toUpperCase())}</p><h2>${esc(a.name || nameById(accounts, a.account, 'Investment account'))}</h2><strong>${money.format(a.current_value ?? a.balance ?? 0)}</strong><div><span>${a.monthly_contribution ? `${money.format(a.monthly_contribution)}/mo` : ''}</span><small>${esc(a.institution || '')}</small></div></article>`).join('') || '<p class="empty">No savings or investment accounts saved yet.</p>';
+    grid.innerHTML = investmentAccounts.map(a => `<article class="card account-card editable"><span class="account-logo savings-logo">◇</span><p>${esc((a.account_type || 'account').toUpperCase())}</p><h2>${esc(a.name)}</h2><strong>${money.format(a.current_value || 0)}</strong><div><span>${a.monthly_contribution ? `${money.format(a.monthly_contribution)}/mo` : ''}</span><small></small></div></article>`).join('') || '<p class="empty">No investment accounts saved yet.</p>';
+    grid.querySelectorAll('.account-card').forEach((el, i) => el.onclick = () => openRecordForm('investment_accounts', investmentAccounts[i]));
   }
 
   const assetAccounts = accounts.filter(a => a.type !== 'credit_card');
@@ -416,14 +439,16 @@ function renderDashboardGoals() {
   const host = document.getElementById('dashboard-goals');
   if (!host) return;
   if (!goals.length) { host.innerHTML = '<p class="empty">No savings goals yet.</p>'; return; }
-  host.innerHTML = goals.slice(0, 3).map(g => {
+  const shown = goals.slice(0, 3);
+  host.innerHTML = shown.map(g => {
     const target = g.target_amount || 0, cur = g.current_amount || 0;
     const progress = target ? clamp(cur / target, 0, 1) : 0;
     const remaining = target - cur;
     const monthsLeft = g.monthly_contribution > 0 ? Math.ceil(remaining / g.monthly_contribution) : null;
     const eta = monthsLeft !== null && monthsLeft >= 0 ? monthsFromNow(monthsLeft) : null;
-    return `<div class="goal-item"><div class="goal-top"><span>${esc(g.name)}</span><b>${money.format(cur)} <small>/ ${money.format(target)}</small></b></div><div class="progress green"><i style="width:${pct(progress)}"></i></div><p>${pct(progress)} complete${eta ? ` · ${money.format(g.monthly_contribution)}/mo gets you there ${eta}` : ''}</p></div>`;
+    return `<div class="goal-item editable"><div class="goal-top"><span>${esc(g.name)}</span><b>${money.format(cur)} <small>/ ${money.format(target)}</small></b></div><div class="progress green"><i style="width:${pct(progress)}"></i></div><p>${pct(progress)} complete${eta ? ` · ${money.format(g.monthly_contribution)}/mo gets you there ${eta}` : ''}</p></div>`;
   }).join('');
+  host.querySelectorAll('.goal-item').forEach((el, i) => el.onclick = () => openRecordForm('goals', shown[i]));
 }
 
 function renderStatCards() {
@@ -598,30 +623,73 @@ async function loadData() {
   if (workspaceNode) {
     workspaceNode.childNodes[1].textContent = currentWorkspaceName();
     const avatar = workspaceNode.querySelector('.avatar');
-    if (avatar) avatar.textContent = initialsOf(pb.authStore.record?.name);
+    if (avatar) avatar.textContent = initialsOf(currentUser()?.name);
   }
   renderAll();
 }
 
-/* ================= ADD TRANSACTION MODAL ================= */
+/* Subscribe to every collection so changes made elsewhere — another tab, another
+   device, or (once an account/debt is shared) a partner's login — refresh this
+   view automatically instead of requiring a manual reload. PocketBase's own
+   list/view API rules decide which records each subscriber actually receives. */
+let realtimeStarted = false;
+let reloadTimer = null;
+function scheduleReload() {
+  clearTimeout(reloadTimer);
+  reloadTimer = setTimeout(() => { loadData(); }, 400);
+}
+async function startRealtime() {
+  if (realtimeStarted) return;
+  realtimeStarted = true;
+  const watched = ['transactions', 'accounts', 'categories', 'monthly_budgets', 'goals', 'debts', 'recurring_items', 'investment_accounts', 'investment_holdings'];
+  for (const name of watched) {
+    try { await pb.collection(name).subscribe('*', scheduleReload); }
+    catch (err) { console.warn('realtime unavailable for', name, err); }
+  }
+}
+
+/* ================= ADD/EDIT TRANSACTION MODAL ================= */
 const modal = document.getElementById('modal');
+let editingTransactionId = null;
 function populateCategoryOptions() {
   const select = document.getElementById('tx-category');
   if (!select) return;
   const existing = categories.map(c => c.name);
   select.innerHTML = existing.map(name => `<option>${esc(name)}</option>`).join('') + '<option>Other</option>';
 }
-function openTransaction() {
-  document.getElementById('tx-date').value = new Date().toISOString().slice(0, 10);
+function openTransactionForm(record = null) {
+  editingTransactionId = record?.id || null;
+  const heading = modal.querySelector('h2');
+  if (heading) heading.textContent = record ? 'Edit transaction' : 'Add a transaction';
+  document.getElementById('tx-desc').value = record ? (record.merchant || record.description || '') : '';
+  document.getElementById('tx-amount').value = record ? Math.abs(record.amount) : '';
+  document.getElementById('tx-date').value = (record ? new Date(record.date) : new Date()).toISOString().slice(0, 10);
+  document.getElementById('tx-type').value = record ? (record.amount < 0 ? 'expense' : 'income') : 'expense';
   document.getElementById('tx-account').innerHTML = '<option value="">Select account</option>' + accounts.map(a => `<option value="${a.id}">${esc(a.name)} · ${money.format(currentBalanceFor(a.id, a.balance))}</option>`).join('');
+  if (record?.account) document.getElementById('tx-account').value = record.account;
   populateCategoryOptions();
+  if (record) document.getElementById('tx-category').value = nameById(categories, record.category);
+  const deleteBtn = document.getElementById('tx-delete-btn');
+  if (deleteBtn) deleteBtn.style.display = record ? '' : 'none';
   modal.classList.add('open');
   document.getElementById('tx-desc').focus();
 }
-document.getElementById('quick-add').onclick = openTransaction;
-document.getElementById('transaction-add').onclick = openTransaction;
+document.getElementById('quick-add').onclick = () => openTransactionForm();
+document.getElementById('transaction-add').onclick = () => openTransactionForm();
 document.getElementById('close-modal').onclick = () => modal.classList.remove('open');
 modal.onclick = e => { if (e.target === modal) modal.classList.remove('open'); };
+const txDeleteBtn = document.getElementById('tx-delete-btn');
+if (txDeleteBtn) {
+  txDeleteBtn.onclick = async () => {
+    if (!editingTransactionId || !confirm("Delete this transaction? This can't be undone.")) return;
+    try {
+      await pb.collection('transactions').delete(editingTransactionId);
+      modal.classList.remove('open');
+      await loadData();
+      toast('Transaction deleted');
+    } catch (err) { toast(err.message || 'Could not delete', true); }
+  };
+}
 document.querySelector('.modal').addEventListener('submit', async e => {
   e.preventDefault();
   try {
@@ -629,19 +697,27 @@ document.querySelector('.modal').addEventListener('submit', async e => {
     const categoryName = document.getElementById('tx-category').value;
     let category = categories.find(c => c.name === categoryName);
     if (!category) {
-      category = await pb.collection('categories').create({ user: pb.authStore.record.id, name: categoryName, group: amount > 0 ? 'income' : 'wants' });
+      category = await pb.collection('categories').create({ user: requireUserId(), name: categoryName, group: amount > 0 ? 'income' : 'wants' });
       categories.push(category);
     }
-    const record = await pb.collection('transactions').create({
-      user: pb.authStore.record.id, merchant: document.getElementById('tx-desc').value, amount,
+    const payload = {
+      merchant: document.getElementById('tx-desc').value, amount,
       date: new Date(document.getElementById('tx-date').value + 'T12:00:00').toISOString(),
       kind: amount > 0 ? 'income' : 'expense', category: category.id, account: document.getElementById('tx-account').value || null,
-    });
-    transactions.unshift(record);
-    renderAll();
+    };
+    if (editingTransactionId) {
+      await pb.collection('transactions').update(editingTransactionId, payload);
+      toast('Transaction updated');
+    } else {
+      payload.user = requireUserId();
+      const record = await pb.collection('transactions').create(payload);
+      transactions.unshift(record);
+      toast('Transaction saved to PocketBase');
+    }
+    editingTransactionId = null;
+    await loadData();
     modal.classList.remove('open');
     e.target.reset();
-    toast('Transaction saved to PocketBase');
   } catch (err) { toast(err.message || 'Could not save transaction', true); }
 });
 
@@ -656,27 +732,49 @@ const createSchemas = {
   scenarios: { title: 'Save scenario', fields: [['name', 'Scenario name'], ['purchase_amount', 'Purchase amount', 'number']] },
 };
 function bindCreateButtons() {
-  document.querySelectorAll('[data-create]').forEach(b => b.onclick = () => openCreator(b.dataset.create));
+  document.querySelectorAll('[data-create]').forEach(b => b.onclick = () => openRecordForm(b.dataset.create));
   document.querySelectorAll('.page .add-button').forEach(b => {
     const page = b.closest('.page')?.id;
     if (b.id || b.dataset.bound) return;
     b.dataset.bound = '1';
     const map = { budget: 'monthly_budgets', loans: 'debts', investments: 'investment_accounts', bills: 'recurring_items' };
-    if (map[page]) b.onclick = () => openCreator(map[page]);
+    if (map[page]) b.onclick = () => openRecordForm(map[page]);
   });
   const budgetEditBtn = document.querySelector('#budget .outline-btn');
-  if (budgetEditBtn) budgetEditBtn.onclick = () => openCreator('monthly_budgets');
+  if (budgetEditBtn) budgetEditBtn.onclick = () => openRecordForm('monthly_budgets');
 }
-function openCreator(type) {
+/* Collections where sharing with another PocketBase user (e.g. a spouse) makes sense.
+   Requires a `shared_with` multi-relation field to exist on that collection — see the
+   Settings page note for the one-time PocketBase Admin setup this depends on. */
+const SHAREABLE = new Set(['accounts', 'debts']);
+function openCreator(type) { openRecordForm(type, null); }
+function openRecordForm(type, record = null) {
   const schema = createSchemas[type];
   if (!schema) return;
-  const fields = schema.fields.map(([key, label, input = 'text']) => `<label>${label}<input name="${key}" type="${input}" ${input === 'number' ? '' : 'required'}></label>`).join('');
+  const isEdit = !!record;
+  const fields = schema.fields.map(([key, label, input = 'text']) => {
+    let value = '';
+    if (isEdit) {
+      if (type === 'monthly_budgets' && key === 'category') value = esc(nameById(categories, record.category));
+      else value = record[key] ?? '';
+    }
+    return `<label>${label}<input name="${key}" type="${input}" value="${value}" ${input === 'number' ? '' : 'required'}></label>`;
+  }).join('');
+  const shareBlock = isEdit && SHAREABLE.has(type) ? `
+    <div class="share-block">
+      <p class="eyebrow">SHARED WITH</p>
+      <div class="share-list" id="share-list"></div>
+      <div class="share-add-row"><input id="share-id-input" placeholder="Paste their account ID (from their Settings page)"><button type="button" class="text-btn" id="share-add-btn">+ Share</button></div>
+    </div>` : '';
   const overlay = document.createElement('div');
   overlay.className = 'modal-backdrop open';
-  overlay.innerHTML = `<form class="modal"><button type="button" class="modal-close">×</button><p class="eyebrow">POCKETBASE</p><h2>${schema.title}</h2>${fields}<button class="add-button" type="submit">Save</button></form>`;
+  overlay.innerHTML = `<form class="modal"><button type="button" class="modal-close">×</button><p class="eyebrow">POCKETBASE</p><h2>${isEdit ? 'Edit' : schema.title}</h2>${fields}${shareBlock}<button class="add-button" type="submit">${isEdit ? 'Save changes' : 'Save'}</button>${isEdit ? '<button type="button" class="text-btn danger-text" id="record-delete-btn">Delete</button>' : ''}</form>`;
   document.body.append(overlay);
   overlay.querySelector('.modal-close').onclick = () => overlay.remove();
   overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+
+  if (shareBlock) renderShareList(overlay, type, record);
+
   overlay.querySelector('form').onsubmit = async e => {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(e.target));
@@ -684,17 +782,66 @@ function openCreator(type) {
     try {
       if (type === 'monthly_budgets') {
         let c = categories.find(x => x.name === data.category);
-        if (!c) { c = await pb.collection('categories').create({ user: pb.authStore.record.id, name: data.category, group: 'needs' }); categories.push(c); }
+        if (!c) { c = await pb.collection('categories').create({ user: requireUserId(), name: data.category, group: 'needs' }); categories.push(c); }
         data.category = c.id;
-        data.month = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+        if (!isEdit) data.month = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
       }
-      data.user = pb.authStore.record.id;
-      await pb.collection(type).create(data);
+      if (isEdit) {
+        await pb.collection(type).update(record.id, data);
+      } else {
+        data.user = requireUserId();
+        await pb.collection(type).create(data);
+      }
       overlay.remove();
       await loadData();
       toast('Saved to PocketBase');
     } catch (err) { toast(err.message || 'Could not save', true); }
   };
+
+  const deleteBtn = overlay.querySelector('#record-delete-btn');
+  if (deleteBtn) {
+    deleteBtn.onclick = async () => {
+      if (!confirm(`Delete "${record.name || 'this'}"? This can't be undone.`)) return;
+      try {
+        await pb.collection(type).delete(record.id);
+        overlay.remove();
+        await loadData();
+        toast('Deleted');
+      } catch (err) { toast(err.message || 'Could not delete', true); }
+    };
+  }
+}
+function renderShareList(overlay, type, record) {
+  const listEl = overlay.querySelector('#share-list');
+  const sharedIds = record.shared_with || [];
+  listEl.innerHTML = sharedIds.length
+    ? sharedIds.map(id => `<span class="share-chip">${esc(id)} <button type="button" data-remove="${esc(id)}">×</button></span>`).join('')
+    : '<p class="empty" style="padding:6px 0">Not shared with anyone yet.</p>';
+  listEl.querySelectorAll('[data-remove]').forEach(btn => btn.onclick = async () => {
+    try {
+      const updated = sharedIds.filter(id => id !== btn.dataset.remove);
+      await pb.collection(type).update(record.id, { shared_with: updated });
+      record.shared_with = updated;
+      renderShareList(overlay, type, record);
+      toast('Removed access');
+    } catch (err) { toast(err.message || 'Could not update sharing', true); }
+  });
+  const addBtn = overlay.querySelector('#share-add-btn');
+  if (addBtn) {
+    addBtn.onclick = async () => {
+      const input = overlay.querySelector('#share-id-input');
+      const id = input.value.trim();
+      if (!id) return;
+      try {
+        const updated = [...new Set([...(record.shared_with || []), id])];
+        await pb.collection(type).update(record.id, { shared_with: updated });
+        record.shared_with = updated;
+        input.value = '';
+        renderShareList(overlay, type, record);
+        toast('Shared');
+      } catch (err) { toast(err.message || 'Could not share — does the shared_with field exist on this collection yet?', true); }
+    };
+  }
 }
 
 /* ================= SCENARIO LAB ================= */
@@ -770,15 +917,25 @@ document.querySelectorAll('.filter').forEach(b => b.addEventListener('click', ()
 function fillSettingsForm() {
   const nameInput = document.getElementById('settings-name');
   const workspaceInput = document.getElementById('settings-workspace');
-  if (nameInput) nameInput.value = pb.authStore.record?.name || '';
+  const idInput = document.getElementById('settings-user-id');
+  if (nameInput) nameInput.value = currentUser()?.name || '';
   if (workspaceInput) workspaceInput.value = currentWorkspaceName();
+  if (idInput) idInput.value = currentUser()?.id || '';
+}
+const copyIdBtn = document.getElementById('settings-copy-id');
+if (copyIdBtn) {
+  copyIdBtn.onclick = async () => {
+    const idInput = document.getElementById('settings-user-id');
+    try { await navigator.clipboard.writeText(idInput.value); toast('Copied'); }
+    catch { idInput.select(); document.execCommand('copy'); toast('Copied'); }
+  };
 }
 function refreshIdentityUI() {
   const workspaceNode = document.querySelector('.workspace');
   if (workspaceNode) {
     workspaceNode.childNodes[1].textContent = currentWorkspaceName();
     const avatar = workspaceNode.querySelector('.avatar');
-    if (avatar) avatar.textContent = initialsOf(pb.authStore.record?.name);
+    if (avatar) avatar.textContent = initialsOf(currentUser()?.name);
   }
   const activePage = document.querySelector('.page.active-page');
   if (activePage) document.getElementById('page-title').innerHTML = pageTitleFor(activePage.id);
@@ -792,8 +949,8 @@ if (settingsForm) {
     const newWorkspace = document.getElementById('settings-workspace').value.trim();
     messageEl.textContent = '';
     try {
-      if (newName && newName !== pb.authStore.record?.name) {
-        await pb.collection('users').update(pb.authStore.record.id, { name: newName });
+      if (newName && newName !== currentUser()?.name) {
+        await pb.collection('users').update(requireUserId(), { name: newName });
         await pb.collection('users').authRefresh();
       }
       if (newWorkspace) localStorage.setItem(workspaceKey(), newWorkspace);
@@ -830,6 +987,7 @@ function authScreen() {
       await pb.collection('users').authWithPassword(f.get('email'), f.get('password'));
       screen.remove();
       await loadData();
+      startRealtime();
       toast('Signed in securely');
     } catch (err) { screen.querySelector('#auth-message').textContent = err.message || 'Sign-in failed'; }
   };
@@ -843,10 +1001,11 @@ function authScreen() {
         await pb.collection('users').authWithPassword(data.email, data.password);
         screen.remove();
         await loadData();
+        startRealtime();
         toast('Account created');
       } catch (err) { screen.querySelector('#auth-message').textContent = err.message || 'Could not create account'; }
     };
   };
 }
-if (pb.authStore.isValid) loadData().then(updateScenario);
+if (pb.authStore.isValid) loadData().then(() => { updateScenario(); startRealtime(); });
 else authScreen();
