@@ -47,7 +47,7 @@
           <article class="card cashflow"><div class="card-title"><div><p class="eyebrow">CASH FLOW</p><h2>Income vs. spending</h2></div><select><option>Last 6 months</option></select></div><div class="legend"><span><i class="legend-income"></i>Income</span><span><i class="legend-spending"></i>Spending</span></div><div class="chart"><div class="y-labels" id="cashflow-ylabels"></div><div class="chart-area"><div class="gridlines"></div><svg id="cashflow-svg" viewBox="0 0 560 190" preserveAspectRatio="none"></svg><div class="x-labels" id="cashflow-xlabels"></div></div></div></article>
           <article class="card plan-card"><div class="card-title"><div><p class="eyebrow">MONTHLY PLAN</p><h2>Your money map</h2></div><button class="text-btn" data-go="budget">View budget →</button></div><div class="donut-row"><div class="donut" id="money-donut"><div><b id="money-donut-pct">0%</b><span>allocated</span></div></div><ul id="money-map-legend"></ul></div><div class="plan-tip">✦ <span id="plan-tip-text"></span></div></article>
         </div>
-        <div class="dashboard-grid lower"><article class="card"><div class="card-title"><div><p class="eyebrow">RECENT ACTIVITY</p><h2>Latest transactions</h2></div><button class="text-btn" data-go="transactions">See all →</button></div><div class="activity-list" id="activity-list"></div></article><article class="card goals"><div class="card-title"><div><p class="eyebrow">GOALS</p><h2>In progress</h2></div><button class="text-btn" data-go="investments">Manage →</button></div><div id="dashboard-goals"></div></article></div>
+        <div class="dashboard-grid lower"><article class="card"><div class="card-title"><div><p class="eyebrow">RECENT ACTIVITY</p><h2>Latest transactions</h2></div><button class="text-btn" data-go="transactions">See all →</button></div><div class="activity-list" id="activity-list"></div></article><article class="card goals"><div class="card-title"><div><p class="eyebrow">GOALS</p><h2>In progress</h2></div><button class="text-btn" data-create="goals">+ Add goal</button></div><div id="dashboard-goals"></div></article></div>
       </section>
 
       <section id="transactions" class="page"><div class="page-intro"><div><p class="eyebrow">MONEY MOVEMENT</p><h2>Transactions</h2><p>Every dollar, neatly organized.</p></div><button class="add-button" id="transaction-add">+ Add transaction</button></div><div class="filter-row"><button class="filter active">All transactions</button><button class="filter">Income</button><button class="filter">Expenses</button><button class="filter">Transfers</button></div><article class="card table-card"><div class="table-head"><span>DATE</span><span>MERCHANT / DESCRIPTION</span><span>CATEGORY</span><span>ACCOUNT</span><span>AMOUNT</span></div><div id="transaction-table"></div></article></section>
@@ -78,6 +78,11 @@
           </form>
         </article>
         <article class="card settings-card">
+          <div class="card-title"><h2>Sharing</h2></div>
+          <p class="subtle">To share an account or debt with someone else, they need your account ID. Give it to them, then open that account or loan's edit screen and paste their ID in the "Shared with" box.</p>
+          <label>Your account ID<div class="id-copy-row"><input id="settings-user-id" readonly><button type="button" class="text-btn" id="settings-copy-id">Copy</button></div></label>
+        </article>
+        <article class="card settings-card">
           <div class="card-title"><h2>Appearance</h2></div>
           <div class="settings-toggle-row">
             <div><b>Dark mode</b><p>Switch the whole app to a darker palette.</p></div>
@@ -87,7 +92,7 @@
       </section>
     </main>
   </div>
-  <div class="modal-backdrop" id="modal"><form class="modal"><button type="button" class="modal-close" id="close-modal">×</button><p class="eyebrow">NEW MONEY MOVEMENT</p><h2>Add a transaction</h2><label>Description<input id="tx-desc" placeholder="e.g. Coffee shop" required></label><div class="form-split"><label>Amount<input id="tx-amount" type="number" step="0.01" placeholder="0.00" required></label><label>Date<input id="tx-date" type="date" required></label></div><div class="form-split"><label>Type<select id="tx-type"><option value="expense">Expense</option><option value="income">Income</option></select></label><label>Account<select id="tx-account"><option value="">Select account</option></select></label></div><label>Category<select id="tx-category"></select></label><button class="add-button" type="submit">Save transaction</button></form></div>
+  <div class="modal-backdrop" id="modal"><form class="modal"><button type="button" class="modal-close" id="close-modal">×</button><p class="eyebrow">NEW MONEY MOVEMENT</p><h2>Add a transaction</h2><label>Description<input id="tx-desc" placeholder="e.g. Coffee shop" required></label><div class="form-split"><label>Amount<input id="tx-amount" type="number" step="0.01" placeholder="0.00" required></label><label>Date<input id="tx-date" type="date" required></label></div><div class="form-split"><label>Type<select id="tx-type"><option value="expense">Expense</option><option value="income">Income</option></select></label><label>Account<select id="tx-account"><option value="">Select account</option></select></label></div><label>Category<select id="tx-category"></select></label><button class="add-button" type="submit">Save transaction</button><button type="button" class="text-btn danger-text" id="tx-delete-btn" style="display:none">Delete transaction</button></form></div>
   <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.21.3/dist/pocketbase.umd.js"></script>
   <script src="app.js"></script>
 </body>
