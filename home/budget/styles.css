@@ -68,6 +68,27 @@
 :root[data-theme="dark"] .modal input,:root[data-theme="dark"] .modal select,:root[data-theme="dark"] .settings-card input,:root[data-theme="dark"] .simulator input,:root[data-theme="dark"] .simulator select,:root[data-theme="dark"] select{background:#12201c;color:var(--ink);border-color:var(--line)}
 :root[data-theme="dark"] .scenario-result{background:#1c2e28;border-color:var(--line)}
 :root[data-theme="dark"] .switch-track{background:#2c3d37}
+:root[data-theme="dark"] .activity-row.editable:hover,:root[data-theme="dark"] .table-row.editable:hover,:root[data-theme="dark"] .budget-line.editable:hover,:root[data-theme="dark"] .debt-row.editable:hover,:root[data-theme="dark"] .bill-row.editable:hover,:root[data-theme="dark"] .goal-item.editable:hover{background:#1c2e28}
+:root[data-theme="dark"] .share-chip{background:#233a33;color:var(--ink)}
+:root[data-theme="dark"] .share-add-row input,:root[data-theme="dark"] .id-copy-row input{background:#12201c;color:var(--ink);border-color:var(--line)}
+
+/* --- editable rows / edit-in-place affordance --- */
+.editable{cursor:pointer;transition:background .15s ease}
+.activity-row.editable:hover,.table-row.editable:hover,.budget-line.editable:hover,.debt-row.editable:hover,.bill-row.editable:hover,.goal-item.editable:hover{background:#f2f6f2}
+.account-card.editable:hover,.loan-feature.editable:hover{box-shadow:0 2px 10px rgba(19,50,40,.08)}
+.danger-text{color:#b54d36;margin-top:10px}
+
+/* --- sharing UI (account/debt edit modal) --- */
+.share-block{margin:16px 0;border-top:1px solid var(--line);padding-top:14px}
+.share-list{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.share-chip{display:inline-flex;align-items:center;gap:6px;background:#eef2ef;border-radius:20px;padding:5px 10px;font-size:11px;font-family:'DM Mono',monospace}
+.share-chip button{border:0;background:none;color:#b54d36;font-size:13px;cursor:pointer;line-height:1}
+.share-add-row{display:flex;gap:8px;margin-top:6px}
+.share-add-row input{flex:1;border:1px solid var(--line);border-radius:7px;padding:9px;font:13px 'DM Sans'}
+
+/* --- settings ID-copy row --- */
+.id-copy-row{display:flex;gap:8px}
+.id-copy-row input{flex:1;font:12px 'DM Mono';background:#f2f4f1;color:var(--muted)}
 
 /* --- auth screen, toast, empty states (previously an inline <style> block in index.html) --- */
 #auth-screen{position:fixed;z-index:100;inset:0;background:#173b32;display:grid;place-items:center;padding:20px}
