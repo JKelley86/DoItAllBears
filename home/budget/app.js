@@ -28,8 +28,17 @@ applyTheme(localStorage.getItem(THEME_KEY) || 'light');
 function currentUser() { return pb.authStore.record || pb.authStore.model || null; }
 function requireUserId() {
   const u = currentUser();
-  if (!u?.id) { toast('Your session expired — please sign in again.', true); throw new Error('You need to be signed in to do that.'); }
+  if (!u?.id) {
+    toast('Your session expired — signing you out.', true);
+    pb.authStore.clear();
+    setTimeout(() => location.reload(), 900);
+    throw new Error('Not signed in');
+  }
   return u.id;
+}
+function logout() {
+  pb.authStore.clear();
+  location.reload();
 }
 
 let transactions = [], accounts = [], categories = [], budgets = [], goals = [], debts = [], recurring = [], investmentAccounts = [], holdings = [];
@@ -758,7 +767,8 @@ function openRecordForm(type, record = null) {
       if (type === 'monthly_budgets' && key === 'category') value = esc(nameById(categories, record.category));
       else value = record[key] ?? '';
     }
-    return `<label>${label}<input name="${key}" type="${input}" value="${value}" ${input === 'number' ? '' : 'required'}></label>`;
+    const attrs = input === 'number' ? 'step="any" inputmode="decimal"' : 'required';
+    return `<label>${label}<input name="${key}" type="${input}" value="${value}" ${attrs}></label>`;
   }).join('');
   const shareBlock = isEdit && SHAREABLE.has(type) ? `
     <div class="share-block">
@@ -918,10 +928,14 @@ function fillSettingsForm() {
   const nameInput = document.getElementById('settings-name');
   const workspaceInput = document.getElementById('settings-workspace');
   const idInput = document.getElementById('settings-user-id');
+  const emailNode = document.getElementById('settings-email');
   if (nameInput) nameInput.value = currentUser()?.name || '';
   if (workspaceInput) workspaceInput.value = currentWorkspaceName();
   if (idInput) idInput.value = currentUser()?.id || '';
+  if (emailNode) emailNode.textContent = currentUser()?.email || '';
 }
+const logoutBtn = document.getElementById('logout-btn');
+if (logoutBtn) logoutBtn.onclick = () => { if (confirm('Log out of Northstar?')) logout(); };
 const copyIdBtn = document.getElementById('settings-copy-id');
 if (copyIdBtn) {
   copyIdBtn.onclick = async () => {
