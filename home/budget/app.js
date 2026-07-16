@@ -48,6 +48,69 @@ let displayedMonth = new Date();
 /* ---------- small data helpers ---------- */
 function startOfMonth(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
 function addMonths(d, n) { return new Date(d.getFullYear(), d.getMonth() + n, 1); }
+function round2(n) { return Math.round((n + Number.EPSILON) * 100) / 100; }
+/* Rolls a recurring bill's next_due_date forward, cycle by cycle, until it's in
+   the future — so a bill you never touch still shows the right upcoming date
+   instead of sitting in the past forever. */
+function advanceDueDate(dateStr, frequency) {
+  let d = new Date(dateStr);
+  const today = new Date();
+  const freq = (frequency || 'monthly').toLowerCase();
+  let guard = 0;
+  while (d < today && guard < 600) {
+    if (freq === 'weekly') d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 7);
+    else if (freq.startsWith('year') || freq.startsWith('annual')) d = new Date(d.getFullYear() + 1, d.getMonth(), d.getDate());
+    else d = new Date(d.getFullYear(), d.getMonth() + 1, d.getDate());
+    guard++;
+  }
+  return d;
+}
+async function autoAdvanceRecurring() {
+  const today = new Date();
+  const jobs = recurring
+    .filter(r => r.next_due_date && new Date(r.next_due_date) < today)
+    .map(async r => {
+      const next = advanceDueDate(r.next_due_date, r.frequency);
+      try {
+        const updated = await pb.collection('recurring_items').update(r.id, { next_due_date: next.toISOString() });
+        Object.assign(r, updated);
+      } catch (err) { console.warn('could not auto-advance bill', r.id, err); }
+    });
+  if (jobs.length) await Promise.allSettled(jobs);
+}
+
+/* A linked debt payment splits into interest (balance × monthly rate) and
+   principal (the rest). We store both on the transaction itself, so the split
+   is a historical record that doesn't drift if the APR changes later, and we
+   keep a running lifetime-interest total on the debt. Edits/deletes reverse the
+   previous split before applying a new one, so the balance never double-counts. */
+function splitPayment(debt, paymentAmount) {
+  const balance = debt.current_balance || 0;
+  const monthlyRate = (debt.interest_rate || 0) / 100 / 12;
+  const interestPortion = round2(Math.min(paymentAmount, balance * monthlyRate));
+  const principalPortion = round2(Math.max(0, paymentAmount - interestPortion));
+  return { interestPortion, principalPortion };
+}
+async function applyDebtPayment(debtId, paymentAmount) {
+  const debt = debts.find(d => d.id === debtId);
+  if (!debt) return null;
+  const { interestPortion, principalPortion } = splitPayment(debt, paymentAmount);
+  const newBalance = round2(Math.max(0, (debt.current_balance || 0) - principalPortion));
+  const newInterestTotal = round2((debt.total_interest_paid || 0) + interestPortion);
+  const updated = await pb.collection('debts').update(debtId, { current_balance: newBalance, total_interest_paid: newInterestTotal });
+  Object.assign(debt, updated);
+  return { interestPortion, principalPortion };
+}
+async function reverseDebtPayment(debtId, interestPortion, principalPortion) {
+  const debt = debts.find(d => d.id === debtId);
+  if (!debt) return;
+  const newBalance = round2((debt.current_balance || 0) + (principalPortion || 0));
+  const newInterestTotal = round2(Math.max(0, (debt.total_interest_paid || 0) - (interestPortion || 0)));
+  try {
+    const updated = await pb.collection('debts').update(debtId, { current_balance: newBalance, total_interest_paid: newInterestTotal });
+    Object.assign(debt, updated);
+  } catch (err) { console.warn('could not reverse debt payment', debtId, err); }
+}
 function inMonth(dateStr, monthDate) {
   const d = new Date(dateStr);
   return d.getFullYear() === monthDate.getFullYear() && d.getMonth() === monthDate.getMonth();
@@ -244,7 +307,7 @@ function renderDebts() {
       debts.map(d => {
         const orig = d.original_balance;
         const progress = orig ? clamp(1 - (d.current_balance || 0) / orig, 0, 1) : null;
-        return `<div class="debt-row editable"><span class="debt-round blue">${esc((d.name || 'D')[0])}</span><div><b>${esc(d.name)}</b><p>${d.interest_rate || 0}% APR · ${money.format(d.minimum_payment || 0)}/mo${d.shared_with?.length ? ' · shared' : ''}</p></div><strong>${money.format(d.current_balance || 0)}</strong>${progress !== null ? `<span class="progress tiny"><i style="width:${pct(progress)}"></i></span>` : '<span></span>'}<button>›</button></div>`;
+        return `<div class="debt-row editable"><span class="debt-round blue">${esc((d.name || 'D')[0])}</span><div><b>${esc(d.name)}</b><p>${d.interest_rate || 0}% APR · ${money.format(d.minimum_payment || 0)}/mo${d.total_interest_paid ? ` · ${money.format(d.total_interest_paid)} interest paid` : ''}${d.shared_with?.length ? ' · shared' : ''}</p></div><strong>${money.format(d.current_balance || 0)}</strong>${progress !== null ? `<span class="progress tiny"><i style="width:${pct(progress)}"></i></span>` : '<span></span>'}<button>›</button></div>`;
       }).join('') || '<p class="empty">No loans or debts saved yet.</p>'
     }`;
     list.querySelectorAll('.debt-row').forEach((el, i) => el.onclick = () => openRecordForm('debts', debts[i]));
@@ -262,7 +325,8 @@ function renderDebts() {
       feature.onclick = () => openRecordForm('debts', primary);
       feature.innerHTML = `<div class="loan-title"><span class="loan-icon">⌂</span><div><p class="eyebrow">${esc((primary.debt_type || 'LOAN').toUpperCase())}</p><h2>${esc(primary.name)}</h2></div><button class="dots">•••</button></div>
         <div class="loan-numbers"><div><span>REMAINING</span><b>${money.format(primary.current_balance || 0)}</b></div><div><span>INTEREST RATE</span><b>${primary.interest_rate || 0}%</b></div><div><span>PAYMENT</span><b>${money.format(primary.minimum_payment || 0)} <small>/mo</small></b></div></div>
-        ${progress !== null ? `<div class="progress"><i style="width:${pct(progress)}"></i></div><p class="subtle">${pct(progress)} paid off${payoff ? ` · Estimated payoff: ${monthsFromNow(payoff.months)}` : ''}</p>` : (payoff ? `<p class="subtle">Estimated payoff: ${monthsFromNow(payoff.months)}</p>` : '<p class="subtle">Add an interest rate and payment to estimate payoff.</p>')}`;
+        ${progress !== null ? `<div class="progress"><i style="width:${pct(progress)}"></i></div><p class="subtle">${pct(progress)} paid off${payoff ? ` · Estimated payoff: ${monthsFromNow(payoff.months)}` : ''}</p>` : (payoff ? `<p class="subtle">Estimated payoff: ${monthsFromNow(payoff.months)}</p>` : '<p class="subtle">Add an interest rate and payment to estimate payoff.</p>')}
+        ${primary.total_interest_paid ? `<p class="subtle">${money.format(primary.total_interest_paid)} in interest paid so far</p>` : ''}`;
     }
   }
 
@@ -628,6 +692,7 @@ async function loadData() {
     getAll('transactions', { sort: '-date' }), getAll('accounts'), getAll('categories'), getAll('monthly_budgets'),
     getAll('goals'), getAll('debts'), getAll('recurring_items', { sort: 'next_due_date' }), getAll('investment_accounts'), getAll('investment_holdings'),
   ]);
+  await autoAdvanceRecurring();
   const workspaceNode = document.querySelector('.workspace');
   if (workspaceNode) {
     workspaceNode.childNodes[1].textContent = currentWorkspaceName();
@@ -637,24 +702,19 @@ async function loadData() {
   renderAll();
 }
 
-/* Subscribe to every collection so changes made elsewhere — another tab, another
-   device, or (once an account/debt is shared) a partner's login — refresh this
-   view automatically instead of requiring a manual reload. PocketBase's own
-   list/view API rules decide which records each subscriber actually receives. */
-let realtimeStarted = false;
-let reloadTimer = null;
-function scheduleReload() {
-  clearTimeout(reloadTimer);
-  reloadTimer = setTimeout(() => { loadData(); }, 400);
-}
-async function startRealtime() {
-  if (realtimeStarted) return;
-  realtimeStarted = true;
-  const watched = ['transactions', 'accounts', 'categories', 'monthly_budgets', 'goals', 'debts', 'recurring_items', 'investment_accounts', 'investment_holdings'];
-  for (const name of watched) {
-    try { await pb.collection(name).subscribe('*', scheduleReload); }
-    catch (err) { console.warn('realtime unavailable for', name, err); }
-  }
+/* PocketBase's realtime feature relies on the browser's EventSource API, which
+   can't send custom headers — so it can't send the ngrok-skip-browser-warning
+   header that makes normal API calls work through a free ngrok tunnel. That left
+   9 EventSource connections endlessly retrying in the background, which saturated
+   the browser's ~6-connections-per-origin limit and made ordinary requests (like
+   saving a transaction) hang. Polling with short, ordinary requests avoids that
+   entirely, at the cost of near-instant (rather than instant) sync. */
+let pollTimer = null;
+function startPolling() {
+  if (pollTimer) return;
+  pollTimer = setInterval(() => {
+    if (document.visibilityState === 'visible') loadData();
+  }, 20000);
 }
 
 /* ================= ADD/EDIT TRANSACTION MODAL ================= */
@@ -666,6 +726,30 @@ function populateCategoryOptions() {
   const existing = categories.map(c => c.name);
   select.innerHTML = existing.map(name => `<option>${esc(name)}</option>`).join('') + '<option>Other</option>';
 }
+function populateDebtOptions() {
+  const select = document.getElementById('tx-debt');
+  if (!select) return;
+  select.innerHTML = '<option value="">Not a loan payment</option>' + debts.map(d => `<option value="${d.id}">${esc(d.name)}</option>`).join('');
+}
+function updatePaymentPreview() {
+  const preview = document.getElementById('tx-debt-preview');
+  if (!preview) return;
+  const debtId = document.getElementById('tx-debt').value;
+  const isExpense = document.getElementById('tx-type').value === 'expense';
+  const amount = Number(document.getElementById('tx-amount').value || 0);
+  const debt = debts.find(d => d.id === debtId);
+  if (!debtId || !isExpense || !debt || amount <= 0) { preview.textContent = ''; return; }
+  const { interestPortion, principalPortion } = splitPayment(debt, amount);
+  preview.textContent = `${money.format(interestPortion)} to interest · ${money.format(principalPortion)} to principal`;
+}
+function toggleDebtField() {
+  const row = document.getElementById('tx-debt-row');
+  if (row) row.style.display = document.getElementById('tx-type').value === 'expense' ? '' : 'none';
+  updatePaymentPreview();
+}
+document.getElementById('tx-type').addEventListener('change', toggleDebtField);
+document.getElementById('tx-amount').addEventListener('input', updatePaymentPreview);
+document.getElementById('tx-debt').addEventListener('change', updatePaymentPreview);
 function openTransactionForm(record = null) {
   editingTransactionId = record?.id || null;
   const heading = modal.querySelector('h2');
@@ -677,7 +761,10 @@ function openTransactionForm(record = null) {
   document.getElementById('tx-account').innerHTML = '<option value="">Select account</option>' + accounts.map(a => `<option value="${a.id}">${esc(a.name)} · ${money.format(currentBalanceFor(a.id, a.balance))}</option>`).join('');
   if (record?.account) document.getElementById('tx-account').value = record.account;
   populateCategoryOptions();
+  populateDebtOptions();
   if (record) document.getElementById('tx-category').value = nameById(categories, record.category);
+  document.getElementById('tx-debt').value = record?.debt || '';
+  toggleDebtField();
   const deleteBtn = document.getElementById('tx-delete-btn');
   if (deleteBtn) deleteBtn.style.display = record ? '' : 'none';
   modal.classList.add('open');
@@ -692,6 +779,8 @@ if (txDeleteBtn) {
   txDeleteBtn.onclick = async () => {
     if (!editingTransactionId || !confirm("Delete this transaction? This can't be undone.")) return;
     try {
+      const old = transactions.find(t => t.id === editingTransactionId);
+      if (old?.debt) await reverseDebtPayment(old.debt, old.interest_portion, old.principal_portion);
       await pb.collection('transactions').delete(editingTransactionId);
       modal.classList.remove('open');
       await loadData();
@@ -709,15 +798,27 @@ document.querySelector('.modal').addEventListener('submit', async e => {
       category = await pb.collection('categories').create({ user: requireUserId(), name: categoryName, group: amount > 0 ? 'income' : 'wants' });
       categories.push(category);
     }
+    const linkedDebtId = document.getElementById('tx-debt').value || null;
     const payload = {
       merchant: document.getElementById('tx-desc').value, amount,
       date: new Date(document.getElementById('tx-date').value + 'T12:00:00').toISOString(),
       kind: amount > 0 ? 'income' : 'expense', category: category.id, account: document.getElementById('tx-account').value || null,
+      debt: linkedDebtId, interest_portion: null, principal_portion: null,
     };
     if (editingTransactionId) {
+      const old = transactions.find(t => t.id === editingTransactionId);
+      if (old?.debt) await reverseDebtPayment(old.debt, old.interest_portion, old.principal_portion);
+      if (linkedDebtId && amount < 0) {
+        const split = await applyDebtPayment(linkedDebtId, Math.abs(amount));
+        if (split) { payload.interest_portion = split.interestPortion; payload.principal_portion = split.principalPortion; }
+      }
       await pb.collection('transactions').update(editingTransactionId, payload);
       toast('Transaction updated');
     } else {
+      if (linkedDebtId && amount < 0) {
+        const split = await applyDebtPayment(linkedDebtId, Math.abs(amount));
+        if (split) { payload.interest_portion = split.interestPortion; payload.principal_portion = split.principalPortion; }
+      }
       payload.user = requireUserId();
       const record = await pb.collection('transactions').create(payload);
       transactions.unshift(record);
@@ -1001,7 +1102,7 @@ function authScreen() {
       await pb.collection('users').authWithPassword(f.get('email'), f.get('password'));
       screen.remove();
       await loadData();
-      startRealtime();
+      startPolling();
       toast('Signed in securely');
     } catch (err) { screen.querySelector('#auth-message').textContent = err.message || 'Sign-in failed'; }
   };
@@ -1015,11 +1116,11 @@ function authScreen() {
         await pb.collection('users').authWithPassword(data.email, data.password);
         screen.remove();
         await loadData();
-        startRealtime();
+        startPolling();
         toast('Account created');
       } catch (err) { screen.querySelector('#auth-message').textContent = err.message || 'Could not create account'; }
     };
   };
 }
-if (pb.authStore.isValid) loadData().then(() => { updateScenario(); startRealtime(); });
+if (pb.authStore.isValid) loadData().then(() => { updateScenario(); startPolling(); });
 else authScreen();
