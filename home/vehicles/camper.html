@@ -40,9 +40,7 @@
     flex-direction: column;
   }
 
-  .top {
-    padding: 18px 20px 0;
-  }
+  .top { padding: 18px 20px 0; }
 
   .brand-row {
     display: flex;
@@ -84,10 +82,7 @@
     100% { box-shadow: 0 0 0 0 rgba(127,163,122,0); }
   }
 
-  /* List picker dropdown */
-  .picker-wrap {
-    margin-bottom: 16px;
-  }
+  .picker-wrap { margin-bottom: 16px; }
   .picker-label {
     font-size: 11px;
     letter-spacing: 0.04em;
@@ -111,7 +106,6 @@
   }
   select.picker:focus { outline: 2px solid var(--amber); }
 
-  /* Stage header */
   .stage-head {
     padding: 4px 20px 16px;
     border-bottom: 1px solid var(--line);
@@ -144,7 +138,6 @@
     color: var(--sage);
   }
 
-  /* Item list */
   .list {
     flex: 1;
     padding: 8px 16px 100px;
@@ -265,6 +258,8 @@ pb.beforeSend = function(url, options) {
   return { url, options };
 };
 
+const POLL_MS = 2000;
+
 const picker = document.getElementById('listPicker');
 const contentEl = document.getElementById('content');
 const statusDot = document.getElementById('statusDot');
@@ -272,8 +267,10 @@ const statusText = document.getElementById('statusText');
 
 let checklists = [];
 let itemsByChecklist = {};
-let unsubscribeItems = null;
-let viewingChecklistId = null; // which list is currently shown on THIS device
+let viewingChecklistId = null;      // list currently shown on screen
+let currentViewRecordId = null;     // the id of the shared "current_view" row
+let suppressNextPollJump = false;   // avoids fighting our own optimistic update for one tick
+let consecutiveFailures = 0;
 
 function setStatus(live, text) {
   statusDot.classList.toggle('live', live);
@@ -360,17 +357,15 @@ async function toggleItem(itemId) {
   } catch (err) {
     item.checked = !item.checked;
     render();
-    setStatus(false, 'Update failed — retry');
     console.error(err);
   }
 }
 
-// Resets every item in a list back to unchecked (used when leaving a completed list)
 async function resetList(checklistId) {
   const items = itemsByChecklist[checklistId] || [];
   const toReset = items.filter(i => i.checked);
   if (toReset.length === 0) return;
-  toReset.forEach(i => i.checked = false); // optimistic
+  toReset.forEach(i => i.checked = false);
   render();
   await Promise.all(
     toReset.map(i => pb.collection('items').update(i.id, { checked: false }).catch(err => console.error('reset failed', err)))
@@ -385,18 +380,44 @@ picker.addEventListener('change', async () => {
   }
   viewingChecklistId = nextId;
   render();
+
+  // broadcast this choice so other devices (and the ESP32) can follow it
+  suppressNextPollJump = true;
+  try {
+    if (currentViewRecordId) {
+      await pb.collection('current_view').update(currentViewRecordId, { checklist: nextId });
+    }
+  } catch (err) {
+    console.error('failed to broadcast current view', err);
+  }
 });
 
-async function loadAll() {
-  checklists = await pb.collection('checklists').getFullList({ sort: 'order' });
-  const allItems = await pb.collection('items').getFullList({ sort: 'position' });
+// One full refresh: checklists, items, and the shared "current_view" pointer.
+async function refreshData() {
+  const [freshChecklists, freshItems, viewRec] = await Promise.all([
+    pb.collection('checklists').getFullList({ sort: 'order' }),
+    pb.collection('items').getFullList({ sort: 'position' }),
+    pb.collection('current_view').getFirstListItem('key="main"').catch(() => null),
+  ]);
 
-  itemsByChecklist = {};
-  checklists.forEach(cl => itemsByChecklist[cl.id] = []);
-  allItems.forEach(it => {
-    if (!itemsByChecklist[it.checklist]) itemsByChecklist[it.checklist] = [];
-    itemsByChecklist[it.checklist].push(it);
+  checklists = freshChecklists;
+  const grouped = {};
+  checklists.forEach(cl => grouped[cl.id] = []);
+  freshItems.forEach(it => {
+    if (!grouped[it.checklist]) grouped[it.checklist] = [];
+    grouped[it.checklist].push(it);
   });
+  itemsByChecklist = grouped;
+
+  if (viewRec) {
+    currentViewRecordId = viewRec.id;
+    if (suppressNextPollJump) {
+      // we just set this ourselves; don't fight it, just clear the flag
+      suppressNextPollJump = false;
+    } else if (viewRec.checklist && viewRec.checklist !== viewingChecklistId) {
+      viewingChecklistId = viewRec.checklist;
+    }
+  }
 
   if (!viewingChecklistId && checklists.length) {
     viewingChecklistId = [...checklists].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))[0].id;
@@ -405,47 +426,33 @@ async function loadAll() {
   render();
 }
 
-function applyItemChange(record) {
-  const list = itemsByChecklist[record.checklist];
-  if (!list) return;
-  const idx = list.findIndex(i => i.id === record.id);
-  if (idx >= 0) list[idx] = record;
-  else list.push(record);
-  render();
-}
-
-function applyItemDelete(record) {
-  const list = itemsByChecklist[record.checklist];
-  if (!list) return;
-  itemsByChecklist[record.checklist] = list.filter(i => i.id !== record.id);
-  render();
-}
-
-async function subscribeRealtime() {
-  unsubscribeItems = await pb.collection('items').subscribe('*', (e) => {
-    if (e.action === 'delete') applyItemDelete(e.record);
-    else applyItemChange(e.record);
+async function pollLoop() {
+  try {
+    await refreshData();
+    consecutiveFailures = 0;
     setStatus(true, 'Live');
-  });
+  } catch (err) {
+    consecutiveFailures++;
+    console.error('poll failed', err);
+    if (consecutiveFailures >= 2) setStatus(false, 'Offline — check tunnel');
+  } finally {
+    setTimeout(pollLoop, POLL_MS);
+  }
 }
 
 async function init() {
   try {
-    await loadAll();
+    await refreshData();
     setStatus(true, 'Live');
-    await subscribeRealtime();
   } catch (err) {
     console.error(err);
     setStatus(false, 'Offline — check tunnel');
     contentEl.innerHTML = `<div class="msg-screen">Couldn't reach PocketBase.<br>Check that the ngrok tunnel and Pi are running.</div>`;
   }
+  setTimeout(pollLoop, POLL_MS);
 }
 
 init();
-
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') loadAll().catch(() => setStatus(false, 'Offline'));
-});
 </script>
 
 </body>
