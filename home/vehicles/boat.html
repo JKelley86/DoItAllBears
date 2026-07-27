@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Boat</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../theme.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Boat</h1>
+        <p>Here you will find any information on your Boat!</p>
+        
+        <!-- Section 1 -->
+        <section class="information-section">
+            <h2>Type of boat and trailer</h2>
+            <p>You have 9 zones. They are labled on the controller inside the garage. Each zone consist of 5 sprinklers. The shut off valve is in back by the AC and the solenoid valves are inbetween the shut off valve and the wood burried in the ground.</p>
+            <p>Zone 1: Front Sidewalk 10 min</p>
+            <p>Zone 2: Front Driveway 35 min</p>
+            <P>Zone 3: North Front/Back 30 min</P>
+            <p>Zone 4: North East Side 25 min</p>
+            <p>Zone 5: South Side 10 min</p>
+            <p>Zone 6: South East Corner 25 min</p>
+            <p>Zone 7: Drip Zone 10 min</p>
+            <p>Zone 8: Not Used</p>
+            <p>Zone 9: Garden 20 min</p>
+        </section>
+
+        <!-- Section 2 -->
+        <section class="information-section">
+            <h2>Winterization</h2>
+            <p>1. Locate the shut off valve behind the house.</p>
+            <p>2. Bring air compressor next to shut off valve and start. Make sure to start it early to accumulate air.</p>
+            <p>3. Shut off the lower valve running into the house. This will shut off the water.</p>
+            <p>4. Start the first zone on the sprinkler controller by switching it to manual and selecting zone 1 then switch it to run.</p>
+            <p>5. Connect the air compressor to the air fitting inbetween the 2 valves. You will see zone 1 start to shoot out water.</p>
+            <p>6. Let the air compressor run until no more water shoots out. Ensure there is enough pressure.</p>
+            <p>7. Turn the top valve on and off as needed to accumulate enough air pressure in the air compressor.</p>
+            <p>8. Turn on the air to each zone at least twice to push out any remaning water that might have settled.</p>
+            <p>9. Repeat steps 5-8 for each zone ensure no water shoots out before moving on. This should take less than an hour.</p>
+        </section>
+
+
+    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+    <div class="sidebar" id="sidebar">
+        <div class="clock" id="clock"></div>
+        <div id="sidebar-nav"></div> <!-- This will be populated dynamically -->
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+    </div>
+
+    <footer> 
+        <span>&copy; 2024 Justin's Website. All rights reserved.</span>
+    </footer>
+
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+                // Close sidebar if clicked outside of it
+                document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuButton = document.querySelector('.menu-btn');
+            if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('clock').textContent = timeString;
+        }
+
+        // Function to toggle the theme
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+        }
+
+        window.onload = function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+            } else if (savedTheme === 'dark') {
+                document.body.classList.remove('light-mode');
+            }
+        }
+    fetch('sidebar.html')
+	    .then(response => response.text())
+	    .then(data => {
+		document.getElementById('sidebar-nav').innerHTML = data;
+    	    });
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+</body>
+</html>
