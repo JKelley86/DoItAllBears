@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Camper Checklist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pocketbase@0.21.1/dist/pocketbase.umd.js"></script>
+<style>
+  :root {
+    --bg: #12181c;
+    --bg-raised: #1a2229;
+    --bg-raised-2: #212b33;
+    --line: #2a353d;
+    --text: #eef1f2;
+    --text-dim: #8fa0a8;
+    --amber: #f2b705;
+    --sage: #7fa37a;
+    --sage-glow: rgba(127, 163, 122, 0.15);
+    --danger: #d9695a;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: contain;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .top {
+    padding: 18px 20px 0;
+  }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .brand {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--danger);
+  }
+  .status-dot.live {
+    background: var(--sage);
+    animation: pulse 2.2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 var(--sage-glow); }
+    70% { box-shadow: 0 0 0 6px rgba(127,163,122,0); }
+    100% { box-shadow: 0 0 0 0 rgba(127,163,122,0); }
+  }
+
+  /* List picker dropdown */
+  .picker-wrap {
+    margin-bottom: 16px;
+  }
+  .picker-label {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  select.picker {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    background: var(--bg-raised) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" stroke="%238fa0a8" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat right 14px center;
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 40px 14px 16px;
+    font-size: 17px;
+    font-weight: 600;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  select.picker:focus { outline: 2px solid var(--amber); }
+
+  /* Stage header */
+  .stage-head {
+    padding: 4px 20px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .stage-progress {
+    font-size: 13px;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .progress-track {
+    margin-top: 10px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--bg-raised-2);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--amber);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+  .complete-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--sage);
+  }
+
+  /* Item list */
+  .list {
+    flex: 1;
+    padding: 8px 16px 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 16px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+  }
+  .item:active { transform: scale(0.99); }
+  .item.checked {
+    background: var(--sage-glow);
+    border-color: rgba(127,163,122,0.35);
+  }
+
+  .box {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    border: 2px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+  }
+  .item.checked .box {
+    background: var(--sage);
+    border-color: var(--sage);
+  }
+  .box svg {
+    width: 15px;
+    height: 15px;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.15s ease;
+  }
+  .item.checked .box svg { opacity: 1; transform: scale(1); }
+
+  .label {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--text);
+    transition: color 0.15s ease;
+  }
+  .item.checked .label {
+    color: var(--text-dim);
+    text-decoration: line-through;
+    text-decoration-color: var(--text-dim);
+    text-decoration-thickness: 1.5px;
+  }
+
+  .msg-screen {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    font-size: 14px;
+    padding: 40px;
+    text-align: center;
+  }
+
+  .footer-hint {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, var(--bg) 60%, transparent);
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: center;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+  <div class="top">
+    <div class="brand-row">
+      <div class="brand">Camper Checklist</div>
+      <div class="status">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Connecting…</span>
+      </div>
+    </div>
+    <div class="picker-wrap">
+      <div class="picker-label">Viewing list</div>
+      <select class="picker" id="listPicker"></select>
+    </div>
+  </div>
+
+  <div id="content">
+    <div class="msg-screen">Loading checklists…</div>
+  </div>
+
+  <div class="footer-hint">Tap an item to check it off · syncs automatically</div>
+
+<script>
+const POCKETBASE_URL = 'https://tumid-kiltlike-maia.ngrok-free.dev';
+const pb = new PocketBase(POCKETBASE_URL);
+pb.autoCancellation(false);
+pb.beforeSend = function(url, options) {
+  options.headers = Object.assign({}, options.headers, {'ngrok-skip-browser-warning': 'true'});
+  return { url, options };
+};
+
+const picker = document.getElementById('listPicker');
+const contentEl = document.getElementById('content');
+const statusDot = document.getElementById('statusDot');
+const statusText = document.getElementById('statusText');
+
+let checklists = [];
+let itemsByChecklist = {};
+let unsubscribeItems = null;
+let viewingChecklistId = null; // which list is currently shown on THIS device
+
+function setStatus(live, text) {
+  statusDot.classList.toggle('live', live);
+  statusText.textContent = text;
+}
+
+function getChecklist(id) {
+  return checklists.find(cl => cl.id === id) || null;
+}
+
+function isListComplete(checklistId) {
+  const items = itemsByChecklist[checklistId] || [];
+  if (items.length === 0) return false;
+  return items.every(i => i.checked);
+}
+
+function renderPicker() {
+  const sorted = [...checklists].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  picker.innerHTML = sorted.map(cl => {
+    const items = itemsByChecklist[cl.id] || [];
+    const checkedCount = items.filter(i => i.checked).length;
+    const tag = items.length ? ` — ${checkedCount}/${items.length}` : '';
+    return `<option value="${cl.id}">${cl.name}${tag}</option>`;
+  }).join('');
+  if (viewingChecklistId) picker.value = viewingChecklistId;
+}
+
+function renderContent() {
+  const displayed = getChecklist(viewingChecklistId);
+  if (!displayed) {
+    contentEl.innerHTML = `<div class="msg-screen">No list selected.</div>`;
+    return;
+  }
+
+  const items = (itemsByChecklist[displayed.id] || []).slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+  const checkedCount = items.filter(i => i.checked).length;
+  const pct = items.length ? Math.round((checkedCount / items.length) * 100) : 0;
+  const complete = items.length > 0 && checkedCount === items.length;
+
+  const itemsHtml = items.map(item => `
+    <div class="item ${item.checked ? 'checked' : ''}" data-id="${item.id}">
+      <div class="box">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 11.5L13 4" stroke="#12181c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="label">${item.label}</div>
+    </div>
+  `).join('');
+
+  const completeTag = complete ? `
+    <div class="complete-tag">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 11.5L13 4" stroke="#7fa37a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Complete — will reset when you switch lists
+    </div>` : '';
+
+  contentEl.innerHTML = `
+    <div class="stage-head">
+      <div class="stage-progress">${checkedCount} of ${items.length} complete</div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+      ${completeTag}
+    </div>
+    <div class="list">${items.length ? itemsHtml : '<div class="msg-screen">No items in this list yet.</div>'}</div>
+  `;
+
+  contentEl.querySelectorAll('.item').forEach(el => {
+    el.addEventListener('click', () => toggleItem(el.dataset.id));
+  });
+}
+
+function render() {
+  renderPicker();
+  renderContent();
+}
+
+async function toggleItem(itemId) {
+  const items = itemsByChecklist[viewingChecklistId] || [];
+  const item = items.find(i => i.id === itemId);
+  if (!item) return;
+
+  item.checked = !item.checked;
+  render();
+
+  try {
+    await pb.collection('items').update(itemId, { checked: item.checked });
+  } catch (err) {
+    item.checked = !item.checked;
+    render();
+    setStatus(false, 'Update failed — retry');
+    console.error(err);
+  }
+}
+
+// Resets every item in a list back to unchecked (used when leaving a completed list)
+async function resetList(checklistId) {
+  const items = itemsByChecklist[checklistId] || [];
+  const toReset = items.filter(i => i.checked);
+  if (toReset.length === 0) return;
+  toReset.forEach(i => i.checked = false); // optimistic
+  render();
+  await Promise.all(
+    toReset.map(i => pb.collection('items').update(i.id, { checked: false }).catch(err => console.error('reset failed', err)))
+  );
+}
+
+picker.addEventListener('change', async () => {
+  const previousId = viewingChecklistId;
+  const nextId = picker.value;
+  if (previousId && previousId !== nextId && isListComplete(previousId)) {
+    await resetList(previousId);
+  }
+  viewingChecklistId = nextId;
+  render();
+});
+
+async function loadAll() {
+  checklists = await pb.collection('checklists').getFullList({ sort: 'order' });
+  const allItems = await pb.collection('items').getFullList({ sort: 'position' });
+
+  itemsByChecklist = {};
+  checklists.forEach(cl => itemsByChecklist[cl.id] = []);
+  allItems.forEach(it => {
+    if (!itemsByChecklist[it.checklist]) itemsByChecklist[it.checklist] = [];
+    itemsByChecklist[it.checklist].push(it);
+  });
+
+  if (!viewingChecklistId && checklists.length) {
+    viewingChecklistId = [...checklists].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))[0].id;
+  }
+
+  render();
+}
+
+function applyItemChange(record) {
+  const list = itemsByChecklist[record.checklist];
+  if (!list) return;
+  const idx = list.findIndex(i => i.id === record.id);
+  if (idx >= 0) list[idx] = record;
+  else list.push(record);
+  render();
+}
+
+function applyItemDelete(record) {
+  const list = itemsByChecklist[record.checklist];
+  if (!list) return;
+  itemsByChecklist[record.checklist] = list.filter(i => i.id !== record.id);
+  render();
+}
+
+async function subscribeRealtime() {
+  unsubscribeItems = await pb.collection('items').subscribe('*', (e) => {
+    if (e.action === 'delete') applyItemDelete(e.record);
+    else applyItemChange(e.record);
+    setStatus(true, 'Live');
+  });
+}
+
+async function init() {
+  try {
+    await loadAll();
+    setStatus(true, 'Live');
+    await subscribeRealtime();
+  } catch (err) {
+    console.error(err);
+    setStatus(false, 'Offline — check tunnel');
+    contentEl.innerHTML = `<div class="msg-screen">Couldn't reach PocketBase.<br>Check that the ngrok tunnel and Pi are running.</div>`;
+  }
+}
+
+init();
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') loadAll().catch(() => setStatus(false, 'Offline'));
+});
+</script>
+
+</body>
+</html>
