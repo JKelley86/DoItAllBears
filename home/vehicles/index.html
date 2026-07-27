@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Justin & Bridget's Fleet</title>
+  <meta name="description" content="Explore Justin's interactive fleet.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="loading-screen">
+    <div class="loading-logo">JUSTIN & BRIDGET'S FLEET</div>
+    <div class="loading-bar"><span></span></div>
+    <div class="loading-text">Preparing the property...</div>
+  </div>
+
+  <div class="world" id="world">
+    <div class="sky"></div>
+    <div class="sun"></div>
+    <div class="moon"></div>
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+
+    <div class="mountains mountains-back"></div>
+    <div class="mountains mountains-front"></div>
+
+    <div class="lake" id="lakeInteractive" tabindex="0" role="button" aria-label="Explore the lake">
+      <div class="lake-shimmer"></div><div class="lake-interaction-label">EXPLORE THE LAKE</div>
+      <div class="dock"></div>
+      <div class="boat vehicle boat-on-lake" data-vehicle="boat" tabindex="0" role="button">
+        <div class="boat-body"></div>
+        <div class="boat-cabin"></div>
+        <div class="boat-wake"></div>
+        <div class="vehicle-label">
+          <span class="vehicle-type">WATERCRAFT</span>
+          <strong>THE BOAT</strong>
+          <button>ENTER</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ground">
+      <div class="road"></div>
+      <div class="driveway"></div>
+
+      <div class="house interactive-object" id="houseInteractive" tabindex="0" role="button" aria-label="Check the house">
+        <div class="house-roof"></div>
+        <div class="house-body"></div>
+        <div class="house-window w1"></div>
+        <div class="house-window w2"></div>
+      </div>
+
+      <div class="garage interactive-object" id="garageInteractive" tabindex="0" role="button" aria-label="Enter the garage">
+        <div class="garage-roof"></div>
+        <div class="garage-body"></div>
+        <div class="garage-door"></div>
+        <div class="garage-light"></div>
+        <div class="garage-sign">JUSTIN & BRIDGET'S<br>GARAGE</div>
+      </div>
+
+      <div class="truck vehicle" data-vehicle="truck" tabindex="0" role="button">
+        <div class="truck-cab"></div>
+        <div class="truck-bed"></div>
+        <div class="truck-wheels"></div>
+        <div class="vehicle-label">
+          <span class="vehicle-type">TRUCK</span>
+          <strong>THE RAM</strong>
+          <button>ENTER</button>
+        </div>
+      </div>
+
+      <div class="car vehicle" data-vehicle="car" tabindex="0" role="button">
+        <div class="car-body"></div>
+        <div class="car-roof"></div>
+        <div class="car-wheels"></div>
+        <div class="vehicle-label">
+          <span class="vehicle-type">CAR</span>
+          <strong>THE CHALLENGER</strong>
+          <button>ENTER</button>
+        </div>
+      </div>
+
+      <div class="camper vehicle" data-vehicle="camper" tabindex="0" role="button">
+        <div class="camper-body"></div>
+        <div class="camper-window"></div>
+        <div class="camper-door"></div>
+        <div class="camper-wheel"></div>
+        <div class="vehicle-label">
+          <span class="vehicle-type">CAMPER</span>
+          <strong>THE CAMPER</strong>
+          <button>ENTER</button>
+        </div>
+      </div>
+
+      <div class="mower vehicle" data-vehicle="mower" tabindex="0" role="button">
+        <div class="mower-seat"></div>
+        <div class="mower-body"></div>
+        <div class="mower-wheels"></div>
+        <div class="vehicle-label">
+          <span class="vehicle-type">LAWN EQUIPMENT</span>
+          <strong>THE MOWER</strong>
+          <button>ENTER</button>
+        </div>
+      </div>
+
+      <div class="campsite">
+        <div class="tent"></div>
+        <div class="campfire interactive-object" id="campfireInteractive" tabindex="0" role="button" aria-label="Interact with campfire">
+          <div class="flame"></div>
+          <div class="log log1"></div>
+          <div class="log log2"></div>
+        </div>
+        <div class="camp-sign">CAMP</div>
+      </div>
+
+      <div class="tree tree-1"></div>
+      <div class="tree tree-2"></div>
+      <div class="tree tree-3"></div>
+      <div class="tree tree-4"></div>
+      <div class="tree tree-5"></div>
+
+      <div class="grass-patch gp1"></div>
+      <div class="grass-patch gp2"></div>
+      <div class="grass-patch gp3"></div>
+    </div>
+
+    <div class="foreground"></div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">JF</span>
+      <div>
+        <strong>JUSTIN & BRIDGET'S FLEET</strong>
+        <small>EVERYTHING I OWN THAT MOVES</small>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button id="timeToggle" class="icon-btn" title="Toggle day/night">☀</button>
+      <button id="soundToggle" class="icon-btn" title="Toggle sound">♪</button>
+      <button id="menuToggle" class="icon-btn menu-btn" title="Open menu">☰</button>
+    </div>
+  </header>
+
+  <div class="intro">
+    <p class="eyebrow">WELCOME HOME</p>
+    <h1>Explore the Fleet.</h1>
+    <p>Five machines. One property. Pick your destination.</p>
+  </div>
+
+  <nav class="fleet-nav" id="fleetNav">
+    <button data-target="car">🚗 <span>Car</span></button>
+    <button data-target="truck">🛻 <span>Truck</span></button>
+    <button data-target="boat">🚤 <span>Boat</span></button>
+    <button data-target="camper">🏕️ <span>Camper</span></button>
+    <button data-target="mower">🌱 <span>Mower</span></button>
+  </nav>
+
+  <aside class="side-panel" id="sidePanel">
+    <button class="close-panel" id="closePanel">×</button>
+    <p class="eyebrow">QUICK ACCESS</p>
+    <h2>My Fleet</h2>
+    <p>Jump directly to a vehicle or explore the property.</p>
+    <div class="panel-links">
+      <button data-target="car">🚗 <span><b>Car</b><small>2020 Dodge Challenger GT</small></span></button>
+      <button data-target="truck">🛻 <span><b>Truck</b><small>2023 RAM 1500 Bighorn</small></span></button>
+      <button data-target="boat">🚤 <span><b>Boat</b><small>2002 Glastron</small></span></button>
+      <button data-target="camper">🏕️ <span><b>Camper</b><small>2026 KZ Connect</small></span></button>
+      <button data-target="mower">🌱 <span><b>Lawnmower</b><small>Your lawn equipment</small></span></button>
+    </div>
+    <div class="panel-divider"></div>
+    <button class="utility-link" id="garageMode">🛠️ Enter Garage Mode</button>
+    <button class="utility-link" id="discoverMode">✨ Find Something</button>
+  </aside>
+
+  <div class="vehicle-modal" id="vehicleModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card">
+      <button class="modal-close" id="modalClose">×</button>
+      <div class="modal-icon" id="modalIcon">🚗</div>
+      <p class="eyebrow" id="modalType">CAR</p>
+      <h2 id="modalTitle">The Challenger</h2>
+      <p id="modalDescription">Your vehicle information lives here.</p>
+      <div class="modal-actions">
+        <a id="modalLink" href="#" class="primary-btn">OPEN VEHICLE PAGE →</a>
+        <button class="secondary-btn" id="modalStay">KEEP EXPLORING</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="garage-mode" id="garageModeScreen">
+    <button class="garage-close" id="garageClose">× EXIT GARAGE</button>
+    <div class="garage-grid"></div>
+    <div class="garage-title">
+      <p class="eyebrow">PRIVATE COLLECTION</p>
+      <h2>GARAGE MODE</h2>
+      <p>Select a machine to inspect.</p>
+    </div>
+    <div class="garage-items">
+      <button data-target="car">🚗<span>CAR</span></button>
+      <button data-target="truck">🛻<span>TRUCK</span></button>
+      <button data-target="boat">🚤<span>BOAT</span></button>
+      <button data-target="camper">🏕️<span>CAMPER</span></button>
+      <button data-target="mower">🌱<span>MOWER</span></button>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
