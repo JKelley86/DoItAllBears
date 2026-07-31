@@ -1,213 +1,115 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Justin & Bridget's Fleet</title>
-  <meta name="description" content="Explore Justin's interactive fleet.">
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Justin's Fleet 3D</title>
+<style>
+:root{--p:rgba(8,16,21,.78);--b:rgba(255,255,255,.16);--t:#f7f3ea;--m:rgba(247,243,234,.68);--a:#e9b85f}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0c171c;color:var(--t);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;touch-action:none}
+button,a{font:inherit}button{color:inherit;cursor:pointer}#scene{position:fixed;inset:0}canvas{display:block;width:100%;height:100%}
+.loading{position:fixed;inset:0;z-index:1000;display:grid;place-content:center;gap:16px;background:#0c171c;transition:.6s}
+.loading.done{opacity:0;visibility:hidden}.loading h1{letter-spacing:.2em;font-size:clamp(1.4rem,4vw,3rem)}
+.bar{width:min(360px,72vw);height:2px;background:#ffffff22}.bar i{display:block;height:100%;background:var(--a);animation:load 1.4s forwards}@keyframes load{to{width:100%}}
+.top{position:fixed;z-index:100;top:max(14px,env(safe-area-inset-top));left:14px;right:14px;display:flex;justify-content:space-between;pointer-events:none}
+.brand,.tools,.intro,.nav,.tip{pointer-events:auto}.brand{display:flex;gap:10px;align-items:center;padding:9px 12px;border:1px solid var(--b);border-radius:15px;background:var(--p);backdrop-filter:blur(16px)}
+.logo{width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:var(--a);color:#201c15;font-weight:900}.brand b,.brand small{display:block}.brand b{font-size:.74rem;letter-spacing:.15em}.brand small{font-size:.48rem;color:var(--m);letter-spacing:.1em;margin-top:2px}
+.tools{display:flex;gap:7px}.tools button{width:43px;height:43px;border:1px solid var(--b);border-radius:50%;background:var(--p);backdrop-filter:blur(16px)}
+.intro{position:fixed;z-index:80;left:5vw;top:21vh;max-width:min(590px,75vw);pointer-events:none;text-shadow:0 4px 22px #0008;transition:.4s}.intro.hide{opacity:0;transform:translateY(-12px)}
+.eyebrow{margin:0;color:var(--a);font-size:.62rem;letter-spacing:.22em;font-weight:800}.intro h1{margin:9px 0 14px;font-size:clamp(2.7rem,7vw,7rem);line-height:.9;letter-spacing:-.055em}.intro p:last-child{margin:0;color:#ffffffd0;line-height:1.5}
+.nav{position:fixed;z-index:110;left:50%;bottom:max(16px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:5px;padding:7px;border:1px solid var(--b);border-radius:19px;background:var(--p);backdrop-filter:blur(18px)}
+.nav button{min-width:72px;padding:9px 11px;border:0;border-radius:13px;background:transparent}.nav button:hover,.nav button.on{background:#ffffff20;transform:translateY(-2px)}.nav span{display:block;font-size:.65rem;margin-top:2px}
+.tip{position:fixed;z-index:90;left:16px;bottom:88px;padding:9px 12px;border:1px solid var(--b);border-radius:999px;background:var(--p);color:var(--m);font-size:.68rem}
+.panel{position:fixed;z-index:250;top:0;right:0;width:min(410px,92vw);height:100%;padding:92px 27px 27px;overflow:auto;background:rgba(8,15,19,.94);border-left:1px solid var(--b);backdrop-filter:blur(22px);transform:translateX(105%);transition:.4s;touch-action:pan-y}.panel.open{transform:none}
+.close{position:absolute;top:18px;right:22px;border:0;background:none;color:var(--m);font-size:2rem}.panel h2{font-size:2.1rem;margin:7px 0}.panel>p:not(.eyebrow){color:var(--m);line-height:1.55}
+.links{display:grid;gap:8px;margin:24px 0}.links button,.utility{width:100%;padding:13px;border:1px solid transparent;border-radius:13px;background:#ffffff0e;text-align:left}.links button:hover,.utility:hover{border-color:var(--b);background:#ffffff18}.links small{display:block;color:var(--m)}
+.utility{margin-bottom:8px;border-color:var(--b);background:transparent}
+.modal{position:fixed;z-index:500;inset:0;display:grid;place-items:center;padding:20px;opacity:0;visibility:hidden;transition:.3s}.modal.open{opacity:1;visibility:visible}.shade{position:absolute;inset:0;background:#03080bbd;backdrop-filter:blur(9px)}
+.card{position:relative;width:min(520px,100%);padding:43px;border:1px solid var(--b);border-radius:27px;background:rgba(13,22,26,.97);text-align:center;transform:translateY(18px) scale(.97);transition:.35s}.modal.open .card{transform:none}.card .icon{font-size:4rem}.card h2{font-size:clamp(2rem,5vw,3rem);margin:8px 0}.card p:not(.eyebrow){color:var(--m);line-height:1.65}.actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:24px}.actions a,.actions button{padding:12px 17px;border-radius:999px;border:1px solid var(--b);text-decoration:none;font-size:.72rem;letter-spacing:.08em}.actions a{background:var(--a);border-color:var(--a);color:#201c15;font-weight:800}.actions button{background:transparent}
+.toast{position:fixed;z-index:700;left:50%;bottom:100px;transform:translate(-50%,15px);padding:10px 15px;border:1px solid var(--b);border-radius:999px;background:var(--p);opacity:0;transition:.25s;white-space:nowrap}.toast.show{opacity:1;transform:translate(-50%,0)}
+.fallback{display:none;position:fixed;z-index:2000;inset:0;place-content:center;padding:30px;background:#0c171c;text-align:center}.fallback.show{display:grid}
+@media(max-width:700px){.brand small{display:none}.intro{left:18px;top:110px;max-width:88vw}.intro h1{font-size:clamp(2.6rem,13vw,4.6rem)}.nav{left:10px;right:10px;bottom:max(9px,env(safe-area-inset-bottom));transform:none;justify-content:space-between}.nav button{flex:1;min-width:0;padding:8px 3px}.nav span{font-size:.56rem}.tip{display:none}.card{padding:36px 21px}}
+</style>
 </head>
 <body>
-  <div id="loading-screen">
-    <div class="loading-logo">JUSTIN & BRIDGET'S FLEET</div>
-    <div class="loading-bar"><span></span></div>
-    <div class="loading-text">Preparing the property...</div>
-  </div>
+<div id="scene"></div>
+<div class="loading" id="loading"><h1>JUSTIN'S FLEET</h1><div class="bar"><i></i></div><small>Rendering the 3D property...</small></div>
+<div class="fallback" id="fallback"><div><h1>3D could not start</h1><p>This page needs WebGL and internet access to load Three.js.</p></div></div>
+<header class="top"><div class="brand"><span class="logo">JF</span><div><b>JUSTIN'S FLEET</b><small>INTERACTIVE 3D PROPERTY</small></div></div><div class="tools"><button id="day">☀</button><button id="home">⌂</button><button id="menu">☰</button></div></header>
+<section class="intro" id="intro"><p class="eyebrow">WELCOME HOME</p><h1>Explore the Fleet.</h1><p>Drag to orbit, scroll or pinch to zoom, and select any vehicle.</p></section>
+<div class="tip">Drag to orbit • Scroll to zoom • Click a vehicle</div>
+<nav class="nav">
+<button data-target="car">🚗<span>Car</span></button><button data-target="truck">🛻<span>Truck</span></button><button data-target="boat">🚤<span>Boat</span></button><button data-target="camper">🏕️<span>Camper</span></button><button data-target="mower">🌱<span>Mower</span></button>
+</nav>
+<aside class="panel" id="panel"><button class="close" id="closePanel">×</button><p class="eyebrow">QUICK ACCESS</p><h2>My Fleet</h2><p>Jump to a vehicle or explore the full property.</p><div class="links">
+<button data-target="car">🚗 <b>Car</b><small>2020 Dodge Challenger GT</small></button><button data-target="truck">🛻 <b>Truck</b><small>2023 RAM 1500 Bighorn</small></button><button data-target="boat">🚤 <b>Boat</b><small>Watercraft</small></button><button data-target="camper">🏕️ <b>Camper</b><small>Travel and camping</small></button><button data-target="mower">🌱 <b>Lawnmower</b><small>Lawn equipment</small></button></div>
+<button class="utility" id="tour">🎥 Start automatic tour</button><button class="utility" id="random">✨ Take me somewhere</button><button class="utility" id="quality">⚙ Performance: High</button></aside>
+<div class="modal" id="modal"><div class="shade" id="shade"></div><article class="card"><button class="close" id="closeModal">×</button><div class="icon" id="mi">🚗</div><p class="eyebrow" id="mt">CAR</p><h2 id="mh">The Challenger</h2><p id="md"></p><div class="actions"><a id="ml" href="#">OPEN VEHICLE PAGE →</a><button id="stay">KEEP EXPLORING</button></div></article></div>
+<div class="toast" id="toast"></div>
+<script type="module">
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/+esm";
+import {OrbitControls} from "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/controls/OrbitControls.js/+esm";
 
-  <div class="world" id="world">
-    <div class="sky"></div>
-    <div class="sun"></div>
-    <div class="moon"></div>
-    <div class="cloud cloud-1"></div>
-    <div class="cloud cloud-2"></div>
+const DATA={
+car:{icon:"🚗",type:"CAR",title:"The Challenger",description:"Specifications, maintenance, photos, documents, and upgrades.",link:"vehicles/car.html"},
+truck:{icon:"🛻",type:"TRUCK",title:"The RAM",description:"Towing information, maintenance, modifications, fuel records, and trips.",link:"vehicles/truck.html"},
+boat:{icon:"🚤",type:"WATERCRAFT",title:"The Boat",description:"Specifications, winterization, maintenance, launch notes, and lake trips.",link:"vehicles/boat.html"},
+camper:{icon:"🏕️",type:"CAMPER",title:"The Camper",description:"Towing setup, packing lists, service records, and camping trips.",link:"vehicles/camper.html"},
+mower:{icon:"🌱",type:"LAWN EQUIPMENT",title:"The Mower",description:"Maintenance schedules, oil, parts, and service history.",link:"vehicles/mower.html"}};
 
-    <div class="mountains mountains-back"></div>
-    <div class="mountains mountains-front"></div>
-
-    <div class="lake" id="lakeInteractive" tabindex="0" role="button" aria-label="Explore the lake">
-      <div class="lake-shimmer"></div><div class="lake-interaction-label">EXPLORE THE LAKE</div>
-      <div class="dock"></div>
-      <div class="boat vehicle boat-on-lake" data-vehicle="boat" tabindex="0" role="button">
-        <div class="boat-body"></div>
-        <div class="boat-cabin"></div>
-        <div class="boat-wake"></div>
-        <div class="vehicle-label">
-          <span class="vehicle-type">WATERCRAFT</span>
-          <strong>THE BOAT</strong>
-          <button>ENTER</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="ground">
-      <div class="road"></div>
-      <div class="driveway"></div>
-
-      <div class="house interactive-object" id="houseInteractive" tabindex="0" role="button" aria-label="Check the house">
-        <div class="house-roof"></div>
-        <div class="house-body"></div>
-        <div class="house-window w1"></div>
-        <div class="house-window w2"></div>
-      </div>
-
-      <div class="garage interactive-object" id="garageInteractive" tabindex="0" role="button" aria-label="Enter the garage">
-        <div class="garage-roof"></div>
-        <div class="garage-body"></div>
-        <div class="garage-door"></div>
-        <div class="garage-light"></div>
-        <div class="garage-sign">JUSTIN & BRIDGET'S<br>GARAGE</div>
-      </div>
-
-      <div class="truck vehicle" data-vehicle="truck" tabindex="0" role="button">
-        <div class="truck-cab"></div>
-        <div class="truck-bed"></div>
-        <div class="truck-wheels"></div>
-        <div class="vehicle-label">
-          <span class="vehicle-type">TRUCK</span>
-          <strong>THE RAM</strong>
-          <button>ENTER</button>
-        </div>
-      </div>
-
-      <div class="car vehicle" data-vehicle="car" tabindex="0" role="button">
-        <div class="car-body"></div>
-        <div class="car-roof"></div>
-        <div class="car-wheels"></div>
-        <div class="vehicle-label">
-          <span class="vehicle-type">CAR</span>
-          <strong>THE CHALLENGER</strong>
-          <button>ENTER</button>
-        </div>
-      </div>
-
-      <div class="camper vehicle" data-vehicle="camper" tabindex="0" role="button">
-        <div class="camper-body"></div>
-        <div class="camper-window"></div>
-        <div class="camper-door"></div>
-        <div class="camper-wheel"></div>
-        <div class="vehicle-label">
-          <span class="vehicle-type">CAMPER</span>
-          <strong>THE CAMPER</strong>
-          <button>ENTER</button>
-        </div>
-      </div>
-
-      <div class="mower vehicle" data-vehicle="mower" tabindex="0" role="button">
-        <div class="mower-seat"></div>
-        <div class="mower-body"></div>
-        <div class="mower-wheels"></div>
-        <div class="vehicle-label">
-          <span class="vehicle-type">LAWN EQUIPMENT</span>
-          <strong>THE MOWER</strong>
-          <button>ENTER</button>
-        </div>
-      </div>
-
-      <div class="campsite">
-        <div class="tent"></div>
-        <div class="campfire interactive-object" id="campfireInteractive" tabindex="0" role="button" aria-label="Interact with campfire">
-          <div class="flame"></div>
-          <div class="log log1"></div>
-          <div class="log log2"></div>
-        </div>
-        <div class="camp-sign">CAMP</div>
-      </div>
-
-      <div class="tree tree-1"></div>
-      <div class="tree tree-2"></div>
-      <div class="tree tree-3"></div>
-      <div class="tree tree-4"></div>
-      <div class="tree tree-5"></div>
-
-      <div class="grass-patch gp1"></div>
-      <div class="grass-patch gp2"></div>
-      <div class="grass-patch gp3"></div>
-    </div>
-
-    <div class="foreground"></div>
-  </div>
-
-  <header class="topbar">
-    <div class="brand">
-      <span class="brand-mark">JF</span>
-      <div>
-        <strong>JUSTIN & BRIDGET'S FLEET</strong>
-        <small>EVERYTHING I OWN THAT MOVES</small>
-      </div>
-    </div>
-
-    <div class="top-actions">
-      <button id="timeToggle" class="icon-btn" title="Toggle day/night">☀</button>
-      <button id="soundToggle" class="icon-btn" title="Toggle sound">♪</button>
-      <button id="menuToggle" class="icon-btn menu-btn" title="Open menu">☰</button>
-    </div>
-  </header>
-
-  <div class="intro">
-    <p class="eyebrow">WELCOME HOME</p>
-    <h1>Explore the Fleet.</h1>
-    <p>Five machines. One property. Pick your destination.</p>
-  </div>
-
-  <nav class="fleet-nav" id="fleetNav">
-    <button data-target="car">🚗 <span>Car</span></button>
-    <button data-target="truck">🛻 <span>Truck</span></button>
-    <button data-target="boat">🚤 <span>Boat</span></button>
-    <button data-target="camper">🏕️ <span>Camper</span></button>
-    <button data-target="mower">🌱 <span>Mower</span></button>
-  </nav>
-
-  <aside class="side-panel" id="sidePanel">
-    <button class="close-panel" id="closePanel">×</button>
-    <p class="eyebrow">QUICK ACCESS</p>
-    <h2>My Fleet</h2>
-    <p>Jump directly to a vehicle or explore the property.</p>
-    <div class="panel-links">
-      <button data-target="car">🚗 <span><b>Car</b><small>2020 Dodge Challenger GT</small></span></button>
-      <button data-target="truck">🛻 <span><b>Truck</b><small>2023 RAM 1500 Bighorn</small></span></button>
-      <button data-target="boat">🚤 <span><b>Boat</b><small>2002 Glastron</small></span></button>
-      <button data-target="camper">🏕️ <span><b>Camper</b><small>2026 KZ Connect</small></span></button>
-      <button data-target="mower">🌱 <span><b>Lawnmower</b><small>Your lawn equipment</small></span></button>
-    </div>
-    <div class="panel-divider"></div>
-    <button class="utility-link" id="garageMode">🛠️ Enter Garage Mode</button>
-    <button class="utility-link" id="discoverMode">✨ Find Something</button>
-  </aside>
-
-  <div class="vehicle-modal" id="vehicleModal">
-    <div class="modal-backdrop"></div>
-    <div class="modal-card">
-      <button class="modal-close" id="modalClose">×</button>
-      <div class="modal-icon" id="modalIcon">🚗</div>
-      <p class="eyebrow" id="modalType">CAR</p>
-      <h2 id="modalTitle">The Challenger</h2>
-      <p id="modalDescription">Your vehicle information lives here.</p>
-      <div class="modal-actions">
-        <a id="modalLink" href="#" class="primary-btn">OPEN VEHICLE PAGE →</a>
-        <button class="secondary-btn" id="modalStay">KEEP EXPLORING</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="toast" id="toast"></div>
-
-  <div class="garage-mode" id="garageModeScreen">
-    <button class="garage-close" id="garageClose">× EXIT GARAGE</button>
-    <div class="garage-grid"></div>
-    <div class="garage-title">
-      <p class="eyebrow">PRIVATE COLLECTION</p>
-      <h2>GARAGE MODE</h2>
-      <p>Select a machine to inspect.</p>
-    </div>
-    <div class="garage-items">
-      <button data-target="car">🚗<span>CAR</span></button>
-      <button data-target="truck">🛻<span>TRUCK</span></button>
-      <button data-target="boat">🚤<span>BOAT</span></button>
-      <button data-target="camper">🏕️<span>CAMPER</span></button>
-      <button data-target="mower">🌱<span>MOWER</span></button>
-    </div>
-  </div>
-
-  <script src="app.js"></script>
+let scene,camera,renderer,controls,sun,hemi,water,night=false,quality=true,tour=false,tourI=0,tourTime=0,tween=null;
+const clock=new THREE.Clock(), ray=new THREE.Raycaster(), mouse=new THREE.Vector2(), clicks=[], groups={}, anim=[];
+const views={
+home:[new THREE.Vector3(25,19,31),new THREE.Vector3(0,1.8,0)],
+car:[new THREE.Vector3(-8,5.5,12),new THREE.Vector3(-9,1.2,3)],
+truck:[new THREE.Vector3(2,6,12),new THREE.Vector3(0,1.5,3)],
+camper:[new THREE.Vector3(15,7,11),new THREE.Vector3(10,2,2)],
+boat:[new THREE.Vector3(19,7,22),new THREE.Vector3(14,.8,11)],
+mower:[new THREE.Vector3(-14,4.5,15),new THREE.Vector3(-13,1,8)]};
+const M=(c,r=.72,m=.05)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
+const sh=o=>(o.castShadow=true,o.receiveShadow=true,o);
+const B=(x,y,z,m)=>sh(new THREE.Mesh(new THREE.BoxGeometry(x,y,z),m));
+const C=(a,b,h,s,m)=>sh(new THREE.Mesh(new THREE.CylinderGeometry(a,b,h,s),m));
+function wheel(r=.55,w=.42){const g=new THREE.Group(),t=C(r,r,w,20,M(0x141719,.95,.05)),h=C(r*.46,r*.46,w+.03,18,M(0x8d9496,.3,.7));t.rotation.z=h.rotation.z=Math.PI/2;g.add(t,h);return g}
+function clickable(g,k){g.userData.key=k;g.traverse(o=>{if(o.isMesh){o.userData.key=k;clicks.push(o)}});groups[k]=g}
+function car(){const g=new THREE.Group(),p=M(0x23282b,.28,.65),gl=M(0x6d9aa5,.12,.15);let a=B(5.4,.9,2.25,p);a.position.y=1.05;let b=B(2.4,.9,1.85,gl);b.position.set(-.4,1.75,0);let c=B(1.7,.45,2.05,p);c.position.set(1.65,1.55,0);g.add(a,b,c);[[-1.75,-1.15],[-1.75,1.15],[1.7,-1.15],[1.7,1.15]].forEach(([x,z])=>{let w=wheel();w.position.set(x,.55,z);g.add(w)});g.position.set(-9,.05,3);g.rotation.y=-.18;clickable(g,"car");return g}
+function truck(){const g=new THREE.Group(),p=M(0x4f5a5d,.32,.5),d=M(0x151a1c,.7,.2);let f=B(6.2,.55,2.45,d);f.position.y=.9;let c=B(2.55,1.9,2.25,p);c.position.set(1.15,1.65,0);let b=B(2.65,1,2.3,p);b.position.set(-1.75,1.25,0);g.add(f,c,b);[[-1.95,-1.25],[-1.95,1.25],[2,-1.25],[2,1.25]].forEach(([x,z])=>{let w=wheel(.72,.5);w.position.set(x,.58,z);g.add(w)});g.position.set(0,.05,3);g.rotation.y=.12;clickable(g,"truck");return g}
+function camper(){const g=new THREE.Group(),p=M(0xe2ddd0,.78,.02),t=M(0x77746c,.6,.2);let b=B(5.7,3.2,2.55,p);b.position.y=2.25;let r=B(5.85,.2,2.7,t);r.position.y=3.92;g.add(b,r);[-1.3,1.3].forEach(z=>{let w=wheel(.62,.42);w.position.set(-.7,.62,z);g.add(w)});g.position.set(10,0,2);g.rotation.y=-.28;clickable(g,"camper");return g}
+function boat(){const g=new THREE.Group(),p=M(0xf0eee7,.45,.18),a=M(0x263e54,.32,.5);let h=B(5.7,.85,2.2,p);h.position.y=.65;h.rotation.z=-.04;let c=B(1.8,1,1.65,a);c.position.set(.25,1.55,0);let m=B(.55,1.1,.75,M(0x24282b,.42,.58));m.position.set(-2.9,.55,0);g.add(h,c,m);g.position.set(14,.15,11);g.rotation.y=-.35;clickable(g,"boat");anim.push(["boat",g,.15]);return g}
+function mower(){const g=new THREE.Group(),p=M(0x60773d,.52,.22),d=M(0x242a23,.8,.1);let a=B(2.9,.45,1.8,p);a.position.y=.52;let b=B(1.25,.9,1.35,p);b.position.set(.55,1.08,0);let s=B(.78,.75,.9,d);s.position.set(-.7,1.45,0);g.add(a,b,s);[[-.95,-.95,.52],[-.95,.95,.52],[1,-.92,.38],[1,.92,.38]].forEach(([x,z,r])=>{let w=wheel(r,.32);w.position.set(x,.48,z);g.add(w)});g.position.set(-13,0,8);g.rotation.y=.5;clickable(g,"mower");return g}
+function tree(x,z,s=1){const g=new THREE.Group(),tr=C(.28*s,.38*s,3.2*s,9,M(0x5c4631,.92,0));tr.position.y=1.6*s;g.add(tr);for(let i=0;i<3;i++){let q=sh(new THREE.Mesh(new THREE.ConeGeometry((1.6-i*.2)*s,2.6*s,10),M(0x315e3f,.95,0)));q.position.y=(3.1+i*1.25)*s;g.add(q)}g.position.set(x,0,z);scene.add(g)}
+function house(){const g=new THREE.Group(),b=B(7,3.6,5,M(0xa98a6c,.82,.02));b.position.y=1.8;let r=sh(new THREE.Mesh(new THREE.ConeGeometry(5,2.7,4),M(0x433c3a,.9,.02)));r.position.y=5;r.rotation.y=Math.PI/4;r.scale.z=.74;g.add(b,r);g.position.set(-10.5,0,-5.5);scene.add(g)}
+function garage(){const g=new THREE.Group(),b=B(8,3.7,5.2,M(0x806c5b,.82,.03));b.position.y=1.85;let r=B(8.4,.5,5.6,M(0x403a38,.9,.02));r.position.y=3.95;let d=B(5.5,2.65,.18,M(0x30383b,.6,.24));d.position.set(0,1.45,2.69);g.add(b,r,d);g.position.set(-1.5,0,-6);scene.add(g)}
+function camp(){const g=new THREE.Group(),t=sh(new THREE.Mesh(new THREE.ConeGeometry(2.25,3,3),M(0x79684d,.9,0)));t.position.y=1.5;t.rotation.y=Math.PI/2;let f=sh(new THREE.Mesh(new THREE.ConeGeometry(.42,1.2,9),new THREE.MeshStandardMaterial({color:0xff9a35,emissive:0xff5c18,emissiveIntensity:1.3})));f.position.set(3,.9,.5);f.userData.action="fire";clicks.push(f);g.add(t,f);g.position.set(8.5,0,-5.8);scene.add(g);anim.push(["fire",f])}
+function dock(){const g=new THREE.Group(),m=M(0x725336,.92,0);for(let i=0;i<8;i++){let p=B(.9,.18,3.1,m);p.position.set(i*.88,.25,0);g.add(p)}g.position.set(8.2,.03,11.4);g.rotation.y=-.12;scene.add(g)}
+function init(){
+scene=new THREE.Scene();scene.background=new THREE.Color(0x87b8c7);scene.fog=new THREE.FogExp2(0x87b8c7,.0125);
+camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,220);camera.position.copy(views.home[0]);
+renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"high-performance"});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;document.getElementById("scene").appendChild(renderer.domElement);
+controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.copy(views.home[1]);controls.minDistance=8;controls.maxDistance=55;controls.maxPolarAngle=1.48;controls.enablePan=false;
+hemi=new THREE.HemisphereLight(0xbfe5f1,0x41543a,2.4);scene.add(hemi);sun=new THREE.DirectionalLight(0xffe8bd,4.2);sun.position.set(-18,28,15);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-35;sun.shadow.camera.right=35;sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;scene.add(sun);
+let ground=sh(new THREE.Mesh(new THREE.CircleGeometry(32,96),M(0x557a48,.96,0)));ground.rotation.x=-Math.PI/2;scene.add(ground);
+let drive=sh(new THREE.Mesh(new THREE.PlaneGeometry(19,11),M(0x686b68,.94,0)));drive.rotation.x=-Math.PI/2;drive.rotation.z=-.16;drive.position.set(-2.7,.018,-.2);scene.add(drive);
+let road=sh(new THREE.Mesh(new THREE.PlaneGeometry(42,7),M(0x484b4b,.97,0)));road.rotation.x=-Math.PI/2;road.rotation.z=.09;road.position.set(-3,.01,13.5);scene.add(road);
+water=new THREE.Mesh(new THREE.CircleGeometry(15,96),new THREE.MeshPhysicalMaterial({color:0x2f7187,roughness:.16,transparent:true,opacity:.9,clearcoat:.35}));water.rotation.x=-Math.PI/2;water.scale.set(1.45,.85,1);water.position.set(15,-.05,13);water.userData.action="lake";scene.add(water);clicks.push(water);
+house();garage();camp();dock();scene.add(car(),truck(),camper(),boat(),mower());
+[[-18,-12,1.2],[-14,-15,.8],[-6,-17,1.1],[5,-15,.9],[14,-12,1.15],[19,-5,.8],[22,3,1],[-20,3,.9],[-18,10,1.25],[5,15,.75],[23,15,1.1]].forEach(v=>tree(...v));
+renderer.domElement.addEventListener("pointerup",pick);addEventListener("resize",resize);setTimeout(()=>loading.classList.add("done"),850);loop()}
+function pick(e){let r=renderer.domElement.getBoundingClientRect();mouse.x=(e.clientX-r.left)/r.width*2-1;mouse.y=-(e.clientY-r.top)/r.height*2+1;ray.setFromCamera(mouse,camera);let h=ray.intersectObjects(clicks,false)[0]?.object;if(!h)return;if(h.userData.key)open(h.userData.key);else if(h.userData.action==="fire"){toastMsg("The campfire flares up 🔥");h.scale.y=1.4;setTimeout(()=>h.scale.y=1,450)}else if(h.userData.action==="lake")toastMsg("You skipped a stone across the lake 🌊")}
+function focus(k,openAfter=true){panel.classList.remove("open");intro.classList.add("hide");document.querySelectorAll("[data-target]").forEach(b=>b.classList.toggle("on",b.dataset.target===k));let v=views[k];tween={sp:camera.position.clone(),ep:v[0],st:controls.target.clone(),et:v[1],at:performance.now(),done:openAfter?()=>open(k):null}}
+function open(k){let d=DATA[k];mi.textContent=d.icon;mt.textContent=d.type;mh.textContent=d.title;md.textContent=d.description;ml.href=d.link;modal.classList.add("open");tour=false}
+function closeM(){modal.classList.remove("open")}
+function toastMsg(s){toast.textContent=s;toast.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>toast.classList.remove("show"),1800)}
+function dayNight(){night=!night;day.textContent=night?"☾":"☀";scene.background.set(night?0x07121d:0x87b8c7);scene.fog.color.set(night?0x07121d:0x87b8c7);sun.intensity=night?1.25:4.2;hemi.intensity=night?1:2.4;toastMsg(night?"Night mode activated":"Day mode activated")}
+function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}
+function loop(){requestAnimationFrame(loop);let dt=clock.getDelta(),t=clock.elapsedTime,n=performance.now();if(tween){let q=Math.min((n-tween.at)/900,1),e=1-(1-q)**3;camera.position.lerpVectors(tween.sp,tween.ep,e);controls.target.lerpVectors(tween.st,tween.et,e);if(q===1){let d=tween.done;tween=null;if(d)d()}}if(tour&&!tween&&!modal.classList.contains("open")){tourTime-=dt;if(tourTime<=0){let k=["car","truck","camper","boat","mower"][tourI++%5];focus(k,false);tourTime=4}}water.material.opacity=.88+Math.sin(t*1.2)*.025;anim.forEach(a=>{if(a[0]==="boat"){a[1].position.y=a[2]+Math.sin(t*1.45)*.08;a[1].rotation.z=Math.sin(t*1.1)*.018}else a[1].scale.y=.9+Math.sin(t*9)*.13});controls.update();renderer.render(scene,camera)}
+document.querySelectorAll("[data-target]").forEach(b=>b.addEventListener("click",()=>focus(b.dataset.target)));
+menu.onclick=()=>panel.classList.add("open");closePanel.onclick=()=>panel.classList.remove("open");day.onclick=dayNight;home.onclick=()=>{intro.classList.remove("hide");tween={sp:camera.position.clone(),ep:views.home[0],st:controls.target.clone(),et:views.home[1],at:performance.now()};tour=false};
+tour.onclick=()=>{tour=!tour;tourI=0;tourTime=0;document.getElementById("tour").textContent=tour?"⏹ Stop automatic tour":"🎥 Start automatic tour";toastMsg(tour?"Automatic tour started":"Automatic tour stopped")};
+random.onclick=()=>focus(Object.keys(DATA)[Math.floor(Math.random()*5)]);
+quality.onclick=()=>{quality=!quality;renderer.setPixelRatio(Math.min(devicePixelRatio,quality?2:1));renderer.shadowMap.enabled=quality;document.getElementById("quality").textContent=quality?"⚙ Performance: High":"⚙ Performance: Battery Saver";toastMsg(quality?"High quality enabled":"Battery saver enabled")};
+closeModal.onclick=stay.onclick=shade.onclick=closeM;addEventListener("keydown",e=>{if(e.key==="Escape"){closeM();panel.classList.remove("open")}});
+try{if(!window.WebGLRenderingContext)throw Error();init()}catch(e){console.error(e);loading.classList.add("done");fallback.classList.add("show")}
+</script>
 </body>
 </html>
