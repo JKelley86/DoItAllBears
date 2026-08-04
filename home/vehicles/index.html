@@ -51,11 +51,11 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/+esm";
 import {OrbitControls} from "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/controls/OrbitControls.js/+esm";
 
 const DATA={
-car:{icon:"🚗",type:"CAR",title:"The Challenger",description:"Specifications, maintenance, photos, documents, and upgrades.",link:"cars.html"},
-truck:{icon:"🛻",type:"TRUCK",title:"The RAM",description:"Towing information, maintenance, modifications, fuel records, and trips.",link:"cars.html"},
-boat:{icon:"🚤",type:"WATERCRAFT",title:"The Boat",description:"Specifications, winterization, maintenance, launch notes, and lake trips.",link:"boat.html"},
-camper:{icon:"🏕️",type:"CAMPER",title:"The Camper",description:"Towing setup, packing lists, service records, and camping trips.",link:"camper.html"},
-mower:{icon:"🌱",type:"LAWN EQUIPMENT",title:"The Mower",description:"Maintenance schedules, oil, parts, and service history.",link:"lawnmower.html"}};
+car:{icon:"🚗",type:"CAR",title:"The Challenger",description:"Specifications, maintenance, photos, documents, and upgrades.",link:"vehicles/car.html"},
+truck:{icon:"🛻",type:"TRUCK",title:"The RAM",description:"Towing information, maintenance, modifications, fuel records, and trips.",link:"vehicles/truck.html"},
+boat:{icon:"🚤",type:"WATERCRAFT",title:"The Boat",description:"Specifications, winterization, maintenance, launch notes, and lake trips.",link:"vehicles/boat.html"},
+camper:{icon:"🏕️",type:"CAMPER",title:"The Camper",description:"Towing setup, packing lists, service records, and camping trips.",link:"vehicles/camper.html"},
+mower:{icon:"🌱",type:"LAWN EQUIPMENT",title:"The Mower",description:"Maintenance schedules, oil, parts, and service history.",link:"vehicles/mower.html"}};
 
 const loadingEl=document.getElementById("loading"),fallbackEl=document.getElementById("fallback"),introEl=document.getElementById("intro"),panelEl=document.getElementById("panel"),modalEl=document.getElementById("modal"),toastEl=document.getElementById("toast"),dayBtn=document.getElementById("day"),homeBtn=document.getElementById("home"),menuBtn=document.getElementById("menu"),closePanelBtn=document.getElementById("closePanel"),tourBtn=document.getElementById("tour"),randomBtn=document.getElementById("random"),qualityBtn=document.getElementById("quality"),closeModalBtn=document.getElementById("closeModal"),stayBtn=document.getElementById("stay"),shadeEl=document.getElementById("shade"),modalIcon=document.getElementById("mi"),modalType=document.getElementById("mt"),modalHeading=document.getElementById("mh"),modalDescription=document.getElementById("md"),modalLink=document.getElementById("ml");
 
