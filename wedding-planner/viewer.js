@@ -33,12 +33,13 @@ const pageIndicator = document.getElementById("pageIndicator");
 
 let pdfDocument = null;
 let pageTexts = [];
-let scale = 1.15;
+let scale = 1;
 let searchResults = [];
 let activeResultIndex = -1;
 let renderToken = 0;
 let currentPage = 1;
 let pageObserver = null;
+let lastRenderWidth = window.innerWidth;
 
 documentTitle.textContent = requestedName;
 document.title = `${requestedName} | Wedding Planner`;
@@ -119,14 +120,15 @@ function createPageObserver() {
   document.querySelectorAll(".pdf-page").forEach(page => pageObserver.observe(page));
 }
 
-async function renderDocument() {
+async function renderDocument({ preservePosition = false, showLoading = false } = {}) {
   const token = ++renderToken;
+  const pageToRestore = currentPage;
   pdfPages.innerHTML = "";
   pageTexts = new Array(pdfDocument.numPages);
   searchResults = [];
   activeResultIndex = -1;
   updateSearchHighlights();
-  loadingState.hidden = false;
+  if (showLoading) loadingState.hidden = false;
 
   const viewportWidth = Math.max(280, Math.min(window.innerWidth - 16, 900));
 
@@ -172,6 +174,11 @@ async function renderDocument() {
   currentPage = Math.min(currentPage, pdfDocument.numPages);
   updatePageIndicator();
   createPageObserver();
+
+  if (preservePosition) {
+    document.querySelector(`.pdf-page[data-page-number="${pageToRestore}"]`)
+      ?.scrollIntoView({ behavior: "instant", block: "start" });
+  }
 }
 
 function performSearch() {
@@ -280,13 +287,13 @@ nextResult.addEventListener("click", () => moveResult(1));
 zoomOut.addEventListener("click", async () => {
   scale = Math.max(0.7, Number((scale - 0.15).toFixed(2)));
   updateZoomLabel();
-  await renderDocument();
+  await renderDocument({ preservePosition: true });
 });
 
 zoomIn.addEventListener("click", async () => {
   scale = Math.min(2.2, Number((scale + 0.15).toFixed(2)));
   updateZoomLabel();
-  await renderDocument();
+  await renderDocument({ preservePosition: true });
 });
 
 previousPage.addEventListener("click", () => goToPage(currentPage - 1));
@@ -296,7 +303,14 @@ let resizeTimer;
 window.addEventListener("resize", () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
-    if (pdfDocument) renderDocument().catch(showError);
+    const newWidth = window.innerWidth;
+
+    // Mobile browsers frequently change only the viewport height while their
+    // address bar opens/closes. Re-rendering for that would jump to the top.
+    if (pdfDocument && Math.abs(newWidth - lastRenderWidth) >= 2) {
+      lastRenderWidth = newWidth;
+      renderDocument({ preservePosition: true }).catch(showError);
+    }
   }, 250);
 });
 
@@ -305,7 +319,7 @@ window.addEventListener("resize", () => {
     updateZoomLabel();
     const source = await resolvePdfSource();
     pdfDocument = await pdfjsLib.getDocument(source).promise;
-    await renderDocument();
+    await renderDocument({ showLoading: true });
   } catch (error) {
     showError(error);
   }
