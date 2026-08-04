@@ -3,77 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#211a22">
-  <title>Wedding Planner Library</title>
+  <meta name="theme-color" content="#f2f0eb">
+  <title>Wedding Planners</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <header class="app-header">
-    <div>
-      <p class="eyebrow">Wedding Day</p>
-      <h1>Planner Library</h1>
-      <p class="subtitle">Schedules, contacts, layouts, and every important detail.</p>
-    </div>
-  </header>
-
+<body class="library-page">
+  <header class="app-header"><div><p class="eyebrow">Day-of command center</p><h1>Wedding planners</h1><p>Everything important, one tap away.</p></div></header>
   <main class="page-shell">
-    <section class="search-panel" aria-label="Search planners">
-      <label class="search-box">
-        <span aria-hidden="true">⌕</span>
-        <input id="plannerSearch" type="search" placeholder="Search planner names…" autocomplete="off">
-      </label>
-
-      <div class="action-row">
-        <button id="uploadButton" class="primary-button" type="button">
-          <span aria-hidden="true">＋</span>
-          Add PDF
-        </button>
-        <input id="pdfUpload" type="file" accept="application/pdf,.pdf" multiple hidden>
-      </div>
-    </section>
-
-    <section class="section-heading">
-      <div>
-        <p class="eyebrow">Quick access</p>
-        <h2>Your planners</h2>
-      </div>
-      <span id="plannerCount" class="count-pill">0</span>
-    </section>
-
-    <section id="plannerGrid" class="planner-grid" aria-live="polite"></section>
-
-    <section id="emptyState" class="empty-state" hidden>
-      <div class="empty-icon">📄</div>
-      <h2>No planners found</h2>
-      <p>Add a PDF or change your search.</p>
-    </section>
+    <div class="search-field light"><span>⌕</span><input id="plannerSearch" type="search" placeholder="Search weddings…"></div>
+    <div class="section-heading"><div><p class="eyebrow">Your weddings</p><h2>Planners</h2></div><span id="plannerCount" class="count-pill">0</span></div>
+    <div id="plannerGrid" class="planner-grid"></div>
+    <div id="emptyState" class="empty-state" hidden><strong>No planners found</strong><p>Add a PDF or change your search.</p></div>
+    <input id="pdfUpload" type="file" accept="application/pdf,.pdf" multiple hidden>
   </main>
-
-  <nav class="bottom-nav" aria-label="Wedding planner navigation">
-    <a class="active" href="index.html">
-      <span aria-hidden="true">▦</span>
-      <small>Planners</small>
-    </a>
-    <button id="bottomUpload" type="button">
-      <span aria-hidden="true">＋</span>
-      <small>Add PDF</small>
-    </button>
+  <nav class="bottom-nav">
+    <a class="active" href="index.html"><span>▤</span><small>Weddings</small></a>
+    <button id="bottomUpload" type="button"><span>＋</span><small>Add PDF</small></button>
   </nav>
-
-  <template id="plannerCardTemplate">
-    <article class="planner-card">
-      <button class="planner-open" type="button">
-        <span class="planner-icon" aria-hidden="true">PDF</span>
-        <span class="planner-info">
-          <strong class="planner-name"></strong>
-          <span class="planner-meta"></span>
-        </span>
-        <span class="chevron" aria-hidden="true">›</span>
-      </button>
-      <button class="planner-delete icon-button" type="button" aria-label="Remove planner" hidden>×</button>
-    </article>
-  </template>
-
+  <template id="plannerCardTemplate"><article class="planner-card"><button class="planner-open" type="button"><span class="planner-icon">PDF</span><span class="planner-info"><strong class="planner-name"></strong><span class="planner-meta"></span></span><span class="chevron">›</span></button><button class="planner-delete" type="button" aria-label="Remove" hidden>×</button></article></template>
   <script src="planners.js"></script>
 </body>
 </html>
