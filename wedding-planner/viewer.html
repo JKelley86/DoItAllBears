@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#211a22">
+  <title>Wedding Planner</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="viewer-page">
+  <header class="viewer-header">
+    <a class="back-button" href="index.html" aria-label="Back to planners">‹</a>
+    <div class="viewer-title-wrap">
+      <p class="eyebrow">Wedding Planner</p>
+      <h1 id="documentTitle">Opening PDF…</h1>
+    </div>
+    <button id="openSearch" class="icon-button header-icon" type="button" aria-label="Search PDF">⌕</button>
+  </header>
+
+  <section id="searchDrawer" class="search-drawer" hidden>
+    <div class="viewer-search-box">
+      <input id="pdfSearch" type="search" placeholder="Search this planner…" autocomplete="off">
+      <button id="runSearch" type="button">Search</button>
+    </div>
+    <div class="search-status-row">
+      <span id="searchStatus">Enter a word or phrase.</span>
+      <div class="result-controls">
+        <button id="previousResult" type="button" aria-label="Previous result">↑</button>
+        <button id="nextResult" type="button" aria-label="Next result">↓</button>
+      </div>
+    </div>
+  </section>
+
+  <main class="pdf-stage">
+    <div id="loadingState" class="loading-card">
+      <div class="spinner"></div>
+      <strong>Opening planner</strong>
+      <span>Preparing pages and search text…</span>
+    </div>
+
+    <div id="errorState" class="error-card" hidden>
+      <strong>Unable to open this PDF</strong>
+      <p id="errorMessage"></p>
+      <a href="index.html" class="primary-button">Back to planners</a>
+    </div>
+
+    <div id="pdfPages" class="pdf-pages"></div>
+  </main>
+
+  <div class="viewer-toolbar" aria-label="PDF controls">
+    <button id="zoomOut" type="button" aria-label="Zoom out">−</button>
+    <span id="zoomLabel">100%</span>
+    <button id="zoomIn" type="button" aria-label="Zoom in">＋</button>
+    <span class="toolbar-divider"></span>
+    <button id="previousPage" type="button" aria-label="Previous page">↑</button>
+    <span id="pageIndicator">0 / 0</span>
+    <button id="nextPage" type="button" aria-label="Next page">↓</button>
+  </div>
+
+  <script type="module" src="viewer.js"></script>
+</body>
+</html>
