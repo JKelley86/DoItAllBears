@@ -1,0 +1,51 @@
+window.VEHICLE_DATA = {
+  id: "ram-2024",
+  dataFile: "ram.js",
+  make: "Ram",
+  model: "1500 Bighorn",
+  year: 2024,
+  type: "Full-size pickup",
+  accent: "#657b69",
+  art: "truck",
+  quickSpecs: [
+    { label: "Engine", value: "Add engine details" },
+    { label: "Drivetrain", value: "Add drivetrain" },
+    { label: "VIN", value: "Add VIN" },
+    { label: "Current mileage", value: "Add mileage" }
+  ],
+  categories: [
+    { id: "overview", name: "Overview & Specifications", icon: "▦", description: "VIN, engine, dimensions, payload, towing, and capacities" },
+    { id: "fluids", name: "Fluids & Capacities", icon: "◉", description: "Oil, coolant, transmission, transfer case, and axle fluids" },
+    { id: "filters", name: "Filters", icon: "≋", description: "Oil, engine air, cabin air, and fuel filters" },
+    { id: "engine", name: "Engine & Ignition", icon: "⚙", description: "Spark plugs, coils, belts, hoses, sensors, and engine parts" },
+    { id: "brakes", name: "Brakes", icon: "◫", description: "Pads, rotors, calipers, fluid, and torque information" },
+    { id: "tires", name: "Tires & Wheels", icon: "⊙", description: "Sizes, pressure, rotation, lug nuts, spare, and wheels" },
+    { id: "lighting", name: "Lighting", icon: "✦", description: "Headlights, taillights, signals, bed lights, and bulbs" },
+    { id: "electrical", name: "Battery & Electrical", icon: "ϟ", description: "Battery, alternator, starter, wiring, outlets, and grounds" },
+    { id: "fuses", name: "Fuses & Relays", icon: "▤", description: "Fuse locations, sizes, relay assignments, and diagrams" },
+    { id: "devices", name: "Technology & Devices", icon: "⌁", description: "Uconnect, displays, cameras, sensors, modules, and accessories" },
+    { id: "drivetrain", name: "Transmission & Drivetrain", icon: "⛭", description: "Transmission, transfer case, differentials, axles, and driveshaft" },
+    { id: "suspension", name: "Suspension & Steering", icon: "⌇", description: "Shocks, control arms, tie rods, alignment, and steering" },
+    { id: "hvac", name: "Heating & Air Conditioning", icon: "❄", description: "Cabin filter, refrigerant, blower, heat, and controls" },
+    { id: "interior", name: "Interior", icon: "▱", description: "Seats, trim, switches, mats, storage, and cabin parts" },
+    { id: "exterior", name: "Exterior & Body", icon: "◇", description: "Wipers, glass, paint, trim, doors, bed, and body parts" },
+    { id: "towing", name: "Towing & Payload", icon: "↔", description: "Hitch, payload, trailer setup, wiring, brake controller, and weights" },
+    { id: "safety", name: "Safety & Security", icon: "⬡", description: "Airbags, locks, keys, alarms, cameras, and safety systems" },
+    { id: "parts", name: "Parts & Consumables", icon: "#", description: "Common replacement parts, part numbers, brands, and alternatives" },
+    { id: "instructions", name: "Instructions & Procedures", icon: "☷", description: "Step-by-step repairs, resets, setup, towing, and operation" },
+    { id: "documents", name: "Documents & Links", icon: "▧", description: "Manuals, diagrams, receipts, warranties, and useful links" },
+    { id: "service", name: "Service History & Notes", icon: "✓", description: "Completed maintenance, repairs, problems, and observations" }
+  ],
+  records: [
+    { id: "ram-oil", category: "fluids", type: "Fluid", title: "Engine Oil", value: "SAE 0W-20 — 5.0 quarts", notes: "Confirm capacity against the owner's manual when servicing." },
+    { id: "ram-filter-bosch", category: "filters", type: "Part", title: "Oil Filter", brand: "Bosch K&G", partNumber: "PS-7026", value: "Engine oil filter option" },
+    { id: "ram-filter-mopar", category: "filters", type: "Part", title: "Oil Filter", brand: "Mopar", partNumber: "M0-349", value: "OEM-style engine oil filter option" },
+    { id: "ram-air-filter", category: "filters", type: "Part", title: "Engine Air Filter", partNumber: "Fram 12375", value: "Replacement engine air filter" },
+    { id: "ram-drain-plug", category: "engine", type: "Part", title: "Oil Drain Plug", partNumber: "653106", value: "M14-1.5 thread" },
+    { id: "ram-front-brakes", category: "brakes", type: "Needed", title: "Front Brake Parts", value: "Part numbers not recorded yet" },
+    { id: "ram-rear-brakes", category: "brakes", type: "Needed", title: "Rear Brake Parts", value: "Part numbers not recorded yet" },
+    { id: "ram-headlights", category: "lighting", type: "Needed", title: "Headlight Bulbs", value: "Bulb information not recorded yet" },
+    { id: "ram-brake-light", category: "lighting", type: "Part", title: "Brake Light Bulb", partNumber: "Sylvania 7443", value: "Rear brake light replacement" },
+    { id: "ram-reverse-light", category: "lighting", type: "Part", title: "Reverse Light Bulb", partNumber: "Sylvania 921", value: "Reverse light replacement" }
+  ]
+};
