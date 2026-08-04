@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Justin's Fleet 3D</title>
+<title>Justin & Bridget's Fleet 3D</title>
 <style>
 :root{--p:rgba(8,16,21,.78);--b:rgba(255,255,255,.16);--t:#f7f3ea;--m:rgba(247,243,234,.68);--a:#e9b85f}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0c171c;color:var(--t);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;touch-action:none}
@@ -33,9 +33,9 @@ button,a{font:inherit}button{color:inherit;cursor:pointer}#scene{position:fixed;
 </head>
 <body>
 <div id="scene"></div>
-<div class="loading" id="loading"><h1>JUSTIN'S FLEET</h1><div class="bar"><i></i></div><small>Rendering the 3D property...</small></div>
+<div class="loading" id="loading"><h1>JUSTIN & BRIDGET'S FLEET</h1><div class="bar"><i></i></div><small>Rendering the 3D property...</small></div>
 <div class="fallback" id="fallback"><div><h1>3D could not start</h1><p>This page needs WebGL and internet access to load Three.js.</p></div></div>
-<header class="top"><div class="brand"><span class="logo">JF</span><div><b>JUSTIN'S FLEET</b><small>INTERACTIVE 3D PROPERTY</small></div></div><div class="tools"><button id="day">☀</button><button id="home">⌂</button><button id="menu">☰</button></div></header>
+<header class="top"><div class="brand"><span class="logo">JF</span><div><b>JUSTIN & BRIDGET'S FLEET</b><small>INTERACTIVE 3D PROPERTY</small></div></div><div class="tools"><button id="day">☀</button><button id="home">⌂</button><button id="menu">☰</button></div></header>
 <section class="intro" id="intro"><p class="eyebrow">WELCOME HOME</p><h1>Explore the Fleet.</h1><p>Drag to orbit, scroll or pinch to zoom, and select any vehicle.</p></section>
 <div class="tip">Drag to orbit • Click vehicles and objects to interact</div>
 <nav class="nav">
@@ -51,11 +51,11 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/+esm";
 import {OrbitControls} from "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/controls/OrbitControls.js/+esm";
 
 const DATA={
-car:{icon:"🚗",type:"CAR",title:"The Challenger",description:"Specifications, maintenance, photos, documents, and upgrades.",link:"vehicles/car.html"},
-truck:{icon:"🛻",type:"TRUCK",title:"The RAM",description:"Towing information, maintenance, modifications, fuel records, and trips.",link:"vehicles/truck.html"},
-boat:{icon:"🚤",type:"WATERCRAFT",title:"The Boat",description:"Specifications, winterization, maintenance, launch notes, and lake trips.",link:"vehicles/boat.html"},
-camper:{icon:"🏕️",type:"CAMPER",title:"The Camper",description:"Towing setup, packing lists, service records, and camping trips.",link:"vehicles/camper.html"},
-mower:{icon:"🌱",type:"LAWN EQUIPMENT",title:"The Mower",description:"Maintenance schedules, oil, parts, and service history.",link:"vehicles/mower.html"}};
+car:{icon:"🚗",type:"CAR",title:"The Challenger",description:"Specifications, maintenance, photos, documents, and upgrades.",link:"challenger.html"},
+truck:{icon:"🛻",type:"TRUCK",title:"The RAM",description:"Towing information, maintenance, modifications, fuel records, and trips.",link:"ram.html"},
+boat:{icon:"🚤",type:"WATERCRAFT",title:"The Boat",description:"Specifications, winterization, maintenance, launch notes, and lake trips.",link:"boat.html"},
+camper:{icon:"🏕️",type:"CAMPER",title:"The Camper",description:"Towing setup, packing lists, service records, and camping trips.",link:"camper.html"},
+mower:{icon:"🌱",type:"LAWN EQUIPMENT",title:"The Mower",description:"Maintenance schedules, oil, parts, and service history.",link:"lawnmower.html"}};
 
 const loadingEl=document.getElementById("loading"),fallbackEl=document.getElementById("fallback"),introEl=document.getElementById("intro"),panelEl=document.getElementById("panel"),modalEl=document.getElementById("modal"),toastEl=document.getElementById("toast"),dayBtn=document.getElementById("day"),homeBtn=document.getElementById("home"),menuBtn=document.getElementById("menu"),closePanelBtn=document.getElementById("closePanel"),tourBtn=document.getElementById("tour"),randomBtn=document.getElementById("random"),qualityBtn=document.getElementById("quality"),closeModalBtn=document.getElementById("closeModal"),stayBtn=document.getElementById("stay"),shadeEl=document.getElementById("shade"),modalIcon=document.getElementById("mi"),modalType=document.getElementById("mt"),modalHeading=document.getElementById("mh"),modalDescription=document.getElementById("md"),modalLink=document.getElementById("ml");
 
