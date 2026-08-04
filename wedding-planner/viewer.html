@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#20211f">
   <title>Wedding Command Center</title>
-  <link rel="stylesheet" href="styles.css?v=mobile2">
+  <link rel="stylesheet" href="styles.css?v=iphone3">
 </head>
 <body class="viewer-page">
   <header class="viewer-header">
@@ -91,6 +91,61 @@
     <button id="nextPage" type="button" aria-label="Next page">↓</button>
   </div>
 
-  <script type="module" src="viewer.js?v=mobile2"></script>
+  <script>
+    // Compatibility for iPhone WebKit versions that do not provide the
+    // ReadableStream async iterator required by PDF.js.
+    if (typeof Promise.withResolvers !== "function") {
+      Promise.withResolvers = function () {
+        let resolve, reject;
+        const promise = new Promise(function (res, rej) {
+          resolve = res;
+          reject = rej;
+        });
+        return { promise, resolve, reject };
+      };
+    }
+
+    if (typeof ReadableStream !== "undefined" &&
+        typeof ReadableStream.prototype.values !== "function") {
+      ReadableStream.prototype.values = function (options) {
+        const reader = this.getReader();
+        let finished = false;
+        const iterator = {
+          next: function () {
+            return reader.read().then(function (result) {
+              if (result.done && !finished) {
+                finished = true;
+                reader.releaseLock();
+              }
+              return result;
+            });
+          },
+          return: function (value) {
+            if (finished) return Promise.resolve({ done: true, value });
+            finished = true;
+            const cancel = options && options.preventCancel
+              ? Promise.resolve()
+              : reader.cancel(value);
+            return cancel.catch(function () {}).then(function () {
+              reader.releaseLock();
+              return { done: true, value };
+            });
+          }
+        };
+        if (typeof Symbol.asyncIterator !== "undefined") {
+          iterator[Symbol.asyncIterator] = function () { return iterator; };
+        }
+        return iterator;
+      };
+    }
+
+    if (typeof ReadableStream !== "undefined" &&
+        typeof Symbol.asyncIterator !== "undefined" &&
+        !ReadableStream.prototype[Symbol.asyncIterator]) {
+      ReadableStream.prototype[Symbol.asyncIterator] =
+        ReadableStream.prototype.values;
+    }
+  </script>
+  <script type="module" src="viewer.js?v=iphone3"></script>
 </body>
 </html>
