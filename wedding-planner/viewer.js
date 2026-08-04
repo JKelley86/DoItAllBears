@@ -1,326 +1,92 @@
-import * as pdfjsLib from "https://cdn.jsdelivr.net/npm/pdfjs-dist@5.3.31/build/pdf.min.mjs";
+import * as pdfjsLib from "./vendor/pdf.mjs";
+pdfjsLib.GlobalWorkerOptions.workerSrc="./vendor/pdf.worker.mjs";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "https://cdn.jsdelivr.net/npm/pdfjs-dist@5.3.31/build/pdf.worker.min.mjs";
+const $=id=>document.getElementById(id);
+const params=new URLSearchParams(location.search);
+const sourcePath=params.get("src"),storedId=params.get("id"),requestedName=params.get("name")||"Wedding Planner";
+const DB_NAME="WeddingPlannerLibrary",STORE_NAME="pdfs",DB_VERSION=1;
+const weddingKey=(storedId||sourcePath||requestedName).replace(/[^a-z0-9]/gi,"_").toLowerCase();
+const STORAGE_KEY=`wedding-command-v3:${weddingKey}`;
+const BOOKMARK_TYPES=["Schedule","Contacts","Ceremony","Reception","Vendor information","Floor plan","Emergency information"];
+const TOPICS={
+  photographer:["photographer","photography","photo","andi","kiley","videographer","video","shot list"],
+  venue:["venue","hotel","courtyard","ballroom","address","floor plan","map"],
+  ceremony:["ceremony","officiant","processional","recessional","vows"],
+  reception:["reception","dinner","dance","speeches","cake","dj","cocktail"],
+  vendor:["vendor","photographer","videographer","dj","cake","hair","makeup","venue","officiant"],
+  emergency:["emergency","backup","hospital","weather","missing","late"],
+  guest:["guest","seating","table","dietary","allergy"]
+};
+const els={title:$("documentTitle"),loading:$("loadingState"),loadingMessage:$("loadingMessage"),error:$("errorState"),errorMessage:$("errorMessage"),pages:$("pdfPages"),searchDrawer:$("searchDrawer"),search:$("pdfSearch"),searchStatus:$("searchStatus"),searchResults:$("searchResults"),panel:$("commandPanel"),panelTitle:$("panelTitle"),panelContent:$("panelContent"),panelBackdrop:$("panelBackdrop"),action:$("actionSheet"),actionBackdrop:$("actionBackdrop"),actionPage:$("actionPageNumber"),category:$("bookmarkCategory"),zoomLabel:$("zoomLabel"),pageIndicator:$("pageIndicator")};
 
-const DB_NAME = "WeddingPlannerLibrary";
-const STORE_NAME = "pdfs";
-const DB_VERSION = 1;
+let pdfDocument=null,pageRecords=[],scale=1,currentPage=1,renderToken=0,pageObserver=null,lastRenderWidth=innerWidth;
+let activePanel="",taskGroup="time",actionTarget=null,currentSearchTerms=[];
+let autoContacts=[],autoTasks=[],autoBookmarks=[],venues=[],guests=[];
+let saved=loadSaved();
 
-const params = new URLSearchParams(window.location.search);
-const sourcePath = params.get("src");
-const storedId = params.get("id");
-const requestedName = params.get("name") || "Wedding Planner";
+function loadSaved(){try{return Object.assign({annotations:[],bookmarks:[],tasks:[],contacts:[]},JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}"));}catch{return{annotations:[],bookmarks:[],tasks:[],contacts:[]}}}
+function persist(){localStorage.setItem(STORAGE_KEY,JSON.stringify(saved))}
+function uid(){return crypto.randomUUID?.()||`${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`}
+function esc(value=""){return String(value).replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]))}
+function toast(message){document.querySelector(".toast")?.remove();const node=document.createElement("div");node.className="toast";node.textContent=message;document.body.append(node);setTimeout(()=>node.remove(),2300)}
+function normalize(value=""){return value.toLowerCase().replace(/[’']/g,"").replace(/[^a-z0-9@.+-]+/g," ").trim()}
+function stem(word=""){let w=normalize(word);const map={photography:"photograph",photographer:"photograph",photos:"photo",videography:"video",videographer:"video",ceremonies:"ceremony"};if(map[w])return map[w];return w.replace(/(ing|ments|ment|ers|er|ies|ed|es|s)$/i,"")}
+function similar(a,b){a=stem(a);b=stem(b);if(!a||!b)return false;if(a===b||a.includes(b)||b.includes(a))return true;if(Math.abs(a.length-b.length)>1||Math.min(a.length,b.length)<4)return false;let edits=0,i=0,j=0;while(i<a.length&&j<b.length){if(a[i]===b[j]){i++;j++;continue}if(++edits>1)return false;if(a.length>b.length)i++;else if(b.length>a.length)j++;else{i++;j++}}return edits+(i<a.length||j<b.length?1:0)<=1}
+function getSearchTerms(query){let clean=normalize(query).replace(/\b(show|tell|find|give|me|everything|anything|all|about|the|for|on)\b/g," ").replace(/\s+/g," ").trim();let terms=clean.split(" ").filter(w=>w.length>2);for(const [topic,related] of Object.entries(TOPICS)){if(terms.some(t=>similar(t,topic)||related.some(r=>similar(t,r))))terms=[...terms,...related]}return [...new Set(terms.map(stem).filter(Boolean))]}
 
-const documentTitle = document.getElementById("documentTitle");
-const loadingState = document.getElementById("loadingState");
-const errorState = document.getElementById("errorState");
-const errorMessage = document.getElementById("errorMessage");
-const pdfPages = document.getElementById("pdfPages");
-const openSearch = document.getElementById("openSearch");
-const searchDrawer = document.getElementById("searchDrawer");
-const pdfSearch = document.getElementById("pdfSearch");
-const runSearch = document.getElementById("runSearch");
-const searchStatus = document.getElementById("searchStatus");
-const previousResult = document.getElementById("previousResult");
-const nextResult = document.getElementById("nextResult");
-const zoomOut = document.getElementById("zoomOut");
-const zoomIn = document.getElementById("zoomIn");
-const zoomLabel = document.getElementById("zoomLabel");
-const previousPage = document.getElementById("previousPage");
-const nextPage = document.getElementById("nextPage");
-const pageIndicator = document.getElementById("pageIndicator");
+function openDatabase(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,DB_VERSION);req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(STORE_NAME))req.result.createObjectStore(STORE_NAME,{keyPath:"id"})};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
+async function resolveSource(){if(storedId){const db=await openDatabase();const item=await new Promise((resolve,reject)=>{const req=db.transaction(STORE_NAME,"readonly").objectStore(STORE_NAME).get(storedId);req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});if(!item?.blob)throw Error("This saved PDF is no longer available on this device.");els.title.textContent=item.name||requestedName;return new Uint8Array(await item.blob.arrayBuffer())}if(sourcePath)return sourcePath;throw Error("No PDF was selected.")}
+function showError(error){console.error(error);els.loading.hidden=true;els.error.hidden=false;els.errorMessage.textContent=error?.message||"The file may have moved or may not be a valid PDF."}
 
-let pdfDocument = null;
-let pageTexts = [];
-let scale = 1;
-let searchResults = [];
-let activeResultIndex = -1;
-let renderToken = 0;
-let currentPage = 1;
-let pageObserver = null;
-let lastRenderWidth = window.innerWidth;
+function buildRows(textContent){const rows=[];for(const item of textContent.items){if(!item.str?.trim())continue;const y=item.transform[5],x=item.transform[4];let row=rows.find(r=>Math.abs(r.y-y)<2.6);if(!row){row={y,parts:[]};rows.push(row)}row.parts.push({x,width:item.width||0,text:item.str.trim()})}rows.sort((a,b)=>b.y-a.y);for(const row of rows)row.parts.sort((a,b)=>a.x-b.x);return rows}
+function cleanPartText(text){const value=text.trim();return /^(?:[A-Za-z]\s+){1,}[A-Za-z]$/.test(value)?value.replace(/\s+/g,""):value}
+function joinParts(parts){let output="",previous=null;for(const part of parts){if(previous){const gap=part.x-(previous.x+previous.width);output+=gap>2.5?" ":""}output+=cleanPartText(part.text);previous=part}return output.replace(/\s+/g," ").trim()}
+function rowsToText(rows){return rows.map(r=>joinParts(r.parts)).join("\n")}
+function createTextLayer(textContent,viewport){const layer=document.createElement("div");layer.className="text-layer";for(const item of textContent.items){if(!item.str)continue;const tx=pdfjsLib.Util.transform(viewport.transform,item.transform);const fontHeight=Math.hypot(tx[2],tx[3]);const span=document.createElement("span");span.textContent=item.str;span.dataset.raw=item.str;span.style.left=`${tx[4]}px`;span.style.top=`${tx[5]-fontHeight}px`;span.style.fontSize=`${fontHeight}px`;span.style.fontFamily="sans-serif";const targetWidth=item.width*viewport.scale;span.style.width=`${targetWidth}px`;span.style.height=`${fontHeight*1.2}px`;layer.append(span)}return layer}
 
-documentTitle.textContent = requestedName;
-document.title = `${requestedName} | Wedding Planner`;
+async function renderDocument({preserve=false,initial=false}={}){const token=++renderToken,restorePage=currentPage;if(pageObserver)pageObserver.disconnect();els.pages.innerHTML="";pageRecords=[];if(initial)els.loading.hidden=false;const viewportWidth=Math.max(280,Math.min(innerWidth-16,900));for(let n=1;n<=pdfDocument.numPages;n++){if(token!==renderToken)return;els.loadingMessage.textContent=`Reading page ${n} of ${pdfDocument.numPages}…`;const page=await pdfDocument.getPage(n),natural=page.getViewport({scale:1}),fit=viewportWidth/natural.width,viewport=page.getViewport({scale:fit*scale}),text=await page.getTextContent(),rows=buildRows(text);const wrapper=document.createElement("section");wrapper.className="pdf-page";wrapper.dataset.pageNumber=n;wrapper.style.width=`${viewport.width}px`;const canvas=document.createElement("canvas"),ctx=canvas.getContext("2d",{alpha:false}),ratio=Math.min(devicePixelRatio||1,2);canvas.width=Math.floor(viewport.width*ratio);canvas.height=Math.floor(viewport.height*ratio);canvas.style.width=`${viewport.width}px`;canvas.style.height=`${viewport.height}px`;const badge=document.createElement("span");badge.className="page-number-badge";badge.textContent=`Page ${n}`;const textLayer=createTextLayer(text,viewport),annotationLayer=document.createElement("div");annotationLayer.className="annotation-layer";wrapper.append(canvas,textLayer,annotationLayer,badge);els.pages.append(wrapper);await page.render({canvasContext:ctx,viewport,transform:ratio===1?null:[ratio,0,0,ratio,0,0]}).promise;pageRecords.push({pageNumber:n,text:rowsToText(rows),rows,wrapper,textLayer});renderAnnotations(n);installLongPress(wrapper,n);if(n%5===0)await new Promise(requestAnimationFrame)}extractAll();els.loading.hidden=true;currentPage=Math.min(restorePage,pdfDocument.numPages);updateIndicators();createObserver();applyWordHighlights();if(preserve)goToPage(restorePage,false)}
 
-function openDatabase() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
+function createObserver(){pageObserver=new IntersectionObserver(entries=>{const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio);if(visible[0]){currentPage=Number(visible[0].target.dataset.pageNumber);updateIndicators()}},{rootMargin:"-20% 0px -55% 0px",threshold:[.05,.25,.5,.75]});document.querySelectorAll(".pdf-page").forEach(p=>pageObserver.observe(p))}
+function updateIndicators(){els.zoomLabel.textContent=`${Math.round(scale*100)}%`;els.pageIndicator.textContent=`${currentPage} / ${pdfDocument?.numPages||0}`}
+function goToPage(page,smooth=true){currentPage=Math.max(1,Math.min(Number(page)||1,pdfDocument?.numPages||1));document.querySelector(`.pdf-page[data-page-number="${currentPage}"]`)?.scrollIntoView({behavior:smooth?"smooth":"auto",block:"start"});updateIndicators();closePanel()}
 
-    request.onupgradeneeded = () => {
-      const db = request.result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, { keyPath: "id" });
-      }
-    };
+function installLongPress(wrapper,page){let timer,start,pointers=0;const cancel=()=>{clearTimeout(timer);timer=null};wrapper.addEventListener("pointerdown",e=>{pointers++;if(pointers>1){cancel();return}start={x:e.clientX,y:e.clientY};const rect=wrapper.getBoundingClientRect(),x=(e.clientX-rect.left)/rect.width,y=(e.clientY-rect.top)/rect.height;timer=setTimeout(()=>{navigator.vibrate?.(35);openAction(page,x,y)},620)});wrapper.addEventListener("pointermove",e=>{if(start&&Math.hypot(e.clientX-start.x,e.clientY-start.y)>10)cancel()});["pointerup","pointercancel","pointerleave"].forEach(type=>wrapper.addEventListener(type,()=>{pointers=Math.max(0,pointers-1);cancel()}));wrapper.addEventListener("contextmenu",e=>{e.preventDefault();const rect=wrapper.getBoundingClientRect();openAction(page,(e.clientX-rect.left)/rect.width,(e.clientY-rect.top)/rect.height)})}
+function openAction(page,x,y){actionTarget={page,x:Math.max(.02,Math.min(.96,x)),y:Math.max(.02,Math.min(.96,y))};els.actionPage.textContent=page;els.action.hidden=false;els.actionBackdrop.hidden=false}
+function closeAction(){els.action.hidden=true;els.actionBackdrop.hidden=true;actionTarget=null}
+function addAnnotation(type){if(!actionTarget)return;const base={id:uid(),page:actionTarget.page,x:actionTarget.x,y:actionTarget.y,type,createdAt:Date.now()};if(type==="note"){const text=prompt("Enter your note:");if(!text)return;base.text=text}if(type==="highlight"){base.width=.28;base.height=.045}saved.annotations.push(base);persist();renderAnnotations(base.page);closeAction();toast(type==="note"?"Note saved":type==="check"?"Checkmark added":"Highlight added")}
+function renderAnnotations(page){const layer=document.querySelector(`.pdf-page[data-page-number="${page}"] .annotation-layer`);if(!layer)return;layer.innerHTML="";saved.annotations.filter(a=>a.page===page).forEach(a=>{const node=document.createElement("button");node.type="button";node.className=`annotation ${a.type}`;node.style.left=`${a.x*100}%`;node.style.top=`${a.y*100}%`;if(a.type==="note"){node.textContent="N";node.title=a.text}else if(a.type==="check")node.textContent="✓";else{node.style.width=`${(a.width||.28)*100}%`;node.style.height=`${(a.height||.045)*100}%`}node.addEventListener("click",e=>{e.stopPropagation();const message=a.type==="note"?`${a.text}\n\nRemove this note?`:`Remove this ${a.type}?`;if(confirm(message)){saved.annotations=saved.annotations.filter(x=>x.id!==a.id);persist();renderAnnotations(page);if(activePanel==="notes")renderPanel("notes")}});layer.append(node)})}
+function addBookmark(){if(!actionTarget)return;const category=els.category.value;saved.bookmarks=saved.bookmarks.filter(b=>!(b.page===actionTarget.page&&b.category===category));saved.bookmarks.push({id:uid(),page:actionTarget.page,category,manual:true});persist();closeAction();toast(`${category} bookmark saved`)}
 
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
+function extractAll(){autoBookmarks=extractBookmarks();autoContacts=extractContacts();autoTasks=extractTasks();venues=extractVenues();guests=extractGuests()}
+function pageHas(record,words){const text=normalize(record.text);return words.some(w=>text.includes(normalize(w)))}
+function extractBookmarks(){const rules={Schedule:["wedding timeline","vendor schedule","detailed timeline"],Contacts:["contact list","wedding party"],Ceremony:["the ceremony","ceremony entrances"],Reception:["reception","order of speeches"],"Vendor information":["vendors","photography services agreement"],"Floor plan":["floor plan","venue map","layout"],"Emergency information":["emergency planning"]},out=[];for(const [category,terms] of Object.entries(rules)){for(const rec of pageRecords){if(pageHas(rec,terms)){out.push({id:`auto-${category}-${rec.pageNumber}`,page:rec.pageNumber,category,manual:false});if(!["Schedule","Vendor information","Floor plan"].includes(category))break}}}return out}
+function cleanPhone(value){const digits=value.replace(/\D/g,"");const d=digits.length===11&&digits[0]==="1"?digits.slice(1):digits;if(d.length!==10)return value.trim();return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`}
+function titleCase(value){return value.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase())}
+function extractContacts(){const out=[],add=c=>{if(!c.name&&!c.phone&&!c.email)return;const key=normalize(c.email||c.phone||`${c.name}-${c.role}`);if(!out.some(x=>normalize(x.email||x.phone||`${x.name}-${x.role}`)===key))out.push(Object.assign({id:`auto-contact-${out.length}`,source:"PDF"},c))};const vendorRoles=/^(venue|videographer|photographer|dj|officiant|hair stylist|cake designer|make up|makeup)$/i;for(const rec of pageRecords){const lines=rec.text.split("\n").map(s=>s.trim()).filter(Boolean);if(/contact list/i.test(rec.text)){for(let i=0;i<lines.length;i++){const m=lines[i].match(/^NAME:\s*(.+)/i);if(m){const window=lines.slice(i,i+6),role=window.find(x=>/^ROLE:/i.test(x))?.replace(/^ROLE:\s*/i,"")||"Main point of contact",phone=window.join(" ").match(/(?:\+?1[ .-]?)?\(?\d{3}\)?[ .-]\d{3}[ .-]\d{4}/)?.[0],email=window.join(" ").match(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/i)?.[0];add({name:titleCase(m[1]),role:titleCase(role),company:"Wedding party",relation:"Main point of contact",phone:phone&&cleanPhone(phone),email,page:rec.pageNumber})}}}if(/^vendors\b/im.test(rec.text)){for(let i=0;i<lines.length;i++){if(!vendorRoles.test(lines[i]))continue;const role=titleCase(lines[i]),company=lines[i+1]||"",name=lines[i+2]||"",window=lines.slice(i,i+7).join(" "),phone=window.match(/(?:\+?1[ .-]?)?\(?\d{3}\)?[ .-]\d{3}[ .-]\d{4}/)?.[0],email=window.match(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/i)?.[0];add({name:titleCase(name),company:titleCase(company),role,relation:`${role} contact`,phone:phone&&cleanPhone(phone),email:email?.toLowerCase(),page:rec.pageNumber})}}const emails=rec.text.match(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/ig)||[],phones=rec.text.match(/(?:\+?1[ .-]?)?\(?\d{3}\)?[ .-]\d{3}[ .-]\d{4}/g)||[];if(/agreement|contract|vendor/i.test(rec.text)){for(const email of emails){const lineIndex=lines.findIndex(l=>l.includes(email));const context=lines.slice(Math.max(0,lineIndex-3),lineIndex+3);const name=context.find(l=>/photography|bakery|courtyard|wedding|complete/i.test(l))||email.split("@")[0];add({name:titleCase(name),company:titleCase(name),role:inferRole(context.join(" ")),relation:"Vendor contact",email:email.toLowerCase(),phone:phones[0]&&cleanPhone(phones[0]),page:rec.pageNumber})}}}return out}
+function inferRole(text){for(const role of ["Photographer","Videographer","Venue","DJ","Cake","Hair","Makeup","Officiant"]){if(new RegExp(role,"i").test(text))return role}return"Vendor"}
+function inferCategory(text){for(const category of ["Ceremony","Reception","Photography","Beauty","Transportation","Vendor","Emergency"]){if(new RegExp(category,"i").test(text))return category}return"General"}
+function extractTasks(){const out=[];for(const rec of pageRecords){const lines=rec.text.split("\n").map(s=>s.trim()).filter(Boolean);if(!/timeline|schedule|duties/i.test(rec.text))continue;for(let i=0;i<lines.length;i++){const combined=`${lines[i]} ${lines[i+1]||""}`;const time=combined.match(/\b(?:1[0-2]|0?[1-9])(?::\d{2})?\s*(?:am|pm)\b/i)?.[0];if(time){const title=lines[i].replace(time,"").trim()||lines[i+1]||"Scheduled item";if(title.length>2&&!/timeline|schedule|arrive depart/i.test(title))out.push({id:`auto-task-${rec.pageNumber}-${i}`,title:titleCase(title),time:time.toUpperCase(),person:inferPerson(combined),category:inferCategory(rec.text),page:rec.pageNumber,auto:true})}}}return out.filter((t,i,a)=>a.findIndex(x=>normalize(`${x.title}${x.time}`)===normalize(`${t.title}${t.time}`))===i).slice(0,120)}
+function inferPerson(text){const found=[...autoContacts].find(c=>normalize(text).includes(normalize(c.name?.split(" ")[0])));return found?.name||(/photo/i.test(text)?"Photography team":/dj/i.test(text)?"DJ":"Unassigned")}
+function extractVenues(){const out=[],seen=new Set();for(const rec of pageRecords){const flat=rec.text.replace(/\n/g," ").replace(/\s+/g," ");const matches=flat.match(/\b\d{2,5}\s+[A-Z0-9.' -]{2,60}(?:AVE(?:NUE)?|ST(?:REET)?|RD|ROAD|BLVD|DR(?:IVE)?|HWY)\s*(?:S|N|E|W|SE|SW|NE|NW)?\s*,?\s*[A-Z .'-]+,?\s*MN\s*\d{5}\b/ig)||[];for(const address of matches){const clean=address.replace(/\s+/g," ").trim();if(seen.has(normalize(clean)))continue;seen.add(normalize(clean));const before=flat.slice(Math.max(0,flat.indexOf(address)-90),flat.indexOf(address));out.push({address:titleCase(clean),name:/courtyard/i.test(before+clean)?"Courtyard Minneapolis":/stone arch/i.test(before)?"Stone Arch Bridge":"Wedding location",page:rec.pageNumber})}}return out}
+function extractGuests(){const out=[];for(const rec of pageRecords){if(!/^\s*seating/im.test(rec.text))continue;let headers=[];for(const row of rec.rows){const headingParts=row.parts.filter(p=>/table\s*\d+/i.test(p.text));if(headingParts.length){headers=headingParts.map(p=>({x:p.x,table:Number(p.text.match(/\d+/)[0])}));continue}if(!headers.length)continue;for(const header of headers){const others=headers.filter(h=>h!==header),left=Math.max(0,...others.filter(h=>h.x<header.x).map(h=>(h.x+header.x)/2)),right=Math.min(9999,...others.filter(h=>h.x>header.x).map(h=>(h.x+header.x)/2));const name=joinParts(row.parts.filter(p=>p.x>=left&&p.x<right));if(name&&name.length>2&&!/seating|table|guest/i.test(name)&&/[a-z]/i.test(name))out.push({name:titleCase(name),table:header.table,page:rec.pageNumber})}}}return out.filter((g,i,a)=>a.findIndex(x=>normalize(x.name)===normalize(g.name))===i)}
 
-async function getStoredPdf(id) {
-  const db = await openDatabase();
+function sentenceSnippet(text,terms){const flat=text.replace(/\n+/g," • ").replace(/\s+/g," ");const words=flat.split(/\s+/),index=words.findIndex(w=>terms.some(t=>similar(w,t)));if(index<0)return flat.slice(0,180);return `${index>12?"… ":""}${words.slice(Math.max(0,index-12),index+18).join(" ")}${index+18<words.length?" …":""}`}
+function highlightHtml(text,terms){let html=esc(text);for(const term of terms.sort((a,b)=>b.length-a.length)){if(term.length<3)continue;html=html.replace(new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}[a-z]*)`,`ig`),"<mark>$1</mark>")}return html}
+function performSearch(query=els.search.value){currentSearchTerms=getSearchTerms(query);document.querySelectorAll(".pdf-page").forEach(p=>p.classList.remove("search-hit"));const results=[];for(const rec of pageRecords){const words=normalize(rec.text).split(" ");const score=currentSearchTerms.reduce((n,t)=>n+words.filter(w=>similar(w,t)).length,0);if(score){results.push({type:"PDF",page:rec.pageNumber,score,text:sentenceSnippet(rec.text,currentSearchTerms)});rec.wrapper.classList.add("search-hit")}}for(const note of saved.annotations.filter(a=>a.type==="note")){const score=currentSearchTerms.reduce((n,t)=>n+normalize(note.text).split(" ").filter(w=>similar(w,t)).length,0);if(score)results.push({type:"Note",page:note.page,score,text:note.text})}results.sort((a,b)=>b.score-a.score);els.searchStatus.textContent=results.length?`${results.length} related pages and notes found.`:`No matches for “${query}”.`;els.searchResults.innerHTML=results.slice(0,40).map(r=>`<button class="result-card" data-page="${r.page}"><strong>${r.type} · Page ${r.page}</strong><p>${highlightHtml(r.text,currentSearchTerms)}</p></button>`).join("");els.searchResults.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>goToPage(b.dataset.page));applyWordHighlights()}
+function applyWordHighlights(){document.querySelectorAll(".text-layer span").forEach(span=>{const words=normalize(span.dataset.raw).split(" ");span.classList.toggle("search-word",currentSearchTerms.length>0&&words.some(w=>currentSearchTerms.some(t=>similar(w,t))))})}
 
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, "readonly");
-    const request = transaction.objectStore(STORE_NAME).get(id);
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
+function openPanel(name){activePanel=name;els.panel.hidden=false;els.panelBackdrop.hidden=false;renderPanel(name)}
+function closePanel(){els.panel.hidden=true;els.panelBackdrop.hidden=true;activePanel=""}
+function renderPanel(name){const titles={bookmarks:"Favorite pages",notes:"Notes & marks",tasks:"Day-of tasks",contacts:"Contacts & locations",seating:"Guest lookup"};els.panelTitle.textContent=titles[name];({bookmarks:renderBookmarks,notes:renderNotes,tasks:renderTasks,contacts:renderContacts,seating:renderSeating}[name])()}
+function renderBookmarks(){const all=[...autoBookmarks,...saved.bookmarks].filter((b,i,a)=>a.findIndex(x=>x.page===b.page&&x.category===b.category)===i);els.panelContent.innerHTML=BOOKMARK_TYPES.map(category=>{const items=all.filter(b=>b.category===category);if(!items.length)return"";return `<section class="category-group"><h3>${esc(category)} <span>${items.length}</span></h3><div class="panel-list">${items.map(b=>`<article class="panel-card"><h3>Page ${b.page}</h3><p>${b.manual?"Your bookmark":"Suggested from planner"}</p><div class="card-actions"><button class="mini-button" data-go="${b.page}">Open page</button>${b.manual?`<button class="mini-button danger" data-delete-bookmark="${b.id}">Remove</button>`:""}</div></article>`).join("")}</div></section>`}).join("")||`<div class="panel-empty">Long-press a PDF page to bookmark it.</div>`;bindPanelActions()}
+function renderNotes(){const list=[...saved.annotations].sort((a,b)=>a.page-b.page);els.panelContent.innerHTML=list.length?`<div class="panel-list">${list.map(a=>`<article class="panel-card"><h3>${a.type==="note"?"Text note":a.type==="highlight"?"Highlight":"Checkmark"} · Page ${a.page}</h3><p>${esc(a.text||`Saved ${a.type}`)}</p><div class="card-actions"><button class="mini-button" data-go="${a.page}">Open page</button><button class="mini-button danger" data-delete-annotation="${a.id}">Remove</button></div></article>`).join("")}</div>`:`<div class="panel-empty">Long-press anywhere on a PDF page to add a note, highlight, or checkmark.</div>`;bindPanelActions()}
+function taskGroupValue(task){if(taskGroup==="person")return task.person||"Unassigned";if(taskGroup==="category")return task.category||"General";const match=(task.time||"").match(/(AM|PM)/i);return match?match[1].toUpperCase()==="AM"?"Morning":"Afternoon & evening":"No time"}
+function renderTasks(){const tasks=[...autoTasks,...saved.tasks];const groups=Object.groupBy?Object.groupBy(tasks,taskGroupValue):tasks.reduce((o,t)=>((o[taskGroupValue(t)]||=[]).push(t),o),{});els.panelContent.innerHTML=`<form id="taskForm" class="panel-form"><input name="title" required placeholder="Add a task"><div class="bookmark-row"><input name="time" placeholder="Time"><input name="person" placeholder="Person"></div><select name="category"><option>General</option><option>Ceremony</option><option>Reception</option><option>Vendor</option><option>Emergency</option></select><button class="solid-button">Add task</button></form><div class="filter-pills">${["time","person","category"].map(x=>`<button type="button" data-task-group="${x}" class="${taskGroup===x?"active":""}">By ${x}</button>`).join("")}</div>${Object.entries(groups).map(([group,list])=>`<section class="category-group"><h3>${esc(group)} <span>${list.length}</span></h3><div class="panel-list">${list.map(t=>{const done=saved.tasks.find(x=>x.id===t.id)?.done;return `<article class="panel-card task-row ${done?"done":""}"><button class="task-toggle" data-task-toggle="${t.id}" data-auto="${!!t.auto}">${done?"✓":""}</button><div><h3>${esc(t.title)}</h3><p>${esc([t.time,t.person,t.category].filter(Boolean).join(" · "))}</p><div class="card-actions">${t.page?`<button class="mini-button" data-go="${t.page}">Page ${t.page}</button>`:""}${!t.auto?`<button class="mini-button danger" data-delete-task="${t.id}">Remove</button>`:""}</div></div></article>`}).join("")}</div></section>`).join("")}`;$("taskForm").onsubmit=e=>{e.preventDefault();const data=new FormData(e.currentTarget);saved.tasks.push({id:uid(),title:data.get("title"),time:data.get("time"),person:data.get("person")||"Unassigned",category:data.get("category"),done:false});persist();renderTasks()};els.panelContent.querySelectorAll("[data-task-group]").forEach(b=>b.onclick=()=>{taskGroup=b.dataset.taskGroup;renderTasks()});bindPanelActions()}
+function renderContacts(){const contacts=[...autoContacts,...saved.contacts],locations=venues;els.panelContent.innerHTML=`<form id="contactForm" class="panel-form"><input name="name" required placeholder="Contact name"><input name="company" placeholder="Company"><input name="role" placeholder="Role"><input name="phone" inputmode="tel" placeholder="Phone"><input name="email" inputmode="email" placeholder="Email"><input name="arrival" placeholder="Arrival time"><input name="payment" placeholder="Payment status"><textarea name="notes" placeholder="Notes"></textarea><button class="solid-button">Add contact</button></form><section class="category-group"><h3>People & vendors <span>${contacts.length}</span></h3><div class="contact-grid">${contacts.map(c=>`<article class="panel-card"><h3>${esc(c.name||c.company||"Contact")}</h3><div class="contact-meta"><p>${esc([c.role,c.company].filter(Boolean).join(" · "))}</p><p>${esc(c.relation||"")}</p>${c.arrival?`<p>Arrival: ${esc(c.arrival)}</p>`:""}${c.payment?`<p>Payment: ${esc(c.payment)}</p>`:""}${c.notes?`<p>${esc(c.notes)}</p>`:""}</div><div class="card-actions">${c.phone?`<a class="mini-button" href="tel:${c.phone.replace(/\D/g,"")}">Call</a><a class="mini-button" href="sms:${c.phone.replace(/\D/g,"")}">Text</a>`:""}${c.email?`<a class="mini-button" href="mailto:${esc(c.email)}">Email</a>`:""}${c.page?`<button class="mini-button" data-go="${c.page}">Source</button>`:""}${!c.source?`<button class="mini-button danger" data-delete-contact="${c.id}">Remove</button>`:""}</div></article>`).join("")}</div></section><section class="category-group"><h3>Locations <span>${locations.length}</span></h3><div class="panel-list">${locations.map(v=>`<article class="panel-card address-card"><h3>${esc(v.name)}</h3><p>${esc(v.address)}</p><a class="mini-button" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.address)}">Open in Maps</a> <button class="mini-button" data-go="${v.page}">Page ${v.page}</button></article>`).join("")||`<div class="panel-empty">No full street addresses were detected.</div>`}</div></section>`;$("contactForm").onsubmit=e=>{e.preventDefault();const c=Object.fromEntries(new FormData(e.currentTarget));saved.contacts.push({id:uid(),...c,relation:"Manually added"});persist();renderContacts()};bindPanelActions()}
+function renderSeating(){els.panelContent.innerHTML=`<div class="search-field light"><span>⌕</span><input id="guestSearch" type="search" placeholder="Enter a guest name"></div><div id="guestResults" class="panel-list" style="margin-top:12px"></div><p class="panel-empty">${guests.length} guests were automatically indexed from the seating charts.</p>`;const input=$("guestSearch"),results=$("guestResults");const run=()=>{const q=normalize(input.value);if(q.length<2){results.innerHTML="";return}const matches=guests.filter(g=>normalize(g.name).includes(q)||q.split(" ").every(term=>normalize(g.name).includes(term))).slice(0,30);const dietary=pageRecords.find(r=>/dietary restrictions/i.test(r.text));results.innerHTML=matches.length?matches.map(g=>`<article class="panel-card guest-result"><strong>${esc(g.name)}</strong><p>Table ${g.table} · Page ${g.page}</p><div class="card-actions"><button class="mini-button" data-go="${g.page}">Show seating chart</button>${dietary&&normalize(dietary.text).includes(normalize(g.name))?`<button class="mini-button" data-go="${dietary.pageNumber}">Dietary note</button>`:""}</div></article>`).join(""):`<div class="panel-empty">No guest found. Try part of the first or last name.</div>`;bindPanelActions()};input.addEventListener("input",run);setTimeout(()=>input.focus(),80)}
+function bindPanelActions(){els.panelContent.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>goToPage(b.dataset.go));els.panelContent.querySelectorAll("[data-delete-bookmark]").forEach(b=>b.onclick=()=>{saved.bookmarks=saved.bookmarks.filter(x=>x.id!==b.dataset.deleteBookmark);persist();renderBookmarks()});els.panelContent.querySelectorAll("[data-delete-annotation]").forEach(b=>b.onclick=()=>{const a=saved.annotations.find(x=>x.id===b.dataset.deleteAnnotation);saved.annotations=saved.annotations.filter(x=>x.id!==b.dataset.deleteAnnotation);persist();if(a)renderAnnotations(a.page);renderNotes()});els.panelContent.querySelectorAll("[data-delete-task]").forEach(b=>b.onclick=()=>{saved.tasks=saved.tasks.filter(x=>x.id!==b.dataset.deleteTask);persist();renderTasks()});els.panelContent.querySelectorAll("[data-delete-contact]").forEach(b=>b.onclick=()=>{saved.contacts=saved.contacts.filter(x=>x.id!==b.dataset.deleteContact);persist();renderContacts()});els.panelContent.querySelectorAll("[data-task-toggle]").forEach(b=>b.onclick=()=>{let task=saved.tasks.find(x=>x.id===b.dataset.taskToggle);if(!task){const source=autoTasks.find(x=>x.id===b.dataset.taskToggle);task={...source,done:true};saved.tasks.push(task)}else task.done=!task.done;persist();renderTasks()})}
 
-async function resolvePdfSource() {
-  if (storedId) {
-    const item = await getStoredPdf(storedId);
-    if (!item?.blob) throw new Error("This saved PDF is no longer available on this device.");
-    documentTitle.textContent = item.name || requestedName;
-    return new Uint8Array(await item.blob.arrayBuffer());
-  }
+$("openSearch").onclick=()=>{els.searchDrawer.hidden=!els.searchDrawer.hidden;if(!els.searchDrawer.hidden)setTimeout(()=>els.search.focus(),60)};$("runSearch").onclick=()=>performSearch();els.search.onkeydown=e=>{if(e.key==="Enter")performSearch()};document.querySelectorAll(".viewer-nav [data-panel]").forEach(b=>b.onclick=()=>openPanel(b.dataset.panel));$("closePanel").onclick=closePanel;els.panelBackdrop.onclick=closePanel;els.actionBackdrop.onclick=closeAction;$("cancelAction").onclick=closeAction;document.querySelectorAll("[data-action]").forEach(b=>b.onclick=()=>addAnnotation(b.dataset.action));$("saveBookmark").onclick=addBookmark;$("zoomOut").onclick=async()=>{scale=Math.max(.7,Number((scale-.15).toFixed(2)));updateIndicators();await renderDocument({preserve:true})};$("zoomIn").onclick=async()=>{scale=Math.min(2.2,Number((scale+.15).toFixed(2)));updateIndicators();await renderDocument({preserve:true})};$("previousPage").onclick=()=>goToPage(currentPage-1);$("nextPage").onclick=()=>goToPage(currentPage+1);
+let resizeTimer;addEventListener("resize",()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{const width=innerWidth;if(pdfDocument&&Math.abs(width-lastRenderWidth)>=2){lastRenderWidth=width;renderDocument({preserve:true}).catch(showError)}},250)});
 
-  if (sourcePath) return sourcePath;
-
-  throw new Error("No PDF was selected.");
-}
-
-function showError(error) {
-  console.error(error);
-  loadingState.hidden = true;
-  errorState.hidden = false;
-  errorMessage.textContent = error?.message || "The file may have moved or may not be a valid PDF.";
-}
-
-async function extractPageText(page) {
-  const textContent = await page.getTextContent();
-  return textContent.items
-    .map(item => item.str)
-    .join(" ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function createPageObserver() {
-  if (pageObserver) pageObserver.disconnect();
-
-  pageObserver = new IntersectionObserver(entries => {
-    const visible = entries
-      .filter(entry => entry.isIntersecting)
-      .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-
-    if (visible[0]) {
-      currentPage = Number(visible[0].target.dataset.pageNumber);
-      updatePageIndicator();
-    }
-  }, {
-    rootMargin: "-20% 0px -55% 0px",
-    threshold: [0.05, 0.25, 0.5, 0.75],
-  });
-
-  document.querySelectorAll(".pdf-page").forEach(page => pageObserver.observe(page));
-}
-
-async function renderDocument({ preservePosition = false, showLoading = false } = {}) {
-  const token = ++renderToken;
-  const pageToRestore = currentPage;
-  pdfPages.innerHTML = "";
-  pageTexts = new Array(pdfDocument.numPages);
-  searchResults = [];
-  activeResultIndex = -1;
-  updateSearchHighlights();
-  if (showLoading) loadingState.hidden = false;
-
-  const viewportWidth = Math.max(280, Math.min(window.innerWidth - 16, 900));
-
-  for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber += 1) {
-    if (token !== renderToken) return;
-
-    const page = await pdfDocument.getPage(pageNumber);
-    const naturalViewport = page.getViewport({ scale: 1 });
-    const fitScale = viewportWidth / naturalViewport.width;
-    const viewport = page.getViewport({ scale: fitScale * scale });
-
-    const wrapper = document.createElement("section");
-    wrapper.className = "pdf-page";
-    wrapper.dataset.pageNumber = String(pageNumber);
-    wrapper.style.width = `${viewport.width}px`;
-
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d", { alpha: false });
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-
-    canvas.width = Math.floor(viewport.width * pixelRatio);
-    canvas.height = Math.floor(viewport.height * pixelRatio);
-    canvas.style.width = `${viewport.width}px`;
-    canvas.style.height = `${viewport.height}px`;
-
-    const badge = document.createElement("span");
-    badge.className = "page-number-badge";
-    badge.textContent = `Page ${pageNumber}`;
-
-    wrapper.append(canvas, badge);
-    pdfPages.appendChild(wrapper);
-
-    await page.render({
-      canvasContext: context,
-      viewport,
-      transform: pixelRatio === 1 ? null : [pixelRatio, 0, 0, pixelRatio, 0, 0],
-    }).promise;
-
-    pageTexts[pageNumber - 1] = await extractPageText(page);
-  }
-
-  loadingState.hidden = true;
-  currentPage = Math.min(currentPage, pdfDocument.numPages);
-  updatePageIndicator();
-  createPageObserver();
-
-  if (preservePosition) {
-    document.querySelector(`.pdf-page[data-page-number="${pageToRestore}"]`)
-      ?.scrollIntoView({ behavior: "instant", block: "start" });
-  }
-}
-
-function performSearch() {
-  const query = pdfSearch.value.trim().toLowerCase();
-  searchResults = [];
-  activeResultIndex = -1;
-
-  if (!query) {
-    searchStatus.textContent = "Enter a word or phrase.";
-    updateSearchHighlights();
-    return;
-  }
-
-  pageTexts.forEach((text, pageIndex) => {
-    const normalized = (text || "").toLowerCase();
-    let startIndex = 0;
-    let occurrence;
-
-    while ((occurrence = normalized.indexOf(query, startIndex)) !== -1) {
-      searchResults.push({ pageNumber: pageIndex + 1, occurrence });
-      startIndex = occurrence + Math.max(query.length, 1);
-    }
-  });
-
-  if (searchResults.length === 0) {
-    searchStatus.textContent = `No matches for “${pdfSearch.value.trim()}”.`;
-    updateSearchHighlights();
-    return;
-  }
-
-  activeResultIndex = 0;
-  updateSearchHighlights();
-  goToActiveResult();
-}
-
-function updateSearchHighlights() {
-  document.querySelectorAll(".pdf-page").forEach(page => {
-    page.classList.remove("search-hit", "active-hit");
-  });
-
-  const hitPages = new Set(searchResults.map(result => result.pageNumber));
-  hitPages.forEach(pageNumber => {
-    document.querySelector(`.pdf-page[data-page-number="${pageNumber}"]`)
-      ?.classList.add("search-hit");
-  });
-
-  if (activeResultIndex >= 0) {
-    const active = searchResults[activeResultIndex];
-    document.querySelector(`.pdf-page[data-page-number="${active.pageNumber}"]`)
-      ?.classList.add("active-hit");
-
-    searchStatus.textContent =
-      `${activeResultIndex + 1} of ${searchResults.length} matches • Page ${active.pageNumber}`;
-  }
-}
-
-function goToActiveResult() {
-  if (activeResultIndex < 0 || !searchResults.length) return;
-
-  const active = searchResults[activeResultIndex];
-  document.querySelector(`.pdf-page[data-page-number="${active.pageNumber}"]`)
-    ?.scrollIntoView({ behavior: "smooth", block: "start" });
-
-  updateSearchHighlights();
-}
-
-function moveResult(direction) {
-  if (!searchResults.length) return;
-  activeResultIndex =
-    (activeResultIndex + direction + searchResults.length) % searchResults.length;
-  goToActiveResult();
-}
-
-function updateZoomLabel() {
-  zoomLabel.textContent = `${Math.round(scale * 100)}%`;
-}
-
-function updatePageIndicator() {
-  pageIndicator.textContent = `${currentPage} / ${pdfDocument?.numPages || 0}`;
-}
-
-function goToPage(pageNumber) {
-  if (!pdfDocument) return;
-
-  currentPage = Math.max(1, Math.min(pageNumber, pdfDocument.numPages));
-  document.querySelector(`.pdf-page[data-page-number="${currentPage}"]`)
-    ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  updatePageIndicator();
-}
-
-openSearch.addEventListener("click", () => {
-  searchDrawer.hidden = !searchDrawer.hidden;
-  if (!searchDrawer.hidden) {
-    setTimeout(() => pdfSearch.focus(), 50);
-  }
-});
-
-runSearch.addEventListener("click", performSearch);
-pdfSearch.addEventListener("keydown", event => {
-  if (event.key === "Enter") performSearch();
-});
-
-previousResult.addEventListener("click", () => moveResult(-1));
-nextResult.addEventListener("click", () => moveResult(1));
-
-zoomOut.addEventListener("click", async () => {
-  scale = Math.max(0.7, Number((scale - 0.15).toFixed(2)));
-  updateZoomLabel();
-  await renderDocument({ preservePosition: true });
-});
-
-zoomIn.addEventListener("click", async () => {
-  scale = Math.min(2.2, Number((scale + 0.15).toFixed(2)));
-  updateZoomLabel();
-  await renderDocument({ preservePosition: true });
-});
-
-previousPage.addEventListener("click", () => goToPage(currentPage - 1));
-nextPage.addEventListener("click", () => goToPage(currentPage + 1));
-
-let resizeTimer;
-window.addEventListener("resize", () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => {
-    const newWidth = window.innerWidth;
-
-    // Mobile browsers frequently change only the viewport height while their
-    // address bar opens/closes. Re-rendering for that would jump to the top.
-    if (pdfDocument && Math.abs(newWidth - lastRenderWidth) >= 2) {
-      lastRenderWidth = newWidth;
-      renderDocument({ preservePosition: true }).catch(showError);
-    }
-  }, 250);
-});
-
-(async function initialize() {
-  try {
-    updateZoomLabel();
-    const source = await resolvePdfSource();
-    pdfDocument = await pdfjsLib.getDocument(source).promise;
-    await renderDocument({ showLoading: true });
-  } catch (error) {
-    showError(error);
-  }
-})();
+(async()=>{try{els.title.textContent=requestedName;document.title=`${requestedName} | Wedding Command Center`;updateIndicators();const source=await resolveSource();pdfDocument=await pdfjsLib.getDocument(source).promise;await renderDocument({initial:true})}catch(error){showError(error)}})();
