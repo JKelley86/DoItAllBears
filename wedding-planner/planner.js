@@ -3,7 +3,7 @@ const PERMANENT_PLANNERS = [
     name: "Damian & Tori",
     file: "pdfs/Damian_Tori.pdf",
     category: "Complete planner"
-    },
+    }
   // Add PDFs to a "pdfs" folder and list them here.
   // Example:
   // { name: "Master Wedding Planner", file: "pdfs/master-wedding-planner.pdf", category: "Complete planner" },
