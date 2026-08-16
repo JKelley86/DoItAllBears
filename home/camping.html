@@ -258,7 +258,14 @@ pb.beforeSend = function(url, options) {
   return { url, options };
 };
 
-const POLL_MS = 2000;
+// ============================================================
+// PocketBase state + realtime sync
+// ============================================================
+
+// If the page has been hidden for more than 5 minutes,
+// refresh once when the user comes back.
+// This is NOT continuous polling.
+const STALE_REFRESH_MS = 5 * 60 * 1000;
 
 const picker = document.getElementById('listPicker');
 const contentEl = document.getElementById('content');
@@ -267,15 +274,26 @@ const statusText = document.getElementById('statusText');
 
 let checklists = [];
 let itemsByChecklist = {};
-let viewingChecklistId = null;      // list currently shown on screen
-let currentViewRecordId = null;     // the id of the shared "current_view" row
-let suppressNextPollJump = false;   // avoids fighting our own optimistic update for one tick
-let consecutiveFailures = 0;
+let viewingChecklistId = null;
+let currentViewRecordId = null;
+
+let lastFullRefresh = 0;
+let realtimeConnected = false;
+
+
+// ============================================================
+// Status
+// ============================================================
 
 function setStatus(live, text) {
   statusDot.classList.toggle('live', live);
   statusText.textContent = text;
 }
+
+
+// ============================================================
+// Helpers
+// ============================================================
 
 function getChecklist(id) {
   return checklists.find(cl => cl.id === id) || null;
@@ -287,170 +305,781 @@ function isListComplete(checklistId) {
   return items.every(i => i.checked);
 }
 
+
+// ============================================================
+// Rendering
+// ============================================================
+
 function renderPicker() {
-  const sorted = [...checklists].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const sorted = [...checklists].sort(
+    (a, b) => (a.order ?? 0) - (b.order ?? 0)
+  );
+
   picker.innerHTML = sorted.map(cl => {
     const items = itemsByChecklist[cl.id] || [];
     const checkedCount = items.filter(i => i.checked).length;
-    const tag = items.length ? ` — ${checkedCount}/${items.length}` : '';
+    const tag = items.length
+      ? ` — ${checkedCount}/${items.length}`
+      : '';
+
     return `<option value="${cl.id}">${cl.name}${tag}</option>`;
   }).join('');
-  if (viewingChecklistId) picker.value = viewingChecklistId;
+
+  if (viewingChecklistId) {
+    picker.value = viewingChecklistId;
+  }
 }
+
 
 function renderContent() {
   const displayed = getChecklist(viewingChecklistId);
+
   if (!displayed) {
-    contentEl.innerHTML = `<div class="msg-screen">No list selected.</div>`;
+    contentEl.innerHTML =
+      `<div class="msg-screen">No list selected.</div>`;
     return;
   }
 
-  const items = (itemsByChecklist[displayed.id] || []).slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+  const items = (itemsByChecklist[displayed.id] || [])
+    .slice()
+    .sort(
+      (a, b) => (a.position ?? 0) - (b.position ?? 0)
+    );
+
   const checkedCount = items.filter(i => i.checked).length;
-  const pct = items.length ? Math.round((checkedCount / items.length) * 100) : 0;
-  const complete = items.length > 0 && checkedCount === items.length;
+  const pct = items.length
+    ? Math.round((checkedCount / items.length) * 100)
+    : 0;
+
+  const complete =
+    items.length > 0 &&
+    checkedCount === items.length;
 
   const itemsHtml = items.map(item => `
-    <div class="item ${item.checked ? 'checked' : ''}" data-id="${item.id}">
+    <div
+      class="item ${item.checked ? 'checked' : ''}"
+      data-id="${item.id}"
+    >
       <div class="box">
-        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 11.5L13 4" stroke="#12181c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 16 16" fill="none">
+          <path
+            d="M3 8.5L6.2 11.5L13 4"
+            stroke="#12181c"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
       </div>
+
       <div class="label">${item.label}</div>
     </div>
   `).join('');
 
   const completeTag = complete ? `
     <div class="complete-tag">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 11.5L13 4" stroke="#7fa37a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 16 16"
+        fill="none"
+      >
+        <path
+          d="M3 8.5L6.2 11.5L13 4"
+          stroke="#7fa37a"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+
       Complete — will reset when you switch lists
-    </div>` : '';
+    </div>
+  ` : '';
 
   contentEl.innerHTML = `
     <div class="stage-head">
-      <div class="stage-progress">${checkedCount} of ${items.length} complete</div>
-      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="stage-progress">
+        ${checkedCount} of ${items.length} complete
+      </div>
+
+      <div class="progress-track">
+        <div
+          class="progress-fill"
+          style="width:${pct}%"
+        ></div>
+      </div>
+
       ${completeTag}
     </div>
-    <div class="list">${items.length ? itemsHtml : '<div class="msg-screen">No items in this list yet.</div>'}</div>
+
+    <div class="list">
+      ${
+        items.length
+          ? itemsHtml
+          : '<div class="msg-screen">No items in this list yet.</div>'
+      }
+    </div>
   `;
 
   contentEl.querySelectorAll('.item').forEach(el => {
-    el.addEventListener('click', () => toggleItem(el.dataset.id));
+    el.addEventListener(
+      'click',
+      () => toggleItem(el.dataset.id)
+    );
   });
 }
+
 
 function render() {
   renderPicker();
   renderContent();
 }
 
+
+// ============================================================
+// Toggle checklist item
+// ============================================================
+
 async function toggleItem(itemId) {
-  const items = itemsByChecklist[viewingChecklistId] || [];
+  const items =
+    itemsByChecklist[viewingChecklistId] || [];
+
   const item = items.find(i => i.id === itemId);
+
   if (!item) return;
 
+  // Optimistic local update
   item.checked = !item.checked;
   render();
 
   try {
-    await pb.collection('items').update(itemId, { checked: item.checked });
+    await pb
+      .collection('items')
+      .update(itemId, {
+        checked: item.checked
+      });
+
+    setStatus(true, 'Live');
+
   } catch (err) {
+
+    // Undo optimistic update if save failed
     item.checked = !item.checked;
     render();
-    console.error(err);
+
+    setStatus(false, 'Sync failed');
+
+    console.error(
+      'item update failed',
+      err
+    );
   }
 }
 
+
+// ============================================================
+// Reset completed list
+// ============================================================
+
 async function resetList(checklistId) {
-  const items = itemsByChecklist[checklistId] || [];
-  const toReset = items.filter(i => i.checked);
+  const items =
+    itemsByChecklist[checklistId] || [];
+
+  const toReset =
+    items.filter(i => i.checked);
+
   if (toReset.length === 0) return;
-  toReset.forEach(i => i.checked = false);
+
+  // Optimistic reset
+  toReset.forEach(i => {
+    i.checked = false;
+  });
+
   render();
+
   await Promise.all(
-    toReset.map(i => pb.collection('items').update(i.id, { checked: false }).catch(err => console.error('reset failed', err)))
+    toReset.map(i =>
+      pb
+        .collection('items')
+        .update(
+          i.id,
+          { checked: false }
+        )
+        .catch(err =>
+          console.error(
+            'reset failed',
+            err
+          )
+        )
+    )
   );
 }
 
-picker.addEventListener('change', async () => {
-  const previousId = viewingChecklistId;
-  const nextId = picker.value;
-  if (previousId && previousId !== nextId && isListComplete(previousId)) {
-    await resetList(previousId);
-  }
-  viewingChecklistId = nextId;
-  render();
 
-  // broadcast this choice so other devices (and the ESP32) can follow it
-  suppressNextPollJump = true;
-  try {
-    if (currentViewRecordId) {
-      await pb.collection('current_view').update(currentViewRecordId, { checklist: nextId });
+// ============================================================
+// User changes checklist
+// ============================================================
+
+picker.addEventListener(
+  'change',
+  async () => {
+
+    const previousId =
+      viewingChecklistId;
+
+    const nextId =
+      picker.value;
+
+    if (
+      previousId &&
+      previousId !== nextId &&
+      isListComplete(previousId)
+    ) {
+      await resetList(previousId);
     }
-  } catch (err) {
-    console.error('failed to broadcast current view', err);
-  }
-});
 
-// One full refresh: checklists, items, and the shared "current_view" pointer.
+    viewingChecklistId = nextId;
+
+    render();
+
+    // Broadcast current list to other devices / ESP32
+    try {
+
+      if (currentViewRecordId) {
+
+        await pb
+          .collection('current_view')
+          .update(
+            currentViewRecordId,
+            {
+              checklist: nextId
+            }
+          );
+
+      }
+
+      setStatus(true, 'Live');
+
+    } catch (err) {
+
+      console.error(
+        'failed to broadcast current view',
+        err
+      );
+
+      setStatus(
+        false,
+        'Sync failed'
+      );
+    }
+  }
+);
+
+
+// ============================================================
+// Initial / recovery refresh
+// ============================================================
+
 async function refreshData() {
-  const [freshChecklists, freshItems, viewRec] = await Promise.all([
-    pb.collection('checklists').getFullList({ sort: 'order' }),
-    pb.collection('items').getFullList({ sort: 'position' }),
-    pb.collection('current_view').getFirstListItem('key="main"').catch(() => null),
+
+  const [
+    freshChecklists,
+    freshItems,
+    viewRec
+  ] = await Promise.all([
+
+    pb
+      .collection('checklists')
+      .getFullList({
+        sort: 'order'
+      }),
+
+    pb
+      .collection('items')
+      .getFullList({
+        sort: 'position'
+      }),
+
+    pb
+      .collection('current_view')
+      .getFirstListItem(
+        'key="main"'
+      )
+      .catch(() => null)
+
   ]);
 
+
   checklists = freshChecklists;
+
+
   const grouped = {};
-  checklists.forEach(cl => grouped[cl.id] = []);
+
+  checklists.forEach(cl => {
+    grouped[cl.id] = [];
+  });
+
+
   freshItems.forEach(it => {
-    if (!grouped[it.checklist]) grouped[it.checklist] = [];
+
+    if (!grouped[it.checklist]) {
+      grouped[it.checklist] = [];
+    }
+
     grouped[it.checklist].push(it);
   });
+
+
   itemsByChecklist = grouped;
 
+
   if (viewRec) {
-    currentViewRecordId = viewRec.id;
-    if (suppressNextPollJump) {
-      // we just set this ourselves; don't fight it, just clear the flag
-      suppressNextPollJump = false;
-    } else if (viewRec.checklist && viewRec.checklist !== viewingChecklistId) {
-      viewingChecklistId = viewRec.checklist;
+
+    currentViewRecordId =
+      viewRec.id;
+
+    if (viewRec.checklist) {
+
+      viewingChecklistId =
+        viewRec.checklist;
+
     }
   }
 
-  if (!viewingChecklistId && checklists.length) {
-    viewingChecklistId = [...checklists].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))[0].id;
+
+  if (
+    !viewingChecklistId &&
+    checklists.length
+  ) {
+
+    viewingChecklistId =
+      [...checklists]
+        .sort(
+          (a, b) =>
+            (a.order ?? 0) -
+            (b.order ?? 0)
+        )[0].id;
   }
+
+
+  lastFullRefresh =
+    Date.now();
 
   render();
 }
 
-async function pollLoop() {
+
+// ============================================================
+// Realtime — Checklist changes
+// ============================================================
+
+function handleChecklistRealtime(e) {
+
+  const record = e.record;
+
+  if (e.action === 'delete') {
+
+    checklists =
+      checklists.filter(
+        cl =>
+          cl.id !== record.id
+      );
+
+    delete itemsByChecklist[
+      record.id
+    ];
+
+
+    if (
+      viewingChecklistId ===
+      record.id
+    ) {
+
+      const sorted =
+        [...checklists].sort(
+          (a, b) =>
+            (a.order ?? 0) -
+            (b.order ?? 0)
+        );
+
+      viewingChecklistId =
+        sorted.length
+          ? sorted[0].id
+          : null;
+    }
+
+  } else {
+
+    const index =
+      checklists.findIndex(
+        cl =>
+          cl.id === record.id
+      );
+
+
+    if (index >= 0) {
+
+      checklists[index] =
+        record;
+
+    } else {
+
+      checklists.push(
+        record
+      );
+
+    }
+
+
+    if (
+      !itemsByChecklist[
+        record.id
+      ]
+    ) {
+
+      itemsByChecklist[
+        record.id
+      ] = [];
+    }
+  }
+
+  setStatus(true, 'Live');
+
+  render();
+}
+
+
+// ============================================================
+// Realtime — Item changes
+// ============================================================
+
+function handleItemRealtime(e) {
+
+  const record = e.record;
+
+
+  // Remove old copy of this item
+  // from any checklist first.
+  Object.keys(
+    itemsByChecklist
+  ).forEach(checklistId => {
+
+    itemsByChecklist[
+      checklistId
+    ] =
+      (
+        itemsByChecklist[
+          checklistId
+        ] || []
+      ).filter(
+        item =>
+          item.id !==
+          record.id
+      );
+
+  });
+
+
+  if (
+    e.action !== 'delete'
+  ) {
+
+    if (
+      !itemsByChecklist[
+        record.checklist
+      ]
+    ) {
+
+      itemsByChecklist[
+        record.checklist
+      ] = [];
+    }
+
+
+    itemsByChecklist[
+      record.checklist
+    ].push(record);
+
+  }
+
+
+  setStatus(true, 'Live');
+
+  render();
+}
+
+
+// ============================================================
+// Realtime — Current shared checklist
+// ============================================================
+
+function handleCurrentViewRealtime(e) {
+
+  const record = e.record;
+
+
+  if (
+    e.action === 'delete'
+  ) {
+
+    if (
+      currentViewRecordId ===
+      record.id
+    ) {
+
+      currentViewRecordId =
+        null;
+
+    }
+
+    return;
+  }
+
+
+  if (
+    record.key !== 'main'
+  ) {
+    return;
+  }
+
+
+  currentViewRecordId =
+    record.id;
+
+
+  if (
+    record.checklist &&
+    record.checklist !==
+      viewingChecklistId
+  ) {
+
+    viewingChecklistId =
+      record.checklist;
+
+    render();
+  }
+
+
+  setStatus(true, 'Live');
+}
+
+
+// ============================================================
+// Start realtime subscriptions
+// ============================================================
+
+async function setupRealtime() {
+
   try {
-    await refreshData();
-    consecutiveFailures = 0;
-    setStatus(true, 'Live');
+
+    await Promise.all([
+
+      pb
+        .collection('checklists')
+        .subscribe(
+          '*',
+          handleChecklistRealtime
+        ),
+
+      pb
+        .collection('items')
+        .subscribe(
+          '*',
+          handleItemRealtime
+        ),
+
+      pb
+        .collection('current_view')
+        .subscribe(
+          '*',
+          handleCurrentViewRealtime
+        )
+
+    ]);
+
+
+    realtimeConnected =
+      true;
+
+    setStatus(
+      true,
+      'Live'
+    );
+
+
   } catch (err) {
-    consecutiveFailures++;
-    console.error('poll failed', err);
-    if (consecutiveFailures >= 2) setStatus(false, 'Offline — check tunnel');
-  } finally {
-    setTimeout(pollLoop, POLL_MS);
+
+    realtimeConnected =
+      false;
+
+    setStatus(
+      false,
+      'Realtime unavailable'
+    );
+
+    console.error(
+      'Realtime connection failed',
+      err
+    );
   }
 }
 
-async function init() {
-  try {
-    await refreshData();
-    setStatus(true, 'Live');
-  } catch (err) {
-    console.error(err);
-    setStatus(false, 'Offline — check tunnel');
-    contentEl.innerHTML = `<div class="msg-screen">Couldn't reach PocketBase.<br>Check that the ngrok tunnel and Pi are running.</div>`;
+
+// ============================================================
+// Browser online/offline detection
+// ============================================================
+
+window.addEventListener(
+  'offline',
+  () => {
+
+    setStatus(
+      false,
+      'Offline'
+    );
+
   }
-  setTimeout(pollLoop, POLL_MS);
+);
+
+
+window.addEventListener(
+  'online',
+  async () => {
+
+    setStatus(
+      false,
+      'Reconnecting…'
+    );
+
+    try {
+
+      await refreshData();
+
+      setStatus(
+        true,
+        'Live'
+      );
+
+    } catch (err) {
+
+      console.error(
+        'reconnect refresh failed',
+        err
+      );
+
+    }
+  }
+);
+
+
+// ============================================================
+// Refresh only when returning to an old tab
+// ============================================================
+
+document.addEventListener(
+  'visibilitychange',
+  async () => {
+
+    if (
+      document.visibilityState !==
+      'visible'
+    ) {
+      return;
+    }
+
+
+    const stale =
+      Date.now() -
+      lastFullRefresh >
+      STALE_REFRESH_MS;
+
+
+    if (!stale) return;
+
+
+    try {
+
+      setStatus(
+        true,
+        'Syncing…'
+      );
+
+      await refreshData();
+
+      setStatus(
+        true,
+        'Live'
+      );
+
+    } catch (err) {
+
+      console.error(
+        'visibility refresh failed',
+        err
+      );
+
+      setStatus(
+        false,
+        'Offline — check tunnel'
+      );
+
+    }
+  }
+);
+
+
+// ============================================================
+// Initialize
+// ============================================================
+
+async function init() {
+
+  try {
+
+    setStatus(
+      false,
+      'Connecting…'
+    );
+
+
+    // One initial read of all data.
+    await refreshData();
+
+
+    // Then realtime takes over.
+    await setupRealtime();
+
+
+    setStatus(
+      true,
+      'Live'
+    );
+
+
+  } catch (err) {
+
+    console.error(
+      'initialization failed',
+      err
+    );
+
+
+    setStatus(
+      false,
+      'Offline — check tunnel'
+    );
+
+
+    contentEl.innerHTML = `
+      <div class="msg-screen">
+        Couldn't reach PocketBase.<br>
+        Check that the tunnel and Pi are running.
+      </div>
+    `;
+  }
 }
+
 
 init();
 </script>
