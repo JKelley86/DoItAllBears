@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trip Packing Planner</title>
+  <style>
+    :root {
+      --bg: #0f1720;
+      --bg-soft: #16212d;
+      --panel: #1b2936;
+      --panel-2: #223443;
+      --text: #eef4f8;
+      --muted: #a8bac8;
+      --accent: #8bc6a8;
+      --accent-2: #d7a96b;
+      --danger: #ef8b8b;
+      --border: rgba(255,255,255,.09);
+      --shadow: 0 18px 45px rgba(0,0,0,.24);
+      --radius: 18px;
+    }
+
+    body.light {
+      --bg: #edf2f5;
+      --bg-soft: #e5ecef;
+      --panel: #ffffff;
+      --panel-2: #f4f7f8;
+      --text: #17212a;
+      --muted: #63717d;
+      --accent: #3f8265;
+      --accent-2: #b6782f;
+      --danger: #c95a5a;
+      --border: rgba(15,23,32,.10);
+      --shadow: 0 16px 36px rgba(50,70,82,.12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(139,198,168,.12), transparent 28%),
+        radial-gradient(circle at 90% 10%, rgba(215,169,107,.10), transparent 24%),
+        var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .app {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 48px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(139,198,168,.26), rgba(215,169,107,.22));
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      font-size: 24px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      letter-spacing: -.03em;
+    }
+
+    .brand p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    .theme-btn {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(139,198,168,.16), rgba(215,169,107,.10)), var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: clamp(20px, 4vw, 34px);
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+
+    .hero h2 {
+      margin: 0 0 8px;
+      font-size: clamp(1.6rem, 4vw, 2.7rem);
+      letter-spacing: -.045em;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 780px;
+      line-height: 1.55;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 390px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-head {
+      padding: 18px 18px 10px;
+    }
+
+    .card-head h3 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .card-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.45;
+    }
+
+    .form {
+      padding: 8px 18px 18px;
+      display: grid;
+      gap: 15px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field label {
+      font-weight: 700;
+      font-size: .9rem;
+    }
+
+    .field small {
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    input[type="number"], select {
+      width: 100%;
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 13px;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+      box-shadow: 0 0 0 3px rgba(139,198,168,.12);
+    }
+
+    .toggle-row, .option-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .toggle {
+      position: relative;
+    }
+
+    .toggle input { position: absolute; opacity: 0; }
+
+    .toggle label {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 46px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+      transition: .18s ease;
+      font-weight: 700;
+      font-size: .88rem;
+    }
+
+    .toggle input:checked + label {
+      color: var(--text);
+      border-color: rgba(139,198,168,.45);
+      background: rgba(139,198,168,.12);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-weight: 800;
+      transition: .18s ease;
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: #0e2118;
+      border-color: transparent;
+    }
+
+    body.light .btn.primary { color: #fff; }
+
+    .btn.secondary {
+      background: var(--panel-2);
+      color: var(--text);
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .result-wrap {
+      display: grid;
+      gap: 18px;
+    }
+
+    .summary {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .summary-box {
+      padding: 14px;
+      border-radius: 14px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+    }
+
+    .summary-box span {
+      display: block;
+      color: var(--muted);
+      font-size: .75rem;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .summary-box strong {
+      font-size: 1.05rem;
+    }
+
+    .packing-card .card-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .progress {
+      min-width: 120px;
+      text-align: right;
+    }
+
+    .progress b {
+      display: block;
+      font-size: .88rem;
+    }
+
+    .progress-bar {
+      height: 7px;
+      background: var(--panel-2);
+      border-radius: 999px;
+      margin-top: 7px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width .2s ease;
+    }
+
+    .sections {
+      padding: 0 14px 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .section {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--panel-2) 72%, transparent);
+      overflow: hidden;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-title h4 {
+      margin: 0;
+      font-size: .95rem;
+    }
+
+    .section-title span {
+      color: var(--muted);
+      font-size: .75rem;
+    }
+
+    .items { padding: 6px; }
+
+    .item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 9px 8px;
+      border-radius: 10px;
+    }
+
+    .item:hover { background: rgba(255,255,255,.025); }
+
+    .item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+    }
+
+    .item-label {
+      min-width: 0;
+    }
+
+    .item-label strong {
+      display: block;
+      font-size: .91rem;
+    }
+
+    .item-label small {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: .74rem;
+    }
+
+    .item.done .item-label strong {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    .qty {
+      display: grid;
+      grid-template-columns: 28px 34px 28px;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .qty button {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .qty span {
+      text-align: center;
+      font-weight: 800;
+      font-size: .88rem;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 42px 22px;
+      color: var(--muted);
+    }
+
+    .note {
+      margin: 0 14px 16px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(215,169,107,.10);
+      border: 1px solid rgba(215,169,107,.22);
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: .84rem;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      margin-top: 24px;
+      font-size: .78rem;
+    }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .summary { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .app { width: min(100% - 18px, 1180px); padding-top: 12px; }
+      .topbar { align-items: flex-start; }
+      .brand p { display: none; }
+      .toggle-row, .option-grid, .actions { grid-template-columns: 1fr; }
+      .summary { grid-template-columns: 1fr 1fr; }
+      .packing-card .card-head { display: block; }
+      .progress { text-align: left; margin-top: 12px; }
+      .item { grid-template-columns: auto 1fr; }
+      .qty { grid-column: 2; justify-self: start; margin-top: 3px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">🧳</div>
+        <div>
+          <h1>Trip Packing Planner</h1>
+          <p>Build a practical packing list without bringing your whole closet.</p>
+        </div>
+      </div>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle theme">☀️</button>
+    </header>
+
+    <section class="hero">
+      <h2>Pack for the trip you’re actually taking.</h2>
+      <p>Enter the trip length and temperatures, choose whether it’s for work, and the planner will build a packing list weighted toward daytime weather. Cooler nights only add a few extra layers instead of turning the whole suitcase into cold-weather gear.</p>
+    </section>
+
+    <div class="layout">
+      <section class="card">
+        <div class="card-head">
+          <h3>Trip Details</h3>
+          <p>Your list updates when you generate it. Quantities can be adjusted afterward with the + and − controls.</p>
+        </div>
+
+        <form class="form" id="tripForm">
+          <div class="field">
+            <label for="days">How many days?</label>
+            <input id="days" type="number" min="1" max="60" value="4" required />
+          </div>
+
+          <div class="field">
+            <label for="dayTemp">Average daytime temperature (°F)</label>
+            <input id="dayTemp" type="number" min="-30" max="130" value="72" required />
+          </div>
+
+          <div class="field">
+            <label for="nightTemp">Average nighttime temperature (°F)</label>
+            <input id="nightTemp" type="number" min="-30" max="120" value="55" required />
+            <small>Night temperature only adds a few useful layers unless the whole trip is cold.</small>
+          </div>
+
+          <div class="field">
+            <label>Trip type</label>
+            <div class="toggle-row">
+              <div class="toggle">
+                <input type="radio" name="tripType" id="normalTrip" value="normal" checked />
+                <label for="normalTrip">🏕️ Normal Trip</label>
+              </div>
+              <div class="toggle">
+                <input type="radio" name="tripType" id="workTrip" value="work" />
+                <label for="workTrip">🧰 Work Trip</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Optional trip conditions</label>
+            <div class="option-grid">
+              <div class="toggle">
+                <input type="checkbox" id="rain" />
+                <label for="rain">🌧️ Rain Possible</label>
+              </div>
+              <div class="toggle">
+                <input type="checkbox" id="laundry" />
+                <label for="laundry">🧺 Laundry Available</label>
+              </div>
+              <div class="toggle">
+                <input type="checkbox" id="swimming" />
+                <label for="swimming">🏊 Swimming</label>
+              </div>
+              <div class="toggle">
+                <input type="checkbox" id="outdoors" />
+                <label for="outdoors">🥾 Outdoor Activity</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" type="submit">Build Packing List</button>
+            <button class="btn secondary" type="button" id="resetBtn">Reset Trip</button>
+          </div>
+        </form>
+      </section>
+
+      <div class="result-wrap">
+        <section class="card summary" id="summary">
+          <div class="summary-box"><span>Trip</span><strong id="sumType">Normal</strong></div>
+          <div class="summary-box"><span>Length</span><strong id="sumDays">4 days</strong></div>
+          <div class="summary-box"><span>Daytime</span><strong id="sumDay">72°F</strong></div>
+          <div class="summary-box"><span>Night</span><strong id="sumNight">55°F</strong></div>
+        </section>
+
+        <section class="card packing-card">
+          <div class="card-head">
+            <div>
+              <h3>Your Packing List</h3>
+              <p id="weatherHint">Generate a list to get started.</p>
+            </div>
+            <div class="progress">
+              <b id="progressText">0 of 0 packed</b>
+              <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            </div>
+          </div>
+
+          <div class="note" id="logicNote">
+            Normal trips use about one casual shirt and one casual bottom per day. Work trips use about one casual shirt and bottom every two days, plus separate work jeans and polos every 3–4 days.
+          </div>
+
+          <div class="sections" id="packingSections">
+            <div class="empty">Your personalized checklist will appear here.</div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="footer">Packing Planner • Saves your current list automatically on this device</div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'tripPackingPlanner_v1';
+    const THEME_KEY = 'tripPackingTheme';
+
+    const $ = (id) => document.getElementById(id);
+    const form = $('tripForm');
+    const sectionsEl = $('packingSections');
+
+    let packingData = [];
+
+    function ceilDiv(value, divisor) {
+      return Math.max(1, Math.ceil(value / divisor));
+    }
+
+    function capQty(qty, days) {
+      return Math.max(1, Math.min(qty, Math.max(days + 2, 2)));
+    }
+
+    function buildPackingList(settings) {
+      const { days, dayTemp, nightTemp, type, rain, laundry, swimming, outdoors } = settings;
+      const isWork = type === 'work';
+      const items = [];
+
+      const add = (section, name, qty = 1, note = '') => {
+        if (qty <= 0) return;
+        items.push({ id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`, section, name, qty, note, packed: false });
+      };
+
+      // Everyday basics
+      let underwear = days + 1;
+      let socks = days + 1;
+      if (laundry && days >= 6) {
+        underwear = Math.max(4, Math.ceil(days * 0.65));
+        socks = Math.max(4, Math.ceil(days * 0.65));
+      }
+      add('Clothes', 'Underwear', underwear, 'One per day plus an extra');
+      add('Clothes', 'Socks', socks, 'One pair per day plus an extra');
+      add('Clothes', 'Sleep clothes', ceilDiv(days, 3.5), 'About one set every 3–4 nights');
+
+      // Casual quantity rules
+      let casualOutfits = isWork ? Math.ceil(days / 2) : days;
+      if (laundry && days >= 6) casualOutfits = Math.max(3, Math.ceil(casualOutfits * 0.7));
+
+      // Day temperature determines majority of clothing.
+      if (dayTemp >= 80) {
+        add('Clothes', 'Casual T-shirts', casualOutfits, isWork ? 'About one every 2 days' : 'About one per day');
+        add('Clothes', 'Casual shorts', casualOutfits, 'Main daytime bottoms');
+        if (days >= 4) add('Clothes', 'Lightweight pants/jeans', 1, 'Backup for cooler weather or nicer plans');
+      } else if (dayTemp >= 65) {
+        add('Clothes', 'Casual shirts', casualOutfits, isWork ? 'About one every 2 days' : 'About one per day');
+        const shorts = Math.max(1, Math.ceil(casualOutfits * 0.6));
+        const pants = Math.max(1, casualOutfits - shorts);
+        add('Clothes', 'Shorts', shorts, 'Most warmer daytime use');
+        add('Clothes', 'Jeans/pants', pants, 'For cooler parts of the day');
+      } else if (dayTemp >= 50) {
+        add('Clothes', 'Casual shirts', casualOutfits, isWork ? 'About one every 2 days' : 'About one per day');
+        add('Clothes', 'Jeans/pants', casualOutfits, 'Main daytime bottoms');
+        add('Clothes', 'Hoodie or sweatshirt', Math.min(2, ceilDiv(days, 4)), 'Useful for cool daytime weather');
+      } else if (dayTemp >= 35) {
+        add('Clothes', 'Long-sleeve shirts', casualOutfits, isWork ? 'About one every 2 days' : 'About one per day');
+        add('Clothes', 'Jeans/pants', casualOutfits, 'Main daytime bottoms');
+        add('Clothes', 'Sweatshirt or fleece', Math.min(2, ceilDiv(days, 3)), 'Layer for cold daytime weather');
+        add('Clothes', 'Warm jacket', 1, 'Main outer layer');
+      } else {
+        add('Clothes', 'Long-sleeve shirts', casualOutfits, isWork ? 'About one every 2 days' : 'About one per day');
+        add('Clothes', 'Warm pants/jeans', casualOutfits, 'Main daytime bottoms');
+        add('Clothes', 'Sweatshirts/fleece layers', Math.min(2, ceilDiv(days, 3)), 'Warm mid layers');
+        add('Clothes', 'Winter coat', 1, 'Cold-weather outer layer');
+        add('Clothes', 'Winter hat', 1);
+        add('Clothes', 'Gloves', 1);
+      }
+
+      // Night-only supplements. Keep these intentionally small.
+      if (nightTemp < dayTemp - 10) {
+        if (nightTemp >= 50 && dayTemp >= 65) {
+          add('Night Layers', 'Light hoodie or sweatshirt', 1, 'For cooler evenings only');
+        } else if (nightTemp >= 35) {
+          if (dayTemp >= 50) add('Night Layers', 'Warm hoodie or fleece', 1, 'Extra evening layer');
+          if (dayTemp >= 65) add('Night Layers', 'Light jacket', 1, 'Only for cold nights');
+        } else if (nightTemp >= 20) {
+          if (dayTemp >= 50) add('Night Layers', 'Warm jacket', 1, 'Cold-night backup');
+          if (dayTemp >= 50) add('Night Layers', 'Winter hat', 1, 'For night use');
+        } else {
+          if (dayTemp >= 35) add('Night Layers', 'Heavy coat', 1, 'Very cold-night backup');
+          if (dayTemp >= 35) add('Night Layers', 'Warm hat and gloves', 1, 'For very cold nights');
+        }
+      }
+
+      // Work-specific items
+      if (isWork) {
+        let workQty = Math.max(1, Math.ceil(days / 3.5));
+        if (days >= 8 && !laundry) workQty = Math.ceil(days / 3.25);
+        add('Work Gear', 'Work jeans', workQty, 'About one pair every 3–4 days');
+        add('Work Gear', 'Work polos', workQty, 'About one polo every 3–4 days');
+        add('Work Gear', 'Steel-toe shoes', 1, 'Always on work trips');
+        add('Work Gear', 'Hard hat', 1, 'Always on work trips');
+        add('Work Gear', 'Tools', 1, 'Always on work trips');
+        add('Work Gear', 'Work backpack', 1, 'Always on work trips');
+      }
+
+      // Shoes
+      add('Shoes', 'Everyday shoes', 1);
+      if (outdoors) add('Shoes', 'Outdoor / hiking shoes or boots', 1);
+      if (swimming) add('Shoes', 'Sandals / flip-flops', 1);
+
+      // Always-present bags
+      add('Travel Bags', 'Charger bag', 1, 'Always bring');
+      add('Travel Bags', 'Toiletry bag', 1, 'Always bring');
+      add('Travel Bags', 'Medicine bag', 1, 'Always bring');
+
+      // Useful travel basics
+      add('Travel Essentials', 'Phone', 1);
+      add('Travel Essentials', 'Wallet / ID', 1);
+      add('Travel Essentials', 'Keys', 1);
+      add('Travel Essentials', 'Water bottle', 1);
+
+      if (rain) {
+        add('Weather Extras', 'Rain jacket', 1);
+        add('Weather Extras', 'Compact umbrella', 1);
+      }
+      if (swimming) {
+        add('Activity Gear', 'Swimsuit', Math.min(2, ceilDiv(days, 4)));
+        add('Activity Gear', 'Swim towel', 1);
+      }
+      if (outdoors) {
+        add('Activity Gear', 'Outdoor hat', 1);
+        add('Activity Gear', 'Sunglasses', 1);
+        add('Activity Gear', 'Bug spray', 1);
+        add('Activity Gear', 'Sunscreen', 1);
+      }
+
+      return items;
+    }
+
+    function getSettings() {
+      return {
+        days: Math.max(1, parseInt($('days').value || '1', 10)),
+        dayTemp: parseInt($('dayTemp').value || '70', 10),
+        nightTemp: parseInt($('nightTemp').value || '55', 10),
+        type: document.querySelector('input[name="tripType"]:checked')?.value || 'normal',
+        rain: $('rain').checked,
+        laundry: $('laundry').checked,
+        swimming: $('swimming').checked,
+        outdoors: $('outdoors').checked
+      };
+    }
+
+    function updateSummary(settings) {
+      $('sumType').textContent = settings.type === 'work' ? 'Work' : 'Normal';
+      $('sumDays').textContent = `${settings.days} ${settings.days === 1 ? 'day' : 'days'}`;
+      $('sumDay').textContent = `${settings.dayTemp}°F`;
+      $('sumNight').textContent = `${settings.nightTemp}°F`;
+
+      let hint = '';
+      if (settings.dayTemp >= 80) hint = 'Mostly hot-weather clothes with only a small cool-night backup.';
+      else if (settings.dayTemp >= 65) hint = 'Warm-weather mix with some pants for cooler periods.';
+      else if (settings.dayTemp >= 50) hint = 'Mostly pants and light layers.';
+      else if (settings.dayTemp >= 35) hint = 'Cold-weather clothing with layered outerwear.';
+      else hint = 'Full cold-weather packing with heavier layers.';
+      $('weatherHint').textContent = hint;
+    }
+
+    function renderList() {
+      if (!packingData.length) {
+        sectionsEl.innerHTML = '<div class="empty">Your personalized checklist will appear here.</div>';
+        updateProgress();
+        return;
+      }
+
+      const grouped = packingData.reduce((acc, item) => {
+        (acc[item.section] ||= []).push(item);
+        return acc;
+      }, {});
+
+      sectionsEl.innerHTML = Object.entries(grouped).map(([section, items]) => `
+        <div class="section">
+          <div class="section-title">
+            <h4>${escapeHtml(section)}</h4>
+            <span>${items.length} item${items.length === 1 ? '' : 's'}</span>
+          </div>
+          <div class="items">
+            ${items.map(item => `
+              <div class="item ${item.packed ? 'done' : ''}" data-id="${item.id}">
+                <input class="pack-check" type="checkbox" ${item.packed ? 'checked' : ''} aria-label="Mark ${escapeHtml(item.name)} packed" />
+                <div class="item-label">
+                  <strong>${escapeHtml(item.name)}</strong>
+                  ${item.note ? `<small>${escapeHtml(item.note)}</small>` : ''}
+                </div>
+                <div class="qty">
+                  <button type="button" class="qty-minus" aria-label="Decrease ${escapeHtml(item.name)}">−</button>
+                  <span>${item.qty}</span>
+                  <button type="button" class="qty-plus" aria-label="Increase ${escapeHtml(item.name)}">+</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+
+      attachListEvents();
+      updateProgress();
+    }
+
+    function attachListEvents() {
+      sectionsEl.querySelectorAll('.item').forEach(row => {
+        const id = row.dataset.id;
+        const item = packingData.find(x => x.id === id);
+        if (!item) return;
+
+        row.querySelector('.pack-check').addEventListener('change', (e) => {
+          item.packed = e.target.checked;
+          row.classList.toggle('done', item.packed);
+          saveState();
+          updateProgress();
+        });
+
+        row.querySelector('.qty-minus').addEventListener('click', () => {
+          item.qty = Math.max(1, item.qty - 1);
+          renderList();
+          saveState();
+        });
+
+        row.querySelector('.qty-plus').addEventListener('click', () => {
+          item.qty += 1;
+          renderList();
+          saveState();
+        });
+      });
+    }
+
+    function updateProgress() {
+      const total = packingData.length;
+      const packed = packingData.filter(i => i.packed).length;
+      const pct = total ? Math.round((packed / total) * 100) : 0;
+      $('progressText').textContent = `${packed} of ${total} packed`;
+      $('progressFill').style.width = `${pct}%`;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function saveState() {
+      const state = { settings: getSettings(), packingData };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        const state = JSON.parse(raw);
+        if (!state?.settings || !Array.isArray(state?.packingData)) return false;
+
+        const s = state.settings;
+        $('days').value = s.days ?? 4;
+        $('dayTemp').value = s.dayTemp ?? 72;
+        $('nightTemp').value = s.nightTemp ?? 55;
+        (s.type === 'work' ? $('workTrip') : $('normalTrip')).checked = true;
+        $('rain').checked = !!s.rain;
+        $('laundry').checked = !!s.laundry;
+        $('swimming').checked = !!s.swimming;
+        $('outdoors').checked = !!s.outdoors;
+        packingData = state.packingData;
+        updateSummary(getSettings());
+        renderList();
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    function generate() {
+      const settings = getSettings();
+      packingData = buildPackingList(settings);
+      updateSummary(settings);
+      renderList();
+      saveState();
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      generate();
+    });
+
+    $('resetBtn').addEventListener('click', () => {
+      localStorage.removeItem(STORAGE_KEY);
+      $('days').value = 4;
+      $('dayTemp').value = 72;
+      $('nightTemp').value = 55;
+      $('normalTrip').checked = true;
+      $('rain').checked = false;
+      $('laundry').checked = false;
+      $('swimming').checked = false;
+      $('outdoors').checked = false;
+      packingData = [];
+      updateSummary(getSettings());
+      $('weatherHint').textContent = 'Generate a list to get started.';
+      renderList();
+    });
+
+    function applyTheme(theme) {
+      document.body.classList.toggle('light', theme === 'light');
+      $('themeBtn').textContent = theme === 'light' ? '🌙' : '☀️';
+    }
+
+    $('themeBtn').addEventListener('click', () => {
+      const next = document.body.classList.contains('light') ? 'dark' : 'light';
+      localStorage.setItem(THEME_KEY, next);
+      applyTheme(next);
+    });
+
+    const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
+    applyTheme(savedTheme);
+    if (!loadState()) updateSummary(getSettings());
+  </script>
+</body>
+</html>
