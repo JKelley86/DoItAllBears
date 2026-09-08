@@ -217,13 +217,19 @@ async function loadPosts() {
 
 async function hydratePostDetails(posts) {
   await Promise.all(posts.map(async (post) => {
-    const postFilter = encodeURIComponent(`postId = "${post.id}"`);
+    const postFilter = encodeURIComponent(`post = "${post.id}"`);
+
     const [comments, reactions] = await Promise.all([
-      pb(`/api/collections/comments/records?sort=created&perPage=80&expand=author&filter=${postFilter}`),
-      pb(`/api/collections/reactions/records?perPage=120&expand=user&filter=${postFilter}`)
+      pb(
+        `/api/collections/comments/records?sort=created&perPage=80&expand=author&filter=${postFilter}`
+      ),
+      pb(
+        `/api/collections/reactions/records?perPage=120&expand=user&filter=${postFilter}`
+      )
     ]);
-    post.comments = comments.items;
-    post.reactions = reactions.items;
+
+    post.comments = comments.items || [];
+    post.reactions = reactions.items || [];
   }));
 }
 
@@ -370,7 +376,7 @@ async function createNotification(post, type, commentId = "") {
       body: JSON.stringify({
         recipient: post.author,
         actor: state.user.id,
-        postId: post.id,
+        post: post.id,
         comment: commentId || undefined,
         type,
         read: false
@@ -511,7 +517,7 @@ function bindEvents() {
     event.preventDefault();
     const post = state.posts.find((item) => item.id === commentForm.closest(".post-card").dataset.postId);
     const commentPayload = {
-      postId: post?.id,
+      post: post?.id,
       author: state.user.id,
       text: commentForm.text.value
     };
@@ -617,7 +623,7 @@ async function handleReaction(postId, type) {
     } else {
       await pb("/api/collections/reactions/records", {
         method: "POST",
-        body: JSON.stringify({ postId, user: state.user.id, type })
+        body: JSON.stringify({ post: postId, user: state.user.id, type })
       });
       await createNotification(post, "reaction");
     }
