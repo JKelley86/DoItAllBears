@@ -1,269 +1,482 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>MN Hunting & Fishing Seasons</title>
-  <link rel="stylesheet" href="../theme.css">
-  <style>
-    .content {
-      margin-left: 260px;
-      padding: 20px;
-      transition: margin-left 0.3s ease;
-    }
-
-    .header {
-      font-size: 2rem;
-      font-weight: bold;
-      margin-top: 40px;
-      margin-bottom: 20px;
-      border-bottom: 2px solid var(--accent);
-      padding-bottom: 5px;
-    }
-
-    .season-card {
-      background: var(--card-bg);
-      color: var(--text);
-      border-radius: 12px;
-      box-shadow: var(--shadow);
-      padding: 16px;
-      margin-bottom: 15px;
-      transition: transform 0.2s ease;
-      width: 70%;
-    }
-
-    .season-card:hover {
-      transform: translateY(-4px);
-    }
-
-    .season-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .season-details {
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
-
-    footer {
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.9rem;
-      opacity: 0.8;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>MN Hunting & Fishing Planner</title>
+<link rel="stylesheet" href="../theme.css">
+<style>
+  :root{
+    --p2:#202e26;--pb:rgba(255,255,255,.11);--muted:#aebbb2;
+    --good:#7bd88f;--warn:#ffd166;--bad:#ff8f87
+  }
+  body.light-mode{--p2:#f0f5f1;--pb:rgba(0,0,0,.12);--muted:#5e6961}
+  *{box-sizing:border-box}
+  body{margin:0}
+  .content{margin-left:260px;padding:22px;transition:margin-left .3s ease;max-width:1500px}
+  .hero,.person-card,.result-card,.smart-card,.season-card,.reference-card{
+    background:var(--card-bg);color:var(--text);border-radius:14px;box-shadow:var(--shadow);
+    border:1px solid var(--pb);padding:17px
+  }
+  .hero{margin:20px 0 18px;padding:24px;background:linear-gradient(135deg,var(--card-bg),var(--p2))}
+  .hero h2{margin:0 0 7px;font-size:2rem}.hero p{margin:0;color:var(--muted);line-height:1.55}
+  .section-title{font-size:1.65rem;font-weight:800;margin:34px 0 14px;border-bottom:2px solid var(--accent);padding-bottom:7px}
+  .planner-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  .results-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
+  .person-head{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .person-head h3,.result-card h3,.smart-card h3{margin:0 0 10px}
+  .name-input{width:155px;max-width:50%;padding:8px 10px;border-radius:9px;border:1px solid var(--pb);background:var(--p2);color:var(--text)}
+  .activity-group{margin-top:14px}.activity-group-title{font-weight:800;margin-bottom:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-size:.78rem}
+  .check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .activity{display:flex;gap:9px;align-items:flex-start;background:var(--p2);border:1px solid var(--pb);border-radius:10px;padding:10px;cursor:pointer;min-height:44px;transition:.15s}
+  .activity:hover{transform:translateY(-1px);border-color:var(--accent)}.activity input{margin-top:2px;accent-color:var(--accent)}
+  .activity small,.muted{color:var(--muted)}.activity small{display:block;margin-top:2px}
+  .planner-actions{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 4px}
+  button{border:0;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:800}
+  .primary-btn{background:var(--accent);color:#fff}.secondary-btn{background:var(--p2);color:var(--text);border:1px solid var(--pb)}
+  .smart-card{border:2px solid var(--accent)}
+  .smart-badge,.status-pill{display:inline-block;border-radius:999px;padding:5px 9px;font-size:.72rem;font-weight:900}
+  .smart-badge{background:var(--accent);color:#fff;margin-bottom:9px}.status-pill{background:rgba(100,200,120,.16);color:var(--good)}
+  .big-price{font-size:2rem;font-weight:900;margin:8px 0}.savings{color:var(--good);font-weight:900}
+  .license-list{display:grid;gap:9px;margin-top:12px}
+  .license-row{background:var(--p2);border:1px solid var(--pb);border-radius:10px;padding:10px 11px;display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:start}
+  .license-row input{margin-top:3px;accent-color:var(--accent)}.license-row strong,.license-row small{display:block}.license-row small{color:var(--muted);line-height:1.4}
+  .price{font-weight:900;white-space:nowrap}
+  .comparison-table{width:100%;border-collapse:collapse;margin-top:10px}.comparison-table th,.comparison-table td{text-align:left;border-bottom:1px solid var(--pb);padding:9px 6px;vertical-align:top}
+  .comparison-table th{color:var(--muted);font-size:.8rem}.best-row{background:rgba(100,200,120,.09)}
+  .notice{padding:11px 13px;border-left:4px solid var(--warn);border-radius:8px;background:rgba(255,209,102,.09);margin:12px 0;line-height:1.5}
+  .good-note{border-left-color:var(--good);background:rgba(123,216,143,.08)}
+  .empty-state{color:var(--muted);padding:14px 0}
+  .purchase-group{margin-top:12px}.purchase-group h4{margin:0 0 7px}
+  .purchase-item{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--pb)}.purchase-item:last-child{border-bottom:0}
+  .header{font-size:2rem;font-weight:bold;margin-top:40px;margin-bottom:20px;border-bottom:2px solid var(--accent);padding-bottom:5px}
+  .season-card{margin-bottom:15px;width:100%}.season-card:hover{transform:translateY(-2px)}
+  .season-title{font-size:1.2rem;font-weight:600;margin-bottom:8px}.season-details{font-size:.95rem;line-height:1.5}
+  .reference-card{margin-bottom:12px;line-height:1.55}.reference-card h3{margin:0 0 8px}
+  details.reference{background:var(--card-bg);border:1px solid var(--pb);border-radius:12px;margin:10px 0;overflow:hidden}
+  details.reference summary{cursor:pointer;padding:14px 16px;font-weight:800}.inner{padding:0 16px 16px;line-height:1.55}
+  footer{text-align:center;padding:1rem;font-size:.9rem;opacity:.8}
+  @media(max-width:1050px){.content{margin-left:0;padding:14px}.planner-grid,.results-grid{grid-template-columns:1fr}}
+  @media(max-width:650px){.check-grid{grid-template-columns:1fr}.person-head{align-items:flex-start}.name-input{max-width:55%}.comparison-table{font-size:.82rem}}
+</style>
 </head>
-
 <body>
-  <header>
-    <h1>Minnesota Hunting & Fishing Seasons</h1>
-  </header>
+<header><h1>🌲 Minnesota Hunting & Fishing Planner</h1></header>
 
-    <h1>Hunting Seasons</h1>
+<main class="content">
+  <section class="hero">
+    <h2>2026 Household License Planner</h2>
+    <p>Choose what each person wants to do. The planner removes duplicate requirements and compares complete household purchase plans — including package licenses plus any individual licenses the other person still needs.</p>
+  </section>
 
-    <!-- Example Animal: Deer -->
-    <div class="header">🦌 Deer</div>
-    <div class="season-card">
-      <div class="season-title">Archery Season</div>
-      <div class="season-details">
-        <strong>Dates:</strong> Sept 13 – Dec 31<br />
-        <strong>Requirements:</strong> Archery License, Blaze Orange during firearm seasons<br />
-        <strong>Notes:</strong> Best hunting around mid-October and rut.
-      </div>
-    </div>
-
-    <div class="season-card">
-      <div class="season-title">Youth</div>
-      <div class="season-details">
-        <strong>Dates:</strong> Oct 16 – Oct 19<br />
-        <strong>Requirements:</strong> Firearm License, Blaze Orange, Tag validation<br />
-        <strong>Notes:</strong> Private land zones vary slightly.
-      </div>
-    </div>
-
-      <div class="season-card">
-      <div class="season-title">Early Anterless</div>
-      <div class="season-details">
-        <strong>Dates:</strong> Oct 16 – Oct 19<br />
-        <strong>Requirements:</strong> Firearm License, Blaze Orange, Tag validation<br />
-        <strong>Notes:</strong> Private land zones vary slightly.
-      </div>
-    </div>
-
-      <div class="season-card">
-      <div class="season-title">Statewide Firearm</div>
-      <div class="season-details">
-        <strong>Dates:</strong> Nov 8 – Nov 16<br />
-        <strong>Requirements:</strong> Firearm License, Blaze Orange, Tag validation<br />
-        <strong>Notes:</strong> You are in Zone 236.
-      </div>
-    </div>
-
-    <!-- Example Animal: Turkey -->
-    <div class="header">🦃 Turkey</div>
-    <div class="season-card">
-      <div class="season-title">Spring Season</div>
-      <div class="season-details">
-        <strong>Dates:</strong> Apr 17 – May 31<br />
-        <strong>Requirements:</strong> Turkey License, Spring Tag, Shotgun or Archery<br />
-        <strong>Notes:</strong> Limited lottery tags in certain zones.
-      </div>
-    </div>
-
-    <div class="season-card">
-      <div class="season-title">Fall Season</div>
-      <div class="season-details">
-        <strong>Dates:</strong> Oct 4 – Nov 2<br />
-        <strong>Requirements:</strong> Turkey License, Fall Tag<br />
-        <strong>Notes:</strong> 1 Turkey Either sex allowed. Only shot size No. 4 or smaller may be used. You are in zone 510.
-      </div>
-    </div>
-
-    <!-- Example Animal: Waterfowl -->
-    <div class="header">🦆 Waterfowl</div>
-    <div class="season-card">
-      <div class="season-title">Duck Season</div>
-      <div class="season-details">
-        <strong>Dates:</strong> Sept 27 – Oct 5 / Oct 11 - Nov 30<br />
-        <strong>Requirements:</strong> Federal Duck Stamp, Small Game License, HIP Certification<br />
-        <strong>Notes:</strong> Steel shot only. Can only have 3 shells at one time. Must have a plug.<br />
-        <strong>Shooting Hours:</strong> Half hour before sunrise to sunset.
-      </div>
-    </div>
-
-    <div class="season-card">
-      <div class="season-title">Goose Season</div>
-      <div class="season-details">
-        <strong>Dates:</strong> Sept 27 – Oct 5 / Oct 11 - Dec 31<br />
-        <strong>Requirements:</strong> State Waterfowl Stamp, Small Game License, HIP Certification, Federal Duck Stamp<br />
-        <strong>Notes:</strong> Steel shot only. Can only have 3 shells at one time. Must have a plug.<br />
-        <strong>Shooting Hours:</strong> Half hour before sunrise to sunset.
-      </div>
-    </div>
-
-    <div class="season-card">
-      <div class="season-title">Pheasant Season</div>
-      <div class="season-details">
-        <strong>Dates:</strong> Sept 27 – Oct 5 / Oct 11 - Dec 31<br />
-        <strong>Requirements:</strong> Pheasant Stamp, Small Game License<br />
-        <strong>Notes:</strong> Steel shot only. Must wear one blaze orange article of clothing above the waist.<br />
-        <strong>Shooting Hours:</strong> Half hour before sunrise to sunset.
-      </div>
-    </div>
-
-    <h1>Fishing Seasons</h1>
-  
-    <div class="header">🎣 Fishing</div>
-    <div class="season-card">
-      <div class="season-title">Fishing Seasons & Zones</div>
-      <div class="season-details">
-        <strong>Dates:</strong> Two weeks before memorial day<br />
-        <strong>Requirements:</strong> Fishing License<br />
-        <strong>Notes:</strong> N/A.
-      </div>
-    </div>
-
-    <div class="season-card">
-      <div class="season-title">Species Specific Seasons</div>
-      <div class="season-details">
-        <strong>Walleye, Sauger, Pike:</strong> Opener to late Feb<br />
-        <strong>Muskie:</strong> Starts early Jun<br />
-        <strong>Stream Trout:</strong> Opens mid Apr<br />
-        <strong>Lake Trout</strong> Mid May to late Sept
-      </div>
-    </div>
-
-    <h1>Licenses</h1>
-
-    <div class="season-card">
-      <div class="season-title">Super Sports</div>
-      <div class="season-details">
-        <strong>Combination:</strong> Combination Super sports license includes married couple fishing only (as recognized by MN state law), small game for primary buyer, 2 state trout stamps, a state waterfowl stamp and a state pheasant stamp for primary buyer. Choice of firearm, archery or muzzleloader deer license after August 1.<br />
-        <strong>Individual:</strong> Super sports license includes fishing,small game, state trout, waterfowl and pheasant stamps. Choice of firearm,archery or muzzleloader deer license after August 1.
-      </div>
-    </div>
-  
-      <div class="season-card">
-      <div class="season-title">Licenses</div>
-      <div class="season-details">
-        <strong>Deer:</strong> #212. $35<br />
-        <strong>Resident Small Game:</strong> #211. $23<br />
-        <strong>State Waterfowl Stamp Validation:</strong> #226. $7.50<br />
-        <strong>Federal Duck Stamp:</strong> #30. $30<br />
-        <strong>HIP Certification:</strong> #227. $0<br />
-        <strong>Pheasant Stamp Validation:</strong> #229. $7.50<br />
-        <strong>Turkey (Spring):</strong> N/A<br />
-        <strong>Turkey (Fall):</strong> #650. $27<br />
-        <strong>Fishing:</strong> #111. $26<br />
-        <strong>Species Specific</strong> N/A<br />
-        <strong>Super Sports (Combination):</strong> #143 $126<br />
-        <strong>Super Sports (Individual):</strong> #142 $100<br />
-        
-      </div>
-    </div>
-  
+  <div class="notice">
+    <strong>Planning aid:</strong> Built around standard adult Minnesota resident licensing. Age/exemption rules, special hunts, lotteries, permit areas and special regulations can change requirements. Verify the final purchase with Minnesota DNR.
   </div>
 
-  <div class="container" id="main-container"></div>
+  <div class="section-title">1. What are you doing this year?</div>
+  <section class="planner-grid">
+    <div class="person-card">
+      <div class="person-head"><h3>👤 Person 1</h3><input class="name-input" id="nameA" value="Justin"></div>
+      <div id="activitiesA"></div>
+    </div>
+    <div class="person-card">
+      <div class="person-head"><h3>👤 Person 2</h3><input class="name-input" id="nameB" value="Bridget"></div>
+      <div id="activitiesB"></div>
+    </div>
+  </section>
 
-  <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
-  <div class="sidebar" id="sidebar">
-    <div class="clock" id="clock"></div>
-    <div id="sidebar-nav"></div>
-    <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+  <div class="planner-actions">
+    <button class="primary-btn" onclick="calculatePlanner()">🧠 Calculate Best License Plan</button>
+    <button class="secondary-btn" onclick="selectExample()">Duck + Goose + Pheasant Example</button>
+    <button class="secondary-btn" onclick="clearSelections()">Clear Activities</button>
+    <button class="secondary-btn" onclick="resetPlanner()">Reset Everything</button>
   </div>
 
-  <footer>
-    <span>Data sourced from the Minnesota Department of Natural Resources. Last updated for the 2025 hunting season.</span>
-  </footer>
+  <div class="section-title">2. Smart Recommendation</div>
+  <section class="results-grid">
+    <div class="smart-card" id="smartRecommendation">
+      <span class="smart-badge">SMART LICENSE OPTIMIZER</span><h3>Select activities above</h3>
+      <p class="muted">Your complete household purchase plan will appear here.</p>
+    </div>
+    <div class="result-card">
+      <h3>💰 Complete Plan Comparison</h3>
+      <div id="comparisonOutput" class="empty-state">Nothing to compare yet.</div>
+    </div>
+  </section>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('MN Hunting & Fishing Log Loaded');
+  <div class="section-title">3. Individual License Checklists</div>
+  <section class="planner-grid">
+    <div class="result-card"><h3 id="checklistTitleA">Justin's Checklist</h3><div id="checklistA"></div></div>
+    <div class="result-card"><h3 id="checklistTitleB">Bridget's Checklist</h3><div id="checklistB"></div></div>
+  </section>
+
+  <div class="section-title">2026 License Reference</div>
+  <div class="reference-card">
+    <h3>Common licenses used by the optimizer</h3>
+    <strong>Resident Individual Angling #111:</strong> $25<br>
+    <strong>Resident Small Game #211:</strong> $22<br>
+    <strong>State Waterfowl Stamp Validation #226:</strong> $7.50<br>
+    <strong>Federal Duck Stamp #10:</strong> $30<br>
+    <strong>HIP Certification #227:</strong> $0<br>
+    <strong>Pheasant Stamp Validation #229:</strong> $7.50<br>
+    <strong>Trout/Salmon Validation #128:</strong> $10<br>
+    <strong>Resident Firearm Deer #212:</strong> $34<br>
+    <strong>Resident Individual Sports #216:</strong> $41<br>
+    <strong>Resident Combination Angling #112:</strong> $40<br>
+    <strong>Resident Combination Sports #217:</strong> $57<br>
+    <strong>Resident Individual Super Sports #142:</strong> $100<br>
+    <strong>Resident Combination Super Sports #143:</strong> $126
+  </div>
+
+  <details class="reference" open>
+    <summary>What Super Sports covers</summary>
+    <div class="inner">
+      <strong>Individual Super Sports:</strong> angling, small game, trout/salmon validation, pheasant validation, state waterfowl validation, and one deer license choice. HIP and the Federal Duck Stamp remain separate when applicable.<br><br>
+      <strong>Combination Super Sports:</strong> married-couple angling and two trout validations, with small game, state waterfowl, pheasant and one deer license choice for the <em>primary purchaser only</em>. HIP and Federal Duck Stamp remain separate when applicable.
+    </div>
+  </details>
+
+  <div class="section-title">Your Detailed Hunting & Fishing Notes</div>
+  <div class="notice">
+    <strong>Saved from your original page:</strong> the detailed season dates below are the 2025 notes you already had. I kept them instead of deleting them. Use them as your reference notes, but verify dates against current 2026 regulations before hunting.
+  </div>
+
+  <h1>Hunting Seasons</h1>
+
+  <div class="header">🦌 Deer</div>
+  <div class="season-card">
+    <div class="season-title">Archery Season</div>
+    <div class="season-details"><strong>Dates:</strong> Sept 13 – Dec 31<br><strong>Requirements:</strong> Archery License, Blaze Orange during firearm seasons<br><strong>Notes:</strong> Best hunting around mid-October and rut.</div>
+  </div>
+  <div class="season-card">
+    <div class="season-title">Youth</div>
+    <div class="season-details"><strong>Dates:</strong> Oct 16 – Oct 19<br><strong>Requirements:</strong> Firearm License, Blaze Orange, Tag validation<br><strong>Notes:</strong> Private land zones vary slightly.</div>
+  </div>
+  <div class="season-card">
+    <div class="season-title">Early Antlerless</div>
+    <div class="season-details"><strong>Dates:</strong> Oct 16 – Oct 19<br><strong>Requirements:</strong> Firearm License, Blaze Orange, Tag validation<br><strong>Notes:</strong> Private land zones vary slightly.</div>
+  </div>
+  <div class="season-card">
+    <div class="season-title">Statewide Firearm</div>
+    <div class="season-details"><strong>Dates:</strong> Nov 8 – Nov 16<br><strong>Requirements:</strong> Firearm License, Blaze Orange, Tag validation<br><strong>Notes:</strong> You are in Zone 236.</div>
+  </div>
+
+  <div class="header">🦃 Turkey</div>
+  <div class="season-card">
+    <div class="season-title">Spring Season</div>
+    <div class="season-details"><strong>Dates:</strong> Apr 17 – May 31<br><strong>Requirements:</strong> Turkey License, Spring Tag, Shotgun or Archery<br><strong>Notes:</strong> Limited lottery tags in certain zones.</div>
+  </div>
+  <div class="season-card">
+    <div class="season-title">Fall Season</div>
+    <div class="season-details"><strong>Dates:</strong> Oct 4 – Nov 2<br><strong>Requirements:</strong> Turkey License, Fall Tag<br><strong>Notes:</strong> 1 Turkey Either sex allowed. Only shot size No. 4 or smaller may be used. You are in zone 510.</div>
+  </div>
+
+  <div class="header">🦆 Waterfowl</div>
+  <div class="season-card">
+    <div class="season-title">Duck Season</div>
+    <div class="season-details"><strong>Dates:</strong> Sept 27 – Oct 5 / Oct 11 - Nov 30<br><strong>Requirements:</strong> State Waterfowl Stamp, Federal Duck Stamp, Small Game License, HIP Certification<br><strong>Notes:</strong> Steel shot only. Can only have 3 shells at one time. Must have a plug.<br><strong>Shooting Hours:</strong> Half hour before sunrise to sunset.</div>
+  </div>
+  <div class="season-card">
+    <div class="season-title">Goose Season</div>
+    <div class="season-details"><strong>Dates:</strong> Sept 27 – Oct 5 / Oct 11 - Dec 31<br><strong>Requirements:</strong> State Waterfowl Stamp, Small Game License, HIP Certification, Federal Duck Stamp<br><strong>Notes:</strong> Steel shot only. Can only have 3 shells at one time. Must have a plug.<br><strong>Shooting Hours:</strong> Half hour before sunrise to sunset.</div>
+  </div>
+  <div class="season-card">
+    <div class="season-title">Pheasant Season</div>
+    <div class="season-details"><strong>Dates:</strong> Sept 27 – Oct 5 / Oct 11 - Dec 31<br><strong>Requirements:</strong> Pheasant Stamp, Small Game License<br><strong>Notes:</strong> Steel shot only. Must wear one blaze orange article of clothing above the waist.<br><strong>Shooting Hours:</strong> Half hour before sunrise to sunset.</div>
+  </div>
+
+  <h1>Fishing Seasons</h1>
+  <div class="header">🎣 Fishing</div>
+  <div class="season-card">
+    <div class="season-title">Fishing Seasons & Zones</div>
+    <div class="season-details"><strong>Dates:</strong> Two weeks before Memorial Day<br><strong>Requirements:</strong> Fishing License<br><strong>Notes:</strong> N/A.</div>
+  </div>
+  <div class="season-card">
+    <div class="season-title">Species Specific Seasons</div>
+    <div class="season-details"><strong>Walleye, Sauger, Pike:</strong> Opener to late Feb<br><strong>Muskie:</strong> Starts early Jun<br><strong>Stream Trout:</strong> Opens mid Apr<br><strong>Lake Trout:</strong> Mid May to late Sept</div>
+  </div>
+
+  <h1>Licenses</h1>
+  <div class="season-card">
+    <div class="season-title">Super Sports</div>
+    <div class="season-details">
+      <strong>Combination:</strong> Combination Super Sports includes married-couple fishing, two trout validations, and small game with state waterfowl and pheasant validations for the primary buyer, plus a choice of firearm, archery or muzzleloader deer license for the primary purchaser.<br>
+      <strong>Individual:</strong> Super Sports includes fishing, small game, trout, waterfowl and pheasant validations plus a choice of firearm, archery or muzzleloader deer license.
+    </div>
+  </div>
+
+  <div class="season-card">
+    <div class="season-title">Original License Quick Reference</div>
+    <div class="season-details">
+      <strong>Deer:</strong> #212 — current 2026 firearm price used by planner: $34<br>
+      <strong>Resident Small Game:</strong> #211 — $22<br>
+      <strong>State Waterfowl Stamp Validation:</strong> #226 — $7.50<br>
+      <strong>Federal Duck Stamp:</strong> #10 — $30<br>
+      <strong>HIP Certification:</strong> #227 — $0<br>
+      <strong>Pheasant Stamp Validation:</strong> #229 — $7.50<br>
+      <strong>Turkey (Spring):</strong> Verify current product<br>
+      <strong>Turkey (Fall):</strong> Verify current product<br>
+      <strong>Fishing:</strong> #111 — $25<br>
+      <strong>Trout/Salmon Validation:</strong> #128 — $10<br>
+      <strong>Super Sports (Combination):</strong> #143 — $126<br>
+      <strong>Super Sports (Individual):</strong> #142 — $100
+    </div>
+  </div>
+</main>
+
+<button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+<div class="sidebar" id="sidebar">
+  <div class="clock" id="clock"></div>
+  <div id="sidebar-nav"></div>
+  <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+</div>
+
+<footer>License optimizer uses 2026 Minnesota DNR pricing. Detailed season notes retained from your original 2025 page; verify current season dates and special regulations before use.</footer>
+
+<script>
+const ACTIVITY_GROUPS=[
+ {title:"Hunting",items:[
+  ["duck","🦆 Duck","Waterfowl"],["goose","🪿 Goose","Waterfowl"],["pheasant","🐓 Pheasant","Small game"],
+  ["grouse","🐦 Grouse","Small game"],["smallgame","🐇 Other Small Game","Rabbit / squirrel / etc."],
+  ["deer_firearm","🦌 Deer — Firearm","Deer license"],["deer_archery","🏹 Deer — Archery","Deer license"],
+  ["deer_muzzle","💨 Deer — Muzzleloader","Deer license"],["turkey_spring","🦃 Spring Turkey","Turkey license"],
+  ["turkey_fall","🦃 Fall Turkey","Turkey license"]]},
+ {title:"Fishing",items:[
+  ["fishing","🎣 General Fishing","Angling license"],["trout","🐟 Trout / Salmon","Angling + trout validation"],
+  ["walleye","🐟 Walleye / Pike / Bass","General angling"],["muskie","🐟 Muskie","General angling"]]}
+];
+
+const LICENSES={
+ angling:{name:"Resident Individual Angling",code:"#111",price:25},
+ small:{name:"Resident Small Game",code:"#211",price:22},
+ waterfowl:{name:"State Waterfowl Stamp Validation",code:"#226",price:7.5},
+ federal:{name:"Federal Duck Stamp",code:"#10",price:30},
+ hip:{name:"HIP Certification",code:"#227",price:0},
+ pheasant:{name:"Pheasant Stamp Validation",code:"#229",price:7.5},
+ trout:{name:"Trout / Salmon Stamp Validation",code:"#128",price:10},
+ deer_firearm:{name:"Resident Deer Firearm License",code:"#212",price:34},
+ deer_archery:{name:"Resident Deer Archery License",code:"#213",price:34},
+ deer_muzzle:{name:"Resident Deer Muzzleloader License",code:"verify code",price:34},
+ turkey_spring:{name:"Spring Turkey License",code:"verify current product",price:null},
+ turkey_fall:{name:"Fall Turkey License",code:"verify current product",price:null}
+};
+
+const REQUIREMENTS={
+ duck:["small","waterfowl","federal","hip"],goose:["small","waterfowl","federal","hip"],
+ pheasant:["small","pheasant"],grouse:["small"],smallgame:["small"],
+ deer_firearm:["deer_firearm"],deer_archery:["deer_archery"],deer_muzzle:["deer_muzzle"],
+ turkey_spring:["turkey_spring"],turkey_fall:["turkey_fall"],
+ fishing:["angling"],trout:["angling","trout"],walleye:["angling"],muskie:["angling"]
+};
+
+const PACKAGES={
+ none:{name:"No package",price:0,covers:[]},
+ sports:{name:"Individual Sports #216",price:41,covers:["angling","small"]},
+ super:{name:"Individual Super Sports #142",price:100,covers:["angling","small","waterfowl","pheasant","trout","deer_any"]},
+ comboAngling:{name:"Combination Angling #112",price:40},
+ comboSports:{name:"Combination Sports #217",price:57},
+ comboSuper:{name:"Combination Super Sports #143",price:126}
+};
+
+function renderActivities(p){
+ document.getElementById("activities"+p).innerHTML=ACTIVITY_GROUPS.map(g=>`
+ <div class="activity-group"><div class="activity-group-title">${g.title}</div><div class="check-grid">
+ ${g.items.map(([id,l,s])=>`<label class="activity"><input type="checkbox" data-person="${p}" data-activity="${id}" onchange="calculatePlanner()"><span><strong>${l}</strong><small>${s}</small></span></label>`).join("")}
+ </div></div>`).join("");
+}
+function selectedActivities(p){return [...document.querySelectorAll(`input[data-person="${p}"]:checked`)].map(x=>x.dataset.activity)}
+function activityLabel(id){for(const g of ACTIVITY_GROUPS){const f=g.items.find(x=>x[0]===id);if(f)return f[1].replace(/^[^\s]+\s/,"")}return id}
+function requiredFor(p){
+ const m={};selectedActivities(p).forEach(a=>(REQUIREMENTS[a]||[]).forEach(k=>{if(!m[k])m[k]=[];m[k].push(activityLabel(a))}));return m;
+}
+function money(v){return "$"+Number(v).toFixed(2).replace(".00","")}
+function isDeer(k){return k==="deer_firearm"||k==="deer_archery"||k==="deer_muzzle"}
+function packageCovers(key,covered){
+ return covered.has(key)||(isDeer(key)&&covered.has("deer_any"));
+}
+function individualCoverage(type){
+ return new Set(PACKAGES[type].covers||[]);
+}
+function householdCoverage(type,primary){
+ const c={A:new Set(),B:new Set()};
+ if(type==="comboAngling"){c.A.add("angling");c.B.add("angling")}
+ if(type==="comboSports"){
+   c.A.add("angling");c.B.add("angling");c[primary].add("small");
+ }
+ if(type==="comboSuper"){
+   c.A.add("angling");c.B.add("angling");c.A.add("trout");c.B.add("trout");
+   ["small","waterfowl","pheasant","deer_any"].forEach(x=>c[primary].add(x));
+ }
+ return c;
+}
+function mergeSet(a,b){return new Set([...a,...b])}
+function uncovered(req,covered){
+ const extra=[];let total=0,complete=true;
+ req.forEach(k=>{
+   if(!packageCovers(k,covered)){
+     extra.push(k);
+     const p=LICENSES[k]?.price;
+     if(p==null)complete=false; else total+=p;
+   }
+ });
+ return {extra,total,complete};
+}
+function planLabel(household,primary,pkgA,pkgB){
+ const pieces=[];
+ if(household!=="none") pieces.push(PACKAGES[household].name+(household!=="comboAngling"?` — ${primary==="A"?"Person 1":"Person 2"} primary`:""));
+ if(pkgA!=="none") pieces.push(`Person 1: ${PACKAGES[pkgA].name}`);
+ if(pkgB!=="none") pieces.push(`Person 2: ${PACKAGES[pkgB].name}`);
+ if(!pieces.length) return "Buy licenses individually";
+ return pieces.join(" + ");
+}
+function buildPlans(reqA,reqB){
+ const plans=[];
+ const householdOptions=[
+  ["none",null],["comboAngling",null],["comboSports","A"],["comboSports","B"],["comboSuper","A"],["comboSuper","B"]
+ ];
+ const indiv=["none","sports","super"];
+ for(const [hh,primary] of householdOptions){
+  for(const pA of indiv){for(const pB of indiv){
+    // Avoid obviously redundant individual packages when a combo Super already fully supplies the same package benefits.
+    const hc=householdCoverage(hh,primary);
+    const covA=mergeSet(hc.A,individualCoverage(pA));
+    const covB=mergeSet(hc.B,individualCoverage(pB));
+    const ea=uncovered(reqA,covA),eb=uncovered(reqB,covB);
+    const base=(hh==="none"?0:PACKAGES[hh].price)+PACKAGES[pA].price+PACKAGES[pB].price;
+    plans.push({
+      household:hh,primary,pkgA:pA,pkgB:pB,
+      label:planLabel(hh,primary,pA,pB),
+      total:base+ea.total+eb.total,
+      complete:ea.complete&&eb.complete,
+      extrasA:ea.extra,extrasB:eb.extra,
+      packageCost:base
     });
+  }}
+ }
+ // Remove duplicate total/coverage-style labels and rank
+ const uniq=new Map();
+ plans.forEach(p=>{const key=[p.label,p.extrasA.join(","),p.extrasB.join(",")].join("|");if(!uniq.has(key)||uniq.get(key).total>p.total)uniq.set(key,p)});
+ return [...uniq.values()];
+}
+function buildChecklist(p,target){
+ const req=requiredFor(p),name=document.getElementById("name"+p).value.trim()||(p==="A"?"Person 1":"Person 2");
+ document.getElementById("checklistTitle"+p).textContent=`${name}'s Checklist`;
+ const keys=Object.keys(req);
+ if(!keys.length){target.innerHTML='<div class="empty-state">No activities selected.</div>';return}
+ target.innerHTML='<div class="license-list">'+keys.map(k=>{
+  const l=LICENSES[k],price=l.price==null?"Verify":money(l.price);
+  const checked=localStorage.getItem(`mnPlannerBought_${p}_${k}`)==="1"?"checked":"";
+  return `<label class="license-row"><input type="checkbox" ${checked} onchange="saveBought('${p}','${k}',this.checked)">
+  <span><strong>${l.name} <span class="muted">${l.code||""}</span></strong><small>Required by: ${req[k].join(", ")}</small></span><span class="price">${price}</span></label>`;
+ }).join("")+'</div>';
+}
+function saveBought(p,k,v){localStorage.setItem(`mnPlannerBought_${p}_${k}`,v?"1":"0")}
+function purchaseRows(keys){
+ if(!keys.length)return '<div class="purchase-item"><span>Nothing additional</span><strong>$0</strong></div>';
+ return keys.map(k=>`<div class="purchase-item"><span>${LICENSES[k].name}</span><strong>${LICENSES[k].price==null?"Verify":money(LICENSES[k].price)}</strong></div>`).join("");
+}
 
-    function toggleTheme() {
-      document.body.classList.toggle('light-mode');
-      localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-    }
+function separatePurchaseBreakdown(reqA,reqB,nameA,nameB){
+  const personBlock=(name,keys)=>{
+    if(!keys.length) return `<div class="purchase-group"><h4>👤 ${name}</h4><div class="purchase-item"><span>Nothing selected</span><strong>$0</strong></div></div>`;
+    return `<div class="purchase-group"><h4>👤 ${name}</h4>` +
+      keys.map(k=>`<div class="purchase-item"><span>${LICENSES[k].name}</span><strong>${LICENSES[k].price==null?"Verify":money(LICENSES[k].price)}</strong></div>`).join("") +
+      `</div>`;
+  };
+  const all=[...reqA,...reqB];
+  const complete=all.every(k=>LICENSES[k]?.price!=null);
+  const total=all.reduce((sum,k)=>sum+(LICENSES[k]?.price||0),0);
+  return {
+    html: personBlock(nameA,reqA)+personBlock(nameB,reqB),
+    total, complete
+  };
+}
+function selectedNames(p){return selectedActivities(p).map(activityLabel).join(", ")||"Nothing selected"}
 
-    function navigateTo(page) {
-      window.location.href = page;
-    }
+function calculatePlanner(){
+ const nameA=document.getElementById("nameA").value.trim()||"Person 1";
+ const nameB=document.getElementById("nameB").value.trim()||"Person 2";
+ localStorage.setItem("mnPlannerNameA",nameA);localStorage.setItem("mnPlannerNameB",nameB);saveSelections();
+ buildChecklist("A",document.getElementById("checklistA"));buildChecklist("B",document.getElementById("checklistB"));
+ const reqA=Object.keys(requiredFor("A")),reqB=Object.keys(requiredFor("B"));
+ if(!reqA.length&&!reqB.length){
+  document.getElementById("smartRecommendation").innerHTML='<span class="smart-badge">SMART LICENSE OPTIMIZER</span><h3>Select activities above</h3><p class="muted">Your complete household purchase plan will appear here.</p>';
+  document.getElementById("comparisonOutput").innerHTML='<div class="empty-state">Nothing to compare yet.</div>';return;
+ }
+ const plans=buildPlans(reqA,reqB);
+ const ranked=plans.filter(p=>p.complete).sort((a,b)=>a.total-b.total);
+ const best=ranked[0];
+ const individual=plans.find(p=>p.household==="none"&&p.pkgA==="none"&&p.pkgB==="none");
+ const hasUnpriced=[...new Set([...reqA,...reqB])].some(k=>LICENSES[k]?.price==null);
 
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('open');
-    }
+ if(best){
+  const savings=individual&&individual.complete?individual.total-best.total:0;
+  const separate=separatePurchaseBreakdown(reqA,reqB,nameA,nameB);
+  document.getElementById("smartRecommendation").innerHTML=`
+   <span class="smart-badge">BEST COMPLETE HOUSEHOLD PLAN</span>
+   <h3>${best.label}</h3>
 
-    document.addEventListener('click', function(event) {
-      const sidebar = document.getElementById('sidebar');
-      const menuButton = document.querySelector('.menu-btn');
-      if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
-        sidebar.classList.remove('open');
-      }
-    });
+   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0;">
+     <div style="background:var(--p2);border:1px solid var(--pb);border-radius:12px;padding:14px;">
+       <div class="muted" style="font-weight:800;text-transform:uppercase;font-size:.78rem;">Best Plan Total</div>
+       <div class="big-price" style="margin-bottom:0;">${money(best.total)}${hasUnpriced?"*":""}</div>
+     </div>
+     <div style="background:var(--p2);border:1px solid var(--pb);border-radius:12px;padding:14px;">
+       <div class="muted" style="font-weight:800;text-transform:uppercase;font-size:.78rem;">Everything Separately</div>
+       <div class="big-price" style="margin-bottom:0;">${separate.complete?money(separate.total):money(separate.total)+"*"}</div>
+     </div>
+   </div>
 
-    function updateClock() {
-      document.getElementById('clock').textContent = new Date().toLocaleTimeString();
-    }
+   ${savings>0?`<div class="savings">Best plan saves ${money(savings)} compared with buying every modeled license separately.</div>`:""}
+   <div class="notice good-note"><strong>${nameA} selected:</strong> ${selectedNames("A")}<br><strong>${nameB} selected:</strong> ${selectedNames("B")}</div>
 
-    window.onload = function() {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'light') {
-        document.body.classList.add('light-mode');
-      }
-    }
+   <div class="purchase-group"><h4>🧾 If You Bought Everything Separately</h4>
+     ${separate.html}
+     <div class="purchase-item" style="font-size:1.05rem;"><span><strong>Separate-license total</strong></span><strong>${separate.complete?money(separate.total):money(separate.total)+"*"}</strong></div>
+   </div>
 
-    fetch('sidebar.html')
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById('sidebar-nav').innerHTML = data;
-      });
+   <div class="purchase-group"><h4>✅ Best Plan Purchase Breakdown</h4></div>
+   <div class="purchase-group"><h4>📦 Package licenses in this plan</h4>
+     ${best.household!=="none"?`<div class="purchase-item"><span>${PACKAGES[best.household].name}${best.primary?` (${best.primary==="A"?nameA:nameB} primary)`:""}</span><strong>${money(PACKAGES[best.household].price)}</strong></div>`:""}
+     ${best.pkgA!=="none"?`<div class="purchase-item"><span>${nameA}: ${PACKAGES[best.pkgA].name}</span><strong>${money(PACKAGES[best.pkgA].price)}</strong></div>`:""}
+     ${best.pkgB!=="none"?`<div class="purchase-item"><span>${nameB}: ${PACKAGES[best.pkgB].name}</span><strong>${money(PACKAGES[best.pkgB].price)}</strong></div>`:""}
+     ${best.household==="none"&&best.pkgA==="none"&&best.pkgB==="none"?'<div class="purchase-item"><span>No package license</span><strong>—</strong></div>':""}
+   </div>
+   <div class="purchase-group"><h4>👤 ${nameA} — additional individual purchases</h4>${purchaseRows(best.extrasA)}</div>
+   <div class="purchase-group"><h4>👤 ${nameB} — additional individual purchases</h4>${purchaseRows(best.extrasB)}</div>
+   ${hasUnpriced?'<div class="notice"><strong>*Verify-price item selected:</strong> a turkey item is present, so the exact total may not include that item. It will never be shown as “nothing needed.”</div>':""}
+  `;
+ }else{
+  document.getElementById("smartRecommendation").innerHTML='<span class="smart-badge">SMART LICENSE OPTIMIZER</span><h3>Exact total needs verification</h3><p>A selected activity has a license price marked Verify. Your individual checklists still show every requirement.</p>';
+ }
 
-    setInterval(updateClock, 1000);
-    updateClock();
-  </script>
+ document.getElementById("comparisonOutput").innerHTML=ranked.length?`
+  <table class="comparison-table"><thead><tr><th>Complete household plan</th><th>Total</th><th></th></tr></thead>
+  <tbody>${ranked.slice(0,8).map((p,i)=>`<tr class="${i===0?"best-row":""}">
+   <td><strong>${p.label}</strong><br><span class="muted">Extra: ${nameA} ${p.extrasA.length?p.extrasA.map(k=>LICENSES[k].name).join(", "):"none"}; ${nameB} ${p.extrasB.length?p.extrasB.map(k=>LICENSES[k].name).join(", "):"none"}</span></td>
+   <td>${money(p.total)}</td><td>${i===0?'<span class="status-pill">BEST</span>':""}</td></tr>`).join("")}</tbody></table>`
+  :'<div class="empty-state">No exact-price plans can be ranked because one or more selected items require price verification.</div>';
+}
+function saveSelections(){["A","B"].forEach(p=>localStorage.setItem(`mnPlannerActivities${p}`,JSON.stringify(selectedActivities(p))))}
+function restoreSelections(){["A","B"].forEach(p=>{let s=[];try{s=JSON.parse(localStorage.getItem(`mnPlannerActivities${p}`)||"[]")}catch(e){}s.forEach(id=>{const cb=document.querySelector(`input[data-person="${p}"][data-activity="${id}"]`);if(cb)cb.checked=true})})}
+function clearSelections(){document.querySelectorAll('input[data-activity]').forEach(x=>x.checked=false);saveSelections();calculatePlanner()}
+function resetPlanner(){document.querySelectorAll('input[data-activity]').forEach(x=>x.checked=false);document.getElementById("nameA").value="Justin";document.getElementById("nameB").value="Bridget";Object.keys(localStorage).forEach(k=>{if(k.startsWith("mnPlannerBought_")||k.startsWith("mnPlannerActivities")||k.startsWith("mnPlannerName"))localStorage.removeItem(k)});calculatePlanner()}
+function selectExample(){clearSelections();["duck","goose","pheasant"].forEach(id=>{const cb=document.querySelector(`input[data-person="A"][data-activity="${id}"]`);if(cb)cb.checked=true});calculatePlanner()}
+function toggleTheme(){document.body.classList.toggle('light-mode');localStorage.setItem('theme',document.body.classList.contains('light-mode')?'light':'dark')}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open')}
+function updateClock(){const c=document.getElementById('clock');if(c)c.textContent=new Date().toLocaleTimeString()}
+document.addEventListener('click',e=>{const s=document.getElementById('sidebar'),m=document.querySelector('.menu-btn');if(s&&m&&!s.contains(e.target)&&!m.contains(e.target))s.classList.remove('open')});
+document.addEventListener('DOMContentLoaded',()=>{
+ renderActivities("A");renderActivities("B");
+ if(localStorage.getItem('theme')==='light')document.body.classList.add('light-mode');
+ document.getElementById("nameA").value=localStorage.getItem("mnPlannerNameA")||"Justin";
+ document.getElementById("nameB").value=localStorage.getItem("mnPlannerNameB")||"Bridget";
+ restoreSelections();calculatePlanner();
+ fetch('sidebar.html').then(r=>r.ok?r.text():Promise.reject()).then(d=>document.getElementById('sidebar-nav').innerHTML=d).catch(()=>{});
+ setInterval(updateClock,1000);updateClock();
+ document.getElementById("nameA").addEventListener("input",calculatePlanner);
+ document.getElementById("nameB").addEventListener("input",calculatePlanner);
+});
+</script>
 </body>
 </html>
