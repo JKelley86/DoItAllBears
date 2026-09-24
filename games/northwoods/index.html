@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#07100c">
+  <meta name="description" content="Northwoods: After Dark — an open-world survival mystery set in the Minnesota wilderness.">
+  <title>Northwoods: After Dark</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2307100c'/%3E%3Cpath d='M32 7 15 38h11L14 55h36L38 38h11z' fill='%2399c9a5'/%3E%3Ccircle cx='48' cy='15' r='6' fill='%23f0a65a'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
+</head>
+<body>
+  <div id="game"></div>
+  <div class="grain"></div><div class="vignette"></div><div id="damageFlash"></div><div id="lightning"></div>
+
+  <section id="loading" class="screen loading-screen">
+    <div class="loading-mark"><i></i><i></i><i></i></div>
+    <p>BUILDING THE NORTHWOODS</p><div class="loadbar"><span id="loadFill"></span></div>
+  </section>
+
+  <section id="menu" class="screen menu-screen hidden">
+    <div class="menu-fog"></div>
+    <div class="title-block">
+      <div class="eyebrow">CEDAR LAKE, MINNESOTA · OCTOBER 1997</div>
+      <h1>NORTHWOODS<br><span>AFTER DARK</span></h1>
+      <p class="tagline">The ranger stopped answering three nights ago.<br>The woods have been listening ever since.</p>
+      <div class="menu-actions">
+        <button id="newGame" class="primary">Begin chapter one</button>
+        <button id="continueGame" class="secondary hidden">Continue</button>
+        <button id="controlsBtn" class="text-btn">Controls</button>
+      </div>
+    </div>
+    <div class="menu-footer"><span>HEADPHONES RECOMMENDED</span><span>LOCAL SAVE ENABLED</span><span>v1.0 · THE SILENT RANGER</span></div>
+  </section>
+
+  <main id="hud" class="hidden">
+    <div class="top-left">
+      <div class="location" id="location">KELLEY CABIN</div>
+      <div class="compass"><span id="compassText">N</span><div class="compass-line"><i id="compassTick"></i></div></div>
+    </div>
+    <div class="top-right">
+      <div class="clock"><strong id="timeText">6:42 PM</strong><span id="dayText">DAY 1 · CLEAR</span></div>
+    </div>
+    <section class="status-bars">
+      <div class="stat health"><label>HEALTH</label><div><i id="healthBar"></i></div><b id="healthText">100</b></div>
+      <div class="stat stamina"><label>STAMINA</label><div><i id="staminaBar"></i></div></div>
+      <div class="stat warmth"><label>WARMTH</label><div><i id="warmthBar"></i></div></div>
+      <div class="stat hunger"><label>HUNGER</label><div><i id="hungerBar"></i></div></div>
+    </section>
+    <section class="objective-box">
+      <small id="questChapter">CHAPTER I · THE SILENT RANGER</small>
+      <h2 id="questTitle">Cold Start</h2>
+      <p id="questText">Search the truck for the generator fuel.</p>
+    </section>
+    <div id="reticle"><i></i></div>
+    <div id="interactPrompt"><b>E</b><span id="promptText">INTERACT</span></div>
+    <div id="message"></div>
+    <div class="quickbar">
+      <button class="slot active" data-slot="1"><kbd>1</kbd><span class="icon">✋</span><small>HANDS</small></button>
+      <button class="slot" data-slot="2"><kbd>2</kbd><span class="icon">🔦</span><small>LIGHT</small></button>
+      <button class="slot" data-slot="3"><kbd>3</kbd><span class="icon">▱</span><small>RIFLE</small><em id="ammoText">6 / 18</em></button>
+      <button class="slot" data-slot="4"><kbd>4</kbd><span class="icon">🪓</span><small>AXE</small></button>
+    </div>
+    <div class="controls-hint"><span><b>TAB</b> PACK</span><span><b>M</b> MAP</span><span><b>F</b> FLASHLIGHT</span><span><b>ESC</b> PAUSE</span></div>
+    <div id="threat"><i></i><span>SOMETHING IS WATCHING</span><i></i></div>
+    <div id="mobileStick"><i></i></div><div id="mobileLook"></div><button id="mobileAction">USE</button><button id="mobileJump">JUMP</button>
+  </main>
+
+  <section id="inventory" class="panel hidden">
+    <div class="panel-head"><div><small>FIELD PACK</small><h2>Inventory</h2></div><button class="close-panel" data-close="inventory">×</button></div>
+    <div class="inventory-layout">
+      <div id="inventoryGrid" class="inventory-grid"></div>
+      <aside class="item-info"><small>SELECTED ITEM</small><h3 id="itemName">Field Knife</h3><p id="itemDesc">Reliable, sharp, and older than it looks.</p><button id="useItem">Use item</button></aside>
+    </div>
+    <div class="crafting"><small>FIELD CRAFTING</small><div id="recipes" class="recipes"></div></div>
+  </section>
+
+  <section id="mapPanel" class="panel map-panel hidden">
+    <div class="panel-head"><div><small>USFS QUADRANGLE · HAND MARKED</small><h2>Cedar Lake</h2></div><button class="close-panel" data-close="mapPanel">×</button></div>
+    <div class="map-wrap"><canvas id="mapCanvas" width="900" height="620"></canvas><div class="map-legend"><span><i class="you"></i>YOU</span><span><i class="known"></i>KNOWN</span><span><i class="unknown"></i>UNEXPLORED</span></div></div>
+  </section>
+
+  <section id="notePanel" class="note-panel hidden"><div class="note-paper"><button id="closeNote">×</button><small id="noteDate">OCTOBER 17</small><h2 id="noteTitle">Justin—</h2><div id="noteBody"></div></div></section>
+
+  <section id="fishing" class="minigame hidden">
+    <div class="fishing-card"><small>CEDAR LAKE</small><h2 id="fishTitle">Line is in the water…</h2><p id="fishText">Wait for the strike.</p><div class="fish-meter"><i id="fishZone"></i><b id="fishNeedle"></b></div><button id="reelBtn" disabled>REEL</button><button id="leaveFishing" class="text-btn">Pack up</button></div>
+  </section>
+
+  <section id="pause" class="screen pause-screen hidden"><div class="pause-card"><small>NORTHWOODS: AFTER DARK</small><h2>Paused</h2><button id="resumeBtn" class="primary">Return to the woods</button><button id="saveBtn" class="secondary">Save game</button><button id="restartBtn" class="text-btn">Restart chapter</button><p>Progress also saves automatically.</p></div></section>
+
+  <section id="controls" class="screen controls-screen hidden"><div class="controls-card"><button id="closeControls">×</button><small>FIELD MANUAL</small><h2>Controls</h2><div class="control-grid"><span><kbd>W A S D</kbd> Move</span><span><kbd>MOUSE</kbd> Look / aim</span><span><kbd>SHIFT</kbd> Sprint</span><span><kbd>SPACE</kbd> Jump</span><span><kbd>E</kbd> Interact</span><span><kbd>CLICK</kbd> Use tool / fire</span><span><kbd>F</kbd> Flashlight</span><span><kbd>R</kbd> Reload</span><span><kbd>TAB</kbd> Inventory</span><span><kbd>M</kbd> Map</span><span><kbd>1–4</kbd> Equipment</span><span><kbd>ESC</kbd> Pause</span></div></div></section>
+
+  <section id="death" class="screen death-screen hidden"><div><small>CEDAR LAKE CLAIMED ANOTHER</small><h2>YOU DIDN'T<br>MAKE IT HOME</h2><p id="deathReason">The cold found you before dawn.</p><button id="loadSave" class="primary">Load last save</button><button id="deathRestart" class="text-btn">Restart chapter</button></div></section>
+
+  <section id="ending" class="screen ending-screen hidden"><div><small>CHAPTER I COMPLETE</small><h2>THE TOWER<br>ANSWERED.</h2><p>You restored the ranger's signal. Something else heard it too.<br>The radio gives you two choices: run—or go beneath the woods.</p><div id="endingStats"></div><button id="keepExploring" class="primary">Continue Chapter II</button></div></section>
+
+  <section id="truckCutscene" class="cutscene hidden" aria-live="polite"><div class="letterbox top"></div><p id="cutsceneCaption">THE ENGINE TURNS OVER.</p><div class="letterbox bottom"></div></section>
+
+  <section id="finalEnding" class="screen ending-screen final-ending hidden"><div><small id="finalKicker">ESCAPE ENDING</small><h2 id="finalTitle">COUNTY ROAD 6</h2><p id="finalCopy">You made it out.</p><button id="finalContinue" class="primary">Return to title</button></div></section>
+
+  <section id="error" class="screen error-screen hidden"><div><h2>THE WOODS WOULD NOT LOAD</h2><p>This game needs WebGL and an internet connection for its 3D engine. Upload all three files to GitHub Pages and open the Pages link in a modern browser.</p></div></section>
+  <script src="game.js"></script>
+</body>
+</html>
