@@ -1,297 +1,1117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Camping Checklist</title>
-  <link rel="stylesheet" href="../theme.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>Camper Trip Command Center</title>
   <style>
-    .clear-button {
-      top: 50%;
-      right: 10px;
-      transform: translateY(-50%);
-      background-color: #cc0000;
+    :root {
+      --bg: #07111c;
+      --bg-2: #0b1725;
+      --panel: rgba(17, 31, 48, 0.88);
+      --panel-strong: rgba(20, 38, 58, 0.97);
+      --panel-soft: rgba(255,255,255,0.045);
+      --text: #f3f8fc;
+      --muted: #98aabd;
+      --line: rgba(255,255,255,0.09);
+      --accent: #66d6a8;
+      --accent-2: #7dc9ff;
+      --warning: #f5c56d;
+      --danger: #ff7b7b;
+      --success: #73e0a8;
+      --shadow: 0 22px 60px rgba(0,0,0,.34);
+      --radius: 22px;
+      --radius-sm: 14px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
-    @media (max-width: 600px) {
-      .back-button, .clear-button {
-        font-size: 0.8rem;
-        padding: 0.3rem 0.5rem;
-      }
+    body.light-mode {
+      --bg: #eef4f7;
+      --bg-2: #e4edf2;
+      --panel: rgba(255,255,255,0.9);
+      --panel-strong: rgba(255,255,255,0.98);
+      --panel-soft: rgba(13, 30, 45, 0.045);
+      --text: #102030;
+      --muted: #66798b;
+      --line: rgba(12, 29, 44, 0.10);
+      --shadow: 0 18px 50px rgba(27, 55, 74, .14);
     }
 
-    section {
-      padding: 2rem;
-      max-width: 600px;
+    * { box-sizing: border-box; }
+
+    html {
+      width: 100%;
+      min-height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior-x: none;
+      overscroll-behavior-y: auto;
+      background: var(--bg);
+      touch-action: pan-y;
+    }
+
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      overflow-y: visible;
+      overscroll-behavior-x: none;
+      overscroll-behavior-y: auto;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(68, 174, 148, .18), transparent 32%),
+        radial-gradient(circle at 95% 10%, rgba(76, 150, 230, .15), transparent 28%),
+        linear-gradient(160deg, var(--bg) 0%, var(--bg-2) 100%);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { touch-action: manipulation; }
+
+    .page-shell {
+      width: min(1500px, 100%);
       margin: 0 auto;
+      padding: calc(18px + var(--safe-top)) 18px calc(36px + var(--safe-bottom));
     }
 
-    .category {
-      background: var(--card-bg);
-      border: 1px solid #99cfff;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .category h2 {
-      margin-top: 0;
-    }
-
-    .item {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      align-items: center;
-      padding: 0.5rem 0;
-    }
-
-    label {
-      padding-right: 1rem;
-    }
-
-    .checkboxes {
+    .topbar {
       display: flex;
-      justify-content: space-evenly;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
     }
 
-    .checkboxes input {
-      transform: scale(1.2);
+    .menu-btn, .top-action {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 11px 14px;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(0,0,0,.16);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
     }
 
-    .checkbox-labels {
+    .menu-btn:hover, .top-action:hover { transform: translateY(-1px); border-color: rgba(125,201,255,.35); }
+
+    .top-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(25,48,66,.94), rgba(11,27,42,.94));
+      box-shadow: var(--shadow);
+      padding: clamp(22px, 4vw, 44px);
+      margin-bottom: 18px;
+    }
+
+    body.light-mode .hero { background: linear-gradient(135deg, rgba(255,255,255,.97), rgba(236,246,249,.97)); }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      width: 380px;
+      height: 380px;
+      border-radius: 50%;
+      right: -130px;
+      top: -190px;
+      background: radial-gradient(circle, rgba(102,214,168,.25), transparent 67%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 10px;
+      border: 1px solid rgba(102,214,168,.22);
+      background: rgba(102,214,168,.08);
+      color: var(--accent);
+      border-radius: 999px;
+      font-size: .77rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .hero-grid {
+      position: relative;
+      z-index: 1;
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      font-weight: bold;
-      margin-bottom: 0.5rem;
+      grid-template-columns: 1.4fr .8fr;
+      gap: 24px;
+      align-items: center;
     }
 
-    #readyMessage {
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 4.6rem);
+      line-height: .98;
+      letter-spacing: -.05em;
+      max-width: 840px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      max-width: 760px;
+      margin: 14px 0 0;
+      font-size: clamp(.98rem, 1.7vw, 1.12rem);
+      line-height: 1.65;
+    }
+
+    .progress-card {
+      display: grid;
+      grid-template-columns: 118px 1fr;
+      gap: 18px;
+      align-items: center;
+      background: rgba(255,255,255,.055);
+      border: 1px solid var(--line);
+      padding: 16px;
+      border-radius: 22px;
+      min-width: 0;
+    }
+
+    .ring {
+      --progress: 0deg;
+      width: 118px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(var(--accent) var(--progress), rgba(255,255,255,.08) 0deg);
+      position: relative;
+    }
+
+    .ring::after {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: 50%;
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+    }
+
+    .ring-center { position: relative; z-index: 2; text-align: center; }
+    .ring-center strong { display: block; font-size: 1.7rem; }
+    .ring-center span { display: block; font-size: .72rem; color: var(--muted); margin-top: 2px; }
+
+    .progress-copy strong { display: block; font-size: 1.2rem; margin-bottom: 6px; }
+    .progress-copy span { color: var(--muted); line-height: 1.45; font-size: .92rem; }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+
+    .panel {
+      grid-column: span 12;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .panel-title-wrap { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .panel-icon { font-size: 1.35rem; width: 34px; text-align: center; }
+    .panel-title { font-size: 1.03rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .panel-meta { color: var(--muted); font-size: .8rem; margin-top: 2px; }
+
+    .collapse-btn {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--panel-soft);
+      color: var(--text);
+      transition: transform .2s ease;
+    }
+
+    .panel.collapsed .collapse-btn { transform: rotate(-90deg); }
+    .panel.collapsed .panel-body { display: none; }
+
+    .panel-body { padding: 14px 18px 18px; }
+
+    .category-panel { grid-column: span 6; }
+    .activities-panel { grid-column: span 12; }
+
+    .search-wrap {
+      margin-bottom: 18px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 16px;
+      padding: 14px 16px;
+      outline: none;
+      box-shadow: 0 12px 28px rgba(0,0,0,.12);
+    }
+
+    .search-wrap input:focus { border-color: rgba(125,201,255,.45); }
+
+    .legend {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      color: var(--muted);
+      font-size: .78rem;
+    }
+
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+    .legend .l-packed { background: var(--success); }
+    .legend .l-camper { background: var(--accent-2); }
+    .legend .l-skip { background: var(--warning); }
+
+    .item-list { display: grid; gap: 9px; }
+
+    .check-item {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.028);
+      border-radius: 15px;
+      transition: border-color .16s ease, background .16s ease, transform .16s ease;
+    }
+
+    .check-item:hover { transform: translateY(-1px); border-color: rgba(125,201,255,.25); }
+    .check-item.hidden-by-search { display: none; }
+
+    .item-name {
+      min-width: 0;
+      font-size: .93rem;
+      font-weight: 700;
+      line-height: 1.3;
+      cursor: pointer;
+    }
+
+    .item-name small {
+      display: block;
+      color: var(--muted);
+      font-size: .73rem;
+      font-weight: 500;
+      margin-top: 3px;
+    }
+
+    .state-group {
+      display: grid;
+      grid-template-columns: repeat(3, 34px);
+      gap: 6px;
+    }
+
+    .state-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--panel-soft);
+      color: var(--muted);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: .84rem;
+      transition: all .15s ease;
+    }
+
+    .state-btn:hover { color: var(--text); }
+    .state-btn.active[data-state="packed"] { color: #0b2517; background: var(--success); border-color: transparent; }
+    .state-btn.active[data-state="camper"] { color: #092033; background: var(--accent-2); border-color: transparent; }
+    .state-btn.active[data-state="skip"] { color: #302407; background: var(--warning); border-color: transparent; }
+
+    .activity-chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .activity-chip {
+      border: 1px solid var(--line);
+      background: var(--panel-soft);
+      color: var(--text);
+      padding: 10px 13px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 750;
+      font-size: .87rem;
+      transition: all .16s ease;
+    }
+
+    .activity-chip.active {
+      background: linear-gradient(135deg, rgba(102,214,168,.25), rgba(125,201,255,.18));
+      border-color: rgba(102,214,168,.48);
+      box-shadow: inset 0 0 0 1px rgba(102,214,168,.1);
+    }
+
+    .dynamic-activities { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+
+    .activity-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,.025);
+      overflow: hidden;
+    }
+
+    .activity-card h3 {
+      margin: 0;
+      padding: 14px 16px;
+      font-size: .98rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .activity-card .item-list { padding: 12px; }
+
+    .empty-activity {
+      color: var(--muted);
+      padding: 20px;
       text-align: center;
-      font-size: 1.2rem;
-      color: #006600;
-      font-weight: bold;
+      border: 1px dashed var(--line);
+      border-radius: 16px;
+      line-height: 1.5;
+    }
+
+    .footer-tools {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .reset-btn {
+      border: 1px solid rgba(255,123,123,.3);
+      color: #ffd5d5;
+      background: rgba(255,123,123,.09);
+      border-radius: 14px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    body.light-mode .reset-btn { color: #8e3030; }
+
+    .ready-banner {
       display: none;
-      margin-top: 2rem;
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(115,224,168,.3);
+      background: rgba(115,224,168,.1);
+      color: var(--success);
+      font-weight: 850;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .ready-banner.show { display: block; animation: pop .35s ease; }
+    @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.99); } to { opacity: 1; transform: none; } }
+
+    .sidebar {
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: min(340px, 88vw);
+      padding: calc(22px + var(--safe-top)) 18px calc(18px + var(--safe-bottom));
+      background: var(--panel-strong);
+      border-right: 1px solid var(--line);
+      box-shadow: 24px 0 60px rgba(0,0,0,.34);
+      transform: translateX(-102%);
+      transition: transform .22s ease;
+      overflow-y: auto;
+    }
+
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+    .clock { color: var(--muted); font-size: .9rem; }
+    .sidebar-close { border: 1px solid var(--line); background: var(--panel-soft); color: var(--text); border-radius: 10px; padding: 8px 10px; cursor: pointer; }
+    #sidebar-nav { display: grid; gap: 6px; }
+    #sidebar-nav a, .sidebar-fallback a {
+      color: var(--text);
+      text-decoration: none;
+      padding: 10px 12px;
+      border-radius: 10px;
+      display: block;
+      border: 1px solid transparent;
+    }
+    #sidebar-nav a:hover, .sidebar-fallback a:hover { background: var(--panel-soft); border-color: var(--line); }
+    .theme-toggle { width: 100%; margin-top: 16px; border: 1px solid var(--line); background: var(--panel-soft); color: var(--text); border-radius: 12px; padding: 11px 12px; cursor: pointer; }
+
+    .scrim {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.42);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+    .scrim.show { opacity: 1; pointer-events: auto; }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(22px + var(--safe-bottom));
+      z-index: 1200;
+      transform: translate(-50%, 120px);
+      opacity: 0;
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      transition: .22s ease;
+      max-width: calc(100vw - 30px);
+      text-align: center;
+      pointer-events: none;
+    }
+    .toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+    @media (max-width: 1050px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .progress-card { max-width: 520px; }
+      .category-panel { grid-column: span 12; }
+      .dynamic-activities { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell { padding-left: 12px; padding-right: 12px; }
+      .topbar { align-items: flex-start; }
+      .top-actions { gap: 8px; }
+      .top-action, .menu-btn { padding: 10px 11px; font-size: .84rem; }
+      .hero { padding: 22px 18px; border-radius: 22px; }
+      .progress-card { grid-template-columns: 86px 1fr; }
+      .ring { width: 86px; }
+      .ring-center strong { font-size: 1.3rem; }
+      .panel-header { padding: 15px 14px; }
+      .panel-body { padding: 12px; }
+      .check-item { grid-template-columns: minmax(0, 1fr) auto; padding: 10px; }
+      .item-name { font-size: .88rem; }
+      .state-group { grid-template-columns: repeat(3, 32px); }
+      .state-btn { width: 32px; height: 32px; }
+      .search-wrap { grid-template-columns: 1fr; }
+      .legend { justify-content: flex-start; }
+    }
+
+    @media (max-width: 420px) {
+      .topbar { gap: 8px; }
+      .top-actions { width: 100%; }
+      .top-action { flex: 1 1 auto; }
+      .progress-card { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+      .hero h1 { font-size: 2.35rem; }
+      .check-item { gap: 8px; }
+      .state-group { grid-template-columns: repeat(3, 30px); gap: 4px; }
+      .state-btn { width: 30px; height: 30px; border-radius: 9px; font-size: .78rem; }
+      .activity-chip { padding: 9px 11px; font-size: .82rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
     }
   </style>
 </head>
-
 <body>
-  <header>
-    <h1>Camping Checklist</h1>
-  </header>
-	<button class="clear-button" onclick="clearChecklist()">Clear All</button>
-  <section id="checklist">
-    <div class="checkbox-labels">
-      <span>Item</span>
-      <span>Packed</span>
-      <span>Not Bringing</span>
-    </div>
+  <div class="scrim" id="scrim" onclick="closeSidebar()"></div>
 
-    <div class="category">
-      <h2>Cooler</h2>
-      <div class="item">
-        <label>Ice</label>
-        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-      </div>
-      <div class="item">
-        <label>Water</label>
-        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-      </div>
-      <div class="item">
-        <label>Pop</label>
-        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-      </div>
-      <div class="item">
-        <label>Alcohol</label>
-        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-      </div>
-      <div class="item">
-        <label>Perishable Food</label>
-        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-      </div>
-    </div>
-
-    <div class="category">
-      <h2>Camping Tote</h2>
-      <div class="item">
-        <label>Paper Plates</label>
-        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-      </div>
-      <div class="item">
-        <label>Paper Towels</label>
-        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-      </div>
-      <div class="item">
-        <label>Plastic Silverware</label>
-        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-      </div>
-      <div class="item">
-        <label>Cooking Utensils</label>
-        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-      </div>
-      <div class="item">
-        <label>Cast Iron Pan</label>
-        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-      </div>
-      <div class="item">
-        <label>Cooking Oil</label>
-        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-      </div>
-      <div class="item">
-        <label>Trash Bags</label>
-        <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-        <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-      </div>
-     </div>
-    
-     <div class="category">
-       <h2>Tent</h2>
-       <div class="item">
-         <label>Tent</label>
-         <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-         <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-       </div>
-       <div class="item">
-         <label>Stakes</label>
-         <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-         <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-       </div>
-       <div class="item">
-         <label>Poles</label>
-         <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-         <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-       </div>
-       <div class="item">
-         <label>Air Mattress/Foam Roll</label>
-         <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-         <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-       </div>
-       <div class="item">
-         <label>Sleeping bags</label>
-         <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-         <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-       </div>
-       <div class="item">
-         <label>Pillows/Blankets</label>
-         <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-         <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-       </div>
-       <div class="item">
-         <label>Extension Cable/Power Strip</label>
-         <input type="checkbox" class="packed" onclick="toggleCheckbox(this)">
-         <input type="checkbox" class="not-bringing" onclick="toggleCheckbox(this)">
-       </div>
-     </div>
-     <div id="readyMessage">
-       You are now ready to go camping! Have fun and be safe.
-     </div>
-   </section>
-	
-    <div class="container" id="main-container"></div>
-	
-    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
-    <div class="sidebar" id="sidebar">
+  <aside class="sidebar" id="sidebar" aria-hidden="true">
+    <div class="sidebar-head">
+      <div>
+        <strong>Website Menu</strong>
         <div class="clock" id="clock"></div>
-	<div id="sidebar-nav"></div>
-        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+      </div>
+      <button class="sidebar-close" onclick="closeSidebar()">✕</button>
     </div>
+    <div id="sidebar-nav" class="sidebar-fallback">
+      <a href="../index.html">← Back to Home</a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+  </aside>
+
+  <main class="page-shell">
+    <div class="topbar">
+      <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+      <div class="top-actions">
+        <button class="top-action" onclick="expandAll()">Expand All</button>
+        <button class="top-action" onclick="collapseAll()">Collapse All</button>
+      </div>
+    </div>
+
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">🚐 Camper Trip Command Center</div>
+          <h1>Pack once. Leave confident.</h1>
+          <p>Your full camper packing checklist, saved automatically between visits. Permanent essentials are always here, while activity-specific gear appears only when you select it.</p>
+        </div>
+        <div class="progress-card">
+          <div class="ring" id="progressRing">
+            <div class="ring-center">
+              <strong id="progressPercent">0%</strong>
+              <span>ready</span>
+            </div>
+          </div>
+          <div class="progress-copy">
+            <strong id="progressCount">0 of 0 ready</strong>
+            <span id="progressMessage">Start checking items as you load the camper.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="search-wrap">
+      <input id="searchInput" type="search" placeholder="Search every packing item…" autocomplete="off" />
+      <div class="legend">
+        <span><i class="l-packed"></i>Packed</span>
+        <span><i class="l-camper"></i>Stays in camper</span>
+        <span><i class="l-skip"></i>Not bringing</span>
+      </div>
+    </div>
+
+    <div class="dashboard-grid" id="dashboardGrid"></div>
+
+    <div class="ready-banner" id="readyBanner">Everything on this trip has been accounted for. You’re ready to go.</div>
+
+    <div class="footer-tools">
+      <button class="reset-btn" onclick="resetTrip()">Reset Trip</button>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
   <script>
-    document.addEventListener('DOMContentLoaded', loadChecklist);
+    const STORAGE_KEY = 'camperCommandCenter_v1';
 
-    function saveChecklist() {
-      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-      checkboxes.forEach(checkbox => {
-        localStorage.setItem(checkbox.dataset.item, checkbox.checked);
+    const permanentCategories = [
+      {
+        id: 'cooler', icon: '🧊', title: 'Cooler',
+        items: [
+          'Ice', 'Water', 'Pop / Soda', 'Alcohol', 'Juice / Sports Drinks', 'Cooler Packs', 'Can Koozies'
+        ]
+      },
+      {
+        id: 'food-kitchen', icon: '🍳', title: 'Food & Kitchen',
+        items: [
+          'Breakfast Food', 'Lunch Food', 'Dinner Food', 'Snacks', 'Perishable Food',
+          'Coffee / Coffee Supplies', 'Paper Plates', 'Cups', 'Plastic Silverware',
+          'Cooking Utensils', 'Cast Iron Pan', 'Other Pots / Pans', 'Grilling Utensils',
+          'Cooking Oil', 'Seasonings', 'Foil', 'Zip Bags / Food Storage', 'Paper Towels',
+          'Dish Soap', 'Sponge / Dish Rag', 'Trash Bags'
+        ]
+      },
+      {
+        id: 'camper-essentials', icon: '🚐', title: 'Camper Essentials',
+        items: [
+          'Camper Keys', 'Fresh Water Hose', 'Water Pressure Regulator', 'Water Filter',
+          'Sewer Hose', 'Sewer Elbow / Adapter', 'Sewer Hose Support', 'Disposable Gloves',
+          'Tank Treatment', 'Black Tank Flush Hose', 'Spare Hose Washers',
+          'Shore Power Cord', 'Surge Protector', '30A / 50A Adapter', 'Outdoor Extension Cord',
+          'Leveling Blocks', 'Wheel Chocks', 'Stabilizer Pads', 'Stabilizer Tool / Crank',
+          'Outdoor Rug', 'Camping Chairs', 'Outdoor Table', 'Awning Lights / Outdoor Lights'
+        ]
+      },
+      {
+        id: 'clothing', icon: '👕', title: 'Clothing',
+        items: [
+          'Shirts', 'Pants / Shorts', 'Underwear', 'Socks', 'Pajamas', 'Sweatshirt / Hoodie',
+          'Jacket', 'Rain Gear', 'Hat', 'Shoes / Boots', 'Extra Shoes / Sandals', 'Cold Weather Layers'
+        ]
+      },
+      {
+        id: 'bathroom', icon: '🧼', title: 'Bathroom & Personal',
+        items: [
+          'Toothbrush / Toothpaste', 'Deodorant', 'Shampoo / Soap', 'Towels', 'Washcloths',
+          'Camper-Safe Toilet Paper', 'Medicine', 'Sunscreen', 'Bug Spray', 'Contacts / Glasses',
+          'Hair / Grooming Items', 'First Aid Basics'
+        ]
+      },
+      {
+        id: 'electronics', icon: '🔌', title: 'Electronics',
+        items: [
+          'Phone Chargers', 'Watch Chargers', 'Battery Packs', 'USB Cables', 'Tablet / iPad',
+          'Streaming Device / Roku', 'Remote Controls', 'Headphones / Earbuds', 'Bluetooth Speaker',
+          'Flashlights', 'Extra Batteries'
+        ]
+      },
+      {
+        id: 'outdoor', icon: '🔥', title: 'Outdoor & Campsite',
+        items: [
+          'Camp Chairs', 'Outdoor Rug / Mat', 'Camp Table', 'Lanterns', 'Firewood', 'Fire Starters / Matches',
+          'Lighter', 'Grill / Blackstone', 'Propane for Grill', 'Grill Tools', 'Tablecloth',
+          'Outdoor Trash Can / Bag Holder', 'Bug Repellent / Thermacell', 'Dog / Pet Gear'
+        ]
+      },
+      {
+        id: 'tools', icon: '🛠️', title: 'Tools & Emergency',
+        items: [
+          'Basic Tool Kit', 'Tire Pressure Gauge', 'Air Compressor', 'Torque Wrench', 'Jack',
+          'Spare Tire Checked', 'Fuses', 'Electrical Tape', 'Duct Tape', 'Zip Ties',
+          'Jumper Pack', 'Work Gloves', 'Fire Extinguisher', 'Emergency Flashlight', 'Roadside Reflectors / Triangles'
+        ]
+      },
+      {
+        id: 'misc', icon: '🎒', title: 'Miscellaneous',
+        items: [
+          'Wallet / ID', 'Cash', 'Reservations / Site Info', 'Maps / Offline Directions',
+          'Cards / Small Games', 'Books', 'Backpack / Day Pack', 'Reusable Water Bottles',
+          'Laundry Bag', 'Extra Blankets', 'Pillows'
+        ]
+      }
+    ];
+
+    const activityDefinitions = {
+      fishing: {
+        label: '🎣 Fishing', title: 'Fishing',
+        items: [
+          'Fishing Poles', 'Tackle Box', 'Bait', 'Fishing License Reminder', 'Landing Net',
+          'Pliers / Hook Remover', 'Stringer / Fish Basket', 'Fillet Knife', 'Fish Measuring Board',
+          'Small Fishing Cooler', 'Polarized Sunglasses', 'Fishing Hat', 'Rain Gear', 'Bug Spray', 'Sunscreen'
+        ]
+      },
+      duck: {
+        label: '🦆 Duck Hunting', title: 'Duck Hunting',
+        items: [
+          'Waders', 'Wader Boots / Boot Check', 'Waterfowl Jacket', 'Waterproof Gloves', 'Warm Layers',
+          'Duck Calls', 'Call Lanyard', 'Decoys', 'Decoy Bag', 'Decoy Weights / Lines', 'Motion Decoy / Spinner',
+          'Blind / Blind Material', 'Blind Bag', 'Seat / Bucket', 'Headlamp', 'Extra Batteries',
+          'Hunting License Reminder', 'HIP / Duck Stamp Reminder', 'Shells', 'Shell Box / Dry Storage',
+          'Ear Protection', 'Eye Protection', 'Game Strap', 'Knife', 'Dog Gear / Leash', 'Dog Vest',
+          'Dog Water / Bowl', 'Hand Warmers', 'Thermos / Hot Drink', 'Waterproof Phone Bag'
+        ]
+      },
+      deer: {
+        label: '🦌 Deer Hunting', title: 'Deer Hunting',
+        items: [
+          'Hunting License Reminder', 'Orange Hat / Vest', 'Hunting Jacket / Bibs', 'Base Layers', 'Warm Socks',
+          'Hunting Boots', 'Gloves', 'Hand Warmers', 'Tree Stand / Blind Gear', 'Safety Harness',
+          'Seat Cushion', 'Binoculars', 'Rangefinder', 'Headlamp', 'Flashlight', 'Extra Batteries',
+          'Hunting Pack', 'Water', 'Snacks', 'Knife', 'Game Bags', 'Drag Rope / Sled',
+          'Ear Protection', 'Eye Protection', 'Shells / Ammunition', 'Scent Control Items',
+          'Field Dressing Gloves', 'Paper Towels', 'Cooler / Ice for Processing'
+        ]
+      },
+      hiking: {
+        label: '🥾 Hiking', title: 'Hiking',
+        items: ['Hiking Shoes / Boots', 'Day Pack', 'Water Bottles', 'Trail Snacks', 'Rain Jacket', 'Sunscreen', 'Bug Spray', 'Hat', 'Map / Offline Trail Map', 'Small First Aid Kit']
+      },
+      swimming: {
+        label: '🏖️ Swimming / Beach', title: 'Swimming / Beach',
+        items: ['Swimsuits', 'Beach Towels', 'Sandals / Water Shoes', 'Sunscreen', 'Beach Chairs', 'Cooler', 'Water Bottles', 'Dry Bag', 'Change of Clothes']
+      },
+      campfire: {
+        label: '🔥 Campfire', title: 'Campfire',
+        items: ['Firewood', 'Fire Starters', 'Matches / Lighter', 'Roasting Sticks', 'Camp Chairs', 'Blankets', 'S’mores Supplies']
+      },
+      boating: {
+        label: '🚤 Boating', title: 'Boating',
+        items: ['Life Jackets', 'Boat Keys', 'Fuel', 'Dock Lines', 'Anchor', 'Tow Rope', 'Boat Registration / Required Items', 'Dry Bag', 'Sunscreen', 'Towels', 'Cooler']
+      },
+      golf: {
+        label: '⛳ Golf', title: 'Golf',
+        items: ['Golf Clubs', 'Golf Shoes', 'Golf Balls', 'Tees', 'Glove', 'Rangefinder', 'Hat', 'Sunscreen', 'Water Bottle']
+      },
+      yard: {
+        label: '🏕️ Yard Games', title: 'Yard Games',
+        items: ['Cornhole', 'Ladder Toss', 'Bocce / Yard Game Set', 'Frisbee', 'Football', 'Portable Speaker']
+      },
+      cards: {
+        label: '🃏 Board / Card Games', title: 'Board / Card Games',
+        items: ['Playing Cards', 'Board Games', 'Dice', 'Score Pad / Pens', 'Small Table / Game Surface']
+      }
+    };
+
+    const stateLabels = {
+      packed: { icon: '✓', title: 'Packed' },
+      camper: { icon: '⌂', title: 'Stays in camper' },
+      skip: { icon: '—', title: 'Not bringing' }
+    };
+
+    let appState = loadState();
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : {};
+        return {
+          itemStates: parsed.itemStates || {},
+          activities: parsed.activities || {},
+          collapsed: parsed.collapsed || {}
+        };
+      } catch {
+        return { itemStates: {}, activities: {}, collapsed: {} };
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+    }
+
+    function slugify(text) {
+      return text.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    function itemKey(scope, item) {
+      return `${scope}::${slugify(item)}`;
+    }
+
+    function renderApp() {
+      const grid = document.getElementById('dashboardGrid');
+      grid.innerHTML = '';
+
+      permanentCategories.forEach(category => {
+        grid.appendChild(buildCategoryPanel(category));
+      });
+
+      grid.appendChild(buildActivitiesPanel());
+      applySearch();
+      updateProgress();
+    }
+
+    function buildCategoryPanel(category) {
+      const panel = document.createElement('section');
+      panel.className = 'panel category-panel';
+      panel.dataset.panelId = category.id;
+      if (appState.collapsed[category.id]) panel.classList.add('collapsed');
+
+      const ready = category.items.filter(item => !!appState.itemStates[itemKey(category.id, item)]).length;
+      panel.innerHTML = `
+        <div class="panel-header" onclick="togglePanel('${category.id}')">
+          <div class="panel-title-wrap">
+            <div class="panel-icon">${category.icon}</div>
+            <div>
+              <div class="panel-title">${category.title}</div>
+              <div class="panel-meta" data-meta-for="${category.id}">${ready} of ${category.items.length} accounted for</div>
+            </div>
+          </div>
+          <button class="collapse-btn" type="button" aria-label="Collapse ${category.title}">⌄</button>
+        </div>
+        <div class="panel-body"><div class="item-list"></div></div>`;
+
+      const list = panel.querySelector('.item-list');
+      category.items.forEach(item => list.appendChild(buildItemRow(category.id, item)));
+      return panel;
+    }
+
+    function buildItemRow(scope, item) {
+      const key = itemKey(scope, item);
+      const current = appState.itemStates[key] || '';
+      const row = document.createElement('div');
+      row.className = 'check-item';
+      row.dataset.search = item.toLowerCase();
+      row.dataset.key = key;
+
+      const buttons = Object.entries(stateLabels).map(([state, info]) => `
+        <button class="state-btn ${current === state ? 'active' : ''}" data-state="${state}" title="${info.title}" aria-label="${info.title}" onclick="setItemState(event, '${escapeJs(key)}', '${state}')">${info.icon}</button>
+      `).join('');
+
+      row.innerHTML = `
+        <div class="item-name" onclick="cycleItemState('${escapeJs(key)}')">${item}</div>
+        <div class="state-group">${buttons}</div>`;
+      return row;
+    }
+
+    function buildActivitiesPanel() {
+      const panel = document.createElement('section');
+      panel.className = 'panel activities-panel';
+      panel.dataset.panelId = 'activities';
+      if (appState.collapsed.activities) panel.classList.add('collapsed');
+
+      const selectedCount = Object.values(appState.activities).filter(Boolean).length;
+      panel.innerHTML = `
+        <div class="panel-header" onclick="togglePanel('activities')">
+          <div class="panel-title-wrap">
+            <div class="panel-icon">🎯</div>
+            <div>
+              <div class="panel-title">Activities</div>
+              <div class="panel-meta">${selectedCount ? `${selectedCount} selected` : 'Choose what you plan to do this trip'}</div>
+            </div>
+          </div>
+          <button class="collapse-btn" type="button" aria-label="Collapse activities">⌄</button>
+        </div>
+        <div class="panel-body">
+          <div class="activity-chips" id="activityChips"></div>
+          <div class="dynamic-activities" id="dynamicActivities"></div>
+        </div>`;
+
+      const chips = panel.querySelector('#activityChips');
+      Object.entries(activityDefinitions).forEach(([id, def]) => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = `activity-chip ${appState.activities[id] ? 'active' : ''}`;
+        chip.textContent = def.label;
+        chip.onclick = e => {
+          e.stopPropagation();
+          toggleActivity(id);
+        };
+        chips.appendChild(chip);
+      });
+
+      renderSelectedActivities(panel.querySelector('#dynamicActivities'));
+      return panel;
+    }
+
+    function renderSelectedActivities(container) {
+      container.innerHTML = '';
+      const selected = Object.entries(activityDefinitions).filter(([id]) => appState.activities[id]);
+      if (!selected.length) {
+        container.innerHTML = '<div class="empty-activity">Select an activity above and its packing list will appear here automatically.</div>';
+        return;
+      }
+
+      selected.forEach(([id, def]) => {
+        const card = document.createElement('div');
+        card.className = 'activity-card';
+        card.innerHTML = `<h3>${def.label}</h3><div class="item-list"></div>`;
+        const list = card.querySelector('.item-list');
+        def.items.forEach(item => list.appendChild(buildItemRow(`activity-${id}`, item)));
+        container.appendChild(card);
       });
     }
 
-    function loadChecklist() {
-      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-      checkboxes.forEach(checkbox => {
-        checkbox.checked = localStorage.getItem(checkbox.dataset.item) === 'true';
+    function escapeJs(str) {
+      return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    }
+
+    function setItemState(event, key, state) {
+      event.stopPropagation();
+      appState.itemStates[key] = appState.itemStates[key] === state ? '' : state;
+      if (!appState.itemStates[key]) delete appState.itemStates[key];
+      saveState();
+      refreshItemRow(key);
+      updatePanelMetaForKey(key);
+      updateProgress();
+    }
+
+    function cycleItemState(key) {
+      const order = ['', 'packed', 'camper', 'skip'];
+      const current = appState.itemStates[key] || '';
+      const next = order[(order.indexOf(current) + 1) % order.length];
+      if (next) appState.itemStates[key] = next;
+      else delete appState.itemStates[key];
+      saveState();
+      refreshItemRow(key);
+      updatePanelMetaForKey(key);
+      updateProgress();
+    }
+
+    function refreshItemRow(key) {
+      const row = document.querySelector(`[data-key="${cssEscape(key)}"]`);
+      if (!row) return;
+      const current = appState.itemStates[key] || '';
+      row.querySelectorAll('.state-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.state === current));
+    }
+
+    function cssEscape(value) {
+      return value.replace(/(["\\])/g, '\\$1');
+    }
+
+    function updatePanelMetaForKey(key) {
+      const scope = key.split('::')[0];
+      const category = permanentCategories.find(c => c.id === scope);
+      if (!category) return;
+      const ready = category.items.filter(item => !!appState.itemStates[itemKey(category.id, item)]).length;
+      const meta = document.querySelector(`[data-meta-for="${scope}"]`);
+      if (meta) meta.textContent = `${ready} of ${category.items.length} accounted for`;
+    }
+
+    function toggleActivity(id) {
+      appState.activities[id] = !appState.activities[id];
+      if (!appState.activities[id]) delete appState.activities[id];
+      saveState();
+      renderApp();
+      showToast(appState.activities[id] ? `${activityDefinitions[id].title} added` : `${activityDefinitions[id].title} removed`);
+    }
+
+    function togglePanel(id) {
+      const panel = document.querySelector(`[data-panel-id="${id}"]`);
+      if (!panel) return;
+      panel.classList.toggle('collapsed');
+      appState.collapsed[id] = panel.classList.contains('collapsed');
+      saveState();
+    }
+
+    function expandAll() {
+      document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('collapsed'));
+      appState.collapsed = {};
+      saveState();
+    }
+
+    function collapseAll() {
+      document.querySelectorAll('.panel').forEach(panel => {
+        panel.classList.add('collapsed');
+        appState.collapsed[panel.dataset.panelId] = true;
       });
-      checkReady();
+      saveState();
     }
 
-    function clearChecklist() {
-      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-      checkboxes.forEach(checkbox => checkbox.checked = false);
-      document.getElementById('readyMessage').style.display = 'none';
-    }
-
-    function toggleCheckbox(clicked) {
-      const siblings = clicked.parentElement.querySelectorAll('input[type="checkbox"]');
-      siblings.forEach(box => {
-        if (box !== clicked) box.checked = false;
+    function getActiveItems() {
+      const items = [];
+      permanentCategories.forEach(category => {
+        category.items.forEach(item => items.push(itemKey(category.id, item)));
       });
-      checkReady();
+      Object.entries(activityDefinitions).forEach(([id, def]) => {
+        if (appState.activities[id]) def.items.forEach(item => items.push(itemKey(`activity-${id}`, item)));
+      });
+      return items;
     }
 
-    function checkReady() {
-      const totalItems = document.querySelectorAll('.item').length;
-      const checkedItems = document.querySelectorAll('.packed:checked, .not-bringing:checked').length;
-      const readyMessage = document.getElementById('readyMessage');
-      readyMessage.style.display = (totalItems === checkedItems) ? 'block' : 'none';
+    function updateProgress() {
+      const items = getActiveItems();
+      const accounted = items.filter(key => !!appState.itemStates[key]).length;
+      const percent = items.length ? Math.round((accounted / items.length) * 100) : 0;
+
+      document.getElementById('progressPercent').textContent = `${percent}%`;
+      document.getElementById('progressCount').textContent = `${accounted} of ${items.length} ready`;
+      document.getElementById('progressRing').style.setProperty('--progress', `${percent * 3.6}deg`);
+
+      let message = 'Start checking items as you load the camper.';
+      if (percent > 0 && percent < 50) message = 'Good start — keep working through each category.';
+      if (percent >= 50 && percent < 80) message = 'More than halfway there.';
+      if (percent >= 80 && percent < 100) message = 'Almost ready — just a few things left.';
+      if (percent === 100 && items.length) message = 'Everything is accounted for.';
+      document.getElementById('progressMessage').textContent = message;
+      document.getElementById('readyBanner').classList.toggle('show', percent === 100 && items.length > 0);
     }
-      function navigateTo(page) {
-        window.location.href = page;
+
+    function resetTrip() {
+      const confirmed = window.confirm('Reset this trip? This will clear all packed / stays in camper / not bringing selections and all selected activities.');
+      if (!confirmed) return;
+      appState.itemStates = {};
+      appState.activities = {};
+      saveState();
+      renderApp();
+      showToast('Trip reset');
     }
+
+    function applySearch() {
+      const query = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+      document.querySelectorAll('.check-item').forEach(row => {
+        const match = !query || row.dataset.search.includes(query);
+        row.classList.toggle('hidden-by-search', !match);
+      });
+
+      if (query) {
+        document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('collapsed'));
+      }
+    }
+
+    document.getElementById('searchInput').addEventListener('input', applySearch);
 
     function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.classList.toggle('open');
+      const sidebar = document.getElementById('sidebar');
+      const scrim = document.getElementById('scrim');
+      const open = !sidebar.classList.contains('open');
+      sidebar.classList.toggle('open', open);
+      sidebar.setAttribute('aria-hidden', String(!open));
+      scrim.classList.toggle('show', open);
+      document.body.style.overflowY = open ? 'hidden' : '';
     }
-        // Close sidebar if clicked outside of it
-    document.addEventListener('click', function(event) {
-	const sidebar = document.getElementById('sidebar');
-        const menuButton = document.querySelector('.menu-btn');
-        if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
-            sidebar.classList.remove('open');
-        }
-    });
+
+    function closeSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.remove('open');
+      sidebar.setAttribute('aria-hidden', 'true');
+      document.getElementById('scrim').classList.remove('show');
+      document.body.style.overflowY = '';
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('light-mode');
+      localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    }
 
     function updateClock() {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString();
-        document.getElementById('clock').textContent = timeString;
+      document.getElementById('clock').textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
     }
-  	    // Function to toggle the theme
-    function toggleTheme() {
-        // Toggle the 'light-mode' class on the body
-        document.body.classList.toggle('light-mode');
 
-        // Save the theme to localStorage
-        localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove('show'), 1800);
     }
-      // Check localStorage for the theme preference on page load
-    window.onload = function() {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'light') {
-            document.body.classList.add('light-mode');
-        } else if (savedTheme === 'dark') {
-            document.body.classList.remove('light-mode');
-        }
-    }
+
+    function loadExternalSidebar() {
       fetch('sidebar.html')
-	    .then(response => response.text())
-	    .then(data => {
-		document.getElementById('sidebar-nav').innerHTML = data;
-    	    });
-	
-    setInterval(updateClock, 1000);
-    updateClock();
+        .then(response => {
+          if (!response.ok) throw new Error('sidebar unavailable');
+          return response.text();
+        })
+        .then(data => {
+          document.getElementById('sidebar-nav').innerHTML = data;
+        })
+        .catch(() => {
+          // Keep the built-in Home fallback link when sidebar.html is unavailable.
+        });
+    }
+
+    function preventDoubleTapZoom() {
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', function (event) {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) event.preventDefault();
+        lastTouchEnd = now;
+      }, { passive: false });
+    }
+
+    document.addEventListener('gesturestart', e => e.preventDefault());
+    document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') closeSidebar();
+    });
+
+    (function init() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light') document.body.classList.add('light-mode');
+      updateClock();
+      setInterval(updateClock, 1000);
+      loadExternalSidebar();
+      preventDoubleTapZoom();
+      renderApp();
+    })();
   </script>
 </body>
 </html>
