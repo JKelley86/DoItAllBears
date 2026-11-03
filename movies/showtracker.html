@@ -3,134 +3,113 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Movie & Show Tracker</title>
+  <title>Movie &amp; Show Tracker</title>
   <link rel="stylesheet" href="../theme.css">
   <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { min-height: 100%; background: #2c3e50; overflow-x: clip; }
     body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #2c3e50;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: white;
-      background-image: linear-gradient(to bottom, #34495e, #2c3e50);
+      font-family: Arial, sans-serif; margin: 0; padding: 0;
+      min-height: 100vh; min-height: 100dvh;
+      background: linear-gradient(to bottom, #34495e, #2c3e50);
+      display: flex; flex-direction: column; align-items: center;
+      color: white; overflow-x: clip; touch-action: manipulation;
     }
-
-    h1 {
-      color: #e74c3c;
-      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
-      font-size: 3rem;
-      margin-top: 20px;
+    h1 { color: #e74c3c; text-shadow: 2px 2px 5px rgba(0,0,0,.8);
+      font-size: clamp(2rem, 5vw, 3rem); margin: 28px 0 12px; text-align: center; }
+    main { width: min(1200px, 90%); flex: 1; }
+    .watch-section { padding: 24px 0 36px; }
+    .watch-section + .watch-section { border-top: 1px solid rgba(255,255,255,.2); }
+    .section-header { display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+    h2 { margin: 0; font-size: 1.8rem; }
+    .show-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 20px; }
+    .card { background: #ecf0f1; padding: 20px 15px; border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,.2); text-align: center;
+      transition: transform .3s ease, box-shadow .3s ease; overflow-wrap: anywhere; }
+    @media (hover: hover) {
+      .card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,.3); }
     }
-
-    .show-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-      width: 80%;
-      margin-top: 30px;
-      padding: 0 10px;
+    .card h3 { margin: 0 0 10px; font-size: 1.5rem; color: #333; }
+    .card p { margin: 5px 0; font-size: 1rem; color: #59686a; }
+    .logo-container { display: flex; align-items: center; justify-content: center; min-height: 60px; margin-bottom: 10px; }
+    .card img { width: 90px; height: 50px; object-fit: contain; }
+    .service-fallback { color: #333; font-weight: bold; }
+    button, a { touch-action: manipulation; }
+    .random-btn { background: #e74c3c; color: white; border: none; border-radius: 8px;
+      cursor: pointer; padding: 12px 20px; font-size: 1rem;
+      transition: background-color .3s ease; min-height: 44px; }
+    .random-btn:hover { background: #c0392b; }
+    button:focus-visible, a:focus-visible { outline: 3px solid #f1c40f; outline-offset: 4px; }
+    .random-result:empty { display: none; }
+    .random-result { margin-top: 24px; }
+    .random-result > p { text-align: center; font-weight: bold; }
+    .random-result .card { width: min(100%, 360px); margin: 0 auto; border: 2px solid #e74c3c; }
+    .menu-btn { position: fixed; top: 16px; left: 16px; z-index: 1001;
+      border: 0; border-radius: 8px; padding: 12px; background: #e74c3c; color: white; cursor: pointer; }
+    .sidebar { position: fixed; top: 0; bottom: 0; left: 0; width: min(300px, 85vw);
+      background: #1c2936; color: white; padding: 80px 20px 24px; overflow-y: auto;
+      transform: translateX(-100%); visibility: hidden; transition: transform .25s ease, visibility .25s; z-index: 1000; }
+    .sidebar.open { transform: translateX(0); visibility: visible; }
+    .clock { margin-bottom: 20px; }
+    .sidebar a { color: inherit; }
+    .theme-toggle { margin-top: 20px; padding: 12px; cursor: pointer; }
+    footer { text-align: center; padding: 24px 16px; font-size: .9rem; }
+    body.light-mode { background: linear-gradient(#f4f6f8, #dce4ec); color: #263849; }
+    body.light-mode h1 { text-shadow: none; }
+    body.light-mode .watch-section + .watch-section { border-color: #b7c4d0; }
+    body.light-mode .card { background: white; }
+    @media (max-width: 600px) {
+      h1 { margin-top: 78px; }
+      .section-header { align-items: stretch; flex-direction: column; }
+      .random-btn { width: 100%; }
     }
-
-    .card {
-      background: #ecf0f1;
-      padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-      text-align: center;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    }
-
-    .card h3 {
-      margin: 0;
-      font-size: 1.5rem;
-      color: #333;
-      margin-bottom: 10px;
-    }
-
-    .card p {
-      margin: 5px 0;
-      font-size: 1rem;
-      color: #7f8c8d;
-    }
-
-    .card img {
-      width: 50px;
-      height: auto;
-      margin-bottom: 10px;
-    }
-
-    .logo-container {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-
-    .random-btn {
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      padding: 10px 20px;
-      font-size: 1rem;
-      margin-top: 20px;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-
-    .random-btn:hover {
-      background-color: #c0392b;
-      transform: scale(1.05);
-    }
-
-    .random-show {
-      margin-top: 30px;
-    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
   </style>
 </head>
 <body>
-  <h1>Movie & Show Tracker</h1>
-
-  <div class="show-cards" id="showCards"></div>
-
-  <button class="random-btn" onclick="pickRandomShow()">Pick a Random Show</button>
-
-  <div id="randomShow" class="random-show"></div>
-  
-    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
-    <div class="sidebar" id="sidebar">
-        <div class="clock" id="clock"></div>
-	<div id="sidebar-nav"></div>
-        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
-    </div>
-
-    <footer> 
-        <span>&copy; 2024 Justin's Website. All rights reserved.</span>
-    </footer> 
+  <h1>Movie &amp; Show Tracker</h1>
+  <main>
+    <section class="watch-section" aria-labelledby="showsHeading">
+      <div class="section-header">
+        <h2 id="showsHeading">TV Shows</h2>
+        <button class="random-btn" type="button" onclick="pickRandomShow()">Pick a Random Show</button>
+      </div>
+      <div class="show-cards" id="showCards"></div>
+      <div id="randomShow" class="random-result" role="status" aria-live="polite" aria-atomic="true"></div>
+    </section>
+    <section class="watch-section" aria-labelledby="moviesHeading">
+      <div class="section-header">
+        <h2 id="moviesHeading">Movies</h2>
+        <button class="random-btn" type="button" onclick="pickRandomMovie()">Pick a Random Movie</button>
+      </div>
+      <div class="show-cards" id="movieCards"></div>
+      <div id="randomMovie" class="random-result" role="status" aria-live="polite" aria-atomic="true"></div>
+    </section>
+  </main>
+  <button class="menu-btn" type="button" onclick="toggleSidebar()" aria-controls="sidebar" aria-expanded="false">☰ Menu</button>
+  <aside class="sidebar" id="sidebar" aria-label="Site menu" inert>
+    <div class="clock" id="clock"></div>
+    <nav id="sidebar-nav"><a href="../index.html">Back to Home</a></nav>
+    <button class="theme-toggle" type="button" onclick="toggleTheme()">🌓 Toggle Theme</button>
+  </aside>
+  <footer><span>&copy; 2024 Justin's Website. All rights reserved.</span></footer>
   <script>
-    const showCards = document.getElementById('showCards');
-    const randomShowDiv = document.getElementById('randomShow');
-
+    // Keep the service names here consistent with the names used in the lists.
     const logoMap = {
       'Netflix': 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg',
       'Disney+': 'https://upload.wikimedia.org/wikipedia/commons/archive/7/77/20230514165915%21Disney_Plus_logo.svg',
       'Amazon Prime': 'https://upload.wikimedia.org/wikipedia/commons/e/e3/Amazon_Prime_Logo.svg',
       'Hulu': 'https://upload.wikimedia.org/wikipedia/commons/f/f9/Hulu_logo_%282018%29.svg',
       'Paramount Plus': 'https://upload.wikimedia.org/wikipedia/commons/9/93/Paramount_Plus_logo.png',
-      'MAX' : 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Max_logo.svg',
-      'AMC+' : 'https://upload.wikimedia.org/wikipedia/commons/4/4a/AMC%2B_logo.png',
-      'Peacock' : 'https://upload.wikimedia.org/wikipedia/commons/d/d3/NBCUniversal_Peacock_Logo.svg',
-      'Tubi' : 'https://upload.wikimedia.org/wikipedia/commons/c/c5/Tubi_logo_2024_purple.svg',
-      'Apple TV' : 'https://upload.wikimedia.org/wikipedia/commons/1/16/AppleTVLogo.png'
+      'MAX': 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Max_logo.svg',
+      'AMC+': 'https://upload.wikimedia.org/wikipedia/commons/4/4a/AMC%2B_logo.png',
+      'Peacock': 'https://upload.wikimedia.org/wikipedia/commons/d/d3/NBCUniversal_Peacock_Logo.svg',
+      'Tubi': 'https://upload.wikimedia.org/wikipedia/commons/c/c5/Tubi_logo_2024_purple.svg',
+      'Apple TV': 'https://upload.wikimedia.org/wikipedia/commons/1/16/AppleTVLogo.png'
     };
 
+    // ADD OR EDIT TV SHOWS HERE.
     const shows = [
       { name: 'Stranger Things', service: 'Netflix' },
       { name: 'The Mandalorian', service: 'Disney+' },
@@ -144,85 +123,97 @@
       { name: 'Landman', service: 'Paramount Plus' },
       { name: 'Fire Country', service: 'Paramount Plus' },
       { name: 'Chicago Med', service: 'Peacock' },
-      { name: 'See', service: 'Apple TV'},
-      { name: 'Monarch', service: 'Apple TV'},
-	  { name: 'The Unhealer', service: 'Tubi'}
+      { name: 'See', service: 'Apple TV' },
+      { name: 'Monarch', service: 'Apple TV' }
     ];
 
-    shows.forEach(show => {
+    // ADD OR EDIT MOVIES HERE. Use the same { name, service } format.
+    // The Unhealer was moved here from your original combined list.
+    const movies = [
+      { name: 'The Unhealer', service: 'Tubi' }
+    ];
+
+    function createCard(item) {
       const card = document.createElement('div');
-      card.classList.add('card');
-      const logoUrl = logoMap[show.service];
-      card.innerHTML = `
-        <div class="logo-container">
-          <img src="${logoUrl}" alt="${show.service} Logo">
-        </div>
-        <h3>${show.name}</h3>
-        <p>Streaming on: ${show.service}</p>
-      `;
-      showCards.appendChild(card);
+      card.className = 'card';
+      const logoContainer = document.createElement('div');
+      logoContainer.className = 'logo-container';
+      const fallback = document.createElement('span');
+      fallback.className = 'service-fallback';
+      fallback.textContent = item.service;
+      const logoUrl = logoMap[item.service];
+      if (logoUrl) {
+        const logo = document.createElement('img');
+        logo.alt = item.service + ' Logo';
+        logo.addEventListener('error', () => logo.replaceWith(fallback), { once: true });
+        logo.src = logoUrl;
+        logoContainer.appendChild(logo);
+      } else { logoContainer.appendChild(fallback); }
+      const title = document.createElement('h3');
+      title.textContent = item.name;
+      const service = document.createElement('p');
+      service.textContent = 'Streaming on: ' + item.service;
+      card.append(logoContainer, title, service);
+      return card;
+    }
+
+    function renderList(items, targetId, label) {
+      const target = document.getElementById(targetId);
+      target.replaceChildren();
+      if (!items.length) {
+        const message = document.createElement('p');
+        message.textContent = 'No ' + label + ' added yet.';
+        target.appendChild(message);
+      } else { items.forEach(item => target.appendChild(createCard(item))); }
+    }
+
+    function pickRandom(items, targetId, label) {
+      const result = document.getElementById(targetId);
+      const heading = document.createElement('p');
+      if (!items.length) {
+        heading.textContent = 'Add a ' + label + ' to the list first.';
+        result.replaceChildren(heading);
+        return;
+      }
+      heading.textContent = 'Your random ' + label + ' pick:';
+      const item = items[Math.floor(Math.random() * items.length)];
+      result.replaceChildren(heading, createCard(item));
+    }
+    function pickRandomShow() { pickRandom(shows, 'randomShow', 'show'); }
+    function pickRandomMovie() { pickRandom(movies, 'randomMovie', 'movie'); }
+
+    function navigateTo(page) { window.location.href = page; }
+    function setSidebar(open) {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('open', open);
+      sidebar.inert = !open;
+      document.querySelector('.menu-btn').setAttribute('aria-expanded', String(open));
+    }
+    function toggleSidebar() { setSidebar(!document.getElementById('sidebar').classList.contains('open')); }
+    document.addEventListener('click', event => {
+      if (!document.getElementById('sidebar').contains(event.target) &&
+          !document.querySelector('.menu-btn').contains(event.target)) { setSidebar(false); }
     });
-
-    function pickRandomShow() {
-      const randomIndex = Math.floor(Math.random() * shows.length);
-      const show = shows[randomIndex];
-      const logoUrl = logoMap[show.service];
-      randomShowDiv.innerHTML = `
-        <div class="card">
-          <div class="logo-container">
-            <img src="${logoUrl}" alt="${show.service} Logo">
-          </div>
-          <h3>${show.name}</h3>
-          <p>Streaming on: ${show.service}</p>
-        </div>
-      `;
-    }
-      function navigateTo(page) {
-        window.location.href = page;
-    }
-
-    function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.classList.toggle('open');
-    }
-        // Close sidebar if clicked outside of it
-    document.addEventListener('click', function(event) {
-	const sidebar = document.getElementById('sidebar');
-        const menuButton = document.querySelector('.menu-btn');
-        if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
-            sidebar.classList.remove('open');
-        }
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && document.getElementById('sidebar').classList.contains('open')) {
+        setSidebar(false);
+        document.querySelector('.menu-btn').focus();
+      }
     });
-
-    function updateClock() {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString();
-        document.getElementById('clock').textContent = timeString;
-    }
-  	    // Function to toggle the theme
+    function updateClock() { document.getElementById('clock').textContent = new Date().toLocaleTimeString(); }
     function toggleTheme() {
-        // Toggle the 'light-mode' class on the body
-        document.body.classList.toggle('light-mode');
-
-        // Save the theme to localStorage
-        localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+      document.body.classList.toggle('light-mode');
+      try { localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark'); } catch (error) { /* Theme still works without storage. */ }
     }
-
-    // Check localStorage for the theme preference on page load
-    window.onload = function() {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'light') {
-            document.body.classList.add('light-mode');
-        } else if (savedTheme === 'dark') {
-            document.body.classList.remove('light-mode');
-        }
-    }
-    fetch('sidebar.html')
-	    .then(response => response.text())
-	    .then(data => {
-		document.getElementById('sidebar-nav').innerHTML = data;
-    	    });
-	
+    try { document.body.classList.toggle('light-mode', localStorage.getItem('theme') === 'light'); } catch (error) { /* Use default theme. */ }
+    fetch('sidebar.html').then(response => {
+      if (!response.ok) throw new Error('Sidebar unavailable');
+      return response.text();
+    }).then(data => {
+      if (data.trim()) document.getElementById('sidebar-nav').innerHTML = data;
+    }).catch(() => { /* Keep the Back to Home link if the sidebar cannot load. */ });
+    renderList(shows, 'showCards', 'TV shows');
+    renderList(movies, 'movieCards', 'movies');
     setInterval(updateClock, 1000);
     updateClock();
   </script>
